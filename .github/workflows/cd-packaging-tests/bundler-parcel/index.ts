@@ -1,3 +1,3 @@
-import { sampleModuleFn } from "@inrupt/template-ts";
+import { sampleModuleFn } from "@inrupt/solid-client-consent";
 
 console.log(sampleModuleFn());

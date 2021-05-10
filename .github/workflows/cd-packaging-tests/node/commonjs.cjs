@@ -1,5 +1,5 @@
 const {
   sampleModuleFn,
-} = require("@inrupt/template-ts");
+} = require("@inrupt/solid-client-consent");
 
 console.log(sampleModuleFn());

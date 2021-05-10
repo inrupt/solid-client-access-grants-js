@@ -37,8 +37,8 @@ migrate: clean
 
 	cp -R $(SOURCEDIR)/index.rst $(SOURCECOPYDIR)
 	cp -R $(SOURCEDIR)/api/modules/ $(SOURCECOPYDIR)/modules/
-	cp -R $(SOURCEDIR)/api/classes/ $(SOURCECOPYDIR)/classes/
-	cp -R $(SOURCEDIR)/api/interfaces/ $(SOURCECOPYDIR)/interfaces/
+	# cp -R $(SOURCEDIR)/api/classes/ $(SOURCECOPYDIR)/classes/
+	# cp -R $(SOURCEDIR)/api/interfaces/ $(SOURCECOPYDIR)/interfaces/
 	
 html: Makefile migrate
 

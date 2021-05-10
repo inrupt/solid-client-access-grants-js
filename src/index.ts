@@ -17,6 +17,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// Ignore the "prefer default" rule; index files won't export a default.
-/* eslint import/prefer-default-export: 0 */
-export { default as sampleModuleFn } from "./module";
+export {
+  createConsentGrantRequest,
+  approveConsentGrant,
+  rejectConsentGrant,
+  getAllConsentGrants,
+  getConsentGrant,
+  revokeConsentGrant,
+} from "./consent";

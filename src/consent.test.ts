@@ -18,21 +18,74 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import {
+  createLDNDataset,
+  getDefaultSessionFetch,
+  getInboxFromWebId,
   createConsentGrantRequest,
+  isSolidDataset,
   approveConsentGrant,
   rejectConsentGrant,
   getAllConsentGrants,
   getConsentGrant,
   revokeConsentGrant,
-} from "./index";
+} from "./consent";
 
-describe("Index exports", () => {
-  test("exposes expected things", () => {
+describe("createLDNDataset", () => {
+  test("is defined", () => {
+    expect(createLDNDataset).toBeDefined();
+  });
+});
+
+describe("getDefaultSessionFetch", () => {
+  test("is defined", () => {
+    expect(getDefaultSessionFetch).toBeDefined();
+  });
+});
+
+describe("getInboxFromWebId", () => {
+  test("is defined", () => {
+    expect(getInboxFromWebId).toBeDefined();
+  });
+});
+
+describe("createConsentGrantRequest", () => {
+  test("is defined", () => {
     expect(createConsentGrantRequest).toBeDefined();
+  });
+});
+
+describe("isSolidDataset", () => {
+  test("is defined", () => {
+    expect(isSolidDataset).toBeDefined();
+  });
+});
+
+describe("approveConsentGrant", () => {
+  test("is defined", () => {
     expect(approveConsentGrant).toBeDefined();
+  });
+});
+
+describe("rejectConsentGrant", () => {
+  test("is defined", () => {
     expect(rejectConsentGrant).toBeDefined();
+  });
+});
+
+describe("getAllConsentGrants", () => {
+  test("is defined", () => {
     expect(getAllConsentGrants).toBeDefined();
+  });
+});
+
+describe("getConsentGrant", () => {
+  test("is defined", () => {
     expect(getConsentGrant).toBeDefined();
+  });
+});
+
+describe("revokeConsentGrant", () => {
+  test("is defined", () => {
     expect(revokeConsentGrant).toBeDefined();
   });
 });

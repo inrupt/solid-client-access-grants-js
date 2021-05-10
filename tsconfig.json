@@ -62,6 +62,8 @@
     /* Experimental Options */
     // "experimentalDecorators": true,        /* Enables experimental support for ES7 decorators. */
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
+
+    "skipLibCheck": true, /* temporarily skip lib checks due to a solid-client bug */
   },
   "typedocOptions": {
     "out": "docs/api/source/api",
@@ -69,7 +71,7 @@
       // The source files of everything listed under `exports` in our package.json
       // (i.e. public API's that should be documented) should be listed here:
       "src/index.ts",
-      "src/module/index.ts",
+      "src/consent.ts",
     ],
     "exclude": [
       "node_modules/**",

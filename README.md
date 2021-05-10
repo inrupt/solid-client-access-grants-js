@@ -1,74 +1,184 @@
-# TypeScript project template for Inrupt projects
+# Solid Consent - solid-client-consent
 
-This is a template project from which new TypeScript projects can be generated. It sets up the
-basic structure for libraries, including linting and tests, from unit testing with Jest through
-to end-to-end acceptance testing with Testcafe and Code Sandbox.
+@inrupt/solid-client-consent is a Javascript library for requesting and managing
+consent given to an agent for a resource. These consent grants are signed by a
+Solid Pod owner's private key, which itself is managed by the Solid Pod server.
 
-## Usage
+@inrupt/solid-client-consent is part of a family open source JavaScript
+libraries designed to support developers building Solid applications.
 
-Short version: search everywhere for "template-ts" and replace all instances with the proper name
-of your GitHub repo or NPM module.
+# Server support
 
-In more detail, you will need to:
+This experimental feature is currently only available in ESS.
 
-- Update references in `.github` from "template-ts" to the name of your GitHub repo.
-- Update packaging tests in `.github/workflows/cd-packaging-tests/bundler-\*` to point to the
-  correct location and relevant exported modules.
-- Replace `src/module/index.ts` and `src/index.ts` with your source code (obviously).
-- Update `e2e/browser/e2e.testcafe.ts` to include actual tests after exporting functions to test
-  from `.codesandbox/sandbox/src/end-to-end-test-helpers.ts`. `pageModels` includes code to
-  handle authentication, which can be removed if irrelevant.
-- Update `package.json` to fix links to homepage, bugs, etc.
-- Update "Exports" to match your directory structure.
+# Browser support
 
-## Caveats
+Our JavaScript Client Libraries use relatively modern JavaScript features that
+will work in all commonly-used browsers, except Internet Explorer. If you need
+support for Internet Explorer, it is recommended to pass them through a tool
+like [Babel](https://babeljs.io), and to add polyfills for e.g. `Map`, `Set`,
+`Promise`, `Headers`, `Array.prototype.includes`, `Object.entries` and
+`String.prototype.endsWith`.
 
-- The `.eslintignore` is hacky, but due to the way `.codesandbox` works we can't include
-  end-to-end test files in the project in the `tsconfig`. This means we have to explicitly
-  ignore the files, or the linter gets upset about trying to lint files outside of the
-  project. To be fixed if we can customize the Code Sandbox location.
-- This project has CodeQL disabled until it is a public project. You may want to enable CodeQL once
-  your project is made public.
-- This project also has the publish-website action disabled for the same reason; enable it in your
-  project once it is ready to be published.
+# Node support
 
-### ENV variables for your GitHub repo
+Our JavaScript Client Libraries track Node.js LTS releases, and support 12.x,
+14.x, and 16.x.
 
-You will need the following variables for the CD process:
+# Installation
 
-- NPM_TOKEN
+For the latest stable version of solid-client-consent:
 
-You will need a number of variables for the CI process, which will allow automated end-to-end tests
-to log in and manipulate a pod. If you do not need to do any logged-in end-to-end tests, you can
-skip this and remove the logged-in tests.
+```bash
+npm install @inrupt/solid-client-consent
+```
 
-End-to-end tests:
+# Overview
 
-- E2E_TEST_ESS_COMPAT_PROD_CLIENT_ID
-- E2E_TEST_ESS_COMPAT_PROD_CLIENT_SECRET
-- E2E_TEST_ESS_COMPAT_PROD_IDP_URL
-- E2E_TEST_ESS_COMPAT_PROD_POD
-- E2E_TEST_ESS_COMPAT_PROD_REFRESH_TOKEN
-- E2E_TEST_ESS_PROD_CLIENT_ID
-- E2E_TEST_ESS_PROD_CLIENT_SECRET
-- E2E_TEST_ESS_PROD_COGNITO_PASSWORD
-- E2E_TEST_ESS_PROD_COGNITO_USER
-- E2E_TEST_ESS_PROD_IDP_URL
-- E2E_TEST_ESS_PROD_POD
-- E2E_TEST_ESS_PROD_REFRESH_TOKEN
-- TESTCAFE_ESS_DEV_COGNITO_PASSWORD
-- TESTCAFE_ESS_DEV_COGNITO_USER
-- TESTCAFE_ESS_DEV_IDP_URL
-- TESTCAFE_ESS_DEV_POD
-- TESTCAFE_ESS_PROD_COGNITO_PASSWORD
-- TESTCAFE_ESS_PROD_COGNITO_USER
-- TESTCAFE_ESS_PROD_IDP_URL
-- TESTCAFE_ESS_PROD_POD
+This is a non-exhaustive list of features exposed by this library.
 
-## Changelog
+## Requesting consent
 
-See [the release notes](https://github.com/inrupt/template-ts/blob/main/CHANGELOG.md).
+This function will be used by an agent who wishes to acquire consent to access
+data on another agent's Solid Pod. To request consent, a number of details are
+required:
 
-## License
+- The resource being requested;
+- The WebId of the owner of the resource;
+- The expiration date for the consent grant;
+- The purpose the consent is being requested;
+- The WebId of the agent requesting the consent grant;
+- Finally, the container URL that a consent grant receipt should be written to.
+
+```typescript
+await createConsentGrantRequest({
+  resource: "https://pod.inrupt.com/some-username/some-resource",
+  resourceOwnerWebId: "https://pod.inrupt.com/some-username/profile/card#me",
+  expiryDate: new Date("2022-05-03"),
+  purpose: "For job applications to MyCompany, Inc.",
+  requestingAgentWebId: "https://pod.inrupt.com/my-username/profile/card#me",
+  responseContainerUrl: "https://pod.inrupt.com/my-username/consent-receipts/",
+});
+```
+
+## Approving consent request
+
+This function will be used by the end-user to approve access to their data to
+another agent. It takes the original consent request (saved as a Dataset to their
+pod as a LDN), or the consent information can be manually passed in.
+
+Optionally as a second parameter, the owner of the resource may apply permissions
+directly to the resource to the requesting agent.
+
+```typescript
+const consentRequest = await fetchSolidDataset(
+  "https://pod.inrupt.com/some-username/inbox/ldn-dataset-resource-url"
+);
+
+await approveConsentGrant(consentRequest, {
+  access: { read: true },
+});
+
+// or
+
+await approveConsentGrant(
+  {
+    resourceOwnerWebId: "https://pod.inrupt.com/some-username/profile/card#me",
+    resourceUrl: "https://pod.inrupt.com/some-username/some-resource",
+    purpose: "For job applications to MyCompany, Inc.",
+    expirationDate: new Date("2022-05-03"),
+    requestingAgentWebId: "https://pod.inrupt.com/my-username/profile/card#me",
+  },
+  {
+    access: { read: true },
+  }
+);
+```
+
+## Rejecting consent request
+
+This function will be used by the end-user to reject access to their data to
+another agent. This deletes the LDN from the end-user's inbox.
+
+```typescript
+const consentRequest = await fetchSolidDataset(
+  "https://consent.inrupt.com/vc/some-guid-consent-id"
+);
+
+await rejectConsentGrant(consentRequest);
+```
+
+## Fetching all consents granted
+
+This function will be used by the end-user to see a list of consent grants made
+on their behalf. This will be a list of links and metadata - not the grants
+themselves. The function can take a "page" parameter as well as a filter, which
+can be used to filter for properties such as the resource URL or the requesting
+agent. Links to the previous and next page, if they exist, will be returned in
+the JSON from the `getAllConsentGrants` call.
+
+```typescript
+const consentGrants = await getAllConsentGrants();
+
+// or
+
+const consentGrants = await getAllConsentGrants(nextPage);
+
+/* returns:
+{
+  nextPage: "https://consent.inrupt.com/vc/some-url"
+  prevPage: "https://consent.inrupt.com/vc/some-url"
+  grants: [
+    "https://consent.inrupt.com/vc/some-guid-consent-id",
+    ...
+  ]
+*/
+```
+
+## Fetching a single consent grant
+
+Information about granted consent can be read by calling `getConsentGrant`. It
+returns all stored information about the consent grant, such as the purpose,
+the expiry date, etc, as well as the signature proof.
+
+```typescript
+const consentGrant = getConsentGrant(
+  "https://consent.inrupt.com/vc/some-guid-consent-id"
+);
+```
+
+## Revoking consent grant
+
+A resource owner may revoke consent at any time.
+
+```typescript
+await revokeConsentGrant(consentGrantUrl);
+```
+
+# Issues & Help
+
+## Solid Community Forum
+
+If you have questions about working with Solid or just want to share what you’re
+working on, visit the [Solid forum](https://forum.solidproject.org/). The Solid
+forum is a good place to meet the rest of the community.
+
+## Bugs and Feature Requests
+
+- For public feedback, bug reports, and feature requests please file an issue
+  via [Github](https://github.com/inrupt/solid-client-consent-js/issues/).
+- For non-public feedback or support inquiries please use the
+  [Inrupt Service Desk](https://inrupt.atlassian.net/servicedesk).
+
+## Documentation
+
+- [Inrupt Solid Javascript Client Libraries](https://docs.inrupt.com/developer-tools/javascript/client-libraries/)
+- [Homepage](https://docs.inrupt.com/)
+
+# Changelog
+
+See [the release notes](https://github.com/inrupt/solid-client-js/blob/main/CHANGELOG.md).
+
+# License
 
 MIT © [Inrupt](https://inrupt.com)
