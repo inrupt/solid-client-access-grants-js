@@ -22,12 +22,16 @@ help:
 	@$(SPHINXBUILD) -M help "$(SOURCECOPYDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 
-.PHONY: help clean Makefile migrate html 
+.PHONY: help clean Makefile migrate html
 
 clean:
 	if [ -d $(BUILDDIR) ]; then rm -rf $(BUILDDIR) ; fi;
+	if [ -d build/docs-assets ]; then rm -rf build/docs-assets ; fi;
+
 migrate: clean
 	mkdir -p $(SOURCECOPYDIR)
+
+	git clone https://github.com/inrupt/docs-assets.git build/docs-assets
 
    # Copying to SOURCECOPYDIR instead of copying source dir to BUILDDIR
    # in case someone forgets to backslash after build/
@@ -37,8 +41,6 @@ migrate: clean
 
 	cp -R $(SOURCEDIR)/index.rst $(SOURCECOPYDIR)
 	cp -R $(SOURCEDIR)/api/modules/ $(SOURCECOPYDIR)/modules/
-	# cp -R $(SOURCEDIR)/api/classes/ $(SOURCECOPYDIR)/classes/
-	# cp -R $(SOURCEDIR)/api/interfaces/ $(SOURCECOPYDIR)/interfaces/
 	
 html: Makefile migrate
 
@@ -57,8 +59,4 @@ endif
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
 %: Makefile migrate
 	@$(SPHINXBUILD) -M $@ "$(SOURCECOPYDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O) -c .
-
-
-
-	
 
