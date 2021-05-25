@@ -179,7 +179,7 @@ export function createLDNDataset(
   );
 
   // add link to object
-  activity = addIri(activity, AS_OBJECT, asUrl(activityObject));
+  activity = addIri(activity, AS_OBJECT, activityObject);
 
   return setThing(dataset, activity);
 }
@@ -258,18 +258,8 @@ export async function approveConsentGrant(
   let inboxIri;
   let resourceOwnerWebId;
 
-  // TODO implement LDN reading code
   if (isSolidDataset(consentRequest)) {
-    resourceUrl = "https://dev-ess.inrupt.com/jacklawson/profile/card";
-    inboxIri = "https://dev-ess.inrupt.com/jacklawson/inbox";
-    purpose = "For saying hello by name";
-    expiryDate = new Date();
-
-    resourceOwnerWebId =
-      "https://dev-ess.inrupt.com/jacklawson/profile/card#me";
-
-    requestingAgentWebId =
-      "https://dev-ess.inrupt.com/jacklawson/profile/card#me";
+    throw new Error("Not implemented; please pass in a ConsentRequest object.");
   } else {
     resourceUrl = consentRequest.resourceUrl;
     purpose = consentRequest.purpose;

@@ -1,7 +1,7 @@
 {
   "name": "@inrupt/solid-client-consent",
   "description": "A library for managing consent in Solid",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "license": "MIT",
   "scripts": {
     "build": "rollup --config rollup.config.js",
