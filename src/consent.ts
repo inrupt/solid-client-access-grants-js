@@ -124,7 +124,7 @@ const GC_HAS_EXPIRY = "https://w3id.org/GConsent#hasExpiry";
 const GC_IS_PROVIDED_TO = "https://w3id.org/GConsent#isProvidedTo";
 
 const DEAFULT_CONSENT_GRANT_BASE_OPTIONS = {
-  consentEndpoint: "https://consent.dev-ess.inrupt.com",
+  consentEndpoint: "https://consent.pod.inrupt.com",
 };
 
 export function createLDNDataset(
