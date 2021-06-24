@@ -162,8 +162,6 @@ jobs:
       run: |
         cd .github/workflows/cd-packaging-tests/node
         node --unhandled-rejections=strict esmodule.mjs
-      # Node 10 does not support ES modules:
-      if: matrix.node-version != '10.x'
 
   verify-imports-parcel:
     runs-on: ubuntu-20.04

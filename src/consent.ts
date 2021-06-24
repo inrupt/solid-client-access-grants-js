@@ -39,6 +39,7 @@ import {
   setThing,
   saveSolidDatasetInContainer,
   deleteSolidDataset,
+  addDatetime,
 } from "@inrupt/solid-client";
 
 export type ConsentGrantBaseOptions = {
@@ -146,7 +147,7 @@ export function createLDNDataset(
   activityObject = addIri(activityObject, rdf.type, GC_CONSENT);
   activityObject = addIri(activityObject, GC_HAS_STATUS, GC_STATUS_REQUESTED);
   activityObject = addIri(activityObject, GC_FOR_PERSONAL_DATA, resourceUrl);
-  activityObject = addStringNoLocale(activityObject, GC_FOR_PURPOSE, purpose);
+  activityObject = addIri(activityObject, GC_FOR_PURPOSE, purpose);
 
   activityObject = addIri(
     activityObject,
@@ -155,11 +156,7 @@ export function createLDNDataset(
   );
 
   if (expiryDate) {
-    activityObject = addStringNoLocale(
-      activityObject,
-      GC_HAS_EXPIRY,
-      expiryDate.toISOString()
-    );
+    activityObject = addDatetime(activityObject, GC_HAS_EXPIRY, expiryDate);
   }
 
   if (inboxIri) {
