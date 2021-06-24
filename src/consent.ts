@@ -39,6 +39,7 @@ import {
   setThing,
   saveSolidDatasetInContainer,
   deleteSolidDataset,
+  addDatetime,
 } from "@inrupt/solid-client";
 
 export type ConsentGrantBaseOptions = {
@@ -155,11 +156,7 @@ export function createLDNDataset(
   );
 
   if (expiryDate) {
-    activityObject = addStringNoLocale(
-      activityObject,
-      GC_HAS_EXPIRY,
-      expiryDate.toISOString()
-    );
+    activityObject = addDatetime(activityObject, GC_HAS_EXPIRY, expiryDate);
   }
 
   if (inboxIri) {
