@@ -16,9 +16,15 @@
 // HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-import {} from "./index";
-
-describe("Index exports", () => {
-  it("exposes expected things", () => {});
-});
+export const AS_ANNOUNCE = "https://www.w3.org/ns/activitystreams#Announce";
+export const AS_SUMMARY = "https://www.w3.org/ns/activitystreams#summary";
+export const AS_ACTOR = "https://www.w3.org/ns/activitystreams#actor";
+export const AS_OBJECT = "https://www.w3.org/ns/activitystreams#object";
+export const GC_CONSENT = "https://w3id.org/GConsent#Consent";
+export const GC_HAS_STATUS = "https://w3id.org/GConsent#hasStatus";
+export const GC_STATUS_REQUESTED =
+  "https://w3id.org/GConsent#ConsentStatusRequested";
+export const GC_FOR_PERSONAL_DATA = "https://w3id.org/GConsent#forPersonalData";
+export const GC_FOR_PURPOSE = "https://w3id.org/GConsent#forPurpose";
+export const GC_HAS_EXPIRY = "https://w3id.org/GConsent#hasExpiry";
+export const GC_IS_PROVIDED_TO = "https://w3id.org/GConsent#isProvidedTo";

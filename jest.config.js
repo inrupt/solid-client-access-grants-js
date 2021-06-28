@@ -23,7 +23,7 @@ module.exports = {
   preset: "ts-jest",
   testEnvironment: "jsdom",
   clearMocks: true,
-  /* TODO: temporary during refactoring
+  injectGlobals: false,
   collectCoverage: true,
   coverageThreshold: {
     global: {
@@ -33,7 +33,6 @@ module.exports = {
       statements: 100,
     },
   },
-  */
   coveragePathIgnorePatterns: ["/node_modules/", "<rootDir>/dist"],
   testPathIgnorePatterns: [
     "/node_modules/",

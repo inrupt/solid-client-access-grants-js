@@ -7,7 +7,7 @@
     "build": "rollup --config rollup.config.js",
     "build-api-docs": "typedoc",
     "build-docs-preview-site": "npm run build-api-docs; cd docs/api; rm source/api/index.md; make html; cd ../; rm -r dist || true; mkdir -p dist/api; cp -r api/build/html/. dist/;",
-    "lint": "eslint src",
+    "lint": "eslint --max-warnings 0 src",
     "test": "jest src",
     "e2e-test-node": "jest --config=jest.e2e.config.js e2e/node",
     "e2e-test-browser": "testcafe",
@@ -86,7 +86,7 @@
     "rdf-namespaces": "^1.9.2"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "eslint --cache --fix",
+    "*.{js,jsx,ts,tsx}": "eslint --max-warnings 0 --cache --fix",
     "*.{ts,tsx,js,jsx,css,md,mdx}": "prettier --write"
   }
 }
