@@ -1,5 +1,5 @@
 const {
-  sampleModuleFn,
+  requestAccess,
 } = require("@inrupt/solid-client-consent");
 
-console.log(sampleModuleFn());
+console.log(typeof requestAccess);

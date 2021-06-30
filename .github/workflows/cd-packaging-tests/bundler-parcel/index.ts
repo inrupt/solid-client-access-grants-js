@@ -1,3 +1,3 @@
-import { sampleModuleFn } from "@inrupt/solid-client-consent";
+import { requestAccess } from "@inrupt/solid-client-consent";
 
-console.log(sampleModuleFn());
+console.log(typeof requestAccess);

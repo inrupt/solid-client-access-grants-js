@@ -18,16 +18,12 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { fetch as crossFetch } from "cross-fetch";
-
-export type ConsentGrantBaseOptions = Partial<{
-  fetch: typeof crossFetch;
-  consentEndpoint: string;
-}>;
-
-const DEAFULT_CONSENT_GRANT_BASE_OPTIONS = {
-  consentEndpoint: "https://consent.pod.inrupt.com",
-  fetch: getDefaultSessionFetch(),
-};
+import { access, UrlString, WebId } from "@inrupt/solid-client";
+import {
+  ConsentRequestBody,
+  getConsentEndpointForWebId,
+  getConsentRequestBody,
+} from "./consent.internal";
 
 // Dynamically import solid-client-authn-browser so that this library doesn't have a hard
 // dependency.
@@ -39,6 +35,109 @@ async function getDefaultSessionFetch(): Promise<typeof fetch> {
 
     return fetchFn;
   } catch (e) {
+    /* istanbul ignore next: @inrupt/solid-client-authn-browser is a devDependency, so this path is not hit in tests: */
     return crossFetch;
   }
+}
+
+async function sendConsentRequest(
+  requestee: WebId,
+  consentRequest: ConsentRequestBody,
+  options: ConsentGrantBaseOptions
+): Promise<unknown> {
+  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
+  const consentEndpoint = await getConsentEndpointForWebId(requestee, fetcher);
+  const response = await fetcher(consentEndpoint, {
+    method: "POST",
+    body: JSON.stringify(consentRequest),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return response.json();
+}
+
+/**
+ * Optional parameters to customise the behaviour of consent requests.
+ *
+ * - `fetch`: Pass in a function with a signature compatible with the WHATWG
+ *            Fetch API, which will be used to make HTTP requests. Primarily
+ *            useful when requests need to be authenticated.
+ *            When `@inrupt/solid-client-authn-browser` is available and this
+ *            property is not set, `fetch` will be imported from there.
+ *            Otherwise, the HTTP requests will be unauthenticated.
+ */
+export type ConsentGrantBaseOptions = Partial<{
+  fetch: typeof fetch;
+}>;
+
+/**
+ * Required parameters to request access to one or more Resources.
+ *
+ * - `requestor`: WebID of the Agent requesting access to the given Resources.
+ * - `requestee`: WebID of an Agent controlling access to the given Resources.
+ * - `access`: Level access to request on the given Resource.
+ *             See {@link https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.access.html}.
+ * - `resources`: Array of URLs of the Resources to which access is requested.
+ */
+export type RequestAccessParameters = {
+  requestor: WebId;
+  // TODO: Come up with a better name before 1.0 release — resourceController?
+  requestee: WebId;
+  access: Partial<access.Access>;
+  resources: Array<UrlString>;
+};
+/**
+ * Request access to a given Resource.
+ *
+ * @param params Access to request.
+ * @param options Optional properties to customise the access request behaviour.
+ * @returns A signed Verifiable Credential representing the access request.
+ */
+export async function requestAccess(
+  params: RequestAccessParameters,
+  options: ConsentGrantBaseOptions = {}
+): Promise<unknown> {
+  const consentRequest = getConsentRequestBody(params);
+
+  return sendConsentRequest(params.requestee, consentRequest, options);
+}
+
+/**
+ * Required parameters to request access to one or more Resources.
+ *
+ * - `requestor`: WebID of the Agent requesting access to the given Resources.
+ * - `requestee`: WebID of an Agent controlling access to the given Resources.
+ * - `access`: Level access to request on the given Resource.
+ *             See {@link https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.access.html}.
+ * - `resources`: Array of URLs of the Resources to which access is requested.
+ * - `purpose`: URL representing what the requested access will be used for.
+ * - `requestorInboxUrl`: (Optional.) URL that a consent receipt may be posted to.
+ * - `issuanceDate`: (Optional, set to the current time if left out.) Point in time from which the access should be granted.
+ * - `expirationDate`: (Optional.) Point in time until when the access is needed.
+ */
+export type RequestAccessWithConsentParameters = RequestAccessParameters & {
+  purpose: UrlString;
+  requestorInboxUrl?: UrlString;
+  issuanceDate?: Date;
+  expirationDate?: Date;
+};
+/**
+ * Request access to a given Resource and proof that consent for a given use of that access was granted.
+ *
+ * @param params Access to request and constraints on how that access will be used.
+ * @param options Optional properties to customise the access request behaviour.
+ * @returns A signed verifiable credential representing the access and consent request.
+ */
+export async function requestAccessWithConsent(
+  params: RequestAccessWithConsentParameters,
+  options: ConsentGrantBaseOptions = {}
+): Promise<unknown> {
+  const paramsWithIssuanceDate: RequestAccessWithConsentParameters = {
+    ...params,
+    issuanceDate: params.issuanceDate ?? new Date(),
+  };
+  const consentRequest = getConsentRequestBody(paramsWithIssuanceDate);
+
+  return sendConsentRequest(params.requestee, consentRequest, options);
 }

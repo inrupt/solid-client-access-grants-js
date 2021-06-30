@@ -44,10 +44,13 @@
     "type": "git",
     "url": "https://github.com/inrupt/solid-client-consent-js.git"
   },
+  "peerDependencies": {
+    "@inrupt/solid-client": "^1.9.0"
+  },
   "devDependencies": {
     "@inrupt/eslint-config-base": "^0.2.0-alpha.1",
     "@inrupt/eslint-config-lib": "^0.2.0-alpha.1",
-    "@inrupt/solid-client": "^1.8.1",
+    "@inrupt/solid-client": "^1.9.0",
     "@inrupt/solid-client-authn-browser": "^1.8.1",
     "@skypack/package-check": "^0.2.2",
     "@testing-library/testcafe": "^4.4.0",
@@ -86,7 +89,7 @@
     "rdf-namespaces": "^1.9.2"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": "eslint --max-warnings 0 --cache --fix",
+    "src/*.{js,jsx,ts,tsx}": "eslint --max-warnings 0 --cache --fix",
     "*.{ts,tsx,js,jsx,css,md,mdx}": "prettier --write"
   }
 }

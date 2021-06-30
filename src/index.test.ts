@@ -17,8 +17,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import {} from "./index";
+// This rule complains about the `@jest/globals` variables overriding global vars:
+/* eslint-disable no-shadow */
+import { describe, it, expect } from "@jest/globals";
+import { requestAccess, requestAccessWithConsent } from "./index";
 
 describe("Index exports", () => {
-  it("exposes expected things", () => {});
+  it("exposes expected things", () => {
+    expect(requestAccess).toBeDefined();
+    expect(requestAccessWithConsent).toBeDefined();
+  });
 });

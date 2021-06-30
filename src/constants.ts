@@ -20,6 +20,7 @@ export const AS_ANNOUNCE = "https://www.w3.org/ns/activitystreams#Announce";
 export const AS_SUMMARY = "https://www.w3.org/ns/activitystreams#summary";
 export const AS_ACTOR = "https://www.w3.org/ns/activitystreams#actor";
 export const AS_OBJECT = "https://www.w3.org/ns/activitystreams#object";
+
 export const GC_CONSENT = "https://w3id.org/GConsent#Consent";
 export const GC_HAS_STATUS = "https://w3id.org/GConsent#hasStatus";
 export const GC_STATUS_REQUESTED =
@@ -28,3 +29,10 @@ export const GC_FOR_PERSONAL_DATA = "https://w3id.org/GConsent#forPersonalData";
 export const GC_FOR_PURPOSE = "https://w3id.org/GConsent#forPurpose";
 export const GC_HAS_EXPIRY = "https://w3id.org/GConsent#hasExpiry";
 export const GC_IS_PROVIDED_TO = "https://w3id.org/GConsent#isProvidedTo";
+
+export const SOLID_VC_ISSUER = "http://www.w3.org/ns/solid/terms#vcIssuer";
+
+export const CONTEXT_CONSENT = [
+  "https://www.w3.org/2018/credentials/v1",
+  "https://consent.pod.inrupt.com/credentials/v1",
+];
