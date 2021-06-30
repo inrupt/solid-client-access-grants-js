@@ -158,7 +158,8 @@ export function getConsentRequestBody(
     consentRequest.credential.issuanceDate = params.issuanceDate.toISOString();
   }
   if (params.expirationDate) {
-    consentRequest.credential.expirationDate = params.expirationDate.toISOString();
+    consentRequest.credential.expirationDate =
+      params.expirationDate.toISOString();
   }
   if (params.purpose) {
     consentRequest.credential.credentialSubject.hasConsent.forPurpose = [
