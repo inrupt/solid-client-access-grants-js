@@ -1,10 +1,10 @@
 # Solid Consent - solid-client-consent
 
-@inrupt/solid-client-consent is a Javascript library for requesting and managing
+`@inrupt/solid-client-consent` is a JavaScript library for requesting and managing
 consent given to an agent for a resource. These consent grants are signed by a
 Solid Pod owner's private key, which itself is managed by the Solid Pod server.
 
-@inrupt/solid-client-consent is part of a family open source JavaScript
+`@inrupt/solid-client-consent` is part of a family open source JavaScript
 libraries designed to support developers building Solid applications.
 
 # Server support
@@ -44,10 +44,10 @@ data on another agent's Solid Pod. To request consent, a number of details are
 required:
 
 - The resource being requested;
-- The WebId of the owner of the resource;
+- The WebID of the owner of the resource;
 - The expiration date for the consent grant;
 - The purpose the consent is being requested;
-- The WebId of the agent requesting the consent grant;
+- The WebID of the agent requesting the consent grant;
 - Finally, the container URL that a consent grant receipt should be written to.
 
 ```typescript
@@ -65,10 +65,10 @@ await createConsentGrantRequest({
 
 This function will be used by the end-user to approve access to their data to
 another agent. It takes the original consent request (saved as a Dataset to their
-pod as a LDN), or the consent information can be manually passed in.
+Pod as a LDN), or the consent information can be manually passed in.
 
 Optionally as a second parameter, the owner of the resource may apply permissions
-directly to the resource to the requesting agent.
+directly to the resource for the requesting agent.
 
 ```typescript
 const consentRequest = await fetchSolidDataset(
@@ -127,7 +127,7 @@ const consentGrants = await getAllConsentGrants(nextPage);
 /* returns:
 {
   nextPage: "https://consent.inrupt.com/vc/some-url"
-  prevPage: "https://consent.inrupt.com/vc/some-url"
+  prevPage: "https://consent.inrupt.com/vc/some-other-url"
   grants: [
     "https://consent.inrupt.com/vc/some-guid-consent-id",
     ...
@@ -137,9 +137,9 @@ const consentGrants = await getAllConsentGrants(nextPage);
 
 ## Fetching a single consent grant
 
-Information about granted consent can be read by calling `getConsentGrant`. It
+Information about granted consent can be read by calling `getConsentGrant()`. It
 returns all stored information about the consent grant, such as the purpose,
-the expiry date, etc, as well as the signature proof.
+the expiry date, etc., as well as the signature proof.
 
 ```typescript
 const consentGrant = getConsentGrant(
@@ -166,7 +166,7 @@ forum is a good place to meet the rest of the community.
 ## Bugs and Feature Requests
 
 - For public feedback, bug reports, and feature requests please file an issue
-  via [Github](https://github.com/inrupt/solid-client-consent-js/issues/).
+  via [GitHub](https://github.com/inrupt/solid-client-consent-js/issues/).
 - For non-public feedback or support inquiries please use the
   [Inrupt Service Desk](https://inrupt.atlassian.net/servicedesk).
 
