@@ -18,13 +18,14 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import {
   access,
-  getIriAll,
-  getSolidDataset,
-  getThing,
   UrlString,
   WebId,
+  getWellKnownSolid,
+  getThingAll,
+  getSourceIri,
+  getIri,
 } from "@inrupt/solid-client";
-import { CONTEXT_CONSENT, SOLID_VC_ISSUER } from "./constants";
+import { CONTEXT_CONSENT, INRUPT_CONSENT_SERVICE } from "./constants";
 
 function accessToConsentRequestModes(
   desiredAccess: Partial<access.Access>
@@ -51,55 +52,33 @@ function accessToConsentRequestModes(
   return modes;
 }
 
-async function getConsentEndpointForIssuer(
-  issuer: UrlString,
-  fetcher: typeof fetch
-): Promise<UrlString> {
-  const issuerUrl = new URL(issuer);
-  const issuerOrigin = issuerUrl.origin;
-  const vcConfigurationUrl = new URL(issuerOrigin);
-  vcConfigurationUrl.pathname = "/.well-known/vc-configuration";
-  const response = await fetcher(vcConfigurationUrl.href);
-  const data: { issuer?: string } = await response.json();
-  if (typeof data.issuer !== "string") {
-    throw new Error(
-      `The Issuer at [${issuer}] did not list a Consent Issuer URL.`
-    );
-  }
-  return data.issuer;
-}
-
-async function getIssuersForWebId(
-  webId: WebId,
-  fetcher: typeof fetch
-): Promise<UrlString[]> {
-  const profileDoc = await getSolidDataset(webId, { fetch: fetcher });
-  const profile = getThing(profileDoc, webId);
-  if (profile === null) {
-    throw new Error(`No profile found at the WebID [${webId}].`);
-  }
-  const issuers = getIriAll(profile, SOLID_VC_ISSUER);
-  return issuers;
-}
-
 export async function getConsentEndpointForWebId(
   webId: WebId,
   fetcher: typeof fetch
 ): Promise<UrlString> {
-  // TODO: According to the draft documentation, apps should let users choose an
-  //       Issuer if there are multiple. We could export the functions called
-  //       here so that developers can implement that, although we should then
-  //       also provide the ability to pass in a custom Issuer instead of the
-  //       requestee's WebID.
-  const issuers = await getIssuersForWebId(webId, fetcher);
-  if (issuers.length === 0) {
-    throw new Error(`The WebID [${webId}] does not list VS Issuers.`);
+  const wellKnown = await getWellKnownSolid(webId, {
+    fetch: fetcher,
+  });
+  const wellKnownSubjects = getThingAll(wellKnown);
+  if (wellKnownSubjects.length === 0) {
+    throw new Error(
+      `Cannot discover consent endpoint from [${getSourceIri(
+        wellKnown
+      )}]: the well-known document is empty.`
+    );
   }
-  const consentEndpoint = await getConsentEndpointForIssuer(
-    issuers[0],
-    fetcher
-  );
-  return consentEndpoint;
+  // There should only be 1 subject in the .well-known/solid document, and if there
+  // are multiple, we arbitrarily pick the first one.
+  const wellKnownSubject = wellKnownSubjects[0];
+  const consentIri = getIri(wellKnownSubject, INRUPT_CONSENT_SERVICE);
+  if (consentIri === null) {
+    throw new Error(
+      `Cannot discover consent endpoint from [${getSourceIri(
+        wellKnown
+      )}]: the well-known document contains no value for property [${INRUPT_CONSENT_SERVICE}].`
+    );
+  }
+  return consentIri;
 }
 
 // TODO: Check that these are actually the modes you can request.
@@ -108,22 +87,20 @@ export async function getConsentEndpointForWebId(
 type ConsentRequestModes = "Read" | "Append" | "Write" | "Control";
 
 export type ConsentRequestBody = {
-  credential: {
-    "@context": typeof CONTEXT_CONSENT;
-    type: ["VerifiableCredential", "SolidCredential", "SolidConsentRequest"];
-    credentialSubject: {
-      id: UrlString;
-      hasConsent: {
-        mode: ConsentRequestModes[];
-        hasStatus: "ConsentStatusRequested";
-        forPersonalData: UrlString[];
-        forPurpose?: UrlString[];
-      };
-      inbox?: UrlString;
+  "@context": typeof CONTEXT_CONSENT;
+  type: ["SolidConsentRequest"];
+  credentialSubject: {
+    id: UrlString;
+    hasConsent: {
+      mode: ConsentRequestModes[];
+      hasStatus: "ConsentStatusRequested";
+      forPersonalData: UrlString[];
+      forPurpose?: UrlString[];
     };
-    issuanceDate?: string;
-    expirationDate?: string;
+    inbox?: UrlString;
   };
+  issuanceDate?: string;
+  expirationDate?: string;
 };
 
 export type ConsentRequestParameters = {
@@ -141,34 +118,28 @@ export function getConsentRequestBody(
 ): ConsentRequestBody {
   const modes = accessToConsentRequestModes(params.access);
   const consentRequest: ConsentRequestBody = {
-    credential: {
-      "@context": CONTEXT_CONSENT,
-      type: ["VerifiableCredential", "SolidCredential", "SolidConsentRequest"],
-      credentialSubject: {
-        id: params.requestor,
-        hasConsent: {
-          mode: modes,
-          hasStatus: "ConsentStatusRequested",
-          forPersonalData: params.resources,
-        },
+    "@context": CONTEXT_CONSENT,
+    type: ["SolidConsentRequest"],
+    credentialSubject: {
+      id: params.requestor,
+      hasConsent: {
+        mode: modes,
+        hasStatus: "ConsentStatusRequested",
+        forPersonalData: params.resources,
       },
     },
   };
   if (params.issuanceDate) {
-    consentRequest.credential.issuanceDate = params.issuanceDate.toISOString();
+    consentRequest.issuanceDate = params.issuanceDate.toISOString();
   }
   if (params.expirationDate) {
-    consentRequest.credential.expirationDate =
-      params.expirationDate.toISOString();
+    consentRequest.expirationDate = params.expirationDate.toISOString();
   }
   if (params.purpose) {
-    consentRequest.credential.credentialSubject.hasConsent.forPurpose = [
-      params.purpose,
-    ];
+    consentRequest.credentialSubject.hasConsent.forPurpose = [params.purpose];
   }
   if (params.requestorInboxUrl) {
-    consentRequest.credential.credentialSubject.inbox =
-      params.requestorInboxUrl;
+    consentRequest.credentialSubject.inbox = params.requestorInboxUrl;
   }
 
   return consentRequest;

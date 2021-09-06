@@ -36,3 +36,7 @@ export const CONTEXT_CONSENT = [
   "https://www.w3.org/2018/credentials/v1",
   "https://consent.pod.inrupt.com/credentials/v1",
 ];
+
+export const WELL_KNOWN_SOLID = ".well-known/solid";
+
+export const INRUPT_CONSENT_SERVICE = "http://inrupt.com/ns/ess#consentIssuer";

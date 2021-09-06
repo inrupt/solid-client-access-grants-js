@@ -19,6 +19,7 @@
 
 import { fetch as crossFetch } from "cross-fetch";
 import { access, UrlString, WebId } from "@inrupt/solid-client";
+import { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   ConsentRequestBody,
   getConsentEndpointForWebId,
@@ -41,20 +42,29 @@ async function getDefaultSessionFetch(): Promise<typeof fetch> {
 }
 
 async function sendConsentRequest(
+  requestor: WebId,
   requestee: WebId,
   consentRequest: ConsentRequestBody,
   options: ConsentGrantBaseOptions
 ): Promise<unknown> {
   const fetcher = options.fetch ?? (await getDefaultSessionFetch());
   const consentEndpoint = await getConsentEndpointForWebId(requestee, fetcher);
-  const response = await fetcher(consentEndpoint, {
-    method: "POST",
-    body: JSON.stringify(consentRequest),
-    headers: {
-      "Content-Type": "application/json",
+  return issueVerifiableCredential(
+    consentEndpoint,
+    requestor,
+    {
+      "@context": consentRequest["@context"],
+      ...consentRequest.credentialSubject,
     },
-  });
-  return response.json();
+    {
+      "@context": consentRequest["@context"],
+      issuanceDate: consentRequest.issuanceDate,
+      expirationDate: consentRequest.expirationDate,
+    },
+    {
+      fetch: fetcher,
+    }
+  );
 }
 
 /**
@@ -75,15 +85,14 @@ export type ConsentGrantBaseOptions = Partial<{
  * Required parameters to request access to one or more Resources.
  *
  * - `requestor`: WebID of the Agent requesting access to the given Resources.
- * - `requestee`: WebID of an Agent controlling access to the given Resources.
+ * - `resourceOwner`: WebID of an Agent controlling access to the given Resources.
  * - `access`: Level access to request on the given Resource.
  *             See {@link https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.access.html}.
  * - `resources`: Array of URLs of the Resources to which access is requested.
  */
 export type RequestAccessParameters = {
   requestor: WebId;
-  // TODO: Come up with a better name before 1.0 release — resourceController?
-  requestee: WebId;
+  resourceOwner: WebId;
   access: Partial<access.Access>;
   resources: Array<UrlString>;
 };
@@ -100,14 +109,19 @@ export async function requestAccess(
 ): Promise<unknown> {
   const consentRequest = getConsentRequestBody(params);
 
-  return sendConsentRequest(params.requestee, consentRequest, options);
+  return sendConsentRequest(
+    params.requestor,
+    params.resourceOwner,
+    consentRequest,
+    options
+  );
 }
 
 /**
  * Required parameters to request access to one or more Resources.
  *
  * - `requestor`: WebID of the Agent requesting access to the given Resources.
- * - `requestee`: WebID of an Agent controlling access to the given Resources.
+ * - `resourceOwner`: WebID of an Agent controlling access to the given Resources.
  * - `access`: Level access to request on the given Resource.
  *             See {@link https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.access.html}.
  * - `resources`: Array of URLs of the Resources to which access is requested.
@@ -139,5 +153,10 @@ export async function requestAccessWithConsent(
   };
   const consentRequest = getConsentRequestBody(paramsWithIssuanceDate);
 
-  return sendConsentRequest(params.requestee, consentRequest, options);
+  return sendConsentRequest(
+    params.requestor,
+    params.resourceOwner,
+    consentRequest,
+    options
+  );
 }
