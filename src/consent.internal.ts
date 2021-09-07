@@ -86,7 +86,7 @@ export async function getConsentEndpointForWebId(
 //       although that is not listed in the example context.
 type ConsentRequestModes = "Read" | "Append" | "Write" | "Control";
 
-export type ConsentRequestBody = {
+export type AccessRequestBody = {
   "@context": typeof CONTEXT_CONSENT;
   type: ["SolidConsentRequest"];
   credentialSubject: {
@@ -95,29 +95,51 @@ export type ConsentRequestBody = {
       mode: ConsentRequestModes[];
       hasStatus: "ConsentStatusRequested";
       forPersonalData: UrlString[];
-      forPurpose?: UrlString[];
     };
     inbox?: UrlString;
+  };
+};
+
+export type ConsentRequestBody = AccessRequestBody & {
+  credentialSubject: {
+    hasConsent: {
+      forPurpose?: UrlString[];
+    };
   };
   issuanceDate?: string;
   expirationDate?: string;
 };
 
-export type ConsentRequestParameters = {
+export type AccessRequestParameters = {
   requestor: UrlString;
   access: Partial<access.Access>;
   resources: Array<UrlString>;
-  purpose?: UrlString;
   requestorInboxUrl?: UrlString;
+};
+
+export type ConsentRequestParameters = AccessRequestParameters & {
+  purpose: UrlString;
   issuanceDate?: Date;
   expirationDate?: Date;
 };
 
-export function getConsentRequestBody(
+function areConsentRequestParameters(
+  parameters: ConsentRequestParameters | AccessRequestParameters
+): parameters is ConsentRequestParameters {
+  return (parameters as ConsentRequestParameters).purpose !== undefined;
+}
+
+export function getRequestBody(
   params: ConsentRequestParameters
-): ConsentRequestBody {
+): ConsentRequestBody;
+export function getRequestBody(
+  params: AccessRequestParameters
+): AccessRequestBody;
+export function getRequestBody(
+  params: AccessRequestParameters | ConsentRequestParameters
+): AccessRequestBody | ConsentRequestBody {
   const modes = accessToConsentRequestModes(params.access);
-  const consentRequest: ConsentRequestBody = {
+  const request: AccessRequestBody = {
     "@context": CONTEXT_CONSENT,
     type: ["SolidConsentRequest"],
     credentialSubject: {
@@ -129,18 +151,21 @@ export function getConsentRequestBody(
       },
     },
   };
-  if (params.issuanceDate) {
-    consentRequest.issuanceDate = params.issuanceDate.toISOString();
-  }
-  if (params.expirationDate) {
-    consentRequest.expirationDate = params.expirationDate.toISOString();
-  }
-  if (params.purpose) {
-    consentRequest.credentialSubject.hasConsent.forPurpose = [params.purpose];
-  }
   if (params.requestorInboxUrl) {
-    consentRequest.credentialSubject.inbox = params.requestorInboxUrl;
+    request.credentialSubject.inbox = params.requestorInboxUrl;
   }
-
-  return consentRequest;
+  if (areConsentRequestParameters(params)) {
+    if (params.issuanceDate) {
+      (request as ConsentRequestBody).issuanceDate =
+        params.issuanceDate.toISOString();
+    }
+    if (params.expirationDate) {
+      (request as ConsentRequestBody).expirationDate =
+        params.expirationDate.toISOString();
+    }
+    (request as ConsentRequestBody).credentialSubject.hasConsent.forPurpose = [
+      params.purpose,
+    ];
+  }
+  return request;
 }

@@ -23,7 +23,7 @@ import { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   ConsentRequestBody,
   getConsentEndpointForWebId,
-  getConsentRequestBody,
+  getRequestBody,
 } from "./consent.internal";
 
 // Dynamically import solid-client-authn-browser so that this library doesn't have a hard
@@ -108,7 +108,7 @@ export async function requestAccess(
   params: RequestAccessParameters,
   options: ConsentGrantBaseOptions = {}
 ): Promise<unknown> {
-  const consentRequest = getConsentRequestBody(params);
+  const consentRequest = getRequestBody(params);
 
   return sendConsentRequest(
     params.requestor,
@@ -148,7 +148,7 @@ export async function requestAccessWithConsent(
   params: RequestAccessWithConsentParameters,
   options: ConsentGrantBaseOptions = {}
 ): Promise<unknown> {
-  const consentRequest = getConsentRequestBody(params);
+  const consentRequest = getRequestBody(params);
   return sendConsentRequest(
     params.requestor,
     params.resourceOwner,

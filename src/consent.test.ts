@@ -26,10 +26,7 @@ import { mocked } from "ts-jest/utils";
 import { mockSolidDatasetFrom, getWellKnownSolid } from "@inrupt/solid-client";
 import { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 import { requestAccess, requestAccessWithConsent } from "./consent";
-import {
-  getConsentEndpointForWebId,
-  getConsentRequestBody,
-} from "./consent.internal";
+import { getConsentEndpointForWebId, getRequestBody } from "./consent.internal";
 import {
   mockAccessGrant,
   mockedConsentEndpoint,
@@ -71,7 +68,7 @@ jest.mock("@inrupt/solid-client-vc");
 
 describe("getConsentRequestBody", () => {
   it("can generate a minimal consent request body", () => {
-    const consentRequestBody = getConsentRequestBody({
+    const consentRequestBody = getRequestBody({
       access: { append: true },
       requestor: MOCK_REQUESTOR_IRI,
       resources: ["https://some.pod/resource"],
@@ -95,7 +92,7 @@ describe("getConsentRequestBody", () => {
   });
 
   it("can generate a full consent request body", () => {
-    const consentRequestBody = getConsentRequestBody({
+    const consentRequestBody = getRequestBody({
       access: {
         read: true,
         write: true,
@@ -258,6 +255,48 @@ describe("requestAccessWithConsent", () => {
         type: ["SolidConsentRequest"],
         issuanceDate: "1955-06-08T13:37:42.042Z",
         expirationDate: "1990-11-12T13:37:42.042Z",
+      }),
+      expect.anything()
+    );
+  });
+
+  it("supports access with consent request with no issuance or expiration set", async () => {
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    mocked(getConsentEndpointForWebId).mockResolvedValueOnce(MOCK_ISSUER_IRI);
+    mockedIssue.mockResolvedValueOnce(
+      mockAccessGrant(MOCK_ISSUER_IRI, MOCK_REQUESTOR_IRI, {
+        someClaim: "some value",
+      })
+    );
+
+    await requestAccessWithConsent({
+      access: { read: true },
+      requestor: MOCK_REQUESTOR_IRI,
+      resourceOwner: MOCK_REQUESTEE_IRI,
+      resources: ["https://some.pod/resource"],
+      purpose: "https://some.vocab/purpose#save-the-world",
+      requestorInboxUrl: "https://some.pod/inbox/",
+    });
+
+    expect(mockedIssue).toHaveBeenCalledWith(
+      MOCK_ISSUER_IRI,
+      MOCK_REQUESTOR_IRI,
+      expect.objectContaining({
+        id: MOCK_REQUESTOR_IRI,
+        hasConsent: {
+          mode: ["Read"],
+          hasStatus: "ConsentStatusRequested",
+          forPersonalData: ["https://some.pod/resource"],
+          forPurpose: ["https://some.vocab/purpose#save-the-world"],
+        },
+      }),
+      expect.objectContaining({
+        type: ["SolidConsentRequest"],
       }),
       expect.anything()
     );
