@@ -108,7 +108,10 @@ export async function requestAccess(
   params: RequestAccessParameters,
   options: ConsentGrantBaseOptions = {}
 ): Promise<unknown> {
-  const consentRequest = getRequestBody(params);
+  const consentRequest = getRequestBody({
+    ...params,
+    status: "ConsentStatusRequested",
+  });
 
   return sendConsentRequest(
     params.requestor,
@@ -148,7 +151,10 @@ export async function requestAccessWithConsent(
   params: RequestAccessWithConsentParameters,
   options: ConsentGrantBaseOptions = {}
 ): Promise<unknown> {
-  const consentRequest = getRequestBody(params);
+  const consentRequest = getRequestBody({
+    ...params,
+    status: "ConsentStatusRequested",
+  });
   return sendConsentRequest(
     params.requestor,
     params.resourceOwner,

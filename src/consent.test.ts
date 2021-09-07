@@ -72,6 +72,7 @@ describe("getConsentRequestBody", () => {
       access: { append: true },
       requestor: MOCK_REQUESTOR_IRI,
       resources: ["https://some.pod/resource"],
+      status: "ConsentStatusRequested",
     });
 
     expect(consentRequestBody).toStrictEqual({
@@ -105,6 +106,7 @@ describe("getConsentRequestBody", () => {
       expirationDate: new Date(Date.UTC(1990, 10, 12, 13, 37, 42, 42)),
       purpose: ["https://some.vocab/purpose#save-the-world"],
       requestorInboxUrl: "https://some.pod/inbox/",
+      status: "ConsentStatusRequested",
     });
 
     expect(consentRequestBody).toStrictEqual({

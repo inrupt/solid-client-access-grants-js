@@ -115,6 +115,7 @@ export type AccessRequestParameters = {
   access: Partial<access.Access>;
   resources: UrlString[];
   requestorInboxUrl?: UrlString;
+  status: "ConsentStatusRequested";
 };
 
 export type ConsentRequestParameters = AccessRequestParameters & {
