@@ -58,6 +58,7 @@ async function sendConsentRequest(
     },
     {
       "@context": consentRequest["@context"],
+      type: ["SolidConsentRequest"],
       issuanceDate: consentRequest.issuanceDate,
       expirationDate: consentRequest.expirationDate,
     },
@@ -147,12 +148,7 @@ export async function requestAccessWithConsent(
   params: RequestAccessWithConsentParameters,
   options: ConsentGrantBaseOptions = {}
 ): Promise<unknown> {
-  const paramsWithIssuanceDate: RequestAccessWithConsentParameters = {
-    ...params,
-    issuanceDate: params.issuanceDate ?? new Date(),
-  };
-  const consentRequest = getConsentRequestBody(paramsWithIssuanceDate);
-
+  const consentRequest = getConsentRequestBody(params);
   return sendConsentRequest(
     params.requestor,
     params.resourceOwner,
