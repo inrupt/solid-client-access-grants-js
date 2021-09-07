@@ -103,7 +103,7 @@ describe("getConsentRequestBody", () => {
       resources: ["https://some.pod/resource"],
       issuanceDate: new Date(Date.UTC(1955, 5, 8, 13, 37, 42, 42)),
       expirationDate: new Date(Date.UTC(1990, 10, 12, 13, 37, 42, 42)),
-      purpose: "https://some.vocab/purpose#save-the-world",
+      purpose: ["https://some.vocab/purpose#save-the-world"],
       requestorInboxUrl: "https://some.pod/inbox/",
     });
 
@@ -229,7 +229,7 @@ describe("requestAccessWithConsent", () => {
         requestor: MOCK_REQUESTOR_IRI,
         resourceOwner: MOCK_REQUESTEE_IRI,
         resources: ["https://some.pod/resource"],
-        purpose: "https://some.vocab/purpose#save-the-world",
+        purpose: ["https://some.vocab/purpose#save-the-world"],
         issuanceDate: new Date(Date.UTC(1955, 5, 8, 13, 37, 42, 42)),
         expirationDate: new Date(Date.UTC(1990, 10, 12, 13, 37, 42, 42)),
         requestorInboxUrl: "https://some.pod/inbox/",
@@ -279,7 +279,7 @@ describe("requestAccessWithConsent", () => {
       requestor: MOCK_REQUESTOR_IRI,
       resourceOwner: MOCK_REQUESTEE_IRI,
       resources: ["https://some.pod/resource"],
-      purpose: "https://some.vocab/purpose#save-the-world",
+      purpose: ["https://some.vocab/purpose#save-the-world"],
       requestorInboxUrl: "https://some.pod/inbox/",
     });
 
@@ -322,7 +322,7 @@ describe("requestAccessWithConsent", () => {
       requestor: MOCK_REQUESTOR_IRI,
       resourceOwner: MOCK_REQUESTEE_IRI,
       resources: ["https://some.pod/resource"],
-      purpose: "https://some.vocab/purpose#save-the-world",
+      purpose: ["https://some.vocab/purpose#save-the-world"],
       issuanceDate: new Date(Date.UTC(1955, 5, 8, 13, 37, 42, 42)),
       expirationDate: new Date(Date.UTC(1990, 10, 12, 13, 37, 42, 42)),
       requestorInboxUrl: "https://some.pod/inbox/",

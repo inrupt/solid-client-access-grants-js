@@ -113,12 +113,12 @@ export type ConsentRequestBody = AccessRequestBody & {
 export type AccessRequestParameters = {
   requestor: UrlString;
   access: Partial<access.Access>;
-  resources: Array<UrlString>;
+  resources: UrlString[];
   requestorInboxUrl?: UrlString;
 };
 
 export type ConsentRequestParameters = AccessRequestParameters & {
-  purpose: UrlString;
+  purpose: UrlString[];
   issuanceDate?: Date;
   expirationDate?: Date;
 };
@@ -163,9 +163,8 @@ export function getRequestBody(
       (request as ConsentRequestBody).expirationDate =
         params.expirationDate.toISOString();
     }
-    (request as ConsentRequestBody).credentialSubject.hasConsent.forPurpose = [
-      params.purpose,
-    ];
+    (request as ConsentRequestBody).credentialSubject.hasConsent.forPurpose =
+      params.purpose;
   }
   return request;
 }

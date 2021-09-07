@@ -132,7 +132,7 @@ export async function requestAccess(
  * - `expirationDate`: (Optional.) Point in time until when the access is needed.
  */
 export type RequestAccessWithConsentParameters = RequestAccessParameters & {
-  purpose: UrlString;
+  purpose: UrlString[];
   requestorInboxUrl?: UrlString;
   issuanceDate?: Date;
   expirationDate?: Date;
