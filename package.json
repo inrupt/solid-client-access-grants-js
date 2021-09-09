@@ -47,7 +47,7 @@
   "devDependencies": {
     "@inrupt/eslint-config-base": "^0.2.0-alpha.1",
     "@inrupt/eslint-config-lib": "^0.2.0-alpha.1",
-    "@inrupt/solid-client": "1.11.2-main-1206576481-4125-1630943360.0",
+    "@inrupt/solid-client": "^1.12.0",
     "@inrupt/solid-client-authn-browser": "^1.8.1",
     "@skypack/package-check": "^0.2.2",
     "@testing-library/testcafe": "^4.4.0",
@@ -84,8 +84,7 @@
     "cross-fetch": "^3.1.4",
     "events": "^3.3.0",
     "parse-link-header": "^1.0.1",
-    "rdf-namespaces": "^1.9.2",
-    "@inrupt/solid-client": "^1.11.2-main-1206576481-4125-1630943360.0"
+    "rdf-namespaces": "^1.9.2"
   },
   "lint-staged": {
     "src/*.{js,jsx,ts,tsx}": "eslint --max-warnings 0 --cache --fix",
