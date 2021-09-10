@@ -22,4 +22,4 @@ export {
   RequestAccessParameters,
   requestAccessWithConsent,
   RequestAccessWithConsentParameters,
-} from "./consent";
+} from "./request/request";

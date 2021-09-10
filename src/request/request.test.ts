@@ -25,22 +25,25 @@ import { jest, describe, it, expect } from "@jest/globals";
 import { mocked } from "ts-jest/utils";
 import { mockSolidDatasetFrom, getWellKnownSolid } from "@inrupt/solid-client";
 import { issueVerifiableCredential } from "@inrupt/solid-client-vc";
-import { requestAccess, requestAccessWithConsent } from "./consent";
-import { getConsentEndpointForWebId, getRequestBody } from "./consent.internal";
+import { requestAccess, requestAccessWithConsent } from "./request";
+import {
+  getConsentEndpointForWebId,
+  getRequestBody,
+} from "../consent.internal";
 import {
   mockAccessGrant,
   mockedConsentEndpoint,
   mockWellKnownNoConsent,
   mockWellKnownWithConsent,
-} from "./consent.mock";
+} from "./request.mock";
 
 const MOCK_REQUESTOR_IRI = "https://some.pod/profile#me";
 const MOCK_REQUESTEE_IRI = "https://some.pod/profile#you";
 const MOCK_ISSUER_IRI = "https://some-issuer.iri/issue";
 
-jest.mock("./consent.internal.ts", () => {
+jest.mock("../consent.internal.ts", () => {
   const internalConsentModule = jest.requireActual(
-    "./consent.internal.ts"
+    "../consent.internal.ts"
     // TypeScript can't infer the type of modules imported via Jest;
     // skip type checking for those:
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

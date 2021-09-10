@@ -32,7 +32,7 @@
       "require": "./dist/index.js",
       "import": "./dist/index.mjs"
     },
-    "./consent": "./dist/consent.mjs"
+    "./request": "./dist/request/request.mjs"
   },
   "files": [
     "dist",

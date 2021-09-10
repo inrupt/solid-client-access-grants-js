@@ -24,7 +24,7 @@ import {
   ConsentRequestBody,
   getConsentEndpointForWebId,
   getRequestBody,
-} from "./consent.internal";
+} from "../consent.internal";
 
 // Dynamically import solid-client-authn-browser so that this library doesn't have a hard
 // dependency.
