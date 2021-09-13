@@ -19,11 +19,16 @@
 
 import { fetch as crossFetch } from "cross-fetch";
 import { access, UrlString, WebId } from "@inrupt/solid-client";
-import { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
+  issueVerifiableCredential,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
+import {
+  AccessRequestBody,
   ConsentRequestBody,
   getConsentEndpointForWebId,
   getRequestBody,
+  isConsentRequest,
 } from "../consent.internal";
 
 // Dynamically import solid-client-authn-browser so that this library doesn't have a hard
@@ -41,10 +46,39 @@ async function getDefaultSessionFetch(): Promise<typeof fetch> {
   }
 }
 
+export function isAccessRequest(
+  credential: VerifiableCredential | AccessRequestBody
+): credential is AccessRequestBody {
+  let result = true;
+  result =
+    result &&
+    (credential as AccessRequestBody).type.includes("SolidConsentRequest");
+  result =
+    result &&
+    (credential as AccessRequestBody).credentialSubject.hasConsent !==
+      undefined;
+  result =
+    result &&
+    (credential as AccessRequestBody).credentialSubject.hasConsent
+      .forPersonalData !== undefined;
+  result =
+    result &&
+    (credential as AccessRequestBody).credentialSubject.hasConsent.hasStatus ===
+      "ConsentStatusRequested";
+  result =
+    result &&
+    (credential as AccessRequestBody).credentialSubject.hasConsent.mode !==
+      undefined;
+  result =
+    result &&
+    (credential as AccessRequestBody).credentialSubject.inbox !== undefined;
+  return result;
+}
+
 async function sendConsentRequest(
   requestor: WebId,
   requestee: WebId,
-  consentRequest: ConsentRequestBody,
+  consentRequest: AccessRequestBody | ConsentRequestBody,
   options: ConsentGrantBaseOptions
 ): Promise<unknown> {
   const fetcher = options.fetch ?? (await getDefaultSessionFetch());
@@ -59,8 +93,12 @@ async function sendConsentRequest(
     {
       "@context": consentRequest["@context"],
       type: ["SolidConsentRequest"],
-      issuanceDate: consentRequest.issuanceDate,
-      expirationDate: consentRequest.expirationDate,
+      issuanceDate: isConsentRequest(consentRequest)
+        ? consentRequest.issuanceDate
+        : undefined,
+      expirationDate: isConsentRequest(consentRequest)
+        ? consentRequest.expirationDate
+        : undefined,
     },
     {
       fetch: fetcher,
@@ -96,6 +134,7 @@ export type RequestAccessParameters = {
   resourceOwner: WebId;
   access: Partial<access.Access>;
   resources: Array<UrlString>;
+  requestorInboxUrl: UrlString;
 };
 /**
  * Request access to a given Resource.
@@ -136,7 +175,6 @@ export async function requestAccess(
  */
 export type RequestAccessWithConsentParameters = RequestAccessParameters & {
   purpose: UrlString[];
-  requestorInboxUrl?: UrlString;
   issuanceDate?: Date;
   expirationDate?: Date;
 };

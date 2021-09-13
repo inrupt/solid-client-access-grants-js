@@ -96,14 +96,14 @@ export type AccessRequestBody = {
       hasStatus: "ConsentStatusRequested";
       forPersonalData: UrlString[];
     };
-    inbox?: UrlString;
+    inbox: UrlString;
   };
 };
 
 export type ConsentRequestBody = AccessRequestBody & {
   credentialSubject: {
     hasConsent: {
-      forPurpose?: UrlString[];
+      forPurpose: UrlString[];
     };
   };
   issuanceDate?: string;
@@ -114,7 +114,7 @@ export type AccessRequestParameters = {
   requestor: UrlString;
   access: Partial<access.Access>;
   resources: UrlString[];
-  requestorInboxUrl?: UrlString;
+  requestorInboxUrl: UrlString;
   status: "ConsentStatusRequested";
 };
 
@@ -128,6 +128,15 @@ function areConsentRequestParameters(
   parameters: ConsentRequestParameters | AccessRequestParameters
 ): parameters is ConsentRequestParameters {
   return (parameters as ConsentRequestParameters).purpose !== undefined;
+}
+
+export function isConsentRequest(
+  request: AccessRequestBody | ConsentRequestBody
+): request is ConsentRequestBody {
+  return (
+    (request as ConsentRequestBody).credentialSubject.hasConsent.forPurpose !==
+    undefined
+  );
 }
 
 export function getRequestBody(
@@ -150,11 +159,9 @@ export function getRequestBody(
         hasStatus: "ConsentStatusRequested",
         forPersonalData: params.resources,
       },
+      inbox: params.requestorInboxUrl,
     },
   };
-  if (params.requestorInboxUrl) {
-    request.credentialSubject.inbox = params.requestorInboxUrl;
-  }
   if (areConsentRequestParameters(params)) {
     if (params.issuanceDate) {
       (request as ConsentRequestBody).issuanceDate =
