@@ -122,9 +122,8 @@ async function sendRequestApproval(
   );
 }
 
-export async function approveAccessRequest(
-  // If the VC is specified, all the overrides become optional
-  requestVc: VerifiableCredential,
+function initializeGrantParameters(
+  requestVc?: AccessRequestBody,
   requestOverride?: Partial<{
     requestor: WebId;
     access: Partial<Access>;
@@ -133,50 +132,8 @@ export async function approveAccessRequest(
     purpose: Array<UrlString>;
     issuanceDate: Date;
     expirationDate: Date;
-  }>,
-  options?: {
-    fetch: typeof window.fetch;
-    consentEndpoint?: UrlString;
-  }
-): Promise<VerifiableCredential>;
-export async function approveAccessRequest(
-  requestVc: undefined,
-  // If the VC is undefined, then some of the overrides become mandatory
-  requestOverride: {
-    requestor: WebId;
-    access: Partial<Access>;
-    resources: Array<UrlString>;
-    requestorInboxIri: UrlString;
-    purpose?: Array<UrlString>;
-    issuanceDate?: Date;
-    expirationDate?: Date;
-  },
-  options?: {
-    fetch: typeof window.fetch;
-    consentEndpoint?: UrlString;
-  }
-): Promise<VerifiableCredential>;
-export async function approveAccessRequest(
-  requestVc?: VerifiableCredential,
-  requestOverride?: Partial<{
-    requestor: WebId;
-    access: Partial<Access>;
-    resources: Array<UrlString>;
-    purpose: Array<UrlString>;
-    requestorInboxIri: UrlString;
-    issuanceDate: Date;
-    expirationDate: Date;
-  }>,
-  options?: {
-    fetch: typeof window.fetch;
-    consentEndpoint?: UrlString;
-  }
-): Promise<VerifiableCredential> {
-  if (requestVc !== undefined && !isAccessRequest(requestVc)) {
-    throw new Error(
-      `Unexpected VC provided for approval: ${JSON.stringify(requestVc)}`
-    );
-  }
+  }>
+): Exclude<Required<typeof requestOverride>, undefined> {
   let internalOptions: typeof requestOverride;
   if (requestVc === undefined) {
     internalOptions = requestOverride;
@@ -204,25 +161,138 @@ export async function approveAccessRequest(
   // At this point, all the assertions in internalOptions are initialised, either
   // from the provided VC or from the provided override.
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const initialisedOptions = (internalOptions as Required<
-    typeof requestOverride
-  >)!;
-  let bodyRequestParams: AccessGrantParameters | ConsentGrantParameters = {
+  return (internalOptions as Required<typeof requestOverride>)!;
+}
+
+export async function approveAccessRequest(
+  // If the VC is specified, all the overrides become optional
+  requestVc: VerifiableCredential,
+  requestOverride?: Partial<{
+    requestor: WebId;
+    access: Partial<Access>;
+    resources: Array<UrlString>;
+    requestorInboxIri: UrlString;
+  }>,
+  options?: {
+    fetch: typeof window.fetch;
+    consentEndpoint?: UrlString;
+  }
+): Promise<VerifiableCredential>;
+export async function approveAccessRequest(
+  requestVc: undefined,
+  // If the VC is undefined, then some of the overrides become mandatory
+  requestOverride: {
+    requestor: WebId;
+    access: Partial<Access>;
+    resources: Array<UrlString>;
+    requestorInboxIri: UrlString;
+  },
+  options?: {
+    fetch: typeof window.fetch;
+    consentEndpoint?: UrlString;
+  }
+): Promise<VerifiableCredential>;
+export async function approveAccessRequest(
+  requestVc?: VerifiableCredential,
+  requestOverride?: Partial<{
+    requestor: WebId;
+    access: Partial<Access>;
+    resources: Array<UrlString>;
+    requestorInboxIri: UrlString;
+  }>,
+  options?: {
+    fetch: typeof window.fetch;
+    consentEndpoint?: UrlString;
+  }
+): Promise<VerifiableCredential> {
+  if (requestVc !== undefined && !isAccessRequest(requestVc)) {
+    throw new Error(
+      `Unexpected VC provided for approval: ${JSON.stringify(requestVc)}`
+    );
+  }
+  const internalOptions = initializeGrantParameters(requestVc, requestOverride);
+  const requestBody = getGrantBody({
+    access: internalOptions.access,
+    requestor: internalOptions.requestor,
+    resources: internalOptions.resources,
+    requestorInboxUrl: internalOptions.requestorInboxIri,
+    status: "ConsentStatusExplicitlyGiven",
+  });
+  return sendRequestApproval(internalOptions.requestor, requestBody, {
+    fetch: options?.fetch,
+    consentEndpoint: options?.consentEndpoint,
+  });
+}
+
+export async function approveAccessRequestWithConsent(
+  // If the VC is specified, all the overrides become optional
+  requestVc: VerifiableCredential,
+  requestOverride?: Partial<{
+    requestor: WebId;
+    access: Partial<Access>;
+    resources: Array<UrlString>;
+    requestorInboxIri: UrlString;
+    purpose: Array<UrlString>;
+    issuanceDate: Date;
+    expirationDate: Date;
+  }>,
+  options?: {
+    fetch: typeof window.fetch;
+    consentEndpoint?: UrlString;
+  }
+): Promise<VerifiableCredential>;
+export async function approveAccessRequestWithConsent(
+  requestVc: undefined,
+  // If the VC is undefined, then some of the overrides become mandatory
+  requestOverride: {
+    requestor: WebId;
+    access: Partial<Access>;
+    resources: Array<UrlString>;
+    requestorInboxIri: UrlString;
+    purpose: Array<UrlString>;
+    issuanceDate: Date;
+    expirationDate: Date;
+  },
+  options?: {
+    fetch: typeof window.fetch;
+    consentEndpoint?: UrlString;
+  }
+): Promise<VerifiableCredential>;
+export async function approveAccessRequestWithConsent(
+  requestVc?: VerifiableCredential,
+  requestOverride?: Partial<{
+    requestor: WebId;
+    access: Partial<Access>;
+    resources: Array<UrlString>;
+    purpose: Array<UrlString>;
+    requestorInboxIri: UrlString;
+    issuanceDate: Date;
+    expirationDate: Date;
+  }>,
+  options?: {
+    fetch: typeof window.fetch;
+    consentEndpoint?: UrlString;
+  }
+): Promise<VerifiableCredential> {
+  if (requestVc !== undefined && !isAccessRequest(requestVc)) {
+    throw new Error(
+      `Unexpected VC provided for approval: ${JSON.stringify(requestVc)}`
+    );
+  }
+  const initialisedOptions = initializeGrantParameters(
+    requestVc,
+    requestOverride
+  );
+  const requestBody = getGrantBody({
     access: initialisedOptions.access,
     requestor: initialisedOptions.requestor,
     resources: initialisedOptions.resources,
     requestorInboxUrl: initialisedOptions.requestorInboxIri,
     status: "ConsentStatusExplicitlyGiven",
-  };
-  if (initialisedOptions.purpose !== undefined) {
-    bodyRequestParams = {
-      ...bodyRequestParams,
-      purpose: initialisedOptions.purpose,
-      issuanceDate: initialisedOptions.issuanceDate,
-      expirationDate: initialisedOptions.expirationDate,
-    };
-  }
-  const requestBody = getGrantBody(bodyRequestParams);
+    purpose: initialisedOptions.purpose,
+    issuanceDate: initialisedOptions.issuanceDate,
+    expirationDate: initialisedOptions.expirationDate,
+  });
   return sendRequestApproval(initialisedOptions.requestor, requestBody, {
     fetch: options?.fetch,
     consentEndpoint: options?.consentEndpoint,

@@ -28,7 +28,10 @@ import {
   ConsentGrantBody,
   getConsentEndpointForResource,
 } from "../consent.internal";
-import { approveAccessRequest } from "./approve";
+import {
+  approveAccessRequest,
+  approveAccessRequestWithConsent,
+} from "./approve";
 
 jest.mock("../consent.internal.ts", () => {
   const internalConsentModule = jest.requireActual(
@@ -312,6 +315,59 @@ describe("approveAccessRequest", () => {
       expect.anything()
     );
   });
+});
+
+describe("approveAccessRequestWithConsent", () => {
+  it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
+    mocked(getConsentEndpointForResource).mockResolvedValueOnce(
+      "https://some.consent-endpoint"
+    );
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: () => unknown;
+      },
+      "issueVerifiableCredential"
+    );
+    // TypeScript can't infer the type of mock modules imported via Jest;
+    // skip type checking for those:
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
+
+    await approveAccessRequestWithConsent(mockConsentRequestVc());
+
+    expect(mockedIssue).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+      {
+        fetch: scab.fetch,
+      }
+    );
+  });
+
+  it("throws if the provided VC isn't an access request", async () => {
+    await expect(
+      approveAccessRequestWithConsent({
+        "@context": "https://some.context",
+        id: "https://some.credential",
+        credentialSubject: {
+          id: "https://some.requestor",
+          someClaim: "some value",
+        },
+        issuanceDate: "some ISO date",
+        issuer: "https://some.issuer",
+        proof: {
+          created: "some ISO date",
+          proofPurpose: "some proof purpose",
+          proofValue: "some proof",
+          type: "some proof type",
+          verificationMethod: "some method",
+        },
+        type: ["Some credential type"],
+      })
+    ).rejects.toThrow(/Unexpected VC.*credentialSubject/);
+  });
 
   it("issues a proper consent grant from a totally overriden request VC", async () => {
     mocked(getConsentEndpointForResource).mockResolvedValueOnce(
@@ -324,7 +380,7 @@ describe("approveAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await approveAccessRequest(
+    await approveAccessRequestWithConsent(
       mockConsentRequestVc(),
       {
         access: { append: true },
@@ -371,7 +427,7 @@ describe("approveAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await approveAccessRequest(
+    await approveAccessRequestWithConsent(
       mockConsentRequestVc(),
       {
         issuanceDate: new Date(2021, 8, 15),
@@ -418,7 +474,7 @@ describe("approveAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await approveAccessRequest(
+    await approveAccessRequestWithConsent(
       mockConsentRequestVc(),
       {
         expirationDate: new Date(2021, 8, 16),
