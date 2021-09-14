@@ -22,9 +22,9 @@ import {
   isVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { ConsentGrantBaseOptions } from "../request/request";
+import { ConsentGrantBaseOptions } from "../constants";
 import {
-  getConsentEndpointForWebId,
+  getConsentEndpointForResource,
   getDefaultSessionFetch,
 } from "../consent.internal";
 
@@ -60,7 +60,7 @@ export default async function isValidConsentGrant(
 
   const consentEndpoint =
     options.consentEndpoint ??
-    (await getConsentEndpointForWebId(credentialSubjectId, fetcher));
+    (await getConsentEndpointForResource(credentialSubjectId, fetcher));
   const consentVerifyEndpoint = `${consentEndpoint}/verify`;
 
   const response = await fetcher(consentVerifyEndpoint, {

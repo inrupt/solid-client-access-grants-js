@@ -33,7 +33,8 @@
       "import": "./dist/index.mjs"
     },
     "./request": "./dist/request/request.mjs",
-    "./verify": "./dist/verify/verify.mjs"
+    "./verify": "./dist/verify/verify.mjs",
+    "./approve": "./dist/approve/approve.mjs"
   },
   "files": [
     "dist",

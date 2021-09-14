@@ -28,99 +28,21 @@ import {
   WebId,
 } from "@inrupt/solid-client";
 import {
-  issueVerifiableCredential,
   revokeVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import {
-  AccessRequestBody,
-  ConsentRequestBody,
-  getConsentEndpointForWebId,
   getRequestBody,
-  isConsentRequest,
+  issueAccessOrConsentVc,
   getDefaultSessionFetch,
+  dereferenceVcIri,
 } from "../consent.internal";
-import { PIM_STORAGE, PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
-
-export function isAccessRequest(
-  credential: VerifiableCredential | AccessRequestBody
-): credential is AccessRequestBody {
-  let result = true;
-  result =
-    result &&
-    (credential as AccessRequestBody).type.includes("SolidConsentRequest");
-  result =
-    result &&
-    (credential as AccessRequestBody).credentialSubject.hasConsent !==
-      undefined;
-  result =
-    result &&
-    (credential as AccessRequestBody).credentialSubject.hasConsent
-      .forPersonalData !== undefined;
-  result =
-    result &&
-    (credential as AccessRequestBody).credentialSubject.hasConsent.hasStatus ===
-      "ConsentStatusRequested";
-  result =
-    result &&
-    (credential as AccessRequestBody).credentialSubject.hasConsent.mode !==
-      undefined;
-  result =
-    result &&
-    (credential as AccessRequestBody).credentialSubject.inbox !== undefined;
-  return result;
-}
-
-async function sendConsentRequest(
-  requestor: WebId,
-  requestee: WebId,
-  consentRequest: AccessRequestBody | ConsentRequestBody,
-  options: ConsentGrantBaseOptions
-): Promise<unknown> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  const consentEndpoint = new URL(
-    "issue",
-    await getConsentEndpointForWebId(requestee, fetcher)
-  );
-  return issueVerifiableCredential(
-    consentEndpoint.href,
-    requestor,
-    {
-      "@context": consentRequest["@context"],
-      ...consentRequest.credentialSubject,
-    },
-    {
-      "@context": consentRequest["@context"],
-      type: ["SolidConsentRequest"],
-      issuanceDate: isConsentRequest(consentRequest)
-        ? consentRequest.issuanceDate
-        : undefined,
-      expirationDate: isConsentRequest(consentRequest)
-        ? consentRequest.expirationDate
-        : undefined,
-    },
-    {
-      fetch: fetcher,
-    }
-  );
-}
-
-/**
- * Optional parameters to customise the behaviour of consent requests.
- *
- * - `fetch`: Pass in a function with a signature compatible with the WHATWG
- *            Fetch API, which will be used to make HTTP requests. Primarily
- *            useful when requests need to be authenticated.
- *            When `@inrupt/solid-client-authn-browser` is available and this
- *            property is not set, `fetch` will be imported from there.
- *            Otherwise, the HTTP requests will be unauthenticated.
- * - `consentEndpoint`: a base URL used when determining the location of
- *                      consent API calls.
- */
-export type ConsentGrantBaseOptions = Partial<{
-  fetch?: typeof fetch;
-  consentEndpoint?: UrlString;
-}>;
+import {
+  PIM_STORAGE,
+  PREFERRED_CONSENT_MANAGEMENT_UI,
+  ConsentGrantBaseOptions,
+  CONSENT_STATUS_REQUESTED,
+} from "../constants";
 
 /**
  * Required parameters to request access to one or more Resources.
@@ -151,15 +73,10 @@ export async function requestAccess(
 ): Promise<unknown> {
   const consentRequest = getRequestBody({
     ...params,
-    status: "ConsentStatusRequested",
+    status: CONSENT_STATUS_REQUESTED,
   });
 
-  return sendConsentRequest(
-    params.requestor,
-    params.resourceOwner,
-    consentRequest,
-    options
-  );
+  return issueAccessOrConsentVc(params.requestor, consentRequest, options);
 }
 
 /**
@@ -176,7 +93,7 @@ export async function requestAccess(
  * - `expirationDate`: (Optional.) Point in time until when the access is needed.
  */
 export type RequestAccessWithConsentParameters = RequestAccessParameters & {
-  purpose: UrlString[];
+  purpose: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;
 };
@@ -193,14 +110,9 @@ export async function requestAccessWithConsent(
 ): Promise<unknown> {
   const consentRequest = getRequestBody({
     ...params,
-    status: "ConsentStatusRequested",
+    status: CONSENT_STATUS_REQUESTED,
   });
-  return sendConsentRequest(
-    params.requestor,
-    params.resourceOwner,
-    consentRequest,
-    options
-  );
+  return issueAccessOrConsentVc(params.requestor, consentRequest, options);
 }
 
 /**
@@ -228,13 +140,7 @@ export async function cancelAccessRequest(
     );
   }
   // Only the credential IRI has been provided, and it needs to be dereferenced.
-  const issuerResponse = await fetcher(accessRequest);
-  if (!issuerResponse.ok) {
-    throw new Error(
-      `An error occured when looking up [${accessRequest}]: ${issuerResponse.status} ${issuerResponse.statusText}`
-    );
-  }
-  const credential = (await issuerResponse.json()) as VerifiableCredential;
+  const credential = await dereferenceVcIri(accessRequest, fetcher);
   return revokeVerifiableCredential(
     new URL("issue", credential.issuer).href,
     credential.id,

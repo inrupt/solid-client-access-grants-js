@@ -6,6 +6,9 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+- `approveAccessRequest` and `approveAccessRequestWithConsent`: As a person controlling
+  some data, grant access to an entity to this data, potentially with your explicit
+  consent for a given purpose.
 - `cancelAccessRequest`: Cancel a pending access request.
 - `getConsentApiEndpoint`: Discover the URL of a consent app where a user prefers
   to be redirected when prompted for consent.

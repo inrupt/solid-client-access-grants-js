@@ -27,3 +27,7 @@ export {
 } from "./request/request";
 
 export { default as isValidConsentGrant } from "./verify/verify";
+export {
+  approveAccessRequest,
+  approveAccessRequestWithConsent,
+} from "./approve/approve";

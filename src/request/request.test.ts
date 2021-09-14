@@ -20,9 +20,6 @@
 // This rule complains about the `@jest/globals` variables overriding global vars:
 /* eslint-disable no-shadow */
 import { jest, describe, it, expect } from "@jest/globals";
-// This ESLint plugin seems to not be able to resolve subpackage imports:
-// eslint-disable-next-line import/no-unresolved
-import { mocked } from "ts-jest/utils";
 import {
   mockSolidDatasetFrom,
   getWellKnownSolid,
@@ -37,13 +34,13 @@ import { Response } from "cross-fetch";
 import {
   cancelAccessRequest,
   getConsentApiEndpoint,
-  isAccessRequest,
   requestAccess,
   requestAccessWithConsent,
 } from "./request";
 import {
-  getConsentEndpointForWebId,
+  getConsentEndpointForResource,
   getRequestBody,
+  isAccessRequest,
 } from "../consent.internal";
 import {
   mockAccessGrant,
@@ -58,7 +55,6 @@ import {
 const MOCK_REQUESTOR_IRI = "https://some.pod/profile#me";
 const MOCK_REQUESTOR_INBOX = "https://some.pod/consent/inbox";
 const MOCK_REQUESTEE_IRI = "https://some.pod/profile#you";
-const MOCK_ISSUER_IRI = "https://some-issuer.iri/";
 
 jest.mock("../consent.internal.ts", () => {
   const internalConsentModule = jest.requireActual(
@@ -68,8 +64,8 @@ jest.mock("../consent.internal.ts", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) as any;
 
-  internalConsentModule.getConsentEndpointForWebId = jest.fn(
-    internalConsentModule.getConsentEndpointForWebId
+  internalConsentModule.getConsentEndpointForResource = jest.fn(
+    internalConsentModule.getConsentEndpointForResource
   );
 
   return internalConsentModule;
@@ -155,17 +151,27 @@ describe("getConsentRequestBody", () => {
   });
 });
 
+const mockConsentEndpoint = (withConsent = true) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
+  solidClientModule.getWellKnownSolid.mockResolvedValue(
+    (withConsent
+      ? mockWellKnownWithConsent()
+      : mockWellKnownNoConsent()) as never
+  );
+};
+
 describe("requestAccess", () => {
   it("sends a proper access request", async () => {
+    mockConsentEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
       "issueVerifiableCredential"
     );
-    mocked(getConsentEndpointForWebId).mockResolvedValueOnce(MOCK_ISSUER_IRI);
     mockedIssue.mockResolvedValueOnce(
-      mockAccessGrant(MOCK_ISSUER_IRI, MOCK_REQUESTOR_IRI, {
+      mockAccessGrant(MOCKED_CONSENT_ISSUER, MOCK_REQUESTOR_IRI, {
         someClaim: "some value",
       })
     );
@@ -184,7 +190,7 @@ describe("requestAccess", () => {
     );
 
     expect(mockedIssue).toHaveBeenCalledWith(
-      `${MOCK_ISSUER_IRI}issue`,
+      `${MOCKED_CONSENT_ISSUER}/issue`,
       MOCK_REQUESTOR_IRI,
       expect.objectContaining({
         id: MOCK_REQUESTOR_IRI,
@@ -202,9 +208,7 @@ describe("requestAccess", () => {
   });
 
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    mocked(getConsentEndpointForWebId).mockResolvedValueOnce(
-      "https://some.pod/issue"
-    );
+    mockConsentEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
@@ -238,15 +242,15 @@ describe("requestAccess", () => {
 
 describe("requestAccessWithConsent", () => {
   it("sends a proper access with consent request", async () => {
+    mockConsentEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
       "issueVerifiableCredential"
     );
-    mocked(getConsentEndpointForWebId).mockResolvedValueOnce(MOCK_ISSUER_IRI);
     mockedIssue.mockResolvedValueOnce(
-      mockAccessGrant(MOCK_ISSUER_IRI, MOCK_REQUESTOR_IRI, {
+      mockAccessGrant(MOCKED_CONSENT_ISSUER, MOCK_REQUESTOR_IRI, {
         someClaim: "some value",
       })
     );
@@ -268,7 +272,7 @@ describe("requestAccessWithConsent", () => {
     );
 
     expect(mockedIssue).toHaveBeenCalledWith(
-      `${MOCK_ISSUER_IRI}issue`,
+      `${MOCKED_CONSENT_ISSUER}/issue`,
       MOCK_REQUESTOR_IRI,
       expect.objectContaining({
         id: MOCK_REQUESTOR_IRI,
@@ -289,15 +293,15 @@ describe("requestAccessWithConsent", () => {
   });
 
   it("supports access with consent request with no issuance or expiration set", async () => {
+    mockConsentEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
       "issueVerifiableCredential"
     );
-    mocked(getConsentEndpointForWebId).mockResolvedValueOnce(MOCK_ISSUER_IRI);
     mockedIssue.mockResolvedValueOnce(
-      mockAccessGrant(MOCK_ISSUER_IRI, MOCK_REQUESTOR_IRI, {
+      mockAccessGrant(MOCKED_CONSENT_ISSUER, MOCK_REQUESTOR_IRI, {
         someClaim: "some value",
       })
     );
@@ -312,7 +316,7 @@ describe("requestAccessWithConsent", () => {
     });
 
     expect(mockedIssue).toHaveBeenCalledWith(
-      `${MOCK_ISSUER_IRI}issue`,
+      `${MOCKED_CONSENT_ISSUER}/issue`,
       MOCK_REQUESTOR_IRI,
       expect.objectContaining({
         id: MOCK_REQUESTOR_IRI,
@@ -331,9 +335,7 @@ describe("requestAccessWithConsent", () => {
   });
 
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    mocked(getConsentEndpointForWebId).mockResolvedValueOnce(
-      "https://some.pod/issue"
-    );
+    mockConsentEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
@@ -368,17 +370,10 @@ describe("requestAccessWithConsent", () => {
   });
 });
 
-describe("getConsentEndpointForWebId", () => {
-  it("can find the consent endpoint for a given WebID", async () => {
-    jest
-      .spyOn(
-        jest.requireMock("@inrupt/solid-client") as {
-          getWellKnownSolid: typeof getWellKnownSolid;
-        },
-        "getWellKnownSolid"
-      )
-      .mockResolvedValueOnce(mockWellKnownWithConsent());
-    const consentEndpoint = await getConsentEndpointForWebId(
+describe("getConsentEndpointForResource", () => {
+  it("can find the consent endpoint for a given resource", async () => {
+    mockConsentEndpoint();
+    const consentEndpoint = await getConsentEndpointForResource(
       MOCK_REQUESTEE_IRI,
       jest.fn()
     );
@@ -397,21 +392,14 @@ describe("getConsentEndpointForWebId", () => {
         mockSolidDatasetFrom("https://some.resource/.well-known/solid")
       );
     await expect(
-      getConsentEndpointForWebId(MOCK_REQUESTEE_IRI, jest.fn())
+      getConsentEndpointForResource(MOCK_REQUESTEE_IRI, jest.fn())
     ).rejects.toThrow(/Cannot discover.*well-known document is empty/);
   });
 
   it("throws an error if the well-known document does not list a consent endpoint", async () => {
-    jest
-      .spyOn(
-        jest.requireMock("@inrupt/solid-client") as {
-          getWellKnownSolid: typeof getWellKnownSolid;
-        },
-        "getWellKnownSolid"
-      )
-      .mockResolvedValueOnce(mockWellKnownNoConsent());
+    mockConsentEndpoint(false);
     await expect(
-      getConsentEndpointForWebId(MOCK_REQUESTEE_IRI, jest.fn())
+      getConsentEndpointForResource(MOCK_REQUESTEE_IRI, jest.fn())
     ).rejects.toThrow(
       /Cannot discover.*no value for property \[http:\/\/inrupt.com\/ns\/ess#consentIssuer\]/
     );

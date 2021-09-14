@@ -25,7 +25,10 @@ import { jest, describe, it, expect } from "@jest/globals";
 // eslint-disable-next-line import/no-unresolved
 import { mocked } from "ts-jest/utils";
 
-import { getConsentEndpointForWebId } from "../consent.internal";
+import {
+  mockWellKnownNoConsent,
+  mockWellKnownWithConsent,
+} from "../request/request.mock";
 import isValidConsentGrant from "./verify";
 
 jest.mock("../consent.internal.ts", () => {
@@ -55,6 +58,16 @@ jest.mock("@inrupt/solid-client", () => {
 });
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
+
+const mockConsentEndpoint = (withConsent = true) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
+  solidClientModule.getWellKnownSolid.mockResolvedValue(
+    (withConsent
+      ? mockWellKnownWithConsent()
+      : mockWellKnownNoConsent()) as never
+  );
+};
 
 describe("isValidConsentGrant", () => {
   const MOCK_CONSENT_GRANT = {
@@ -102,9 +115,7 @@ describe("isValidConsentGrant", () => {
   });
 
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    mocked(getConsentEndpointForWebId).mockResolvedValueOnce(
-      "https://some.pod/issue"
-    );
+    mockConsentEndpoint();
     // TypeScript can't infer the type of mock modules imported via Jest;
     // skip type checking for those:
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -176,8 +187,14 @@ describe("isValidConsentGrant", () => {
   });
 
   it("gets consent endpoint using credentialSubject.id if no consentEndpoint was passed", async () => {
-    mocked(getConsentEndpointForWebId).mockResolvedValueOnce(
-      "https://consent.some.pod"
+    mockConsentEndpoint();
+    const internalConsentModule = jest.requireActual(
+      "../consent.internal"
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ) as any;
+    const spiedConsentEndpointLookup = jest.spyOn(
+      internalConsentModule,
+      "getConsentEndpointForResource"
     );
     const mockedFetch = jest.fn().mockReturnValue({
       ok: true,
@@ -189,7 +206,7 @@ describe("isValidConsentGrant", () => {
       fetch: mockedFetch as typeof fetch,
     });
 
-    expect(getConsentEndpointForWebId).toHaveBeenCalledWith(
+    expect(spiedConsentEndpointLookup).toHaveBeenCalledWith(
       MOCK_CONSENT_GRANT.credentialSubject.id,
       expect.anything()
     );
