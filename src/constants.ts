@@ -45,4 +45,8 @@ export const CREDENTIAL_TYPE = "SolidConsentRequest";
 
 export const CONSENT_STATUS_REQUESTED = "ConsentStatusRequested";
 
-export type CONSENT_STATUS = typeof CONSENT_STATUS_REQUESTED;
+export const CONSENT_STATUS_GIVEN = "ConsentStatusExplicitlyGiven";
+
+export type CONSENT_STATUS =
+  | typeof CONSENT_STATUS_REQUESTED
+  | typeof CONSENT_STATUS_GIVEN;

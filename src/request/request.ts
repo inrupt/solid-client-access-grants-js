@@ -17,7 +17,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { fetch as crossFetch } from "cross-fetch";
 import { access, UrlString, WebId } from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
@@ -26,25 +25,11 @@ import {
 import {
   AccessRequestBody,
   ConsentRequestBody,
-  getConsentEndpointForWebId,
+  getConsentEndpointForResource,
   getRequestBody,
   isConsentRequest,
+  getDefaultSessionFetch,
 } from "../consent.internal";
-
-// Dynamically import solid-client-authn-browser so that this library doesn't have a hard
-// dependency.
-async function getDefaultSessionFetch(): Promise<typeof fetch> {
-  try {
-    const { fetch: fetchFn } = await import(
-      "@inrupt/solid-client-authn-browser"
-    );
-
-    return fetchFn;
-  } catch (e) {
-    /* istanbul ignore next: @inrupt/solid-client-authn-browser is a devDependency, so this path is not hit in tests: */
-    return crossFetch;
-  }
-}
 
 export function isAccessRequest(
   credential: VerifiableCredential | AccessRequestBody
@@ -84,7 +69,7 @@ async function sendConsentRequest(
   const fetcher = options.fetch ?? (await getDefaultSessionFetch());
   const consentEndpoint = new URL(
     "issue",
-    await getConsentEndpointForWebId(requestee, fetcher)
+    await getConsentEndpointForResource(requestee, fetcher)
   );
   return issueVerifiableCredential(
     consentEndpoint.href,
@@ -121,6 +106,7 @@ async function sendConsentRequest(
  */
 export type ConsentGrantBaseOptions = Partial<{
   fetch?: typeof fetch;
+  consentEndpoint: UrlString;
 }>;
 
 /**
@@ -177,7 +163,7 @@ export async function requestAccess(
  * - `expirationDate`: (Optional.) Point in time until when the access is needed.
  */
 export type RequestAccessWithConsentParameters = RequestAccessParameters & {
-  purpose: UrlString[];
+  purpose: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;
 };
