@@ -21,6 +21,7 @@ import { fetch as crossFetch } from "cross-fetch";
 import { access, UrlString, WebId } from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
+  isVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import {
@@ -118,9 +119,12 @@ async function sendConsentRequest(
  *            When `@inrupt/solid-client-authn-browser` is available and this
  *            property is not set, `fetch` will be imported from there.
  *            Otherwise, the HTTP requests will be unauthenticated.
+ * - `consentEndpoint`: a base URL used when determining the location of
+ *                      consent API calls.
  */
 export type ConsentGrantBaseOptions = Partial<{
   fetch?: typeof fetch;
+  consentEndpoint?: UrlString;
 }>;
 
 /**
@@ -202,4 +206,47 @@ export async function requestAccessWithConsent(
     consentRequest,
     options
   );
+}
+
+export async function isValidConsentGrant(
+  vc: VerifiableCredential | UrlString,
+  options: ConsentGrantBaseOptions = {}
+): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
+  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
+
+  let vcObject = vc;
+  if (typeof vc === "string") {
+    const vcResponse = await fetcher(vc);
+    vcObject = await vcResponse.json();
+    if (!isVerifiableCredential(vcObject)) {
+      throw new Error(
+        `The request to [${vc}] returned an unexpected response: ${JSON.stringify(
+          vcObject,
+          null,
+          "  "
+        )}`
+      );
+    }
+  }
+  const credentialSubjectId = (vcObject as VerifiableCredential)
+    .credentialSubject.id;
+
+  const consentEndpoint =
+    options.consentEndpoint ??
+    (await getConsentEndpointForWebId(credentialSubjectId, fetcher));
+  const consentVerifyEndpoint = `${consentEndpoint}/verify`;
+
+  const response = await fetcher(consentVerifyEndpoint, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    method: "POST",
+    body: JSON.stringify({
+      verifiableCredential: vcObject,
+    }),
+  });
+
+  const jsonData = await response.json();
+
+  return jsonData;
 }

@@ -26,10 +26,12 @@ import { mocked } from "ts-jest/utils";
 import { mockSolidDatasetFrom, getWellKnownSolid } from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
+  isVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import {
   isAccessRequest,
+  isValidConsentGrant,
   requestAccess,
   requestAccessWithConsent,
 } from "./request";
@@ -561,5 +563,145 @@ describe("isAccessRequest", () => {
         type: ["SolidConsentRequest"],
       })
     ).toBe(true);
+  });
+});
+
+describe("isValidConsentGrant", () => {
+  const MOCK_CONSENT_GRANT = {
+    "@context": [
+      "https://www.w3.org/2018/credentials/v1",
+      "https://consent.pod.inrupt.com/credentials/v1",
+    ],
+    id: "https://example.com/id",
+    issuer: "https://example.com/issuer",
+    type: ["VerifiableCredential", "SolidCredential", "SolidConsentGrant"],
+    issuanceDate: "2021-05-26T16:40:03",
+    expirationDate: "2021-06-09T16:40:03",
+    credentialSubject: {
+      id: "https://pod.inrupt.com/alice/profile/card#me",
+      providedConsent: {
+        mode: ["Read"],
+        hasStatus: "ConsentStatusExplicitlyGiven",
+        forPersonalData: "https://pod.inrupt.com/alice/private/data",
+        forPurpose: "https://example.com/SomeSpecificPurpose",
+        isProvidedToPerson: "https://pod.inrupt.com/bob/profile/card#me",
+      },
+    },
+    proof: {
+      created: "2021-05-26T16:40:03.009Z",
+      proofPurpose: "assertionMethod",
+      proofValue: "eqp8h_kL1DwJCpn65z-d1Arnysx6b11...jb8j0MxUCc1uDQ",
+      type: "Ed25519Signature2020",
+      verificationMethod: "https://consent.pod.inrupt.com/key/396f686b",
+    },
+  };
+  const MOCK_CONSENT_ENDPOINT = "https://consent.example.com";
+  const MOCK_VERIFY_RESPONSE = { checks: [], warning: [], errors: [] };
+
+  it("uses the provided fetch if any", async () => {
+    const mockedFetch = jest.fn() as typeof fetch;
+    try {
+      await isValidConsentGrant(MOCK_CONSENT_GRANT, {
+        fetch: mockedFetch,
+        consentEndpoint: MOCK_CONSENT_ENDPOINT,
+      });
+      // eslint-disable-next-line no-empty
+    } catch (_e) {}
+
+    expect(mockedFetch).toHaveBeenCalled();
+  });
+
+  it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
+    mocked(getConsentEndpointForWebId).mockResolvedValueOnce(
+      "https://some.pod/issue"
+    );
+    // TypeScript can't infer the type of mock modules imported via Jest;
+    // skip type checking for those:
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
+    try {
+      await isValidConsentGrant(MOCK_CONSENT_GRANT);
+      // eslint-disable-next-line no-empty
+    } catch (_e) {}
+    expect(scab.fetch).toHaveBeenCalled();
+  });
+
+  it("sends the given vc to the verify endpoint", async () => {
+    const mockedFetch = jest.fn().mockReturnValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockReturnValueOnce(MOCK_VERIFY_RESPONSE),
+    }) as typeof fetch;
+
+    await isValidConsentGrant(MOCK_CONSENT_GRANT, {
+      fetch: mockedFetch,
+      consentEndpoint: MOCK_CONSENT_ENDPOINT,
+    });
+
+    expect(mockedFetch).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        body: JSON.stringify({ verifiableCredential: MOCK_CONSENT_GRANT }),
+      })
+    );
+  });
+
+  it("retrieves the vc if a url was passed", async () => {
+    const mockedFetch = jest.fn().mockReturnValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockReturnValueOnce(MOCK_VERIFY_RESPONSE),
+    });
+    mockedFetch.mockReturnValueOnce({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockReturnValueOnce(MOCK_CONSENT_GRANT),
+    });
+    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+
+    await isValidConsentGrant("https://example.com/someVc", {
+      fetch: mockedFetch as typeof fetch,
+      consentEndpoint: MOCK_CONSENT_ENDPOINT,
+    });
+
+    expect(mockedFetch).toHaveBeenCalledWith("https://example.com/someVc");
+  });
+
+  it("throws if the passed url returns a non-vc", async () => {
+    const mockedFetch = jest.fn().mockReturnValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockReturnValueOnce({ someField: "Not a credential" }),
+    });
+    mocked(isVerifiableCredential).mockReturnValueOnce(false);
+
+    await expect(
+      isValidConsentGrant("https://example.com/someVc", {
+        fetch: mockedFetch as typeof fetch,
+        consentEndpoint: MOCK_CONSENT_ENDPOINT,
+      })
+    ).rejects.toThrow(
+      "The request to [https://example.com/someVc] returned an unexpected response:"
+    );
+  });
+
+  it("gets consent endpoint using credentialSubject.id if no consentEndpoint was passed", async () => {
+    mocked(getConsentEndpointForWebId).mockResolvedValueOnce(
+      "https://consent.some.pod"
+    );
+    const mockedFetch = jest.fn().mockReturnValue({
+      ok: true,
+      status: 200,
+      json: jest.fn().mockReturnValueOnce(MOCK_VERIFY_RESPONSE),
+    });
+
+    await isValidConsentGrant(MOCK_CONSENT_GRANT, {
+      fetch: mockedFetch as typeof fetch,
+    });
+
+    expect(getConsentEndpointForWebId).toHaveBeenCalledWith(
+      MOCK_CONSENT_GRANT.credentialSubject.id,
+      expect.anything()
+    );
   });
 });
