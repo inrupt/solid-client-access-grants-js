@@ -47,7 +47,7 @@ import {
 const MOCK_REQUESTOR_IRI = "https://some.pod/profile#me";
 const MOCK_REQUESTOR_INBOX = "https://some.pod/consent/inbox";
 const MOCK_REQUESTEE_IRI = "https://some.pod/profile#you";
-const MOCK_ISSUER_IRI = "https://some-issuer.iri/issue";
+const MOCK_ISSUER_IRI = "https://some-issuer.iri/";
 
 jest.mock("../consent.internal.ts", () => {
   const internalConsentModule = jest.requireActual(
@@ -173,7 +173,7 @@ describe("requestAccess", () => {
     );
 
     expect(mockedIssue).toHaveBeenCalledWith(
-      MOCK_ISSUER_IRI,
+      `${MOCK_ISSUER_IRI}issue`,
       MOCK_REQUESTOR_IRI,
       expect.objectContaining({
         id: MOCK_REQUESTOR_IRI,
@@ -257,7 +257,7 @@ describe("requestAccessWithConsent", () => {
     );
 
     expect(mockedIssue).toHaveBeenCalledWith(
-      MOCK_ISSUER_IRI,
+      `${MOCK_ISSUER_IRI}issue`,
       MOCK_REQUESTOR_IRI,
       expect.objectContaining({
         id: MOCK_REQUESTOR_IRI,
@@ -301,7 +301,7 @@ describe("requestAccessWithConsent", () => {
     });
 
     expect(mockedIssue).toHaveBeenCalledWith(
-      MOCK_ISSUER_IRI,
+      `${MOCK_ISSUER_IRI}issue`,
       MOCK_REQUESTOR_IRI,
       expect.objectContaining({
         id: MOCK_REQUESTOR_IRI,

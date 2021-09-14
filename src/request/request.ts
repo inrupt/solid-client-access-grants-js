@@ -82,9 +82,12 @@ async function sendConsentRequest(
   options: ConsentGrantBaseOptions
 ): Promise<unknown> {
   const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  const consentEndpoint = await getConsentEndpointForWebId(requestee, fetcher);
+  const consentEndpoint = new URL(
+    "/issue",
+    await getConsentEndpointForWebId(requestee, fetcher)
+  );
   return issueVerifiableCredential(
-    consentEndpoint,
+    consentEndpoint.href,
     requestor,
     {
       "@context": consentRequest["@context"],
