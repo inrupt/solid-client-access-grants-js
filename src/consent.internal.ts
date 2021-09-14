@@ -33,7 +33,7 @@ import {
   CONSENT_STATUS,
 } from "./constants";
 
-function accessToConsentRequestModes(
+export function accessToConsentRequestModes(
   desiredAccess: Partial<access.Access>
 ): ConsentRequestModes[] {
   // TODO: Check that these are actually the modes you can request.
