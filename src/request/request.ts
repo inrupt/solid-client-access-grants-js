@@ -120,7 +120,7 @@ async function sendConsentRequest(
  *            Otherwise, the HTTP requests will be unauthenticated.
  */
 export type ConsentGrantBaseOptions = Partial<{
-  fetch: typeof fetch;
+  fetch?: typeof fetch;
 }>;
 
 /**
