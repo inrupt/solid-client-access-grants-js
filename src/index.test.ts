@@ -20,10 +20,15 @@
 // This rule complains about the `@jest/globals` variables overriding global vars:
 /* eslint-disable no-shadow */
 import { describe, it, expect } from "@jest/globals";
-import { requestAccess, requestAccessWithConsent } from "./index";
+import {
+  isValidConsentGrant,
+  requestAccess,
+  requestAccessWithConsent,
+} from "./index";
 
 describe("Index exports", () => {
   it("exposes expected things", () => {
+    expect(isValidConsentGrant).toBeDefined();
     expect(requestAccess).toBeDefined();
     expect(requestAccessWithConsent).toBeDefined();
   });
