@@ -28,6 +28,7 @@ import {
   getConsentApiEndpoint,
   approveAccessRequest,
   approveAccessRequestWithConsent,
+  revokeConsentGrant,
 } from "./index";
 
 describe("Index exports", () => {
@@ -39,5 +40,6 @@ describe("Index exports", () => {
     expect(getConsentApiEndpoint).toBeDefined();
     expect(approveAccessRequest).toBeDefined();
     expect(approveAccessRequestWithConsent).toBeDefined();
+    expect(revokeConsentGrant).toBeDefined();
   });
 });
