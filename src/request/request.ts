@@ -208,6 +208,13 @@ export async function requestAccessWithConsent(
   );
 }
 
+/**
+ * Makes a request to the consent server to verify the validity of a given VC.
+ *
+ * @param vc Either a VC, or a URL to a VC, to be verified.
+ * @param options Optional properties to customise the request behaviour.
+ * @returns An object containing checks, warnings, and errors.
+ */
 export async function isValidConsentGrant(
   vc: VerifiableCredential | UrlString,
   options: ConsentGrantBaseOptions = {}
