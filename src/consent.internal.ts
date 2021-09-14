@@ -25,6 +25,7 @@ import {
   getSourceIri,
   getIri,
 } from "@inrupt/solid-client";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetch as crossFetch } from "cross-fetch";
 import {
   CONTEXT_CONSENT,
@@ -33,7 +34,7 @@ import {
   CONSENT_STATUS,
 } from "./constants";
 
-function accessToConsentRequestModes(
+export function accessToConsentRequestModes(
   desiredAccess: Partial<access.Access>
 ): ConsentRequestModes[] {
   // TODO: Check that these are actually the modes you can request.
@@ -265,4 +266,33 @@ export async function getDefaultSessionFetch(): Promise<typeof fetch> {
     /* istanbul ignore next: @inrupt/solid-client-authn-browser is a devDependency, so this path is not hit in tests: */
     return crossFetch;
   }
+}
+
+export function isAccessRequest(
+  credential: VerifiableCredential | AccessRequestBody
+): credential is AccessRequestBody {
+  let result = true;
+  result =
+    result &&
+    (credential as AccessRequestBody).type.includes("SolidConsentRequest");
+  result =
+    result &&
+    (credential as AccessRequestBody).credentialSubject.hasConsent !==
+      undefined;
+  result =
+    result &&
+    (credential as AccessRequestBody).credentialSubject.hasConsent
+      .forPersonalData !== undefined;
+  result =
+    result &&
+    (credential as AccessRequestBody).credentialSubject.hasConsent.hasStatus ===
+      "ConsentStatusRequested";
+  result =
+    result &&
+    (credential as AccessRequestBody).credentialSubject.hasConsent.mode !==
+      undefined;
+  result =
+    result &&
+    (credential as AccessRequestBody).credentialSubject.inbox !== undefined;
+  return result;
 }

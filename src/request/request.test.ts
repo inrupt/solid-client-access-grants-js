@@ -28,14 +28,11 @@ import {
   issueVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import {
-  isAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./request";
+import { requestAccess, requestAccessWithConsent } from "./request";
 import {
   getConsentEndpointForResource,
   getRequestBody,
+  isAccessRequest,
 } from "../consent.internal";
 import {
   mockAccessGrant,
