@@ -23,16 +23,23 @@ import {
   getThingAll,
   getSourceIri,
   getIri,
+  WebId,
 } from "@inrupt/solid-client";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import {
+  issueVerifiableCredential,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import { fetch as crossFetch } from "cross-fetch";
 import {
   CONTEXT_CONSENT,
   INRUPT_CONSENT_SERVICE,
   CREDENTIAL_TYPE,
   CONSENT_STATUS,
+  CONSENT_STATUS_REQUESTED,
   ResourceAccessModes,
+  CONSENT_STATUS_GIVEN,
 } from "./constants";
+import { ConsentGrantBaseOptions } from "./request/request";
 
 export function accessToConsentRequestModes(
   desiredAccess: Partial<access.Access>
@@ -115,7 +122,7 @@ export type BaseConsentBody = BaseAccessBody & {
 export type AccessRequestBody = BaseAccessBody & {
   credentialSubject: {
     hasConsent: {
-      hasStatus: "ConsentStatusRequested";
+      hasStatus: typeof CONSENT_STATUS_REQUESTED;
     };
   };
 };
@@ -123,7 +130,7 @@ export type AccessRequestBody = BaseAccessBody & {
 export type AccessGrantBody = BaseAccessBody & {
   credentialSubject: {
     hasConsent: {
-      hasStatus: "ConsentStatusRequested";
+      hasStatus: typeof CONSENT_STATUS_GIVEN;
       isProvidedTo: UrlString;
     };
   };
@@ -148,14 +155,14 @@ export type BaseConsentParameters = {
 };
 
 export type AccessRequestParameters = BaseRequestParameters & {
-  status: "ConsentStatusRequested";
+  status: typeof CONSENT_STATUS_REQUESTED;
 };
 
 export type ConsentRequestParameters = AccessRequestParameters &
   BaseConsentParameters;
 
 export type AccessGrantParameters = BaseRequestParameters & {
-  status: "ConsentStatusExplicitlyGiven";
+  status: typeof CONSENT_STATUS_GIVEN;
 };
 
 export type ConsentGrantParameters = AccessGrantParameters &
@@ -168,8 +175,8 @@ function areConsentParameters(
 }
 
 export function isConsentRequest(
-  request: AccessRequestBody | ConsentRequestBody
-): request is ConsentRequestBody {
+  request: BaseAccessBody | BaseConsentBody
+): request is BaseConsentBody {
   return (
     (request as ConsentRequestBody).credentialSubject.hasConsent.forPurpose !==
     undefined
@@ -290,4 +297,40 @@ export function isAccessRequest(
     result &&
     (credential as AccessRequestBody).credentialSubject.inbox !== undefined;
   return result;
+}
+
+export async function issueAccessOrConsentVc(
+  requestor: WebId,
+  vcBody: BaseAccessBody | BaseConsentBody,
+  options: ConsentGrantBaseOptions
+): Promise<VerifiableCredential> {
+  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
+  const consentEndpoint = options.consentEndpoint
+    ? new URL(options.consentEndpoint)
+    : new URL(
+        "issue",
+        await getConsentEndpointForResource(
+          vcBody.credentialSubject.hasConsent.forPersonalData[0],
+          fetcher
+        )
+      );
+  return issueVerifiableCredential(
+    consentEndpoint.href,
+    requestor,
+    {
+      "@context": vcBody["@context"],
+      ...vcBody.credentialSubject,
+    },
+    {
+      "@context": vcBody["@context"],
+      type: ["SolidConsentRequest"],
+      issuanceDate: isConsentRequest(vcBody) ? vcBody.issuanceDate : undefined,
+      expirationDate: isConsentRequest(vcBody)
+        ? vcBody.expirationDate
+        : undefined,
+    },
+    {
+      fetch: fetcher,
+    }
+  );
 }

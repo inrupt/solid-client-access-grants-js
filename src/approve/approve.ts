@@ -30,6 +30,7 @@ import {
   getConsentEndpointForResource,
   getGrantBody,
   isAccessRequest,
+  issueAccessOrConsentVc,
 } from "../consent.internal";
 import { ResourceAccessModes } from "../constants";
 import { ConsentGrantBaseOptions } from "../request/request";
@@ -83,42 +84,6 @@ function getExpirationFromConsentRequest(
   return isConsentRequest(requestVc) && requestVc.expirationDate !== undefined
     ? new Date(requestVc.expirationDate)
     : undefined;
-}
-
-async function sendRequestApproval(
-  requestor: WebId,
-  requestApproval: AccessRequestBody | ConsentRequestBody,
-  options: ConsentGrantBaseOptions
-): Promise<VerifiableCredential> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  // We assume that all the resources are controlled by the same consent endpoint.
-  const consentEndpoint =
-    options.consentEndpoint ??
-    (await getConsentEndpointForResource(
-      requestApproval.credentialSubject.hasConsent.forPersonalData[0],
-      fetcher
-    ));
-  return issueVerifiableCredential(
-    consentEndpoint,
-    requestor,
-    {
-      "@context": requestApproval["@context"],
-      ...requestApproval.credentialSubject,
-    },
-    {
-      "@context": requestApproval["@context"],
-      type: ["SolidConsentRequest"],
-      issuanceDate: isConsentRequest(requestApproval)
-        ? requestApproval.issuanceDate
-        : undefined,
-      expirationDate: isConsentRequest(requestApproval)
-        ? requestApproval.expirationDate
-        : undefined,
-    },
-    {
-      fetch: fetcher,
-    }
-  );
 }
 
 function initializeGrantParameters(
@@ -238,7 +203,7 @@ export async function approveAccessRequest(
     requestorInboxUrl: internalOptions.requestorInboxIri,
     status: "ConsentStatusExplicitlyGiven",
   });
-  return sendRequestApproval(internalOptions.requestor, requestBody, {
+  return issueAccessOrConsentVc(internalOptions.requestor, requestBody, {
     fetch: options?.fetch,
     consentEndpoint: options?.consentEndpoint,
   });
@@ -337,7 +302,7 @@ export async function approveAccessRequestWithConsent(
     issuanceDate: initialisedOptions.issuanceDate,
     expirationDate: initialisedOptions.expirationDate,
   });
-  return sendRequestApproval(initialisedOptions.requestor, requestBody, {
+  return issueAccessOrConsentVc(initialisedOptions.requestor, requestBody, {
     fetch: options?.fetch,
     consentEndpoint: options?.consentEndpoint,
   });

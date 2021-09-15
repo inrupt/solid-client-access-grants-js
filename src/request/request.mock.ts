@@ -54,12 +54,12 @@ export const mockAccessGrant = (
   };
 };
 
-export const mockedConsentEndpoint = "https://consent-issuer.iri";
+export const MOCKED_CONSENT_ENDPOINT = "https://consent-issuer.iri";
 
 export const mockWellKnownWithConsent = (): SolidDataset &
   WithServerResourceInfo => {
   const wellKown = buildThing()
-    .addIri("http://inrupt.com/ns/ess#consentIssuer", mockedConsentEndpoint)
+    .addIri("http://inrupt.com/ns/ess#consentIssuer", MOCKED_CONSENT_ENDPOINT)
     .build();
   return setThing(
     mockSolidDatasetFrom("https://pod-provider.iri/resource/.well-known/solid"),

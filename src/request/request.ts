@@ -18,49 +18,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { access, UrlString, WebId } from "@inrupt/solid-client";
-import { issueVerifiableCredential } from "@inrupt/solid-client-vc";
-import {
-  AccessRequestBody,
-  ConsentRequestBody,
-  getConsentEndpointForResource,
-  getRequestBody,
-  isConsentRequest,
-  getDefaultSessionFetch,
-} from "../consent.internal";
-
-async function sendConsentRequest(
-  requestor: WebId,
-  requestee: WebId,
-  consentRequest: AccessRequestBody | ConsentRequestBody,
-  options: ConsentGrantBaseOptions
-): Promise<unknown> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  const consentEndpoint = new URL(
-    "issue",
-    await getConsentEndpointForResource(requestee, fetcher)
-  );
-  return issueVerifiableCredential(
-    consentEndpoint.href,
-    requestor,
-    {
-      "@context": consentRequest["@context"],
-      ...consentRequest.credentialSubject,
-    },
-    {
-      "@context": consentRequest["@context"],
-      type: ["SolidConsentRequest"],
-      issuanceDate: isConsentRequest(consentRequest)
-        ? consentRequest.issuanceDate
-        : undefined,
-      expirationDate: isConsentRequest(consentRequest)
-        ? consentRequest.expirationDate
-        : undefined,
-    },
-    {
-      fetch: fetcher,
-    }
-  );
-}
+import { getRequestBody, issueAccessOrConsentVc } from "../consent.internal";
 
 /**
  * Optional parameters to customise the behaviour of consent requests.
@@ -109,12 +67,7 @@ export async function requestAccess(
     status: "ConsentStatusRequested",
   });
 
-  return sendConsentRequest(
-    params.requestor,
-    params.resourceOwner,
-    consentRequest,
-    options
-  );
+  return issueAccessOrConsentVc(params.requestor, consentRequest, options);
 }
 
 /**
@@ -150,10 +103,5 @@ export async function requestAccessWithConsent(
     ...params,
     status: "ConsentStatusRequested",
   });
-  return sendConsentRequest(
-    params.requestor,
-    params.resourceOwner,
-    consentRequest,
-    options
-  );
+  return issueAccessOrConsentVc(params.requestor, consentRequest, options);
 }
