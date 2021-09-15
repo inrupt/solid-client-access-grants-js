@@ -18,21 +18,15 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { Access, UrlString, WebId } from "@inrupt/solid-client";
-import {
-  issueVerifiableCredential,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   AccessRequestBody,
-  ConsentRequestBody,
   isConsentRequest,
-  getDefaultSessionFetch,
-  getConsentEndpointForResource,
   getGrantBody,
-  ConsentRequestModes,
   isAccessRequest,
+  issueAccessOrConsentVc,
 } from "../consent.internal";
-import { ConsentGrantBaseOptions } from "../request/request";
+import { ResourceAccessModes } from "../constants";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
   return requestVc.credentialSubject.id;
@@ -40,11 +34,11 @@ function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
 
 function getModesFromRequest(
   requestVc: AccessRequestBody
-): ConsentRequestModes[] {
+): ResourceAccessModes[] {
   return requestVc.credentialSubject.hasConsent.mode;
 }
 
-function modesToAccess(modes: ConsentRequestModes[]): Partial<Access> {
+function modesToAccess(modes: ResourceAccessModes[]): Partial<Access> {
   const access: Partial<Access> = {};
   access.append = modes.includes("Append");
   access.control = modes.includes("Control");
@@ -83,42 +77,6 @@ function getExpirationFromConsentRequest(
   return isConsentRequest(requestVc) && requestVc.expirationDate !== undefined
     ? new Date(requestVc.expirationDate)
     : undefined;
-}
-
-async function sendRequestApproval(
-  requestor: WebId,
-  requestApproval: AccessRequestBody | ConsentRequestBody,
-  options: ConsentGrantBaseOptions
-): Promise<VerifiableCredential> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  // We assume that all the resources are controlled by the same consent endpoint.
-  const consentEndpoint =
-    options.consentEndpoint ??
-    (await getConsentEndpointForResource(
-      requestApproval.credentialSubject.hasConsent.forPersonalData[0],
-      fetcher
-    ));
-  return issueVerifiableCredential(
-    consentEndpoint,
-    requestor,
-    {
-      "@context": requestApproval["@context"],
-      ...requestApproval.credentialSubject,
-    },
-    {
-      "@context": requestApproval["@context"],
-      type: ["SolidConsentRequest"],
-      issuanceDate: isConsentRequest(requestApproval)
-        ? requestApproval.issuanceDate
-        : undefined,
-      expirationDate: isConsentRequest(requestApproval)
-        ? requestApproval.expirationDate
-        : undefined,
-    },
-    {
-      fetch: fetcher,
-    }
-  );
 }
 
 function initializeGrantParameters(
@@ -238,7 +196,7 @@ export async function approveAccessRequest(
     requestorInboxUrl: internalOptions.requestorInboxIri,
     status: "ConsentStatusExplicitlyGiven",
   });
-  return sendRequestApproval(internalOptions.requestor, requestBody, {
+  return issueAccessOrConsentVc(internalOptions.requestor, requestBody, {
     fetch: options?.fetch,
     consentEndpoint: options?.consentEndpoint,
   });
@@ -337,7 +295,7 @@ export async function approveAccessRequestWithConsent(
     issuanceDate: initialisedOptions.issuanceDate,
     expirationDate: initialisedOptions.expirationDate,
   });
-  return sendRequestApproval(initialisedOptions.requestor, requestBody, {
+  return issueAccessOrConsentVc(initialisedOptions.requestor, requestBody, {
     fetch: options?.fetch,
     consentEndpoint: options?.consentEndpoint,
   });
