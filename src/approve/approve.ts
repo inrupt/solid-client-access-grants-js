@@ -30,8 +30,8 @@ import {
   getConsentEndpointForResource,
   getGrantBody,
   isAccessRequest,
-  ConsentRequestModes,
 } from "../consent.internal";
+import { ResourceAccessModes } from "../constants";
 import { ConsentGrantBaseOptions } from "../request/request";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
@@ -40,11 +40,11 @@ function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
 
 function getModesFromRequest(
   requestVc: AccessRequestBody
-): ConsentRequestModes[] {
+): ResourceAccessModes[] {
   return requestVc.credentialSubject.hasConsent.mode;
 }
 
-function modesToAccess(modes: ConsentRequestModes[]): Partial<Access> {
+function modesToAccess(modes: ResourceAccessModes[]): Partial<Access> {
   const access: Partial<Access> = {};
   access.append = modes.includes("Append");
   access.control = modes.includes("Control");

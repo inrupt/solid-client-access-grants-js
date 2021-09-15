@@ -31,15 +31,16 @@ import {
   INRUPT_CONSENT_SERVICE,
   CREDENTIAL_TYPE,
   CONSENT_STATUS,
+  ResourceAccessModes,
 } from "./constants";
 
 export function accessToConsentRequestModes(
   desiredAccess: Partial<access.Access>
-): ConsentRequestModes[] {
+): ResourceAccessModes[] {
   // TODO: Check that these are actually the modes you can request.
   //       The Server API doc does refer to `acl:` as a prefix,
   //       although that is not listed in the example context.
-  const modes: ConsentRequestModes[] = [];
+  const modes: ResourceAccessModes[] = [];
   if (desiredAccess.read === true) {
     modes.push("Read");
   }
@@ -87,18 +88,13 @@ export async function getConsentEndpointForResource(
   return consentIri;
 }
 
-// TODO: Check that these are actually the modes you can request.
-//       The Server API doc does refer to `acl:` as a prefix,
-//       although that is not listed in the example context.
-export type ConsentRequestModes = "Read" | "Append" | "Write" | "Control";
-
 export type BaseAccessBody = {
   "@context": typeof CONTEXT_CONSENT;
   type: [typeof CREDENTIAL_TYPE];
   credentialSubject: {
     id: UrlString;
     hasConsent: {
-      mode: ConsentRequestModes[];
+      mode: ResourceAccessModes[];
       hasStatus: CONSENT_STATUS;
       forPersonalData: UrlString[];
     };

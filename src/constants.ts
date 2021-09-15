@@ -50,3 +50,8 @@ export const CONSENT_STATUS_GIVEN = "ConsentStatusExplicitlyGiven";
 export type CONSENT_STATUS =
   | typeof CONSENT_STATUS_REQUESTED
   | typeof CONSENT_STATUS_GIVEN;
+
+// TODO: Check that these are actually the modes you can request.
+//       The Server API doc does refer to `acl:` as a prefix,
+//       although that is not listed in the example context.
+export type ResourceAccessModes = "Read" | "Append" | "Write" | "Control";
