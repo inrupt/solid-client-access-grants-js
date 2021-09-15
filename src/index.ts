@@ -23,3 +23,8 @@ export {
   requestAccessWithConsent,
   RequestAccessWithConsentParameters,
 } from "./request/request";
+
+export {
+  approveAccessRequest,
+  approveAccessRequestWithConsent,
+} from "./approve/approve";
