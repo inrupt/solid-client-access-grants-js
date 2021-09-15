@@ -83,7 +83,7 @@ async function sendConsentRequest(
 ): Promise<unknown> {
   const fetcher = options.fetch ?? (await getDefaultSessionFetch());
   const consentEndpoint = new URL(
-    "/issue",
+    "issue",
     await getConsentEndpointForWebId(requestee, fetcher)
   );
   return issueVerifiableCredential(
