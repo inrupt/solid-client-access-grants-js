@@ -29,8 +29,8 @@ import {
   getDefaultSessionFetch,
   getConsentEndpointForResource,
   getGrantBody,
-  ConsentRequestModes,
   isAccessRequest,
+  ConsentRequestModes,
 } from "../consent.internal";
 import { ConsentGrantBaseOptions } from "../request/request";
 

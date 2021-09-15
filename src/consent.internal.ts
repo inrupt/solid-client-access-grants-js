@@ -91,7 +91,7 @@ export async function getConsentEndpointForResource(
 // TODO: Check that these are actually the modes you can request.
 //       The Server API doc does refer to `acl:` as a prefix,
 //       although that is not listed in the example context.
-type ConsentRequestModes = "Read" | "Append" | "Write" | "Control";
+export type ConsentRequestModes = "Read" | "Append" | "Write" | "Control";
 
 export type BaseAccessBody = {
   "@context": typeof CONTEXT_CONSENT;
