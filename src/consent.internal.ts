@@ -25,7 +25,13 @@ import {
   getSourceIri,
   getIri,
 } from "@inrupt/solid-client";
-import { CONTEXT_CONSENT, INRUPT_CONSENT_SERVICE } from "./constants";
+import {
+  CONTEXT_CONSENT,
+  INRUPT_CONSENT_SERVICE,
+  CREDENTIAL_TYPE,
+  CONSENT_STATUS,
+  CONSENT_STATUS_REQUESTED,
+} from "./constants";
 
 function accessToConsentRequestModes(
   desiredAccess: Partial<access.Access>
@@ -88,12 +94,12 @@ type ConsentRequestModes = "Read" | "Append" | "Write" | "Control";
 
 export type AccessRequestBody = {
   "@context": typeof CONTEXT_CONSENT;
-  type: ["SolidConsentRequest"];
+  type: [typeof CREDENTIAL_TYPE];
   credentialSubject: {
     id: UrlString;
     hasConsent: {
       mode: ConsentRequestModes[];
-      hasStatus: "ConsentStatusRequested";
+      hasStatus: CONSENT_STATUS;
       forPersonalData: UrlString[];
     };
     inbox: UrlString;
@@ -115,7 +121,7 @@ export type AccessRequestParameters = {
   access: Partial<access.Access>;
   resources: UrlString[];
   requestorInboxUrl: UrlString;
-  status: "ConsentStatusRequested";
+  status: CONSENT_STATUS;
 };
 
 export type ConsentRequestParameters = AccessRequestParameters & {
@@ -151,12 +157,12 @@ export function getRequestBody(
   const modes = accessToConsentRequestModes(params.access);
   const request: AccessRequestBody = {
     "@context": CONTEXT_CONSENT,
-    type: ["SolidConsentRequest"],
+    type: [CREDENTIAL_TYPE],
     credentialSubject: {
       id: params.requestor,
       hasConsent: {
         mode: modes,
-        hasStatus: "ConsentStatusRequested",
+        hasStatus: CONSENT_STATUS_REQUESTED,
         forPersonalData: params.resources,
       },
       inbox: params.requestorInboxUrl,

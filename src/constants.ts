@@ -40,3 +40,9 @@ export const CONTEXT_CONSENT = [
 export const WELL_KNOWN_SOLID = ".well-known/solid";
 
 export const INRUPT_CONSENT_SERVICE = "http://inrupt.com/ns/ess#consentIssuer";
+
+export const CREDENTIAL_TYPE = "SolidConsentRequest";
+
+export const CONSENT_STATUS_REQUESTED = "ConsentStatusRequested";
+
+export type CONSENT_STATUS = typeof CONSENT_STATUS_REQUESTED;
