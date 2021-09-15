@@ -20,14 +20,7 @@
 /* eslint-disable no-shadow */
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { jest, it, describe, expect } from "@jest/globals";
-// This ESLint plugin seems to not be able to resolve subpackage imports:
-// eslint-disable-next-line import/no-unresolved
-import { mocked } from "ts-jest/utils";
-import {
-  AccessGrantBody,
-  ConsentGrantBody,
-  getConsentEndpointForResource,
-} from "../consent.internal";
+import { AccessGrantBody, ConsentGrantBody } from "../consent.internal";
 import {
   MOCKED_CONSENT_ENDPOINT,
   mockWellKnownNoConsent,

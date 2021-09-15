@@ -18,22 +18,15 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { Access, UrlString, WebId } from "@inrupt/solid-client";
-import {
-  issueVerifiableCredential,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   AccessRequestBody,
-  ConsentRequestBody,
   isConsentRequest,
-  getDefaultSessionFetch,
-  getConsentEndpointForResource,
   getGrantBody,
   isAccessRequest,
   issueAccessOrConsentVc,
 } from "../consent.internal";
 import { ResourceAccessModes } from "../constants";
-import { ConsentGrantBaseOptions } from "../request/request";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
   return requestVc.credentialSubject.id;
