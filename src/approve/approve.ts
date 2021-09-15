@@ -28,8 +28,6 @@ import {
   isConsentRequest,
   getDefaultSessionFetch,
   getConsentEndpointForResource,
-  ConsentGrantParameters,
-  AccessGrantParameters,
   getGrantBody,
   ConsentRequestModes,
 } from "../consent.internal";
@@ -164,6 +162,17 @@ function initializeGrantParameters(
   return (internalOptions as Required<typeof requestOverride>)!;
 }
 
+/**
+ * Approve an access request. The content of the approved access request is provided
+ * as a Verifiable Credential which properties may be overriden if necessary.
+ *
+ * @param requestVc The Verifiable Credential representing the Access Request. If
+ * not conform to an Access Request, the function will throw.
+ * @param requestOverride Elements overriding information from the provided Verifiable Credential.
+ * @param options Optional properties to customise the access grant behaviour.
+ * @returns A Verifiable Credential representing the granted access.
+ * @since Unreleased.
+ */
 export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential,
@@ -178,6 +187,16 @@ export async function approveAccessRequest(
     consentEndpoint?: UrlString;
   }
 ): Promise<VerifiableCredential>;
+/**
+ * Approve an access request. The content of the approved access request is provided
+ * as a set of claims, and no input Verifiable Credential is expected.
+ *
+ * @param requestVc A Verifiable Credential that would represent the Access Request if provided.
+ * @param requestOverride Claims constructing the Access Grant.
+ * @param options Optional properties to customise the access grant behaviour.
+ * @returns A Verifiable Credential representing the granted access.
+ * @since Unreleased.
+ */
 export async function approveAccessRequest(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
@@ -224,6 +243,17 @@ export async function approveAccessRequest(
   });
 }
 
+/**
+ * Approve an consent request. The content of the approved consent request is provided
+ * as a Verifiable Credential which properties may be overriden if necessary.
+ *
+ * @param requestVc The Verifiable Credential representing the Consent Request. If
+ * not conform to a Consent Request, the function will throw.
+ * @param requestOverride Elements overriding information from the provided Verifiable Credential.
+ * @param options Optional properties to customise the consent grant behaviour.
+ * @returns A Verifiable Credential representing the granted consent.
+ * @since Unreleased.
+ */
 export async function approveAccessRequestWithConsent(
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential,
@@ -241,6 +271,16 @@ export async function approveAccessRequestWithConsent(
     consentEndpoint?: UrlString;
   }
 ): Promise<VerifiableCredential>;
+/**
+ * Approve a consent request. The content of the approved consent request is provided
+ * as a set of claims, and no input Verifiable Credential is expected.
+ *
+ * @param requestVc A Verifiable Credential that would represent the Consent Request if provided.
+ * @param requestOverride Claims constructing the Consent Grant.
+ * @param options Optional properties to customise the consent grant behaviour.
+ * @returns A Verifiable Credential representing the granted consent.
+ * @since Unreleased.
+ */
 export async function approveAccessRequestWithConsent(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
