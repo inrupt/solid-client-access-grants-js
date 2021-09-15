@@ -19,7 +19,6 @@
 import {
   access,
   UrlString,
-  WebId,
   getWellKnownSolid,
   getThingAll,
   getSourceIri,
@@ -60,10 +59,10 @@ export function accessToConsentRequestModes(
 }
 
 export async function getConsentEndpointForResource(
-  webId: WebId,
+  resource: UrlString,
   fetcher: typeof fetch
 ): Promise<UrlString> {
-  const wellKnown = await getWellKnownSolid(webId, {
+  const wellKnown = await getWellKnownSolid(resource, {
     fetch: fetcher,
   });
   const wellKnownSubjects = getThingAll(wellKnown);
