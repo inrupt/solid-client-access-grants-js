@@ -1,7 +1,7 @@
 // Verify that imports from the main export work:
-import { sampleModuleFn as mainModuleFn } from "@inrupt/solid-client-consent";
+import { requestAccess as mainModuleFn } from "@inrupt/solid-client-consent";
 // Verify that submodule imports work:
-import sampleModuleFn from "@inrupt/solid-client-consent/module";
+import { requestAccess } from "@inrupt/solid-client-consent/consent";
 
-console.log(mainModuleFn());
-console.log(sampleModuleFn());
+console.log(typeof mainModuleFn);
+console.log(typeof requestAccess);

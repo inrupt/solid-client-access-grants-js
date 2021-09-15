@@ -18,10 +18,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 export {
-  createConsentGrantRequest,
-  approveConsentGrant,
-  rejectConsentGrant,
-  getAllConsentGrants,
-  getConsentGrant,
-  revokeConsentGrant,
-} from "./consent";
+  requestAccess,
+  RequestAccessParameters,
+  requestAccessWithConsent,
+  RequestAccessWithConsentParameters,
+} from "./request/request";
