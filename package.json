@@ -32,7 +32,8 @@
       "require": "./dist/index.js",
       "import": "./dist/index.mjs"
     },
-    "./request": "./dist/request/request.mjs"
+    "./request": "./dist/request/request.mjs",
+    "./approve": "./dist/approve/approve.mjs"
   },
   "files": [
     "dist",
