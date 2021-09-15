@@ -18,10 +18,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { access, UrlString, WebId } from "@inrupt/solid-client";
-import {
-  issueVerifiableCredential,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
+import { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   AccessRequestBody,
   ConsentRequestBody,
@@ -30,35 +27,6 @@ import {
   isConsentRequest,
   getDefaultSessionFetch,
 } from "../consent.internal";
-
-export function isAccessRequest(
-  credential: VerifiableCredential | AccessRequestBody
-): credential is AccessRequestBody {
-  let result = true;
-  result =
-    result &&
-    (credential as AccessRequestBody).type.includes("SolidConsentRequest");
-  result =
-    result &&
-    (credential as AccessRequestBody).credentialSubject.hasConsent !==
-      undefined;
-  result =
-    result &&
-    (credential as AccessRequestBody).credentialSubject.hasConsent
-      .forPersonalData !== undefined;
-  result =
-    result &&
-    (credential as AccessRequestBody).credentialSubject.hasConsent.hasStatus ===
-      "ConsentStatusRequested";
-  result =
-    result &&
-    (credential as AccessRequestBody).credentialSubject.hasConsent.mode !==
-      undefined;
-  result =
-    result &&
-    (credential as AccessRequestBody).credentialSubject.inbox !== undefined;
-  return result;
-}
 
 async function sendConsentRequest(
   requestor: WebId,

@@ -30,8 +30,9 @@ import {
   getConsentEndpointForResource,
   getGrantBody,
   ConsentRequestModes,
+  isAccessRequest,
 } from "../consent.internal";
-import { ConsentGrantBaseOptions, isAccessRequest } from "../request/request";
+import { ConsentGrantBaseOptions } from "../request/request";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
   return requestVc.credentialSubject.id;
@@ -314,7 +315,10 @@ export async function approveAccessRequestWithConsent(
     consentEndpoint?: UrlString;
   }
 ): Promise<VerifiableCredential> {
-  if (requestVc !== undefined && !isAccessRequest(requestVc)) {
+  if (
+    requestVc !== undefined &&
+    !(isAccessRequest(requestVc) && isConsentRequest(requestVc))
+  ) {
     throw new Error(
       `Unexpected VC provided for approval: ${JSON.stringify(requestVc)}`
     );
