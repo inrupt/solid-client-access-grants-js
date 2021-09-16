@@ -17,7 +17,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { fetch as crossFetch } from "cross-fetch";
 import { access, UrlString, WebId } from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
@@ -29,22 +28,8 @@ import {
   getConsentEndpointForWebId,
   getRequestBody,
   isConsentRequest,
+  getDefaultSessionFetch,
 } from "../consent.internal";
-
-// Dynamically import solid-client-authn-browser so that this library doesn't have a hard
-// dependency.
-async function getDefaultSessionFetch(): Promise<typeof fetch> {
-  try {
-    const { fetch: fetchFn } = await import(
-      "@inrupt/solid-client-authn-browser"
-    );
-
-    return fetchFn;
-  } catch (e) {
-    /* istanbul ignore next: @inrupt/solid-client-authn-browser is a devDependency, so this path is not hit in tests: */
-    return crossFetch;
-  }
-}
 
 export function isAccessRequest(
   credential: VerifiableCredential | AccessRequestBody
@@ -118,9 +103,12 @@ async function sendConsentRequest(
  *            When `@inrupt/solid-client-authn-browser` is available and this
  *            property is not set, `fetch` will be imported from there.
  *            Otherwise, the HTTP requests will be unauthenticated.
+ * - `consentEndpoint`: a base URL used when determining the location of
+ *                      consent API calls.
  */
 export type ConsentGrantBaseOptions = Partial<{
   fetch?: typeof fetch;
+  consentEndpoint?: UrlString;
 }>;
 
 /**

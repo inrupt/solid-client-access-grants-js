@@ -23,3 +23,5 @@ export {
   requestAccessWithConsent,
   RequestAccessWithConsentParameters,
 } from "./request/request";
+
+export { default as isValidConsentGrant } from "./verify/verify";
