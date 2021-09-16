@@ -28,6 +28,7 @@ import {
   getConsentEndpointForWebId,
   getRequestBody,
   isConsentRequest,
+  getDefaultSessionFetch,
 } from "../consent.internal";
 
 export function isAccessRequest(

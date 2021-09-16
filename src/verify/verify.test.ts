@@ -28,6 +28,34 @@ import { mocked } from "ts-jest/utils";
 import { getConsentEndpointForWebId } from "../consent.internal";
 import isValidConsentGrant from "./verify";
 
+jest.mock("../consent.internal.ts", () => {
+  const internalConsentModule = jest.requireActual(
+    "../consent.internal.ts"
+    // TypeScript can't infer the type of modules imported via Jest;
+    // skip type checking for those:
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ) as any;
+
+  internalConsentModule.getConsentEndpointForWebId = jest.fn(
+    internalConsentModule.getConsentEndpointForWebId
+  );
+
+  return internalConsentModule;
+});
+jest.mock("@inrupt/solid-client", () => {
+  // TypeScript can't infer the type of modules imported via Jest;
+  // skip type checking for those:
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
+  solidClientModule.getSolidDataset = jest.fn(
+    solidClientModule.getSolidDataset
+  );
+  solidClientModule.getWellKnownSolid = jest.fn();
+  return solidClientModule;
+});
+jest.mock("@inrupt/solid-client-authn-browser");
+jest.mock("@inrupt/solid-client-vc");
+
 describe("isValidConsentGrant", () => {
   const MOCK_CONSENT_GRANT = {
     "@context": [
