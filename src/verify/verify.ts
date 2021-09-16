@@ -73,7 +73,5 @@ export default async function isValidConsentGrant(
     }),
   });
 
-  const jsonData = await response.json();
-
-  return jsonData;
+  return response.json();
 }
