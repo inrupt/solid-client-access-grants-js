@@ -26,7 +26,14 @@ import {
   isAccessRequest,
   issueAccessOrConsentVc,
 } from "../consent.internal";
-import { ResourceAccessModes } from "../constants";
+import {
+  CONSENT_STATUS_EXPLICITLY_GIVEN,
+  ResourceAccessMode,
+  RESOURCE_ACCESS_MODE_APPEND,
+  RESOURCE_ACCESS_MODE_CONTROL,
+  RESOURCE_ACCESS_MODE_READ,
+  RESOURCE_ACCESS_MODE_WRITE,
+} from "../constants";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
   return requestVc.credentialSubject.id;
@@ -34,16 +41,16 @@ function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
 
 function getModesFromRequest(
   requestVc: AccessRequestBody
-): ResourceAccessModes[] {
+): ResourceAccessMode[] {
   return requestVc.credentialSubject.hasConsent.mode;
 }
 
-function modesToAccess(modes: ResourceAccessModes[]): Partial<Access> {
+function modesToAccess(modes: ResourceAccessMode[]): Partial<Access> {
   const access: Partial<Access> = {};
-  access.append = modes.includes("Append");
-  access.control = modes.includes("Control");
-  access.read = modes.includes("Read");
-  access.write = modes.includes("Write");
+  access.append = modes.includes(RESOURCE_ACCESS_MODE_APPEND);
+  access.control = modes.includes(RESOURCE_ACCESS_MODE_CONTROL);
+  access.read = modes.includes(RESOURCE_ACCESS_MODE_READ);
+  access.write = modes.includes(RESOURCE_ACCESS_MODE_WRITE);
   return access;
 }
 
@@ -194,7 +201,7 @@ export async function approveAccessRequest(
     requestor: internalOptions.requestor,
     resources: internalOptions.resources,
     requestorInboxUrl: internalOptions.requestorInboxIri,
-    status: "ConsentStatusExplicitlyGiven",
+    status: CONSENT_STATUS_EXPLICITLY_GIVEN,
   });
   return issueAccessOrConsentVc(internalOptions.requestor, requestBody, {
     fetch: options?.fetch,
@@ -290,7 +297,7 @@ export async function approveAccessRequestWithConsent(
     requestor: initialisedOptions.requestor,
     resources: initialisedOptions.resources,
     requestorInboxUrl: initialisedOptions.requestorInboxIri,
-    status: "ConsentStatusExplicitlyGiven",
+    status: CONSENT_STATUS_EXPLICITLY_GIVEN,
     purpose: initialisedOptions.purpose,
     issuanceDate: initialisedOptions.issuanceDate,
     expirationDate: initialisedOptions.expirationDate,

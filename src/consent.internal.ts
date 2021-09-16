@@ -31,37 +31,38 @@ import {
 } from "@inrupt/solid-client-vc";
 import { fetch as crossFetch } from "cross-fetch";
 import {
-  CONTEXT_CONSENT,
+  CONSENT_CONTEXT,
   INRUPT_CONSENT_SERVICE,
   CREDENTIAL_TYPE,
-  CONSENT_STATUS,
+  ConsentStatus,
   CONSENT_STATUS_REQUESTED,
-  ResourceAccessModes,
-  CONSENT_STATUS_GIVEN,
+  ResourceAccessMode,
+  CONSENT_STATUS_EXPLICITLY_GIVEN,
+  RESOURCE_ACCESS_MODE_READ,
+  RESOURCE_ACCESS_MODE_APPEND,
+  RESOURCE_ACCESS_MODE_WRITE,
+  RESOURCE_ACCESS_MODE_CONTROL,
 } from "./constants";
 import { ConsentGrantBaseOptions } from "./request/request";
 
 export function accessToConsentRequestModes(
   desiredAccess: Partial<access.Access>
-): ResourceAccessModes[] {
-  // TODO: Check that these are actually the modes you can request.
-  //       The Server API doc does refer to `acl:` as a prefix,
-  //       although that is not listed in the example context.
-  const modes: ResourceAccessModes[] = [];
+): ResourceAccessMode[] {
+  const modes: ResourceAccessMode[] = [];
   if (desiredAccess.read === true) {
-    modes.push("Read");
+    modes.push(RESOURCE_ACCESS_MODE_READ);
   }
   if (desiredAccess.append === true) {
-    modes.push("Append");
+    modes.push(RESOURCE_ACCESS_MODE_APPEND);
   }
   if (desiredAccess.write === true) {
-    modes.push("Write");
+    modes.push(RESOURCE_ACCESS_MODE_WRITE);
   }
   if (
     desiredAccess.controlRead === true ||
     desiredAccess.controlWrite === true
   ) {
-    modes.push("Control");
+    modes.push(RESOURCE_ACCESS_MODE_CONTROL);
   }
   return modes;
 }
@@ -96,13 +97,13 @@ export async function getConsentEndpointForResource(
 }
 
 export type BaseAccessBody = {
-  "@context": typeof CONTEXT_CONSENT;
+  "@context": typeof CONSENT_CONTEXT;
   type: [typeof CREDENTIAL_TYPE];
   credentialSubject: {
     id: UrlString;
     hasConsent: {
-      mode: ResourceAccessModes[];
-      hasStatus: CONSENT_STATUS;
+      mode: ResourceAccessMode[];
+      hasStatus: ConsentStatus;
       forPersonalData: UrlString[];
     };
     inbox: UrlString;
@@ -130,7 +131,7 @@ export type AccessRequestBody = BaseAccessBody & {
 export type AccessGrantBody = BaseAccessBody & {
   credentialSubject: {
     hasConsent: {
-      hasStatus: typeof CONSENT_STATUS_GIVEN;
+      hasStatus: typeof CONSENT_STATUS_EXPLICITLY_GIVEN;
       isProvidedTo: UrlString;
     };
   };
@@ -145,7 +146,7 @@ export type BaseRequestParameters = {
   access: Partial<access.Access>;
   resources: Array<UrlString>;
   requestorInboxUrl: UrlString;
-  status: CONSENT_STATUS;
+  status: ConsentStatus;
 };
 
 export type BaseConsentParameters = {
@@ -162,7 +163,7 @@ export type ConsentRequestParameters = AccessRequestParameters &
   BaseConsentParameters;
 
 export type AccessGrantParameters = BaseRequestParameters & {
-  status: typeof CONSENT_STATUS_GIVEN;
+  status: typeof CONSENT_STATUS_EXPLICITLY_GIVEN;
 };
 
 export type ConsentGrantParameters = AccessGrantParameters &
@@ -186,7 +187,7 @@ export function isConsentRequest(
 function getBaseBody(params: BaseRequestParameters): BaseAccessBody {
   const modes = accessToConsentRequestModes(params.access);
   return {
-    "@context": CONTEXT_CONSENT,
+    "@context": CONSENT_CONTEXT,
     type: [CREDENTIAL_TYPE],
     credentialSubject: {
       id: params.requestor,
@@ -275,8 +276,7 @@ export function isAccessRequest(
 ): credential is AccessRequestBody {
   let result = true;
   result =
-    result &&
-    (credential as AccessRequestBody).type.includes("SolidConsentRequest");
+    result && (credential as AccessRequestBody).type.includes(CREDENTIAL_TYPE);
   result =
     result &&
     (credential as AccessRequestBody).credentialSubject.hasConsent !==
@@ -288,7 +288,7 @@ export function isAccessRequest(
   result =
     result &&
     (credential as AccessRequestBody).credentialSubject.hasConsent.hasStatus ===
-      "ConsentStatusRequested";
+      CONSENT_STATUS_REQUESTED;
   result =
     result &&
     (credential as AccessRequestBody).credentialSubject.hasConsent.mode !==
@@ -323,7 +323,7 @@ export async function issueAccessOrConsentVc(
     },
     {
       "@context": vcBody["@context"],
-      type: ["SolidConsentRequest"],
+      type: [CREDENTIAL_TYPE],
       issuanceDate: isConsentRequest(vcBody) ? vcBody.issuanceDate : undefined,
       expirationDate: isConsentRequest(vcBody)
         ? vcBody.expirationDate

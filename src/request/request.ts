@@ -19,6 +19,7 @@
 
 import { access, UrlString, WebId } from "@inrupt/solid-client";
 import { getRequestBody, issueAccessOrConsentVc } from "../consent.internal";
+import { CONSENT_STATUS_REQUESTED } from "../constants";
 
 /**
  * Optional parameters to customise the behaviour of consent requests.
@@ -64,7 +65,7 @@ export async function requestAccess(
 ): Promise<unknown> {
   const consentRequest = getRequestBody({
     ...params,
-    status: "ConsentStatusRequested",
+    status: CONSENT_STATUS_REQUESTED,
   });
 
   return issueAccessOrConsentVc(params.requestor, consentRequest, options);
@@ -101,7 +102,7 @@ export async function requestAccessWithConsent(
 ): Promise<unknown> {
   const consentRequest = getRequestBody({
     ...params,
-    status: "ConsentStatusRequested",
+    status: CONSENT_STATUS_REQUESTED,
   });
   return issueAccessOrConsentVc(params.requestor, consentRequest, options);
 }
