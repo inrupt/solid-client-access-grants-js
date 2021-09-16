@@ -23,7 +23,11 @@ import { jest, describe, it, expect } from "@jest/globals";
 // This ESLint plugin seems to not be able to resolve subpackage imports:
 // eslint-disable-next-line import/no-unresolved
 import { mocked } from "ts-jest/utils";
-import { mockSolidDatasetFrom, getWellKnownSolid } from "@inrupt/solid-client";
+import {
+  mockSolidDatasetFrom,
+  getWellKnownSolid,
+  getSolidDataset,
+} from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
   revokeVerifiableCredential,
@@ -31,7 +35,11 @@ import {
 } from "@inrupt/solid-client-vc";
 import { Response } from "cross-fetch";
 import {
+<<<<<<< HEAD
   cancelAccessRequest,
+=======
+  getConsentApiEndpoint,
+>>>>>>> d475799 (Get preferred consent UI)
   isAccessRequest,
   requestAccess,
   requestAccessWithConsent,
@@ -42,8 +50,14 @@ import {
 } from "../consent.internal";
 import {
   mockAccessGrant,
+<<<<<<< HEAD
   mockedConsentEndpoint,
   MOCKED_CREDENTIAL_ID,
+=======
+  MOCKED_CONSENT_ISSUER,
+  MOCKED_CONSENT_UI_IRI,
+  mockWebIdWithUi,
+>>>>>>> d475799 (Get preferred consent UI)
   mockWellKnownNoConsent,
   mockWellKnownWithConsent,
 } from "./request.mock";
@@ -375,7 +389,7 @@ describe("getConsentEndpointForWebId", () => {
       MOCK_REQUESTEE_IRI,
       jest.fn()
     );
-    expect(consentEndpoint).toBe(mockedConsentEndpoint);
+    expect(consentEndpoint).toBe(MOCKED_CONSENT_ISSUER);
   });
 
   it("throws an error if the well-known document does not list any subject", async () => {
@@ -687,5 +701,150 @@ describe("cancelAccessRequest", () => {
       expect.anything()
     );
     expect(mockedFetch).not.toHaveBeenCalled();
+  });
+});
+
+describe("getConsentApiEndpoint", () => {
+  it("defaults to the default session fetch if no fetch is provided", async () => {
+    // TypeScript can't infer the type of mock modules imported via Jest;
+    // skip type checking for those:
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
+    const spiedGetDataset = jest
+      .spyOn(
+        jest.requireMock("@inrupt/solid-client") as {
+          getSolidDataset: typeof getSolidDataset;
+        },
+        "getSolidDataset"
+      )
+      .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid"));
+    await getConsentApiEndpoint("https://some.webid");
+    expect(spiedGetDataset).toHaveBeenCalledWith("https://some.webid", {
+      fetch: scab.fetch,
+    });
+  });
+
+  it("uses the provided fetch if any", async () => {
+    const spiedGetDataset = jest
+      .spyOn(
+        jest.requireMock("@inrupt/solid-client") as {
+          getSolidDataset: typeof getSolidDataset;
+        },
+        "getSolidDataset"
+      )
+      .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid"));
+    const mockedFetch = jest.fn(global.fetch);
+    await getConsentApiEndpoint("https://some.webid", { fetch: mockedFetch });
+    expect(spiedGetDataset).toHaveBeenCalledWith("https://some.webid", {
+      fetch: mockedFetch,
+    });
+  });
+
+  it("throws if the WebID document cannot be dereferenced", async () => {
+    const solidClient = jest.requireMock("@inrupt/solid-client") as {
+      getSolidDataset: typeof getSolidDataset;
+      getWellKnownSolid: typeof getWellKnownSolid;
+    };
+    jest.spyOn(solidClient, "getSolidDataset").mockRejectedValue("Some error");
+    await expect(getConsentApiEndpoint("https://some.webid")).rejects.toThrow(
+      /some.webid.*Some error/
+    );
+  });
+
+  it("throws if the WebID document does not contain the WebID", async () => {
+    const solidClient = jest.requireMock("@inrupt/solid-client") as {
+      getSolidDataset: typeof getSolidDataset;
+      getWellKnownSolid: typeof getWellKnownSolid;
+    };
+    jest
+      .spyOn(solidClient, "getSolidDataset")
+      .mockResolvedValue(mockSolidDatasetFrom("https://some.webid"));
+    await expect(getConsentApiEndpoint("https://some.webid")).rejects.toThrow(
+      /some.webid.*WebID cannot be dereferenced/
+    );
+  });
+
+  it("returns the IRI advertized by the user's profile when present", async () => {
+    const solidClient = jest.requireMock("@inrupt/solid-client") as {
+      getSolidDataset: typeof getSolidDataset;
+      getWellKnownSolid: typeof getWellKnownSolid;
+    };
+    jest
+      .spyOn(solidClient, "getSolidDataset")
+      .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid"));
+    const spiedGetWellKnown = jest.spyOn(solidClient, "getWellKnownSolid");
+    await expect(getConsentApiEndpoint("https://some.webid")).resolves.toBe(
+      MOCKED_CONSENT_UI_IRI
+    );
+    // If the profile contains a preferred UI, the .well-known document should not be looked up.
+    expect(spiedGetWellKnown).not.toHaveBeenCalled();
+  });
+
+  it("falls back to the IRI advertized by the user's Pod provider when present", async () => {
+    const solidClient = jest.requireMock("@inrupt/solid-client") as {
+      getSolidDataset: typeof getSolidDataset;
+      getWellKnownSolid: typeof getWellKnownSolid;
+    };
+    jest
+      .spyOn(solidClient, "getSolidDataset")
+      .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid", false));
+    const spiedGetWellKnown = jest
+      .spyOn(solidClient, "getWellKnownSolid")
+      .mockResolvedValueOnce(mockWellKnownWithConsent());
+    await expect(getConsentApiEndpoint("https://some.webid")).resolves.toBe(
+      MOCKED_CONSENT_UI_IRI
+    );
+    expect(spiedGetWellKnown).toHaveBeenCalled();
+  });
+
+  it("returns undefined if the user's WebID does not link to a storage", async () => {
+    const solidClient = jest.requireMock("@inrupt/solid-client") as {
+      getSolidDataset: typeof getSolidDataset;
+      getWellKnownSolid: typeof getWellKnownSolid;
+    };
+    jest
+      .spyOn(solidClient, "getSolidDataset")
+      .mockResolvedValueOnce(
+        mockWebIdWithUi("https://some.webid", false, false)
+      );
+    await expect(
+      getConsentApiEndpoint("https://some.webid")
+    ).resolves.toBeUndefined();
+  });
+
+  it("returns undefined if the host's well-known does not link to a recommanded consent UI", async () => {
+    const solidClient = jest.requireMock("@inrupt/solid-client") as {
+      getSolidDataset: typeof getSolidDataset;
+      getWellKnownSolid: typeof getWellKnownSolid;
+    };
+    jest
+      .spyOn(solidClient, "getSolidDataset")
+      .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid", false));
+    const spiedGetWellKnown = jest
+      .spyOn(solidClient, "getWellKnownSolid")
+      .mockResolvedValueOnce(mockWellKnownWithConsent(false));
+    await expect(
+      getConsentApiEndpoint("https://some.webid")
+    ).resolves.toBeUndefined();
+    expect(spiedGetWellKnown).toHaveBeenCalled();
+  });
+
+  it("returns undefined if the host's well-known is empty", async () => {
+    const solidClient = jest.requireMock("@inrupt/solid-client") as {
+      getSolidDataset: typeof getSolidDataset;
+      getWellKnownSolid: typeof getWellKnownSolid;
+    };
+    jest
+      .spyOn(solidClient, "getSolidDataset")
+      .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid", false));
+    const spiedGetWellKnown = jest
+      .spyOn(solidClient, "getWellKnownSolid")
+      .mockResolvedValueOnce(
+        mockSolidDatasetFrom("https://some.server/.well-known/solid")
+      );
+    await expect(
+      getConsentApiEndpoint("https://some.webid")
+    ).resolves.toBeUndefined();
+    expect(spiedGetWellKnown).toHaveBeenCalled();
   });
 });
