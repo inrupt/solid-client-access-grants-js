@@ -25,6 +25,7 @@ import {
   getSourceIri,
   getIri,
 } from "@inrupt/solid-client";
+import { fetch as crossFetch } from "cross-fetch";
 import {
   CONTEXT_CONSENT,
   INRUPT_CONSENT_SERVICE,
@@ -181,4 +182,19 @@ export function getRequestBody(
       params.purpose;
   }
   return request;
+}
+
+// Dynamically import solid-client-authn-browser so that this library doesn't have a hard
+// dependency.
+export async function getDefaultSessionFetch(): Promise<typeof fetch> {
+  try {
+    const { fetch: fetchFn } = await import(
+      "@inrupt/solid-client-authn-browser"
+    );
+
+    return fetchFn;
+  } catch (e) {
+    /* istanbul ignore next: @inrupt/solid-client-authn-browser is a devDependency, so this path is not hit in tests: */
+    return crossFetch;
+  }
 }

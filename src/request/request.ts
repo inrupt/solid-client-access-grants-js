@@ -17,11 +17,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { fetch as crossFetch } from "cross-fetch";
 import { access, UrlString, WebId } from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
-  isVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import {
@@ -31,21 +29,6 @@ import {
   getRequestBody,
   isConsentRequest,
 } from "../consent.internal";
-
-// Dynamically import solid-client-authn-browser so that this library doesn't have a hard
-// dependency.
-async function getDefaultSessionFetch(): Promise<typeof fetch> {
-  try {
-    const { fetch: fetchFn } = await import(
-      "@inrupt/solid-client-authn-browser"
-    );
-
-    return fetchFn;
-  } catch (e) {
-    /* istanbul ignore next: @inrupt/solid-client-authn-browser is a devDependency, so this path is not hit in tests: */
-    return crossFetch;
-  }
-}
 
 export function isAccessRequest(
   credential: VerifiableCredential | AccessRequestBody
@@ -206,54 +189,4 @@ export async function requestAccessWithConsent(
     consentRequest,
     options
   );
-}
-
-/**
- * Makes a request to the consent server to verify the validity of a given VC.
- *
- * @param vc Either a VC, or a URL to a VC, to be verified.
- * @param options Optional properties to customise the request behaviour.
- * @returns An object containing checks, warnings, and errors.
- */
-export async function isValidConsentGrant(
-  vc: VerifiableCredential | UrlString,
-  options: ConsentGrantBaseOptions = {}
-): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-
-  let vcObject = vc;
-  if (typeof vc === "string") {
-    const vcResponse = await fetcher(vc);
-    vcObject = await vcResponse.json();
-    if (!isVerifiableCredential(vcObject)) {
-      throw new Error(
-        `The request to [${vc}] returned an unexpected response: ${JSON.stringify(
-          vcObject,
-          null,
-          "  "
-        )}`
-      );
-    }
-  }
-  const credentialSubjectId = (vcObject as VerifiableCredential)
-    .credentialSubject.id;
-
-  const consentEndpoint =
-    options.consentEndpoint ??
-    (await getConsentEndpointForWebId(credentialSubjectId, fetcher));
-  const consentVerifyEndpoint = `${consentEndpoint}/verify`;
-
-  const response = await fetcher(consentVerifyEndpoint, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "POST",
-    body: JSON.stringify({
-      verifiableCredential: vcObject,
-    }),
-  });
-
-  const jsonData = await response.json();
-
-  return jsonData;
 }
