@@ -18,9 +18,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 export {
-  isValidConsentGrant,
   requestAccess,
   RequestAccessParameters,
   requestAccessWithConsent,
   RequestAccessWithConsentParameters,
 } from "./request/request";
+
+export { default as isValidConsentGrant } from "./verify/verify";
