@@ -24,6 +24,7 @@ import {
   isValidConsentGrant,
   requestAccess,
   requestAccessWithConsent,
+  cancelAccessRequest,
 } from "./index";
 
 describe("Index exports", () => {
@@ -31,5 +32,6 @@ describe("Index exports", () => {
     expect(isValidConsentGrant).toBeDefined();
     expect(requestAccess).toBeDefined();
     expect(requestAccessWithConsent).toBeDefined();
+    expect(cancelAccessRequest).toBeDefined();
   });
 });

@@ -20,6 +20,7 @@
 import { access, UrlString, WebId } from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
+  revokeVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import {
@@ -189,5 +190,46 @@ export async function requestAccessWithConsent(
     params.resourceOwner,
     consentRequest,
     options
+  );
+}
+
+/**
+ * Cancel a request for access to data (with explicit or implicit consent) before
+ * the person being asked for consent has replied.
+ *
+ * @param accessRequest The access request, either in the form of a VC URL or a full-fledged VC.
+ * @param options Optional properties to customise the access request behaviour.
+ * @returns A void promise
+ * @since Unreleased
+ */
+export async function cancelAccessRequest(
+  accessRequest: VerifiableCredential | UrlString,
+  options: { fetch?: typeof global.fetch } = {}
+): Promise<void> {
+  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
+  if (typeof accessRequest === "object") {
+    // If the full VC is provided, no additional information is needed.
+    return revokeVerifiableCredential(
+      new URL("issue", accessRequest.issuer).href,
+      accessRequest.id,
+      {
+        fetch: fetcher,
+      }
+    );
+  }
+  // Only the credential IRI has been provided, and it needs to be dereferenced.
+  const issuerResponse = await fetcher(accessRequest);
+  if (!issuerResponse.ok) {
+    throw new Error(
+      `An error occured when looking up [${accessRequest}]: ${issuerResponse.status} ${issuerResponse.statusText}`
+    );
+  }
+  const credential = (await issuerResponse.json()) as VerifiableCredential;
+  return revokeVerifiableCredential(
+    new URL("issue", credential.issuer).href,
+    credential.id,
+    {
+      fetch: fetcher,
+    }
   );
 }

@@ -26,9 +26,12 @@ import { mocked } from "ts-jest/utils";
 import { mockSolidDatasetFrom, getWellKnownSolid } from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
+  revokeVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
+import { Response } from "cross-fetch";
 import {
+  cancelAccessRequest,
   isAccessRequest,
   requestAccess,
   requestAccessWithConsent,
@@ -40,6 +43,7 @@ import {
 import {
   mockAccessGrant,
   mockedConsentEndpoint,
+  MOCKED_CREDENTIAL_ID,
   mockWellKnownNoConsent,
   mockWellKnownWithConsent,
 } from "./request.mock";
@@ -561,5 +565,127 @@ describe("isAccessRequest", () => {
         type: ["SolidConsentRequest"],
       })
     ).toBe(true);
+  });
+});
+
+describe("cancelAccessRequest", () => {
+  it("defaults to the authenticated fetch from solid-client-authn-browser", async () => {
+    const sca = jest.requireMock("@inrupt/solid-client-authn-browser") as {
+      fetch: typeof global.fetch;
+    };
+    sca.fetch = jest
+      .fn(global.fetch)
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify(
+            mockAccessGrant("https://some.issuer", "https://some.subject")
+          )
+        )
+      );
+    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      revokeVerifiableCredential: typeof revokeVerifiableCredential;
+    };
+    const spiedRevoke = jest.spyOn(
+      mockedVcModule,
+      "revokeVerifiableCredential"
+    );
+    await cancelAccessRequest("https://some.credential");
+    expect(spiedRevoke).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      {
+        fetch: sca.fetch,
+      }
+    );
+  });
+
+  it("uses the provided fetch if any", async () => {
+    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      revokeVerifiableCredential: typeof revokeVerifiableCredential;
+    };
+    const spiedRevoke = jest.spyOn(
+      mockedVcModule,
+      "revokeVerifiableCredential"
+    );
+    const mockedFetch = jest
+      .fn(global.fetch)
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify(
+            mockAccessGrant("https://some.issuer", "https://some.subject")
+          )
+        )
+      );
+    await cancelAccessRequest("https://some.credential", {
+      fetch: mockedFetch,
+    });
+    expect(spiedRevoke).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.anything(),
+      {
+        fetch: mockedFetch,
+      }
+    );
+  });
+
+  it("looks up the VC if provided as an IRI", async () => {
+    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      revokeVerifiableCredential: typeof revokeVerifiableCredential;
+    };
+    const spiedRevoke = jest.spyOn(
+      mockedVcModule,
+      "revokeVerifiableCredential"
+    );
+    const mockedVc = mockAccessGrant(
+      "https://some.issuer",
+      "https://some.subject"
+    );
+    const mockedFetch = jest
+      .fn(global.fetch)
+      .mockResolvedValue(new Response(JSON.stringify(mockedVc)));
+    await cancelAccessRequest(MOCKED_CREDENTIAL_ID, {
+      fetch: mockedFetch,
+    });
+    expect(mockedFetch).toHaveBeenCalledWith(MOCKED_CREDENTIAL_ID);
+    expect(spiedRevoke).toHaveBeenCalledWith(
+      "https://some.issuer/issue",
+      MOCKED_CREDENTIAL_ID,
+      expect.anything()
+    );
+  });
+
+  it("throws if dereferencing the credential ID fails", async () => {
+    const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
+      new Response(undefined, {
+        status: 401,
+        statusText: "Unauthorized",
+      })
+    );
+    await expect(
+      cancelAccessRequest("https://some.credential", { fetch: mockedFetch })
+    ).rejects.toThrow(/\[https:\/\/some.credential\].*401.*Unauthorized/);
+  });
+
+  it("gets the VC identifier if provided as a full credential", async () => {
+    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      revokeVerifiableCredential: typeof revokeVerifiableCredential;
+    };
+    const spiedRevoke = jest.spyOn(
+      mockedVcModule,
+      "revokeVerifiableCredential"
+    );
+    const mockedFetch = jest.fn(global.fetch);
+    await cancelAccessRequest(
+      mockAccessGrant("https://some.issuer", "https://some.subject"),
+      {
+        fetch: mockedFetch,
+      }
+    );
+    expect(spiedRevoke).toHaveBeenCalledWith(
+      "https://some.issuer/issue",
+      MOCKED_CREDENTIAL_ID,
+      expect.anything()
+    );
+    expect(mockedFetch).not.toHaveBeenCalled();
   });
 });
