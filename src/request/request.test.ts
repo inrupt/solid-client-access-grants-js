@@ -35,11 +35,8 @@ import {
 } from "@inrupt/solid-client-vc";
 import { Response } from "cross-fetch";
 import {
-<<<<<<< HEAD
   cancelAccessRequest,
-=======
   getConsentApiEndpoint,
->>>>>>> d475799 (Get preferred consent UI)
   isAccessRequest,
   requestAccess,
   requestAccessWithConsent,
@@ -50,14 +47,10 @@ import {
 } from "../consent.internal";
 import {
   mockAccessGrant,
-<<<<<<< HEAD
-  mockedConsentEndpoint,
   MOCKED_CREDENTIAL_ID,
-=======
   MOCKED_CONSENT_ISSUER,
   MOCKED_CONSENT_UI_IRI,
   mockWebIdWithUi,
->>>>>>> d475799 (Get preferred consent UI)
   mockWellKnownNoConsent,
   mockWellKnownWithConsent,
 } from "./request.mock";
