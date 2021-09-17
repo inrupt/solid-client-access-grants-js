@@ -7,6 +7,8 @@ The following changes have been implemented but not released yet:
 ## [Unreleased]
 
 - `cancelAccessRequest`: Cancel a pending access request.
+- `getConsentApiEndpoint`: Discover the URL of a consent app where a user prefers
+  to be redirected when prompted for consent.
 - `isValidConsentGrant`: Verify if a consent grant is valid (correct signature, issuer key match...).
   The verification is done at a remote endpoint, and not client-side.
 
