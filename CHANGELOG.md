@@ -6,6 +6,7 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+- `cancelAccessRequest`: Cancel a pending access request.
 - `isValidConsentGrant`: Verify if a consent grant is valid (correct signature, issuer key match...).
   The verification is done at a remote endpoint, and not client-side.
 

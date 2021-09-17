@@ -22,6 +22,7 @@ export {
   RequestAccessParameters,
   requestAccessWithConsent,
   RequestAccessWithConsentParameters,
+  cancelAccessRequest,
 } from "./request/request";
 
 export { default as isValidConsentGrant } from "./verify/verify";

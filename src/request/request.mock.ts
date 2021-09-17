@@ -26,8 +26,8 @@ import {
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 
-export const mockedCredentialId = "https://some.credential";
-export const mockedIssuanceDate = "2021-09-07T09:59:00Z";
+export const MOCKED_CREDENTIAL_ID = "https://some.credential";
+export const MOCKED_ISSUANCE_DATE = "2021-09-07T09:59:00Z";
 
 export const mockAccessGrant = (
   issuer: string,
@@ -41,11 +41,11 @@ export const mockAccessGrant = (
       ...subjectClaims,
     },
     type: ["SolidCredential", "SolidConsentRequest"],
-    id: mockedCredentialId,
-    issuanceDate: mockedIssuanceDate,
+    id: MOCKED_CREDENTIAL_ID,
+    issuanceDate: MOCKED_ISSUANCE_DATE,
     issuer,
     proof: {
-      created: mockedIssuanceDate,
+      created: MOCKED_ISSUANCE_DATE,
       proofPurpose: "assertionMethod",
       verificationMethod: "https://issuer.jwks",
       proofValue: "eyJhbGciO..E1og50tS9tH8WyXMlXyo45CA",
