@@ -63,22 +63,22 @@ export const MOCKED_STORAGE = "https://pod-provider.iri";
 export const mockWellKnownWithConsent = (
   hasUi = true
 ): SolidDataset & WithServerResourceInfo => {
-  const wellKown = buildThing().addIri(
+  const wellKnown = buildThing().addIri(
     "http://inrupt.com/ns/ess#consentIssuer",
     MOCKED_CONSENT_ISSUER
   );
   if (hasUi) {
-    wellKown.addIri(PREFERRED_CONSENT_MANAGEMENT_UI, MOCKED_CONSENT_UI_IRI);
+    wellKnown.addIri(PREFERRED_CONSENT_MANAGEMENT_UI, MOCKED_CONSENT_UI_IRI);
   }
   return setThing(
     mockSolidDatasetFrom("https://pod-provider.iri/resource/.well-known/solid"),
-    wellKown.build()
+    wellKnown.build()
   );
 };
 
 export const mockWellKnownNoConsent = (): SolidDataset &
   WithServerResourceInfo => {
-  const wellKown = buildThing()
+  const wellKnown = buildThing()
     .addIri(
       "http://www.w3.org/ns/pim/space#storage",
       "https://pod-provider.iri"
@@ -86,7 +86,7 @@ export const mockWellKnownNoConsent = (): SolidDataset &
     .build();
   return setThing(
     mockSolidDatasetFrom("https://pod-provider.iri/resource/.well-known/solid"),
-    wellKown
+    wellKnown
   );
 };
 
