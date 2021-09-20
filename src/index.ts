@@ -23,6 +23,7 @@ export {
   requestAccessWithConsent,
   RequestAccessWithConsentParameters,
   cancelAccessRequest,
+  getConsentApiEndpoint,
 } from "./request/request";
 
 export { default as isValidConsentGrant } from "./verify/verify";

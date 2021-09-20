@@ -25,6 +25,7 @@ import {
   requestAccess,
   requestAccessWithConsent,
   cancelAccessRequest,
+  getConsentApiEndpoint,
 } from "./index";
 
 describe("Index exports", () => {
@@ -33,5 +34,6 @@ describe("Index exports", () => {
     expect(requestAccess).toBeDefined();
     expect(requestAccessWithConsent).toBeDefined();
     expect(cancelAccessRequest).toBeDefined();
+    expect(getConsentApiEndpoint).toBeDefined();
   });
 });

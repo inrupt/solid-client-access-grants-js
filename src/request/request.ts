@@ -17,7 +17,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { access, UrlString, WebId } from "@inrupt/solid-client";
+import {
+  access,
+  getIri,
+  getSolidDataset,
+  getThing,
+  getThingAll,
+  getWellKnownSolid,
+  UrlString,
+  WebId,
+} from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
   revokeVerifiableCredential,
@@ -31,6 +40,7 @@ import {
   isConsentRequest,
   getDefaultSessionFetch,
 } from "../consent.internal";
+import { PIM_STORAGE, PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
 export function isAccessRequest(
   credential: VerifiableCredential | AccessRequestBody
@@ -231,5 +241,79 @@ export async function cancelAccessRequest(
     {
       fetch: fetcher,
     }
+  );
+}
+
+async function getConsentApiEndpointFromProfile(
+  webId: UrlString,
+  options: { fetch: typeof global.fetch }
+): Promise<{ consentEndpoint?: UrlString; storage?: UrlString }> {
+  const result: { consentEndpoint?: UrlString; storage?: UrlString } = {};
+  let webIdDocument;
+  try {
+    webIdDocument = await getSolidDataset(webId, {
+      fetch: options.fetch,
+    });
+  } catch (e) {
+    throw new Error(`Cannot get consent API for ${webId}: ${e}.`);
+  }
+  const profile = getThing(webIdDocument, webId);
+  if (profile === null) {
+    throw new Error(
+      `Cannot get consent API for ${webId}: the WebID cannot be dereferenced.`
+    );
+  }
+  const profileConsentUi = getIri(profile, PREFERRED_CONSENT_MANAGEMENT_UI);
+  if (profileConsentUi !== null) {
+    result.consentEndpoint = profileConsentUi;
+  }
+  // If the profile document does not advertize for the consent UI, look for a storage root.
+  const storage = getIri(profile, PIM_STORAGE);
+  if (storage !== null) {
+    result.storage = storage;
+  }
+  return result;
+}
+
+async function getConsentApiEndpointFromWellKnown(
+  storage: UrlString | undefined,
+  options: { fetch: typeof global.fetch }
+): Promise<UrlString | undefined> {
+  if (storage === undefined) {
+    return undefined;
+  }
+  const wellKnown = await getWellKnownSolid(storage, {
+    fetch: options.fetch,
+  });
+  if (getThingAll(wellKnown).length === 0) {
+    return undefined;
+  }
+  const wellKnownConsentUi = getIri(
+    getThingAll(wellKnown)[0],
+    PREFERRED_CONSENT_MANAGEMENT_UI
+  );
+  return wellKnownConsentUi ?? undefined;
+}
+
+/**
+ * Get the endpoint where the user prefers to be redirected when asked for consent.
+ * If the user does not specify an endpoint, this function attemps to discover the
+ * default consent UI recommanded by their Pod provider.
+ *
+ * @param webId The WebID of the user asked for consent.
+ * @param options Optional properties to customise the access request behaviour.
+ */
+export async function getConsentApiEndpoint(
+  webId: UrlString,
+  options: { fetch?: ConsentGrantBaseOptions["fetch"] } = {}
+): Promise<UrlString | undefined> {
+  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
+  const { consentEndpoint, storage } = await getConsentApiEndpointFromProfile(
+    webId,
+    { fetch: fetcher }
+  );
+  return (
+    consentEndpoint ??
+    getConsentApiEndpointFromWellKnown(storage, { fetch: fetcher })
   );
 }

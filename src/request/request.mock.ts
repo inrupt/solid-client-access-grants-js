@@ -22,9 +22,11 @@ import {
   mockSolidDatasetFrom,
   setThing,
   SolidDataset,
+  UrlString,
   WithServerResourceInfo,
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
 export const MOCKED_CREDENTIAL_ID = "https://some.credential";
 export const MOCKED_ISSUANCE_DATE = "2021-09-07T09:59:00Z";
@@ -54,22 +56,29 @@ export const mockAccessGrant = (
   };
 };
 
-export const mockedConsentEndpoint = "https://consent-issuer.iri";
+export const MOCKED_CONSENT_ISSUER = "https://consent-issuer.iri";
+export const MOCKED_CONSENT_UI_IRI = "https://some-consent.app";
+export const MOCKED_STORAGE = "https://pod-provider.iri";
 
-export const mockWellKnownWithConsent = (): SolidDataset &
-  WithServerResourceInfo => {
-  const wellKown = buildThing()
-    .addIri("http://inrupt.com/ns/ess#consentIssuer", mockedConsentEndpoint)
-    .build();
+export const mockWellKnownWithConsent = (
+  hasUi = true
+): SolidDataset & WithServerResourceInfo => {
+  const wellKnown = buildThing().addIri(
+    "http://inrupt.com/ns/ess#consentIssuer",
+    MOCKED_CONSENT_ISSUER
+  );
+  if (hasUi) {
+    wellKnown.addIri(PREFERRED_CONSENT_MANAGEMENT_UI, MOCKED_CONSENT_UI_IRI);
+  }
   return setThing(
     mockSolidDatasetFrom("https://pod-provider.iri/resource/.well-known/solid"),
-    wellKown
+    wellKnown.build()
   );
 };
 
 export const mockWellKnownNoConsent = (): SolidDataset &
   WithServerResourceInfo => {
-  const wellKown = buildThing()
+  const wellKnown = buildThing()
     .addIri(
       "http://www.w3.org/ns/pim/space#storage",
       "https://pod-provider.iri"
@@ -77,6 +86,21 @@ export const mockWellKnownNoConsent = (): SolidDataset &
     .build();
   return setThing(
     mockSolidDatasetFrom("https://pod-provider.iri/resource/.well-known/solid"),
-    wellKown
+    wellKnown
   );
+};
+
+export const mockWebIdWithUi = (
+  webId: UrlString,
+  hasUi = true,
+  hasStorage = true
+): SolidDataset & WithServerResourceInfo => {
+  const profile = buildThing({ url: webId });
+  if (hasStorage) {
+    profile.addIri("http://www.w3.org/ns/pim/space#storage", MOCKED_STORAGE);
+  }
+  if (hasUi) {
+    profile.addIri(PREFERRED_CONSENT_MANAGEMENT_UI, MOCKED_CONSENT_UI_IRI);
+  }
+  return setThing(mockSolidDatasetFrom(webId), profile.build());
 };

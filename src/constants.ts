@@ -32,6 +32,13 @@ export const GC_IS_PROVIDED_TO = "https://w3id.org/GConsent#isProvidedTo";
 
 export const SOLID_VC_ISSUER = "http://www.w3.org/ns/solid/terms#vcIssuer";
 
+// TODO: Add dependency on generated vocabulary.
+export const PIM_STORAGE = "http://www.w3.org/ns/pim/space#storage";
+
+// TODO: This is a temporary filler term, until we publish a definitive term for this.
+export const PREFERRED_CONSENT_MANAGEMENT_UI =
+  "http://inrupt.com/ns/ess#ConsentManagementUI";
+
 export const CONTEXT_CONSENT = [
   "https://www.w3.org/2018/credentials/v1",
   "https://consent.pod.inrupt.com/credentials/v1",
