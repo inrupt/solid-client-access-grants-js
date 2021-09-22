@@ -73,6 +73,7 @@
       "src/index.ts",
       "src/request/request.ts",
       "src/verify/verify.ts",
+      "src/approve/approve.ts",
     ],
     "exclude": [
       "node_modules/**",
