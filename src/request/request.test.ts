@@ -643,7 +643,7 @@ describe("cancelAccessRequest", () => {
     });
     expect(mockedFetch).toHaveBeenCalledWith(MOCKED_CREDENTIAL_ID);
     expect(spiedRevoke).toHaveBeenCalledWith(
-      "https://some.issuer/issue",
+      "https://some.issuer/status",
       MOCKED_CREDENTIAL_ID,
       expect.anything()
     );
@@ -677,7 +677,7 @@ describe("cancelAccessRequest", () => {
       }
     );
     expect(spiedRevoke).toHaveBeenCalledWith(
-      "https://some.issuer/issue",
+      "https://some.issuer/status",
       MOCKED_CREDENTIAL_ID,
       expect.anything()
     );

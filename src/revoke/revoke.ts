@@ -17,18 +17,21 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export {
-  requestAccess,
-  RequestAccessParameters,
-  requestAccessWithConsent,
-  RequestAccessWithConsentParameters,
-  cancelAccessRequest,
-  getConsentApiEndpoint,
-} from "./request/request";
+import { UrlString } from "@inrupt/solid-client";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { revokeVc } from "../consent.internal";
+import { ConsentGrantBaseOptions } from "../constants";
 
-export { default as revokeConsentGrant } from "./revoke/revoke";
-export { default as isValidConsentGrant } from "./verify/verify";
-export {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-} from "./approve/approve";
+/**
+ * Makes a request to the consent server to revoke a given VC.
+ *
+ * @param vc Either a VC, or a URL to a VC, to be revoked.
+ * @param options Optional properties to customise the request behaviour.
+ * @returns A void promise.
+ */
+export default async function revokeConsentGrant(
+  vc: VerifiableCredential | UrlString,
+  options: ConsentGrantBaseOptions = {}
+): Promise<void> {
+  return revokeVc(vc, options);
+}
