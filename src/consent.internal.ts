@@ -28,6 +28,7 @@ import {
 } from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
+  revokeVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { fetch as crossFetch } from "cross-fetch";
@@ -338,4 +339,30 @@ export async function dereferenceVcIri(
     );
   }
   return (await issuerResponse.json()) as VerifiableCredential;
+}
+
+export async function revokeVc(
+  vc: VerifiableCredential | UrlString,
+  options: ConsentGrantBaseOptions
+): Promise<void> {
+  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
+  if (typeof vc === "object") {
+    // If the full VC is provided, no additional information is needed.
+    return revokeVerifiableCredential(
+      new URL("status", vc.issuer).href,
+      vc.id,
+      {
+        fetch: fetcher,
+      }
+    );
+  }
+  // Only the credential IRI has been provided, and it needs to be dereferenced.
+  const credential = await dereferenceVcIri(vc, fetcher);
+  return revokeVerifiableCredential(
+    new URL("status", credential.issuer).href,
+    credential.id,
+    {
+      fetch: fetcher,
+    }
+  );
 }

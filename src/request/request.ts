@@ -27,15 +27,12 @@ import {
   UrlString,
   WebId,
 } from "@inrupt/solid-client";
-import {
-  revokeVerifiableCredential,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   getRequestBody,
   issueAccessOrConsentVc,
   getDefaultSessionFetch,
-  dereferenceVcIri,
+  revokeVc,
 } from "../consent.internal";
 import {
   PIM_STORAGE,
@@ -128,26 +125,7 @@ export async function cancelAccessRequest(
   accessRequest: VerifiableCredential | UrlString,
   options: { fetch?: typeof global.fetch } = {}
 ): Promise<void> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  if (typeof accessRequest === "object") {
-    // If the full VC is provided, no additional information is needed.
-    return revokeVerifiableCredential(
-      new URL("issue", accessRequest.issuer).href,
-      accessRequest.id,
-      {
-        fetch: fetcher,
-      }
-    );
-  }
-  // Only the credential IRI has been provided, and it needs to be dereferenced.
-  const credential = await dereferenceVcIri(accessRequest, fetcher);
-  return revokeVerifiableCredential(
-    new URL("issue", credential.issuer).href,
-    credential.id,
-    {
-      fetch: fetcher,
-    }
-  );
+  return revokeVc(accessRequest, options);
 }
 
 async function getConsentApiEndpointFromProfile(

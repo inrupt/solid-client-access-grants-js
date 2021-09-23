@@ -17,31 +17,21 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// This rule complains about the `@jest/globals` variables overriding global vars:
-/* eslint-disable no-shadow */
-import { describe, it, expect } from "@jest/globals";
-import {
-  isValidConsentGrant,
-  requestAccess,
-  requestAccessWithConsent,
-  cancelAccessRequest,
-  getConsentApiEndpoint,
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  revokeConsentGrant,
-} from "./index";
+import { UrlString } from "@inrupt/solid-client";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { revokeVc } from "../consent.internal";
+import { ConsentGrantBaseOptions } from "../constants";
 
-describe("Index exports", () => {
-  it("exposes expected things", () => {
-    expect(approveAccessRequest).toBeDefined();
-    expect(approveAccessRequestWithConsent).toBeDefined();
-    expect(cancelAccessRequest).toBeDefined();
-    expect(denyAccessRequest).toBeDefined();
-    expect(getConsentApiEndpoint).toBeDefined();
-    expect(isValidConsentGrant).toBeDefined();
-    expect(requestAccess).toBeDefined();
-    expect(requestAccessWithConsent).toBeDefined();
-    expect(revokeConsentGrant).toBeDefined();
-  });
-});
+/**
+ * Makes a request to the consent server to revoke a given VC.
+ *
+ * @param vc Either a VC, or a URL to a VC, to be revoked.
+ * @param options Optional properties to customise the request behaviour.
+ * @returns A void promise.
+ */
+export default async function revokeConsentGrant(
+  vc: VerifiableCredential | UrlString,
+  options: ConsentGrantBaseOptions = {}
+): Promise<void> {
+  return revokeVc(vc, options);
+}

@@ -26,6 +26,7 @@ export {
   getConsentApiEndpoint,
 } from "./request/request";
 
+export { default as revokeConsentGrant } from "./revoke/revoke";
 export { default as isValidConsentGrant } from "./verify/verify";
 export {
   approveAccessRequest,
