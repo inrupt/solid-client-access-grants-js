@@ -17,31 +17,33 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// This rule complains about the `@jest/globals` variables overriding global vars:
-/* eslint-disable no-shadow */
-import { describe, it, expect } from "@jest/globals";
-import {
-  isValidConsentGrant,
-  requestAccess,
-  requestAccessWithConsent,
-  cancelAccessRequest,
-  getConsentApiEndpoint,
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  revokeConsentGrant,
-} from "./index";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { CONSENT_CONTEXT } from "../constants";
+import { BaseAccessBody } from "../consent.internal";
 
-describe("Index exports", () => {
-  it("exposes expected things", () => {
-    expect(approveAccessRequest).toBeDefined();
-    expect(approveAccessRequestWithConsent).toBeDefined();
-    expect(cancelAccessRequest).toBeDefined();
-    expect(denyAccessRequest).toBeDefined();
-    expect(getConsentApiEndpoint).toBeDefined();
-    expect(isValidConsentGrant).toBeDefined();
-    expect(requestAccess).toBeDefined();
-    expect(requestAccessWithConsent).toBeDefined();
-    expect(revokeConsentGrant).toBeDefined();
-  });
-});
+// eslint-disable-next-line import/prefer-default-export
+export const mockDenyAccessVc = (): VerifiableCredential & BaseAccessBody => {
+  return {
+    "@context": CONSENT_CONTEXT,
+    id: "https://some.credential",
+    credentialSubject: {
+      id: "https://some.requestor",
+      hasConsent: {
+        forPersonalData: ["https://some.resource"],
+        hasStatus: "ConsentStatusRequested",
+        mode: ["Read"],
+      },
+      inbox: "https://some.inbox",
+    },
+    issuanceDate: "some ISO date",
+    issuer: "https://some.issuer",
+    proof: {
+      created: "some ISO date",
+      proofPurpose: "some proof purpose",
+      proofValue: "some proof",
+      type: "some proof type",
+      verificationMethod: "some method",
+    },
+    type: ["SolidConsentRequest"],
+  };
+};

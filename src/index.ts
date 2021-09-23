@@ -32,3 +32,4 @@ export {
   approveAccessRequest,
   approveAccessRequestWithConsent,
 } from "./approve/approve";
+export { denyAccessRequest } from "./deny/deny";

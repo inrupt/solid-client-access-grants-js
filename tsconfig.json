@@ -71,10 +71,11 @@
       // The source files of everything listed under `exports` in our package.json
       // (i.e. public API's that should be documented) should be listed here:
       "src/index.ts",
+      "src/approve/approve.ts",
+      "src/deny/deny.ts",
       "src/request/request.ts",
       "src/revoke/revoke.ts",
       "src/verify/verify.ts",
-      "src/approve/approve.ts",
     ],
     "exclude": [
       "node_modules/**",
