@@ -45,7 +45,7 @@ export const PREFERRED_CONSENT_MANAGEMENT_UI =
 export const CONSENT_CONTEXT = [
   "https://www.w3.org/2018/credentials/v1",
   "https://consent.pod.inrupt.com/credentials/v1",
-];
+] as const;
 
 export const WELL_KNOWN_SOLID = ".well-known/solid";
 
@@ -57,10 +57,11 @@ export const CONSENT_STATUS_DENIED = "ConsentStatusDenied";
 export const CONSENT_STATUS_EXPLICITLY_GIVEN = "ConsentStatusExplicitlyGiven";
 export const CONSENT_STATUS_REQUESTED = "ConsentStatusRequested";
 
-export type ConsentStatus =
-  | typeof CONSENT_STATUS_DENIED
-  | typeof CONSENT_STATUS_EXPLICITLY_GIVEN
-  | typeof CONSENT_STATUS_REQUESTED;
+export const CONSENT_STATUS = new Set([
+  CONSENT_STATUS_DENIED,
+  CONSENT_STATUS_EXPLICITLY_GIVEN,
+  CONSENT_STATUS_REQUESTED,
+] as const);
 
 // TODO: Check that these are actually the modes you can request.
 //       The Server API doc does refer to `acl:` as a prefix,

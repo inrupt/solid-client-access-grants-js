@@ -24,7 +24,8 @@ import {
   mockWellKnownNoConsent,
   mockWellKnownWithConsent,
 } from "../request/request.mock";
-import { ConsentGrantBody } from "../consent.internal";
+import { BaseAccessBody, BaseConsentBody } from "../consent.internal";
+import { CONSENT_CONTEXT } from "../constants";
 
 export const mockConsentEndpoint = (withConsent = true): void => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,9 +37,10 @@ export const mockConsentEndpoint = (withConsent = true): void => {
   );
 };
 
-export const mockAccessRequestVc = (): VerifiableCredential => {
+export const mockAccessRequestVc = (): VerifiableCredential &
+  BaseAccessBody => {
   return {
-    "@context": ["https://some.context"],
+    "@context": CONSENT_CONTEXT,
     id: "https://some.credential",
     credentialSubject: {
       id: "https://some.requestor",
@@ -62,11 +64,12 @@ export const mockAccessRequestVc = (): VerifiableCredential => {
   };
 };
 
-export const mockConsentRequestVc = (): VerifiableCredential => {
-  const requestVc = mockAccessRequestVc();
-  (
-    requestVc.credentialSubject as ConsentGrantBody["credentialSubject"]
-  ).hasConsent.forPurpose = ["https://some.purpose"];
+export const mockConsentRequestVc = (): VerifiableCredential &
+  BaseConsentBody => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const requestVc = mockAccessRequestVc() as any as VerifiableCredential &
+    BaseConsentBody;
+  requestVc.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
   requestVc.expirationDate = new Date(2021, 8, 14).toISOString();
   requestVc.issuanceDate = new Date(2021, 8, 13).toISOString();
   return requestVc;

@@ -327,26 +327,31 @@ describe("approveAccessRequestWithConsent", () => {
     );
   });
 
-  it("throws if the provided VC isn't an access request", async () => {
+  it("throws if the provided VC isn't a VC of type Solid Consent request", async () => {
     mockConsentEndpoint();
     await expect(
       approveAccessRequestWithConsent({
-        "@context": "https://some.context",
-        id: "https://some.credential",
+        ...mockConsentRequestVc(),
+        type: ["NotASolidConsentRequest"],
+      })
+    ).rejects.toThrow(
+      "An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential."
+    );
+  });
+
+  it("throws if the provided VC isn't an access request", async () => {
+    mockConsentEndpoint();
+    const accessRequestWithConsent = mockConsentRequestVc();
+    await expect(
+      approveAccessRequestWithConsent({
+        ...accessRequestWithConsent,
         credentialSubject: {
-          id: "https://some.requestor",
-          someClaim: "some value",
+          ...accessRequestWithConsent.credentialSubject,
+          hasConsent: {
+            ...accessRequestWithConsent.credentialSubject.hasConsent,
+            hasStatus: "ConsentStatusDenied",
+          },
         },
-        issuanceDate: "some ISO date",
-        issuer: "https://some.issuer",
-        proof: {
-          created: "some ISO date",
-          proofPurpose: "some proof purpose",
-          proofValue: "some proof",
-          type: "some proof type",
-          verificationMethod: "some method",
-        },
-        type: ["Some credential type"],
       })
     ).rejects.toThrow(/Unexpected VC.*credentialSubject/);
   });
@@ -407,6 +412,51 @@ describe("approveAccessRequestWithConsent", () => {
     );
     await approveAccessRequestWithConsent(
       mockConsentRequestVc(),
+      {
+        access: { append: true },
+        expirationDate: new Date(2021, 9, 14),
+        issuanceDate: new Date(2021, 9, 15),
+        purpose: ["https://some-custom.purpose"],
+        requestor: "https://some-custom.requestor",
+        resources: ["https://some-custom.resource"],
+        requestorInboxIri: "https://some-custom.inbox",
+      },
+      {
+        fetch: jest.fn(global.fetch),
+      }
+    );
+
+    expect(spiedIssueRequest).toHaveBeenCalledWith(
+      `${MOCKED_CONSENT_ISSUER}/issue`,
+      "https://some-custom.requestor",
+      expect.objectContaining({
+        hasConsent: {
+          mode: ["Append"],
+          hasStatus: "ConsentStatusExplicitlyGiven",
+          forPersonalData: ["https://some-custom.resource"],
+          isProvidedTo: "https://some-custom.requestor",
+          forPurpose: ["https://some-custom.purpose"],
+        },
+        inbox: "https://some-custom.inbox",
+      }),
+      expect.objectContaining({
+        type: ["SolidConsentRequest"],
+      }),
+      expect.anything()
+    );
+  });
+
+  it("issues a proper consent grant from a request override alone", async () => {
+    mockConsentEndpoint();
+    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      issueVerifiableCredential: () => unknown;
+    };
+    const spiedIssueRequest = jest.spyOn(
+      mockedVcModule,
+      "issueVerifiableCredential"
+    );
+    await approveAccessRequestWithConsent(
+      undefined,
       {
         access: { append: true },
         expirationDate: new Date(2021, 9, 14),

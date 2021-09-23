@@ -36,7 +36,6 @@ import {
   CONSENT_CONTEXT,
   INRUPT_CONSENT_SERVICE,
   CREDENTIAL_TYPE,
-  ConsentStatus,
   CONSENT_STATUS_REQUESTED,
   ResourceAccessMode,
   CONSENT_STATUS_EXPLICITLY_GIVEN,
@@ -46,6 +45,7 @@ import {
   RESOURCE_ACCESS_MODE_CONTROL,
   ConsentGrantBaseOptions,
 } from "./constants";
+import { ConsentStatus } from "./type/ConsentStatus";
 
 export function accessToConsentRequestModes(
   desiredAccess: Partial<access.Access>

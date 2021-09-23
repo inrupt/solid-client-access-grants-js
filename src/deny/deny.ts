@@ -19,88 +19,9 @@
 
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
-import type { ConsentGrantBaseOptions } from "../constants";
-import {
-  CONSENT_CONTEXT,
-  CONSENT_STATUS_DENIED,
-  CONSENT_STATUS_EXPLICITLY_GIVEN,
-  CONSENT_STATUS_REQUESTED,
-  CREDENTIAL_TYPE,
-} from "../constants";
-import {
-  BaseAccessBody,
-  dereferenceVcIri,
-  getDefaultSessionFetch,
-  issueAccessOrConsentVc,
-} from "../consent.internal";
-
-export function isUnknownObject(
-  x: unknown
-): x is { [key in PropertyKey]: unknown } {
-  return x !== null && typeof x === "object";
-}
-
-export const consentStatus = new Set([
-  CONSENT_STATUS_DENIED,
-  CONSENT_STATUS_EXPLICITLY_GIVEN,
-  CONSENT_STATUS_REQUESTED,
-] as const);
-
-export type ConsentStatus = typeof consentStatus extends Set<infer T>
-  ? T
-  : never;
-
-export function isConsentContext(x: unknown): x is typeof CONSENT_CONTEXT {
-  return (
-    Array.isArray(x) &&
-    CONSENT_CONTEXT.map((y) => x.includes(y)).reduce(
-      (previous, current) => previous && current
-    )
-  );
-}
-
-export function isConsentStatus(x: unknown): x is ConsentStatus {
-  return typeof x === "string" && (consentStatus as Set<string>).has(x);
-}
-
-// TODO: Fix type checking
-export function isBaseAccessVerifiableCredential(
-  x: unknown
-): x is BaseAccessBody {
-  return (
-    isUnknownObject(x) &&
-    isConsentContext(x["@context"]) &&
-    Array.isArray(x.type) &&
-    x.type.includes(CREDENTIAL_TYPE) &&
-    isUnknownObject(x.credentialSubject) &&
-    typeof x.credentialSubject.id === "string" &&
-    isUnknownObject(x.credentialSubject.hasConsent) &&
-    // TODO: Add mode check
-    "mode" in x.credentialSubject.hasConsent &&
-    isConsentStatus(x.credentialSubject.hasConsent.hasStatus) &&
-    // TODO: Add Array of string check
-    Array.isArray(x.credentialSubject.hasConsent.forPersonalData) &&
-    typeof x.credentialSubject.inbox === "string"
-  );
-}
-
-async function getBaseAccessVerifiableCredential(
-  vc: VerifiableCredential | URL | UrlString,
-  options: ConsentGrantBaseOptions
-): Promise<BaseAccessBody> {
-  // TODO: Actually test the getDefaultSessionFetch() gets called by default (refactor)
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  const fetchedVerifiableCredential =
-    typeof vc === "string" || vc instanceof URL
-      ? await dereferenceVcIri(vc, fetcher)
-      : vc;
-  if (!isBaseAccessVerifiableCredential(fetchedVerifiableCredential)) {
-    throw new Error(
-      `An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential.`
-    );
-  }
-  return fetchedVerifiableCredential;
-}
+import { ConsentGrantBaseOptions, CONSENT_STATUS_DENIED } from "../constants";
+import { BaseAccessBody, issueAccessOrConsentVc } from "../consent.internal";
+import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
 
 /**
  * Deny an access request. The content of the denied access request is provided
@@ -112,6 +33,7 @@ async function getBaseAccessVerifiableCredential(
  * @returns A Verifiable Credential representing the denied access.
  * @since Unreleased.
  */
+// eslint-disable-next-line import/prefer-default-export
 export async function denyAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
   options: ConsentGrantBaseOptions = {}

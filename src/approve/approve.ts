@@ -38,6 +38,7 @@ import {
   RESOURCE_ACCESS_MODE_READ,
   RESOURCE_ACCESS_MODE_WRITE,
 } from "../constants";
+import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
   return requestVc.credentialSubject.id;
@@ -278,13 +279,11 @@ export async function approveAccessRequestWithConsent(
   }>,
   options: ConsentGrantBaseOptions = {}
 ): Promise<VerifiableCredential> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  let requestCredential;
-  if (typeof requestVc === "string") {
-    requestCredential = await dereferenceVcIri(requestVc, fetcher);
-  } else {
-    requestCredential = requestVc;
-  }
+  const requestCredential =
+    typeof requestVc !== "undefined"
+      ? await getBaseAccessVerifiableCredential(requestVc, options)
+      : requestVc;
+
   if (
     requestCredential !== undefined &&
     !(isAccessRequest(requestCredential) && isConsentRequest(requestCredential))
@@ -307,8 +306,9 @@ export async function approveAccessRequestWithConsent(
     issuanceDate: initialisedOptions.issuanceDate,
     expirationDate: initialisedOptions.expirationDate,
   });
-  return issueAccessOrConsentVc(initialisedOptions.requestor, requestBody, {
-    fetch: fetcher,
-    consentEndpoint: options.consentEndpoint,
-  });
+  return issueAccessOrConsentVc(
+    initialisedOptions.requestor,
+    requestBody,
+    options
+  );
 }
