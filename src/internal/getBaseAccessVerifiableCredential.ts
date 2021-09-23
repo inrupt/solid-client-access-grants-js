@@ -20,7 +20,7 @@
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
 import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
-import { BaseAccessBody } from "../type/BaseAccessBody";
+import type { BaseAccessBody } from "../type/AccessVerifiableCredential";
 import { getDefaultSessionFetch } from "./getDefaultSessionFetch";
 import { isBaseAccessVerifiableCredential } from "../guard/isBaseAccessVerifiableCredential";
 

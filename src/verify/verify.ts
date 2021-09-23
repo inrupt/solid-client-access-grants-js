@@ -17,13 +17,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { UrlString } from "@inrupt/solid-client";
+import type { UrlString } from "@inrupt/solid-client";
 import {
   isVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
-import { getConsentEndpointForResource } from "../consent.internal";
+import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import { getConsentEndpointForResource } from "../internal/consent.internal";
 import { getDefaultSessionFetch } from "../internal/getDefaultSessionFetch";
 
 /**

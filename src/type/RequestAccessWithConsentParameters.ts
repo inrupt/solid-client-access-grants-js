@@ -18,18 +18,24 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import type { UrlString } from "@inrupt/solid-client";
+import type { RequestAccessParameters } from "./RequestAccessParameters";
 
 /**
- * Optional parameters to customise the behaviour of consent requests.
+ * Required parameters to request access to one or more Resources.
  *
- * - `fetch`: Pass in a function with a signature compatible with the WHATWG
- *            Fetch API, which will be used to make HTTP requests. Primarily
- *            useful when requests need to be authenticated.
- *            When `@inrupt/solid-client-authn-browser` is available and this
- *            property is not set, `fetch` will be imported from there.
- *            Otherwise, the HTTP requests will be unauthenticated.
+ * - `requestor`: WebID of the Agent requesting access to the given Resources.
+ * - `resourceOwner`: WebID of an Agent controlling access to the given Resources.
+ * - `access`: Level access to request on the given Resource.
+ *             See {@link https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.access.html}.
+ * - `resources`: Array of URLs of the Resources to which access is requested.
+ * - `purpose`: URL representing what the requested access will be used for.
+ * - `requestorInboxUrl`: (Optional.) URL that a consent receipt may be posted to.
+ * - `issuanceDate`: (Optional, set to the current time if left out.) Point in time from which the access should be granted.
+ * - `expirationDate`: (Optional.) Point in time until when the access is needed.
  */
-export type ConsentGrantBaseOptions = {
-  fetch?: typeof fetch;
-  consentEndpoint?: UrlString;
+// TODO: Find out about the overlap with BaseConsentParameters
+export type RequestAccessWithConsentParameters = RequestAccessParameters & {
+  purpose: Array<UrlString>;
+  issuanceDate?: Date;
+  expirationDate?: Date;
 };

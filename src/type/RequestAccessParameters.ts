@@ -16,10 +16,24 @@
 // HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-import type { RESOURCE_ACCESS_MODE } from "../constants";
 
-export type ResourceAccessMode = typeof RESOURCE_ACCESS_MODE extends Set<
-  infer T
->
-  ? T
-  : never;
+import type { access, UrlString, WebId } from "@inrupt/solid-client";
+
+/**
+ * Required parameters to request access to one or more Resources.
+ *
+ * - `requestor`: WebID of the Agent requesting access to the given Resources.
+ * - `resourceOwner`: WebID of an Agent controlling access to the given Resources.
+ * - `access`: Level access to request on the given Resource.
+ *             See {@link https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.access.html}.
+ * - `resources`: Array of URLs of the Resources to which access is requested.
+ */
+// TODO: Find out about the overlap with BaseRequestParameters (differs in status and resource owner)
+// TODO: There seems to be no use of resourceOwner. Find out about it.
+export type RequestAccessParameters = {
+  access: Partial<access.Access>;
+  requestor: WebId;
+  requestorInboxUrl: UrlString;
+  resourceOwner: WebId;
+  resources: Array<UrlString>;
+};

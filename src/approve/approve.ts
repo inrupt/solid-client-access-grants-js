@@ -20,13 +20,11 @@
 import { Access, UrlString, WebId } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import {
-  AccessRequestBody,
-  isConsentRequest,
   getGrantBody,
-  isAccessRequest,
   issueAccessOrConsentVc,
-  ConsentRequestBody,
-} from "../consent.internal";
+} from "../internal/consent.internal";
+import { isAccessRequest } from "../guard/isAccessRequest";
+import { isConsentRequest } from "../guard/isConsentRequest";
 import {
   CONSENT_STATUS_EXPLICITLY_GIVEN,
   RESOURCE_ACCESS_MODE_APPEND,
@@ -34,9 +32,13 @@ import {
   RESOURCE_ACCESS_MODE_READ,
   RESOURCE_ACCESS_MODE_WRITE,
 } from "../constants";
-import { ResourceAccessMode } from "../type/ResourceAccessMode";
-import { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
 import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
+import type {
+  AccessRequestBody,
+  ConsentRequestBody,
+} from "../type/AccessVerifiableCredential";
+import type { ResourceAccessMode } from "../type/ResourceAccessMode";
+import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
   return requestVc.credentialSubject.id;

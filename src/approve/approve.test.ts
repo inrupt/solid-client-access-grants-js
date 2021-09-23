@@ -19,7 +19,10 @@
 
 /* eslint-disable no-shadow */
 import { jest, it, describe, expect } from "@jest/globals";
-import { AccessGrantBody, ConsentGrantBody } from "../consent.internal";
+import type {
+  AccessGrantBody,
+  ConsentGrantBody,
+} from "../type/AccessVerifiableCredential";
 import { MOCKED_CONSENT_ISSUER } from "../request/request.mock";
 import {
   approveAccessRequest,

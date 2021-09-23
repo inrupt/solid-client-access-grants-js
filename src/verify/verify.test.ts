@@ -31,9 +31,9 @@ import {
 } from "../request/request.mock";
 import { isValidConsentGrant } from "./verify";
 
-jest.mock("../consent.internal.ts", () => {
+jest.mock("../internal/consent.internal.ts", () => {
   const internalConsentModule = jest.requireActual(
-    "../consent.internal.ts"
+    "../internal/consent.internal.ts"
     // TypeScript can't infer the type of modules imported via Jest;
     // skip type checking for those:
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -189,7 +189,7 @@ describe("isValidConsentGrant", () => {
   it("gets consent endpoint using credentialSubject.id if no consentEndpoint was passed", async () => {
     mockConsentEndpoint();
     const internalConsentModule = jest.requireActual(
-      "../consent.internal"
+      "../internal/consent.internal"
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) as any;
     const spiedConsentEndpointLookup = jest.spyOn(

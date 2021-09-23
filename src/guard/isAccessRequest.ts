@@ -16,10 +16,18 @@
 // HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-import type { RESOURCE_ACCESS_MODE } from "../constants";
 
-export type ResourceAccessMode = typeof RESOURCE_ACCESS_MODE extends Set<
-  infer T
->
-  ? T
-  : never;
+import { CONSENT_STATUS_REQUESTED } from "../constants";
+import { AccessRequestBody } from "../type/AccessVerifiableCredential";
+import { isBaseAccessVerifiableCredential } from "./isBaseAccessVerifiableCredential";
+
+// eslint-disable-next-line import/prefer-default-export
+export function isAccessRequest(
+  x: unknown
+): x is AccessRequestBody & { issuanceDate: string } {
+  return (
+    isBaseAccessVerifiableCredential(x) &&
+    x.credentialSubject.hasConsent.hasStatus === CONSENT_STATUS_REQUESTED &&
+    typeof x.issuanceDate === "string"
+  );
+}

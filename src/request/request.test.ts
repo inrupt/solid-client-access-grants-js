@@ -40,8 +40,8 @@ import { cancelAccessRequest } from "../cancel/cancel";
 import {
   getConsentEndpointForResource,
   getRequestBody,
-  isAccessRequest,
-} from "../consent.internal";
+} from "../internal/consent.internal";
+import { isAccessRequest } from "../guard/isAccessRequest";
 import {
   mockAccessGrant,
   MOCKED_CREDENTIAL_ID,
@@ -51,14 +51,15 @@ import {
   mockWellKnownNoConsent,
   mockWellKnownWithConsent,
 } from "./request.mock";
+import { CONSENT_CONTEXT } from "../constants";
 
 const MOCK_REQUESTOR_IRI = "https://some.pod/profile#me";
 const MOCK_REQUESTOR_INBOX = "https://some.pod/consent/inbox";
 const MOCK_REQUESTEE_IRI = "https://some.pod/profile#you";
 
-jest.mock("../consent.internal.ts", () => {
+jest.mock("../internal/consent.internal.ts", () => {
   const internalConsentModule = jest.requireActual(
-    "../consent.internal.ts"
+    "../internal/consent.internal.ts"
     // TypeScript can't infer the type of modules imported via Jest;
     // skip type checking for those:
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -543,7 +544,7 @@ describe("isAccessRequest", () => {
   it("returns true if the credential matches the expected shape", () => {
     expect(
       isAccessRequest({
-        "@context": "https://some.context",
+        "@context": CONSENT_CONTEXT,
         credentialSubject: {
           id: "https://some.id",
           inbox: "https://some.inbox",

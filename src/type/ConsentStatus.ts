@@ -17,7 +17,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { CONSENT_STATUS } from "../constants";
+import type { CONSENT_STATUS } from "../constants";
 
 export type ConsentStatus = typeof CONSENT_STATUS extends Set<infer T>
   ? T

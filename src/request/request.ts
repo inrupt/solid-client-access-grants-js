@@ -18,40 +18,27 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import {
-  access,
   getIri,
   getSolidDataset,
   getThing,
   getThingAll,
   getWellKnownSolid,
   UrlString,
-  WebId,
 } from "@inrupt/solid-client";
-import { getRequestBody, issueAccessOrConsentVc } from "../consent.internal";
+import {
+  getRequestBody,
+  issueAccessOrConsentVc,
+} from "../internal/consent.internal";
 import { getDefaultSessionFetch } from "../internal/getDefaultSessionFetch";
 import {
   PIM_STORAGE,
   PREFERRED_CONSENT_MANAGEMENT_UI,
   CONSENT_STATUS_REQUESTED,
 } from "../constants";
-import { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import type { RequestAccessParameters } from "../type/RequestAccessParameters";
+import type { RequestAccessWithConsentParameters } from "../type/RequestAccessWithConsentParameters";
 
-/**
- * Required parameters to request access to one or more Resources.
- *
- * - `requestor`: WebID of the Agent requesting access to the given Resources.
- * - `resourceOwner`: WebID of an Agent controlling access to the given Resources.
- * - `access`: Level access to request on the given Resource.
- *             See {@link https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.access.html}.
- * - `resources`: Array of URLs of the Resources to which access is requested.
- */
-export type RequestAccessParameters = {
-  requestor: WebId;
-  resourceOwner: WebId;
-  access: Partial<access.Access>;
-  resources: Array<UrlString>;
-  requestorInboxUrl: UrlString;
-};
 /**
  * Request access to a given Resource.
  *
@@ -71,24 +58,6 @@ export async function requestAccess(
   return issueAccessOrConsentVc(params.requestor, consentRequest, options);
 }
 
-/**
- * Required parameters to request access to one or more Resources.
- *
- * - `requestor`: WebID of the Agent requesting access to the given Resources.
- * - `resourceOwner`: WebID of an Agent controlling access to the given Resources.
- * - `access`: Level access to request on the given Resource.
- *             See {@link https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.access.html}.
- * - `resources`: Array of URLs of the Resources to which access is requested.
- * - `purpose`: URL representing what the requested access will be used for.
- * - `requestorInboxUrl`: (Optional.) URL that a consent receipt may be posted to.
- * - `issuanceDate`: (Optional, set to the current time if left out.) Point in time from which the access should be granted.
- * - `expirationDate`: (Optional.) Point in time until when the access is needed.
- */
-export type RequestAccessWithConsentParameters = RequestAccessParameters & {
-  purpose: Array<UrlString>;
-  issuanceDate?: Date;
-  expirationDate?: Date;
-};
 /**
  * Request access to a given Resource and proof that consent for a given use of that access was granted.
  *

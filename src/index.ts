@@ -17,11 +17,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+export type { RequestAccessParameters } from "./type/RequestAccessParameters";
+export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
+
 export {
   requestAccess,
-  RequestAccessParameters,
   requestAccessWithConsent,
-  RequestAccessWithConsentParameters,
   getConsentApiEndpoint,
 } from "./request/request";
 

@@ -33,18 +33,31 @@ import {
   CONSENT_CONTEXT,
   INRUPT_CONSENT_SERVICE,
   CREDENTIAL_TYPE,
-  CONSENT_STATUS_REQUESTED,
-  CONSENT_STATUS_EXPLICITLY_GIVEN,
   RESOURCE_ACCESS_MODE_READ,
   RESOURCE_ACCESS_MODE_APPEND,
   RESOURCE_ACCESS_MODE_WRITE,
   RESOURCE_ACCESS_MODE_CONTROL,
-} from "./constants";
-import { ResourceAccessMode } from "./type/ResourceAccessMode";
-import { ConsentGrantBaseOptions } from "./type/ConsentGrantBaseOptions";
-import { ConsentStatus } from "./type/ConsentStatus";
-import { getDefaultSessionFetch } from "./internal/getDefaultSessionFetch";
-import { BaseAccessBody } from "./type/BaseAccessBody";
+} from "../constants";
+import type { ResourceAccessMode } from "../type/ResourceAccessMode";
+import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import { getDefaultSessionFetch } from "./getDefaultSessionFetch";
+import type {
+  AccessGrantBody,
+  AccessRequestBody,
+  BaseAccessBody,
+  BaseConsentBody,
+  ConsentGrantBody,
+  ConsentRequestBody,
+} from "../type/AccessVerifiableCredential";
+import { isConsentRequest } from "../guard/isConsentRequest";
+import type {
+  BaseConsentParameters,
+  BaseRequestParameters,
+  ConsentRequestParameters,
+  AccessRequestParameters,
+  ConsentGrantParameters,
+  AccessGrantParameters,
+} from "../type/Parameter";
 
 export function accessToConsentRequestModes(
   desiredAccess: Partial<access.Access>
@@ -97,77 +110,10 @@ export async function getConsentEndpointForResource(
   return consentIri;
 }
 
-export type BaseConsentBody = BaseAccessBody & {
-  credentialSubject: {
-    hasConsent: {
-      forPurpose: UrlString[];
-    };
-  };
-  expirationDate?: string;
-};
-
-export type AccessRequestBody = BaseAccessBody & {
-  credentialSubject: {
-    hasConsent: {
-      hasStatus: typeof CONSENT_STATUS_REQUESTED;
-    };
-  };
-};
-
-export type AccessGrantBody = BaseAccessBody & {
-  credentialSubject: {
-    hasConsent: {
-      hasStatus: typeof CONSENT_STATUS_EXPLICITLY_GIVEN;
-      isProvidedTo: UrlString;
-    };
-  };
-};
-
-export type ConsentRequestBody = AccessRequestBody & BaseConsentBody;
-
-export type ConsentGrantBody = AccessGrantBody & BaseConsentBody;
-
-export type BaseRequestParameters = {
-  requestor: UrlString;
-  access: Partial<access.Access>;
-  resources: Array<UrlString>;
-  requestorInboxUrl: UrlString;
-  status: ConsentStatus;
-};
-
-export type BaseConsentParameters = {
-  purpose: Array<UrlString>;
-  issuanceDate?: Date;
-  expirationDate?: Date;
-};
-
-export type AccessRequestParameters = BaseRequestParameters & {
-  status: typeof CONSENT_STATUS_REQUESTED;
-};
-
-export type ConsentRequestParameters = AccessRequestParameters &
-  BaseConsentParameters;
-
-export type AccessGrantParameters = BaseRequestParameters & {
-  status: typeof CONSENT_STATUS_EXPLICITLY_GIVEN;
-};
-
-export type ConsentGrantParameters = AccessGrantParameters &
-  BaseConsentParameters;
-
-function areConsentParameters(
-  parameters: BaseConsentParameters | BaseRequestParameters
-): parameters is BaseConsentParameters {
-  return (parameters as BaseConsentParameters).purpose !== undefined;
-}
-
-export function isConsentRequest(
-  request: BaseAccessBody | BaseConsentBody
-): request is BaseConsentBody {
-  return (
-    (request as ConsentRequestBody).credentialSubject.hasConsent.forPurpose !==
-    undefined
-  );
+function isConsentRequestParameters(
+  params: unknown | AccessRequestParameters | ConsentRequestParameters
+): params is ConsentRequestParameters {
+  return (params as ConsentRequestParameters).purpose !== undefined;
 }
 
 function getBaseBody(params: BaseRequestParameters): BaseAccessBody {
@@ -218,7 +164,7 @@ export function getRequestBody(
   const request = getBaseBody(params);
   // From this point on, request is an AccessRequestBody
   request.credentialSubject.hasConsent.hasStatus = params.status;
-  if (areConsentParameters(params)) {
+  if (isConsentRequestParameters(params)) {
     // This makes request a ConsentRequestBody
     return getConsentBody(params, request) as ConsentRequestBody;
   }
@@ -235,29 +181,11 @@ export function getGrantBody(
   grant.credentialSubject.hasConsent.hasStatus = params.status;
   (grant as AccessGrantBody).credentialSubject.hasConsent.isProvidedTo =
     params.requestor;
-  if (areConsentParameters(params)) {
+  if (isConsentRequestParameters(params)) {
     // This makes request a ConsentGrantBody
     return getConsentBody(params, grant) as ConsentGrantBody;
   }
   return grant as AccessGrantBody;
-}
-
-export function isAccessRequest(
-  credential:
-    | VerifiableCredential
-    | (AccessRequestBody & { issuanceDate: string })
-): credential is AccessRequestBody & { issuanceDate: string } {
-  return (
-    credential.type.includes(CREDENTIAL_TYPE) &&
-    "hasConsent" in credential.credentialSubject &&
-    "forPersonalData" in
-      (credential as AccessRequestBody).credentialSubject.hasConsent &&
-    (credential as AccessRequestBody).credentialSubject.hasConsent.hasStatus ===
-      CONSENT_STATUS_REQUESTED &&
-    "mode" in (credential as AccessRequestBody).credentialSubject.hasConsent &&
-    "inbox" in (credential as AccessRequestBody).credentialSubject &&
-    credential.issuanceDate !== undefined
-  );
 }
 
 export async function issueAccessOrConsentVc(

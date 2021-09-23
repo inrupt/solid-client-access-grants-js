@@ -39,6 +39,9 @@ export async function revokeConsentGrant(
   options: ConsentGrantBaseOptions = {}
 ): Promise<void> {
   const credential = await getBaseAccessVerifiableCredential(vc, options);
+  // TODO: Find out if this should take the optional consentEndpoint
+  // Potentially factor out the getConsentEndpoint taking VC or URL or UrlString and options
+  // TODO: Find out about the overlap with getConsentApiEndpoint
   return revokeVerifiableCredential(
     new URL("status", credential.issuer).href,
     credential.id,
