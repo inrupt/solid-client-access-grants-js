@@ -24,7 +24,8 @@ import {
   mockWellKnownNoConsent,
   mockWellKnownWithConsent,
 } from "../request/request.mock";
-import { BaseAccessBody, BaseConsentBody } from "../consent.internal";
+import { BaseConsentBody } from "../consent.internal";
+import { BaseAccessBody } from "../type/BaseAccessBody";
 import { CONSENT_CONTEXT } from "../constants";
 
 export const mockConsentEndpoint = (withConsent = true): void => {

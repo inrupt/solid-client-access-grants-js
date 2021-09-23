@@ -19,8 +19,10 @@
 
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
-import { ConsentGrantBaseOptions, CONSENT_STATUS_DENIED } from "../constants";
-import { BaseAccessBody, issueAccessOrConsentVc } from "../consent.internal";
+import { CONSENT_STATUS_DENIED } from "../constants";
+import { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import { issueAccessOrConsentVc } from "../consent.internal";
+import { BaseAccessBody } from "../type/BaseAccessBody";
 import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
 
 /**

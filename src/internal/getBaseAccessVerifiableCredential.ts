@@ -17,21 +17,22 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { IriString, UrlString } from "@inrupt/solid-client";
-import { ConsentGrantBaseOptions } from "../constants";
-import { BaseAccessBody, getDefaultSessionFetch } from "../consent.internal";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { UrlString } from "@inrupt/solid-client";
+import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import { BaseAccessBody } from "../type/BaseAccessBody";
+import { getDefaultSessionFetch } from "./getDefaultSessionFetch";
 import { isBaseAccessVerifiableCredential } from "../guard/isBaseAccessVerifiableCredential";
 
-export async function getVerifiableCredential(
-  vcIri: IriString | URL,
-  fetcher: typeof global.fetch
+async function getVerifiableCredential(
+  vc: URL | UrlString,
+  fetcher: typeof fetch
 ): Promise<VerifiableCredential> {
-  const vc = vcIri instanceof URL ? vcIri.toString() : vcIri;
-  const issuerResponse = await fetcher(vc);
+  const vcAsUrlString = vc instanceof URL ? vc.toString() : vc;
+  const issuerResponse = await fetcher(vcAsUrlString);
   if (!issuerResponse.ok) {
     throw new Error(
-      `An error occured when looking up [${vc}]: ${issuerResponse.status} ${issuerResponse.statusText}`
+      `An error occured when looking up [${vcAsUrlString}]: ${issuerResponse.status} ${issuerResponse.statusText}`
     );
   }
   return (await issuerResponse.json()) as VerifiableCredential;
@@ -48,6 +49,7 @@ export async function getBaseAccessVerifiableCredential(
     typeof vc === "string" || vc instanceof URL
       ? await getVerifiableCredential(vc, fetcher)
       : vc;
+
   if (!isBaseAccessVerifiableCredential(fetchedVerifiableCredential)) {
     throw new Error(
       `An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential.`

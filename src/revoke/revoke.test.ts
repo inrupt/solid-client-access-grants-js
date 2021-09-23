@@ -21,7 +21,7 @@
 /* eslint-disable no-shadow */
 import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { jest, describe, it, expect } from "@jest/globals";
-import revokeConsentGrant from "./revoke";
+import { revokeConsentGrant } from "./revoke";
 import { mockAccessGrant, MOCKED_CREDENTIAL_ID } from "../request/request.mock";
 
 jest.mock("@inrupt/solid-client-authn-browser");

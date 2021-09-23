@@ -26,7 +26,7 @@ import {
   WithServerResourceInfo,
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
+import { CONSENT_CONTEXT, PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
 export const MOCKED_CREDENTIAL_ID = "https://some.credential";
 export const MOCKED_ISSUANCE_DATE = "2021-09-07T09:59:00Z";
@@ -37,9 +37,15 @@ export const mockAccessGrant = (
   subjectClaims?: Record<string, string>
 ): VerifiableCredential => {
   return {
-    "@context": [],
+    "@context": CONSENT_CONTEXT,
     credentialSubject: {
       id: subjectId,
+      hasConsent: {
+        forPersonalData: ["https://some.resource"],
+        hasStatus: "ConsentStatusRequested",
+        mode: ["Read"],
+      },
+      inbox: "https://some.inbox",
       ...subjectClaims,
     },
     type: ["SolidCredential", "SolidConsentRequest"],

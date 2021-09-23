@@ -16,30 +16,24 @@
 // HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-import { CREDENTIAL_TYPE } from "../constants";
-import { BaseAccessBody } from "../type/BaseAccessBody";
-import { isUnknownObject } from "./isUnknownObject";
-import { isConsentContext } from "./isConsentContext";
-import { isConsentStatus } from "./isConsentStatus";
+import { fetch as crossFetch } from "cross-fetch";
 
-// TODO: Fix type checking
+/**
+ * Dynamically import solid-client-authn-browser so that
+ * this library doesn't have a hard dependency.
+ *
+ * @returns fetch function
+ */
 // eslint-disable-next-line import/prefer-default-export
-export function isBaseAccessVerifiableCredential(
-  x: unknown
-): x is BaseAccessBody {
-  return (
-    isUnknownObject(x) &&
-    isConsentContext(x["@context"]) &&
-    Array.isArray(x.type) &&
-    x.type.includes(CREDENTIAL_TYPE) &&
-    isUnknownObject(x.credentialSubject) &&
-    typeof x.credentialSubject.id === "string" &&
-    isUnknownObject(x.credentialSubject.hasConsent) &&
-    // TODO: Add mode check
-    "mode" in x.credentialSubject.hasConsent &&
-    isConsentStatus(x.credentialSubject.hasConsent.hasStatus) &&
-    // TODO: Add Array of string check
-    Array.isArray(x.credentialSubject.hasConsent.forPersonalData) &&
-    typeof x.credentialSubject.inbox === "string"
-  );
+export async function getDefaultSessionFetch(): Promise<typeof fetch> {
+  try {
+    const { fetch: fetchFn } = await import(
+      "@inrupt/solid-client-authn-browser"
+    );
+
+    return fetchFn;
+  } catch (e) {
+    /* istanbul ignore next: @inrupt/solid-client-authn-browser is a devDependency, so this path is not hit in tests: */
+    return crossFetch;
+  }
 }

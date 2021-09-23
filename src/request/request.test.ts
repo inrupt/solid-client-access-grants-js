@@ -32,11 +32,11 @@ import {
 } from "@inrupt/solid-client-vc";
 import { Response } from "cross-fetch";
 import {
-  cancelAccessRequest,
   getConsentApiEndpoint,
   requestAccess,
   requestAccessWithConsent,
 } from "./request";
+import { cancelAccessRequest } from "../cancel/cancel";
 import {
   getConsentEndpointForResource,
   getRequestBody,

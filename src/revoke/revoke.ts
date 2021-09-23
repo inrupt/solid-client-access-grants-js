@@ -17,10 +17,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { UrlString } from "@inrupt/solid-client";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { revokeVc } from "../consent.internal";
-import { ConsentGrantBaseOptions } from "../constants";
+import type { UrlString } from "@inrupt/solid-client";
+import {
+  revokeVerifiableCredential,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
+import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
+import { getDefaultSessionFetch } from "../internal/getDefaultSessionFetch";
 
 /**
  * Makes a request to the consent server to revoke a given VC.
@@ -29,9 +33,17 @@ import { ConsentGrantBaseOptions } from "../constants";
  * @param options Optional properties to customise the request behaviour.
  * @returns A void promise.
  */
-export default async function revokeConsentGrant(
-  vc: VerifiableCredential | UrlString,
+// eslint-disable-next-line import/prefer-default-export
+export async function revokeConsentGrant(
+  vc: VerifiableCredential | URL | UrlString,
   options: ConsentGrantBaseOptions = {}
 ): Promise<void> {
-  return revokeVc(vc, options);
+  const credential = await getBaseAccessVerifiableCredential(vc, options);
+  return revokeVerifiableCredential(
+    new URL("status", credential.issuer).href,
+    credential.id,
+    {
+      fetch: options.fetch ?? (await getDefaultSessionFetch()),
+    }
+  );
 }

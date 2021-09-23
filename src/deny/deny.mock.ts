@@ -19,7 +19,7 @@
 
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { CONSENT_CONTEXT } from "../constants";
-import { BaseAccessBody } from "../consent.internal";
+import { BaseAccessBody } from "../type/BaseAccessBody";
 
 // eslint-disable-next-line import/prefer-default-export
 export const mockDenyAccessVc = (): VerifiableCredential & BaseAccessBody => {

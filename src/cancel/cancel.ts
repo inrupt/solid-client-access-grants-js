@@ -16,30 +16,25 @@
 // HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-import { CREDENTIAL_TYPE } from "../constants";
-import { BaseAccessBody } from "../type/BaseAccessBody";
-import { isUnknownObject } from "./isUnknownObject";
-import { isConsentContext } from "./isConsentContext";
-import { isConsentStatus } from "./isConsentStatus";
+import { UrlString } from "@inrupt/solid-client";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { revokeConsentGrant } from "../revoke/revoke";
+import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
 
-// TODO: Fix type checking
+/**
+ * Cancel a request for access to data (with explicit or implicit consent) before
+ * the person being asked for consent has replied.
+ * This is equivalent to revoking a consent grant.
+ *
+ * @param accessRequest The access request, either in the form of a VC URL or a full-fledged VC.
+ * @param options Optional properties to customise the access request behaviour.
+ * @returns A void promise
+ * @since Unreleased
+ */
 // eslint-disable-next-line import/prefer-default-export
-export function isBaseAccessVerifiableCredential(
-  x: unknown
-): x is BaseAccessBody {
-  return (
-    isUnknownObject(x) &&
-    isConsentContext(x["@context"]) &&
-    Array.isArray(x.type) &&
-    x.type.includes(CREDENTIAL_TYPE) &&
-    isUnknownObject(x.credentialSubject) &&
-    typeof x.credentialSubject.id === "string" &&
-    isUnknownObject(x.credentialSubject.hasConsent) &&
-    // TODO: Add mode check
-    "mode" in x.credentialSubject.hasConsent &&
-    isConsentStatus(x.credentialSubject.hasConsent.hasStatus) &&
-    // TODO: Add Array of string check
-    Array.isArray(x.credentialSubject.hasConsent.forPersonalData) &&
-    typeof x.credentialSubject.inbox === "string"
-  );
+export async function cancelAccessRequest(
+  accessRequest: VerifiableCredential | URL | UrlString,
+  options: ConsentGrantBaseOptions = {}
+): Promise<void> {
+  return revokeConsentGrant(accessRequest, options);
 }

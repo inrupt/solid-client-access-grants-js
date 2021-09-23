@@ -22,11 +22,9 @@ import {
   isVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { ConsentGrantBaseOptions } from "../constants";
-import {
-  getConsentEndpointForResource,
-  getDefaultSessionFetch,
-} from "../consent.internal";
+import { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import { getConsentEndpointForResource } from "../consent.internal";
+import { getDefaultSessionFetch } from "../internal/getDefaultSessionFetch";
 
 /**
  * Makes a request to the consent server to verify the validity of a given VC.
@@ -35,7 +33,8 @@ import {
  * @param options Optional properties to customise the request behaviour.
  * @returns An object containing checks, warnings, and errors.
  */
-export default async function isValidConsentGrant(
+// eslint-disable-next-line import/prefer-default-export
+export async function isValidConsentGrant(
   vc: VerifiableCredential | UrlString,
   options: ConsentGrantBaseOptions = {}
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {

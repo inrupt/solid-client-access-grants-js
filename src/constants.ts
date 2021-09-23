@@ -17,8 +17,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { UrlString } from "@inrupt/solid-client";
-
 export const AS_ACTOR = "https://www.w3.org/ns/activitystreams#actor";
 export const AS_ANNOUNCE = "https://www.w3.org/ns/activitystreams#Announce";
 export const AS_OBJECT = "https://www.w3.org/ns/activitystreams#object";
@@ -71,23 +69,9 @@ export const RESOURCE_ACCESS_MODE_CONTROL = "Control";
 export const RESOURCE_ACCESS_MODE_READ = "Read";
 export const RESOURCE_ACCESS_MODE_WRITE = "Write";
 
-export type ResourceAccessMode =
-  | typeof RESOURCE_ACCESS_MODE_APPEND
-  | typeof RESOURCE_ACCESS_MODE_CONTROL
-  | typeof RESOURCE_ACCESS_MODE_READ
-  | typeof RESOURCE_ACCESS_MODE_WRITE;
-
-/**
- * Optional parameters to customise the behaviour of consent requests.
- *
- * - `fetch`: Pass in a function with a signature compatible with the WHATWG
- *            Fetch API, which will be used to make HTTP requests. Primarily
- *            useful when requests need to be authenticated.
- *            When `@inrupt/solid-client-authn-browser` is available and this
- *            property is not set, `fetch` will be imported from there.
- *            Otherwise, the HTTP requests will be unauthenticated.
- */
-export type ConsentGrantBaseOptions = Partial<{
-  fetch?: typeof fetch;
-  consentEndpoint?: UrlString;
-}>;
+export const RESOURCE_ACCESS_MODE = new Set([
+  RESOURCE_ACCESS_MODE_APPEND,
+  RESOURCE_ACCESS_MODE_CONTROL,
+  RESOURCE_ACCESS_MODE_READ,
+  RESOURCE_ACCESS_MODE_WRITE,
+] as const);

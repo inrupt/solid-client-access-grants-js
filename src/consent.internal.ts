@@ -27,25 +27,24 @@ import {
 } from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
-  revokeVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { fetch as crossFetch } from "cross-fetch";
 import {
   CONSENT_CONTEXT,
   INRUPT_CONSENT_SERVICE,
   CREDENTIAL_TYPE,
   CONSENT_STATUS_REQUESTED,
-  ResourceAccessMode,
   CONSENT_STATUS_EXPLICITLY_GIVEN,
   RESOURCE_ACCESS_MODE_READ,
   RESOURCE_ACCESS_MODE_APPEND,
   RESOURCE_ACCESS_MODE_WRITE,
   RESOURCE_ACCESS_MODE_CONTROL,
-  ConsentGrantBaseOptions,
 } from "./constants";
-import { getVerifiableCredential } from "./internal/getBaseAccessVerifiableCredential";
+import { ResourceAccessMode } from "./type/ResourceAccessMode";
+import { ConsentGrantBaseOptions } from "./type/ConsentGrantBaseOptions";
 import { ConsentStatus } from "./type/ConsentStatus";
+import { getDefaultSessionFetch } from "./internal/getDefaultSessionFetch";
+import { BaseAccessBody } from "./type/BaseAccessBody";
 
 export function accessToConsentRequestModes(
   desiredAccess: Partial<access.Access>
@@ -97,21 +96,6 @@ export async function getConsentEndpointForResource(
   }
   return consentIri;
 }
-
-export type BaseAccessBody = {
-  "@context": typeof CONSENT_CONTEXT;
-  type: [typeof CREDENTIAL_TYPE];
-  credentialSubject: {
-    id: UrlString;
-    hasConsent: {
-      mode: ResourceAccessMode[];
-      hasStatus: ConsentStatus;
-      forPersonalData: UrlString[];
-    };
-    inbox: UrlString;
-  };
-  issuanceDate?: string;
-};
 
 export type BaseConsentBody = BaseAccessBody & {
   credentialSubject: {
@@ -258,21 +242,6 @@ export function getGrantBody(
   return grant as AccessGrantBody;
 }
 
-// Dynamically import solid-client-authn-browser so that this library doesn't have a hard
-// dependency.
-export async function getDefaultSessionFetch(): Promise<typeof fetch> {
-  try {
-    const { fetch: fetchFn } = await import(
-      "@inrupt/solid-client-authn-browser"
-    );
-
-    return fetchFn;
-  } catch (e) {
-    /* istanbul ignore next: @inrupt/solid-client-authn-browser is a devDependency, so this path is not hit in tests: */
-    return crossFetch;
-  }
-}
-
 export function isAccessRequest(
   credential:
     | VerifiableCredential
@@ -321,32 +290,6 @@ export async function issueAccessOrConsentVc(
         ? vcBody.expirationDate
         : undefined,
     },
-    {
-      fetch: fetcher,
-    }
-  );
-}
-
-export async function revokeVc(
-  vc: VerifiableCredential | UrlString,
-  options: ConsentGrantBaseOptions
-): Promise<void> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  if (typeof vc === "object") {
-    // If the full VC is provided, no additional information is needed.
-    return revokeVerifiableCredential(
-      new URL("status", vc.issuer).href,
-      vc.id,
-      {
-        fetch: fetcher,
-      }
-    );
-  }
-  // Only the credential IRI has been provided, and it needs to be dereferenced.
-  const credential = await getVerifiableCredential(vc, fetcher);
-  return revokeVerifiableCredential(
-    new URL("status", credential.issuer).href,
-    credential.id,
     {
       fetch: fetcher,
     }

@@ -27,19 +27,14 @@ import {
   UrlString,
   WebId,
 } from "@inrupt/solid-client";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import {
-  getRequestBody,
-  issueAccessOrConsentVc,
-  getDefaultSessionFetch,
-  revokeVc,
-} from "../consent.internal";
+import { getRequestBody, issueAccessOrConsentVc } from "../consent.internal";
+import { getDefaultSessionFetch } from "../internal/getDefaultSessionFetch";
 import {
   PIM_STORAGE,
   PREFERRED_CONSENT_MANAGEMENT_UI,
-  ConsentGrantBaseOptions,
   CONSENT_STATUS_REQUESTED,
 } from "../constants";
+import { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
 
 /**
  * Required parameters to request access to one or more Resources.
@@ -110,22 +105,6 @@ export async function requestAccessWithConsent(
     status: CONSENT_STATUS_REQUESTED,
   });
   return issueAccessOrConsentVc(params.requestor, consentRequest, options);
-}
-
-/**
- * Cancel a request for access to data (with explicit or implicit consent) before
- * the person being asked for consent has replied.
- *
- * @param accessRequest The access request, either in the form of a VC URL or a full-fledged VC.
- * @param options Optional properties to customise the access request behaviour.
- * @returns A void promise
- * @since Unreleased
- */
-export async function cancelAccessRequest(
-  accessRequest: VerifiableCredential | UrlString,
-  options: { fetch?: typeof global.fetch } = {}
-): Promise<void> {
-  return revokeVc(accessRequest, options);
 }
 
 async function getConsentApiEndpointFromProfile(

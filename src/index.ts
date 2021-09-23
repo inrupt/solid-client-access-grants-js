@@ -22,14 +22,14 @@ export {
   RequestAccessParameters,
   requestAccessWithConsent,
   RequestAccessWithConsentParameters,
-  cancelAccessRequest,
   getConsentApiEndpoint,
 } from "./request/request";
 
-export { default as revokeConsentGrant } from "./revoke/revoke";
-export { default as isValidConsentGrant } from "./verify/verify";
 export {
   approveAccessRequest,
   approveAccessRequestWithConsent,
 } from "./approve/approve";
+export { cancelAccessRequest } from "./cancel/cancel";
 export { denyAccessRequest } from "./deny/deny";
+export { revokeConsentGrant } from "./revoke/revoke";
+export { isValidConsentGrant } from "./verify/verify";

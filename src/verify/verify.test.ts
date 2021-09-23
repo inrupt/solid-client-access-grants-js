@@ -29,7 +29,7 @@ import {
   mockWellKnownNoConsent,
   mockWellKnownWithConsent,
 } from "../request/request.mock";
-import isValidConsentGrant from "./verify";
+import { isValidConsentGrant } from "./verify";
 
 jest.mock("../consent.internal.ts", () => {
   const internalConsentModule = jest.requireActual(

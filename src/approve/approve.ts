@@ -28,14 +28,14 @@ import {
   ConsentRequestBody,
 } from "../consent.internal";
 import {
-  ConsentGrantBaseOptions,
   CONSENT_STATUS_EXPLICITLY_GIVEN,
-  ResourceAccessMode,
   RESOURCE_ACCESS_MODE_APPEND,
   RESOURCE_ACCESS_MODE_CONTROL,
   RESOURCE_ACCESS_MODE_READ,
   RESOURCE_ACCESS_MODE_WRITE,
 } from "../constants";
+import { ResourceAccessMode } from "../type/ResourceAccessMode";
+import { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
 import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
@@ -227,7 +227,7 @@ export async function approveAccessRequest(
  */
 export async function approveAccessRequestWithConsent(
   // If the VC is specified, all the overrides become optional
-  requestVc: VerifiableCredential | UrlString,
+  requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<{
     requestor: WebId;
     access: Partial<Access>;
@@ -264,7 +264,7 @@ export async function approveAccessRequestWithConsent(
   options?: ConsentGrantBaseOptions
 ): Promise<VerifiableCredential>;
 export async function approveAccessRequestWithConsent(
-  requestVc?: VerifiableCredential | UrlString,
+  requestVc?: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<{
     requestor: WebId;
     access: Partial<Access>;
