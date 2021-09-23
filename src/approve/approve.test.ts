@@ -72,26 +72,32 @@ describe("approveAccessRequest", () => {
       }
     );
   });
-  it("throws if the provided VC isn't an access request", async () => {
+
+  it("throws if the provided VC isn't a solid consent request VC", async () => {
     mockConsentEndpoint();
     await expect(
       approveAccessRequest({
-        "@context": "https://some.context",
-        id: "https://some.credential",
+        ...mockAccessRequestVc(),
+        type: ["NotASolidConsentRequest"],
+      })
+    ).rejects.toThrow(
+      "An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential."
+    );
+  });
+
+  it("throws if the provided VC isn't an access request", async () => {
+    mockConsentEndpoint();
+    const accessRequest = mockAccessRequestVc();
+    await expect(
+      approveAccessRequest({
+        ...accessRequest,
         credentialSubject: {
-          id: "https://some.requestor",
-          someClaim: "some value",
+          ...accessRequest.credentialSubject,
+          hasConsent: {
+            ...accessRequest.credentialSubject.hasConsent,
+            hasStatus: "ConsentStatusDenied",
+          },
         },
-        issuanceDate: "some ISO date",
-        issuer: "https://some.issuer",
-        proof: {
-          created: "some ISO date",
-          proofPurpose: "some proof purpose",
-          proofValue: "some proof",
-          type: "some proof type",
-          verificationMethod: "some method",
-        },
-        type: ["Some credential type"],
       })
     ).rejects.toThrow(/Unexpected VC.*credentialSubject/);
   });
@@ -276,21 +282,13 @@ describe("approveAccessRequest", () => {
       mockAccessRequestVc().credentialSubject.id,
       expect.objectContaining({
         hasConsent: {
-          mode: (
-            mockAccessRequestVc()
-              .credentialSubject as ConsentGrantBody["credentialSubject"]
-          ).hasConsent.mode,
+          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "ConsentStatusExplicitlyGiven",
-          forPersonalData: (
-            mockAccessRequestVc()
-              .credentialSubject as ConsentGrantBody["credentialSubject"]
-          ).hasConsent.forPersonalData,
+          forPersonalData:
+            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: mockAccessRequestVc().credentialSubject.id,
         },
-        inbox: (
-          mockAccessRequestVc()
-            .credentialSubject as ConsentGrantBody["credentialSubject"]
-        ).inbox,
+        inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidConsentRequest"],

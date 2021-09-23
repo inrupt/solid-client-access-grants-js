@@ -18,14 +18,24 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { UrlString } from "@inrupt/solid-client";
+import { IriString, UrlString } from "@inrupt/solid-client";
 import { ConsentGrantBaseOptions } from "../constants";
-import {
-  BaseAccessBody,
-  dereferenceVcIri,
-  getDefaultSessionFetch,
-} from "../consent.internal";
+import { BaseAccessBody, getDefaultSessionFetch } from "../consent.internal";
 import { isBaseAccessVerifiableCredential } from "../guard/isBaseAccessVerifiableCredential";
+
+export async function getVerifiableCredential(
+  vcIri: IriString | URL,
+  fetcher: typeof global.fetch
+): Promise<VerifiableCredential> {
+  const vc = vcIri instanceof URL ? vcIri.toString() : vcIri;
+  const issuerResponse = await fetcher(vc);
+  if (!issuerResponse.ok) {
+    throw new Error(
+      `An error occured when looking up [${vc}]: ${issuerResponse.status} ${issuerResponse.statusText}`
+    );
+  }
+  return (await issuerResponse.json()) as VerifiableCredential;
+}
 
 // eslint-disable-next-line import/prefer-default-export
 export async function getBaseAccessVerifiableCredential(
@@ -36,7 +46,7 @@ export async function getBaseAccessVerifiableCredential(
   const fetcher = options.fetch ?? (await getDefaultSessionFetch());
   const fetchedVerifiableCredential =
     typeof vc === "string" || vc instanceof URL
-      ? await dereferenceVcIri(vc, fetcher)
+      ? await getVerifiableCredential(vc, fetcher)
       : vc;
   if (!isBaseAccessVerifiableCredential(fetchedVerifiableCredential)) {
     throw new Error(

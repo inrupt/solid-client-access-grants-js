@@ -26,8 +26,6 @@ import {
   isAccessRequest,
   issueAccessOrConsentVc,
   ConsentRequestBody,
-  dereferenceVcIri,
-  getDefaultSessionFetch,
 } from "../consent.internal";
 import {
   ConsentGrantBaseOptions,
@@ -188,13 +186,11 @@ export async function approveAccessRequest(
   }>,
   options: ConsentGrantBaseOptions = {}
 ): Promise<VerifiableCredential> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  let requestCredential;
-  if (typeof requestVc === "string") {
-    requestCredential = await dereferenceVcIri(requestVc, fetcher);
-  } else {
-    requestCredential = requestVc;
-  }
+  const requestCredential =
+    typeof requestVc !== "undefined"
+      ? await getBaseAccessVerifiableCredential(requestVc, options)
+      : requestVc;
+
   if (requestCredential !== undefined && !isAccessRequest(requestCredential)) {
     throw new Error(
       `Unexpected VC provided for approval: ${JSON.stringify(requestVc)}`
@@ -211,10 +207,11 @@ export async function approveAccessRequest(
     requestorInboxUrl: internalOptions.requestorInboxIri,
     status: CONSENT_STATUS_EXPLICITLY_GIVEN,
   });
-  return issueAccessOrConsentVc(internalOptions.requestor, requestBody, {
-    fetch: fetcher,
-    consentEndpoint: options.consentEndpoint,
-  });
+  return issueAccessOrConsentVc(
+    internalOptions.requestor,
+    requestBody,
+    options
+  );
 }
 
 /**

@@ -24,7 +24,6 @@ import {
   getSourceIri,
   getIri,
   WebId,
-  IriString,
 } from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
@@ -45,6 +44,7 @@ import {
   RESOURCE_ACCESS_MODE_CONTROL,
   ConsentGrantBaseOptions,
 } from "./constants";
+import { getVerifiableCredential } from "./internal/getBaseAccessVerifiableCredential";
 import { ConsentStatus } from "./type/ConsentStatus";
 
 export function accessToConsentRequestModes(
@@ -327,20 +327,6 @@ export async function issueAccessOrConsentVc(
   );
 }
 
-export async function dereferenceVcIri(
-  vcIri: IriString | URL,
-  fetcher: typeof global.fetch
-): Promise<VerifiableCredential> {
-  const vc = vcIri instanceof URL ? vcIri.toString() : vcIri;
-  const issuerResponse = await fetcher(vc);
-  if (!issuerResponse.ok) {
-    throw new Error(
-      `An error occured when looking up [${vc}]: ${issuerResponse.status} ${issuerResponse.statusText}`
-    );
-  }
-  return (await issuerResponse.json()) as VerifiableCredential;
-}
-
 export async function revokeVc(
   vc: VerifiableCredential | UrlString,
   options: ConsentGrantBaseOptions
@@ -357,7 +343,7 @@ export async function revokeVc(
     );
   }
   // Only the credential IRI has been provided, and it needs to be dereferenced.
-  const credential = await dereferenceVcIri(vc, fetcher);
+  const credential = await getVerifiableCredential(vc, fetcher);
   return revokeVerifiableCredential(
     new URL("status", credential.issuer).href,
     credential.id,
