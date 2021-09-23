@@ -327,13 +327,14 @@ export async function issueAccessOrConsentVc(
 }
 
 export async function dereferenceVcIri(
-  vcIri: IriString,
+  vcIri: IriString | URL,
   fetcher: typeof global.fetch
 ): Promise<VerifiableCredential> {
-  const issuerResponse = await fetcher(vcIri);
+  const vc = vcIri instanceof URL ? vcIri.toString() : vcIri;
+  const issuerResponse = await fetcher(vc);
   if (!issuerResponse.ok) {
     throw new Error(
-      `An error occured when looking up [${vcIri}]: ${issuerResponse.status} ${issuerResponse.statusText}`
+      `An error occured when looking up [${vc}]: ${issuerResponse.status} ${issuerResponse.statusText}`
     );
   }
   return (await issuerResponse.json()) as VerifiableCredential;

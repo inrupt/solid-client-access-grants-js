@@ -18,18 +18,18 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /* eslint-disable no-shadow */
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { jest, it, describe, expect } from "@jest/globals";
 import { AccessGrantBody, ConsentGrantBody } from "../consent.internal";
-import {
-  MOCKED_CONSENT_ISSUER,
-  mockWellKnownNoConsent,
-  mockWellKnownWithConsent,
-} from "../request/request.mock";
+import { MOCKED_CONSENT_ISSUER } from "../request/request.mock";
 import {
   approveAccessRequest,
   approveAccessRequestWithConsent,
 } from "./approve";
+import {
+  mockAccessRequestVc,
+  mockConsentEndpoint,
+  mockConsentRequestVc,
+} from "./approve.mock";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -43,54 +43,8 @@ jest.mock("@inrupt/solid-client", () => {
   return solidClientModule;
 });
 
-const mockConsentEndpoint = (withConsent = true) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
-  solidClientModule.getWellKnownSolid.mockResolvedValue(
-    (withConsent
-      ? mockWellKnownWithConsent()
-      : mockWellKnownNoConsent()) as never
-  );
-};
-
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
-
-const mockAccessRequestVc = (): VerifiableCredential => {
-  return {
-    "@context": ["https://some.context"],
-    id: "https://some.credential",
-    credentialSubject: {
-      id: "https://some.requestor",
-      hasConsent: {
-        forPersonalData: ["https://some.resource"],
-        hasStatus: "ConsentStatusRequested",
-        mode: ["Read"],
-      },
-      inbox: "https://some.inbox",
-    },
-    issuanceDate: "some ISO date",
-    issuer: "https://some.issuer",
-    proof: {
-      created: "some ISO date",
-      proofPurpose: "some proof purpose",
-      proofValue: "some proof",
-      type: "some proof type",
-      verificationMethod: "some method",
-    },
-    type: ["SolidConsentRequest"],
-  };
-};
-
-const mockConsentRequestVc = (): VerifiableCredential => {
-  const requestVc = mockAccessRequestVc();
-  (
-    requestVc.credentialSubject as ConsentGrantBody["credentialSubject"]
-  ).hasConsent.forPurpose = ["https://some.purpose"];
-  requestVc.expirationDate = new Date(2021, 8, 14).toISOString();
-  requestVc.issuanceDate = new Date(2021, 8, 13).toISOString();
-  return requestVc;
-};
 
 describe("approveAccessRequest", () => {
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {

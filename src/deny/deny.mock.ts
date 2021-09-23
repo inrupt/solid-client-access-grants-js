@@ -17,18 +17,33 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export {
-  requestAccess,
-  RequestAccessParameters,
-  requestAccessWithConsent,
-  RequestAccessWithConsentParameters,
-  cancelAccessRequest,
-  getConsentApiEndpoint,
-} from "./request/request";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { CONSENT_CONTEXT } from "../constants";
+import { BaseAccessBody } from "../consent.internal";
 
-export { default as isValidConsentGrant } from "./verify/verify";
-export {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-} from "./approve/approve";
-export { denyAccessRequest } from "./deny/deny";
+// eslint-disable-next-line import/prefer-default-export
+export const mockDenyAccessVc = (): VerifiableCredential & BaseAccessBody => {
+  return {
+    "@context": CONSENT_CONTEXT,
+    id: "https://some.credential",
+    credentialSubject: {
+      id: "https://some.requestor",
+      hasConsent: {
+        forPersonalData: ["https://some.resource"],
+        hasStatus: "ConsentStatusRequested",
+        mode: ["Read"],
+      },
+      inbox: "https://some.inbox",
+    },
+    issuanceDate: "some ISO date",
+    issuer: "https://some.issuer",
+    proof: {
+      created: "some ISO date",
+      proofPurpose: "some proof purpose",
+      proofValue: "some proof",
+      type: "some proof type",
+      verificationMethod: "some method",
+    },
+    type: ["SolidConsentRequest"],
+  };
+};

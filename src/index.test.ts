@@ -28,16 +28,18 @@ import {
   getConsentApiEndpoint,
   approveAccessRequest,
   approveAccessRequestWithConsent,
+  denyAccessRequest,
 } from "./index";
 
 describe("Index exports", () => {
   it("exposes expected things", () => {
+    expect(approveAccessRequest).toBeDefined();
+    expect(approveAccessRequestWithConsent).toBeDefined();
+    expect(cancelAccessRequest).toBeDefined();
+    expect(denyAccessRequest).toBeDefined();
+    expect(getConsentApiEndpoint).toBeDefined();
     expect(isValidConsentGrant).toBeDefined();
     expect(requestAccess).toBeDefined();
     expect(requestAccessWithConsent).toBeDefined();
-    expect(cancelAccessRequest).toBeDefined();
-    expect(getConsentApiEndpoint).toBeDefined();
-    expect(approveAccessRequest).toBeDefined();
-    expect(approveAccessRequestWithConsent).toBeDefined();
   });
 });
