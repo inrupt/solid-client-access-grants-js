@@ -22,8 +22,8 @@ import type { UrlString } from "@inrupt/solid-client";
 import { CONSENT_STATUS_DENIED } from "../constants";
 import { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
 import { issueAccessOrConsentVc } from "../internal/consent.internal";
-import { BaseAccessBody } from "../type/AccessVerifiableCredential";
 import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
+import { setAccessVerifiableCredentialStatus } from "../internal/setAccessVerifiableCredentialStatus";
 
 /**
  * Deny an access request. The content of the denied access request is provided
@@ -43,16 +43,10 @@ export async function denyAccessRequest(
   const baseAccessVerifiableCredential =
     await getBaseAccessVerifiableCredential(vc, options);
 
-  const deniedAccessOrConsentVc: BaseAccessBody = {
-    ...baseAccessVerifiableCredential,
-    credentialSubject: {
-      ...baseAccessVerifiableCredential.credentialSubject,
-      hasConsent: {
-        ...baseAccessVerifiableCredential.credentialSubject.hasConsent,
-        hasStatus: CONSENT_STATUS_DENIED,
-      },
-    },
-  };
+  const deniedAccessOrConsentVc = setAccessVerifiableCredentialStatus(
+    baseAccessVerifiableCredential,
+    CONSENT_STATUS_DENIED
+  );
 
   return issueAccessOrConsentVc(
     deniedAccessOrConsentVc.credentialSubject.id,

@@ -35,6 +35,7 @@ async function getVerifiableCredential(
       `An error occured when looking up [${vcAsUrlString}]: ${issuerResponse.status} ${issuerResponse.statusText}`
     );
   }
+  // TODO: Type checking VerifiableCredential (probably via solid-client-vc?)
   return (await issuerResponse.json()) as VerifiableCredential;
 }
 

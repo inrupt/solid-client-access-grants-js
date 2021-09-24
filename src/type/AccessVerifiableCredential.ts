@@ -20,6 +20,7 @@
 import type { UrlString } from "@inrupt/solid-client";
 import type {
   CONSENT_CONTEXT,
+  CONSENT_STATUS_DENIED,
   CONSENT_STATUS_EXPLICITLY_GIVEN,
   CONSENT_STATUS_REQUESTED,
   CREDENTIAL_TYPE,
@@ -42,6 +43,7 @@ export type BaseAccessBody = {
   issuanceDate?: string;
 };
 
+// TODO: Check why the access credentials would not have optional expiration dates
 export type BaseConsentBody = BaseAccessBody & {
   credentialSubject: {
     hasConsent: {
@@ -62,6 +64,16 @@ export type AccessRequestBody = BaseAccessBody & {
 
 export type ConsentRequestBody = AccessRequestBody & BaseConsentBody;
 
+export type AccessDeniedBody = BaseAccessBody & {
+  credentialSubject: {
+    hasConsent: {
+      hasStatus: typeof CONSENT_STATUS_DENIED;
+    };
+  };
+};
+
+export type ConsentDeniedBody = AccessRequestBody & BaseConsentBody;
+
 export type AccessGrantBody = BaseAccessBody & {
   credentialSubject: {
     hasConsent: {
@@ -72,3 +84,11 @@ export type AccessGrantBody = BaseAccessBody & {
 };
 
 export type ConsentGrantBody = AccessGrantBody & BaseConsentBody;
+
+export type AccessVerifiableCredentialBody =
+  | AccessRequestBody
+  | ConsentRequestBody
+  | AccessDeniedBody
+  | ConsentDeniedBody
+  | AccessGrantBody
+  | ConsentGrantBody;
