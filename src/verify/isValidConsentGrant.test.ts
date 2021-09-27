@@ -174,7 +174,7 @@ describe("isValidConsentGrant", () => {
   it("gets consent endpoint using credentialSubject.id if no consentEndpoint was passed", async () => {
     mockConsentEndpoint();
     const getConsentApiEndpoint = jest.requireActual(
-      "../discovery/getConsentApiEndpoint"
+      "../discover/getConsentApiEndpoint"
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) as any;
     const spiedConsentEndpointLookup = jest.spyOn(

@@ -27,8 +27,8 @@ export {
 } from "./manage/approve";
 export { cancelAccessRequest } from "./request/cancelAccessRequest";
 export { denyAccessRequest } from "./manage/denyAccessRequest";
-export { getConsentApiEndpoint } from "./discovery/getConsentApiEndpoint";
-export { getConsentManagementUi } from "./discovery/getConsentManagementUi";
+export { getConsentApiEndpoint } from "./discover/getConsentApiEndpoint";
+export { getConsentManagementUi } from "./discover/getConsentManagementUi";
 export { requestAccess } from "./request/requestAccess";
 export { requestAccessWithConsent } from "./request/requestAccessWithConsent";
 export { revokeAccess } from "./manage/revokeAccess";

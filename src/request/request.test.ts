@@ -38,8 +38,8 @@ import {
 } from "./request.mock";
 import { CONSENT_CONTEXT } from "../constants";
 
-jest.mock("../discovery/getConsentApiEndpoint", () => {
-  return jest.requireActual("../discovery/getConsentApiEndpoint");
+jest.mock("../discover/getConsentApiEndpoint", () => {
+  return jest.requireActual("../discover/getConsentApiEndpoint");
 });
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
