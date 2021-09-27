@@ -26,10 +26,11 @@ import {
   requestAccessWithConsent,
   cancelAccessRequest,
   getConsentApiEndpoint,
+  getConsentManagementUi,
   approveAccessRequest,
   approveAccessRequestWithConsent,
   denyAccessRequest,
-  revokeConsentGrant,
+  revokeAccess,
 } from "./index";
 
 describe("Index exports", () => {
@@ -39,9 +40,10 @@ describe("Index exports", () => {
     expect(cancelAccessRequest).toBeDefined();
     expect(denyAccessRequest).toBeDefined();
     expect(getConsentApiEndpoint).toBeDefined();
+    expect(getConsentManagementUi).toBeDefined();
     expect(isValidConsentGrant).toBeDefined();
     expect(requestAccess).toBeDefined();
     expect(requestAccessWithConsent).toBeDefined();
-    expect(revokeConsentGrant).toBeDefined();
+    expect(revokeAccess).toBeDefined();
   });
 });

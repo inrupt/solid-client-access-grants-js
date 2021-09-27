@@ -17,15 +17,31 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { CONSENT_CONTEXT } from "../constants";
-import { ConsentContext } from "../type/ConsentContext";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import {
+  getRequestBody,
+  issueAccessOrConsentVc,
+} from "../internal/issueAccessOrConsentVc";
+import { CONSENT_STATUS_REQUESTED } from "../constants";
+import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import type { RequestAccessParameters } from "../type/RequestAccessParameters";
 
+/**
+ * Request access to a given Resource.
+ *
+ * @param params Access to request.
+ * @param options Optional properties to customise the access request behaviour.
+ * @returns A signed Verifiable Credential representing the access request.
+ */
 // eslint-disable-next-line import/prefer-default-export
-export function isConsentContext(x: unknown): x is ConsentContext {
-  return (
-    Array.isArray(x) &&
-    CONSENT_CONTEXT.map((y) => x.includes(y)).reduce(
-      (previous, current) => previous && current
-    )
-  );
+export async function requestAccess(
+  params: RequestAccessParameters,
+  options: ConsentApiBaseOptions = {}
+): Promise<VerifiableCredential> {
+  const consentRequest = getRequestBody({
+    ...params,
+    status: CONSENT_STATUS_REQUESTED,
+  });
+
+  return issueAccessOrConsentVc(params.requestor, consentRequest, options);
 }

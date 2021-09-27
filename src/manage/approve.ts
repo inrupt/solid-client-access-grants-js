@@ -22,7 +22,7 @@ import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   getGrantBody,
   issueAccessOrConsentVc,
-} from "../internal/consent.internal";
+} from "../internal/issueAccessOrConsentVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import { isConsentRequest } from "../guard/isConsentRequest";
 import {

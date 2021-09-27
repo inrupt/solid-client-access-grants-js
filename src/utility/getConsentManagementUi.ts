@@ -21,62 +21,15 @@ import {
   getIri,
   getSolidDataset,
   getThing,
+  getThingAll,
+  getWellKnownSolid,
   UrlString,
 } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import {
-  getRequestBody,
-  issueAccessOrConsentVc,
-} from "../internal/consent.internal";
-import { getDefaultSessionFetch } from "../internal/getDefaultSessionFetch";
-import {
-  PIM_STORAGE,
-  PREFERRED_CONSENT_MANAGEMENT_UI,
-  CONSENT_STATUS_REQUESTED,
-} from "../constants";
-import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import type { RequestAccessParameters } from "../type/RequestAccessParameters";
-import type { RequestAccessWithConsentParameters } from "../type/RequestAccessWithConsentParameters";
-import { getConsentApiEndpointFromWellKnown } from "../internal/getConsentApiEndpointFromWellKnown";
+import { getSessionFetch } from "../internal/getSessionFetch";
+import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import { PIM_STORAGE, PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
-/**
- * Request access to a given Resource.
- *
- * @param params Access to request.
- * @param options Optional properties to customise the access request behaviour.
- * @returns A signed Verifiable Credential representing the access request.
- */
-export async function requestAccess(
-  params: RequestAccessParameters,
-  options: ConsentApiBaseOptions = {}
-): Promise<VerifiableCredential> {
-  const consentRequest = getRequestBody({
-    ...params,
-    status: CONSENT_STATUS_REQUESTED,
-  });
-
-  return issueAccessOrConsentVc(params.requestor, consentRequest, options);
-}
-
-/**
- * Request access to a given Resource and proof that consent for a given use of that access was granted.
- *
- * @param params Access to request and constraints on how that access will be used.
- * @param options Optional properties to customise the access request behaviour.
- * @returns A signed verifiable credential representing the access and consent request.
- */
-export async function requestAccessWithConsent(
-  params: RequestAccessWithConsentParameters,
-  options: ConsentApiBaseOptions = {}
-): Promise<VerifiableCredential> {
-  const consentRequest = getRequestBody({
-    ...params,
-    status: CONSENT_STATUS_REQUESTED,
-  });
-  return issueAccessOrConsentVc(params.requestor, consentRequest, options);
-}
-
-async function getConsentApiEndpointFromProfile(
+async function getConsentManagementUiFromProfile(
   webId: UrlString,
   options: { fetch: typeof global.fetch }
 ): Promise<{ consentEndpoint?: UrlString; storage?: UrlString }> {
@@ -107,25 +60,48 @@ async function getConsentApiEndpointFromProfile(
   return result;
 }
 
+async function getConsentManagementUiFromWellKnown(
+  storage: UrlString | undefined,
+  options: { fetch: typeof global.fetch }
+): Promise<UrlString | undefined> {
+  if (storage === undefined) {
+    return undefined;
+  }
+  const wellKnown = await getWellKnownSolid(storage, {
+    fetch: options.fetch,
+  });
+  if (getThingAll(wellKnown).length === 0) {
+    return undefined;
+  }
+  const wellKnownConsentUi = getIri(
+    getThingAll(wellKnown)[0],
+    PREFERRED_CONSENT_MANAGEMENT_UI
+  );
+  return wellKnownConsentUi ?? undefined;
+}
+
 /**
  * Get the endpoint where the user prefers to be redirected when asked for consent.
  * If the user does not specify an endpoint, this function attemps to discover the
- * default consent UI recommanded by their Pod provider.
+ * default consent UI recommended by their Pod provider.
  *
  * @param webId The WebID of the user asked for consent.
  * @param options Optional properties to customise the access request behaviour.
  */
-export async function getConsentApiEndpoint(
-  webId: UrlString,
+// eslint-disable-next-line import/prefer-default-export
+export async function getConsentManagementUi(
+  webId: URL | UrlString,
   options: { fetch?: ConsentApiBaseOptions["fetch"] } = {}
 ): Promise<UrlString | undefined> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  const { consentEndpoint, storage } = await getConsentApiEndpointFromProfile(
-    webId,
+  const fetcher = await getSessionFetch(options);
+  // TODO: Complete code coverage for URL argument
+  const { consentEndpoint, storage } = await getConsentManagementUiFromProfile(
+    /* istanbul ignore next */
+    webId instanceof URL ? webId.href : webId,
     { fetch: fetcher }
   );
   return (
     consentEndpoint ??
-    getConsentApiEndpointFromWellKnown(storage, { fetch: fetcher })
+    getConsentManagementUiFromWellKnown(storage, { fetch: fetcher })
   );
 }

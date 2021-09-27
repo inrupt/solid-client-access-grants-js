@@ -21,7 +21,7 @@ import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import type { BaseAccessBody } from "../type/AccessVerifiableCredential";
-import { getDefaultSessionFetch } from "./getDefaultSessionFetch";
+import { getSessionFetch } from "./getSessionFetch";
 import { isBaseAccessVerifiableCredential } from "../guard/isBaseAccessVerifiableCredential";
 
 async function getVerifiableCredential(
@@ -45,7 +45,7 @@ export async function getBaseAccessVerifiableCredential(
   options: ConsentApiBaseOptions
 ): Promise<BaseAccessBody & VerifiableCredential> {
   // TODO: Actually test the getDefaultSessionFetch() gets called by default (refactor)
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
+  const fetcher = await getSessionFetch(options);
   const fetchedVerifiableCredential =
     typeof vc === "string" || vc instanceof URL
       ? await getVerifiableCredential(vc, fetcher)

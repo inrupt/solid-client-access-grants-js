@@ -16,7 +16,9 @@
 // HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
 import { fetch as crossFetch } from "cross-fetch";
+import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 
 /**
  * Dynamically import solid-client-authn-browser so that
@@ -25,7 +27,12 @@ import { fetch as crossFetch } from "cross-fetch";
  * @returns fetch function
  */
 // eslint-disable-next-line import/prefer-default-export
-export async function getDefaultSessionFetch(): Promise<typeof fetch> {
+export async function getSessionFetch(
+  options: ConsentApiBaseOptions
+): Promise<typeof fetch> {
+  if (options.fetch) {
+    return options.fetch;
+  }
   try {
     const { fetch: fetchFn } = await import(
       "@inrupt/solid-client-authn-browser"

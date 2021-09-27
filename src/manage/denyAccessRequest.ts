@@ -21,7 +21,7 @@ import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
 import { CONSENT_STATUS_DENIED } from "../constants";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import { issueAccessOrConsentVc } from "../internal/consent.internal";
+import { issueAccessOrConsentVc } from "../internal/issueAccessOrConsentVc";
 import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
 import { setAccessVerifiableCredentialStatus } from "../internal/setAccessVerifiableCredentialStatus";
 

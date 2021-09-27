@@ -17,15 +17,34 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { CONSENT_CONTEXT } from "../constants";
-import { ConsentContext } from "../type/ConsentContext";
+import { access } from "@inrupt/solid-client";
+import {
+  RESOURCE_ACCESS_MODE_READ,
+  RESOURCE_ACCESS_MODE_APPEND,
+  RESOURCE_ACCESS_MODE_WRITE,
+  RESOURCE_ACCESS_MODE_CONTROL,
+} from "../constants";
+import { ResourceAccessMode } from "../type/ResourceAccessMode";
 
 // eslint-disable-next-line import/prefer-default-export
-export function isConsentContext(x: unknown): x is ConsentContext {
-  return (
-    Array.isArray(x) &&
-    CONSENT_CONTEXT.map((y) => x.includes(y)).reduce(
-      (previous, current) => previous && current
-    )
-  );
+export function accessToResourceAccessModeArray(
+  desiredAccess: Partial<access.Access>
+): ResourceAccessMode[] {
+  const modes: ResourceAccessMode[] = [];
+  if (desiredAccess.read === true) {
+    modes.push(RESOURCE_ACCESS_MODE_READ);
+  }
+  if (desiredAccess.append === true) {
+    modes.push(RESOURCE_ACCESS_MODE_APPEND);
+  }
+  if (desiredAccess.write === true) {
+    modes.push(RESOURCE_ACCESS_MODE_WRITE);
+  }
+  if (
+    desiredAccess.controlRead === true ||
+    desiredAccess.controlWrite === true
+  ) {
+    modes.push(RESOURCE_ACCESS_MODE_CONTROL);
+  }
+  return modes;
 }

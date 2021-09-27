@@ -16,31 +16,15 @@
 // HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-import {
-  access,
-  UrlString,
-  getWellKnownSolid,
-  getThingAll,
-  getSourceIri,
-  getIri,
-  WebId,
-} from "@inrupt/solid-client";
+
+import { WebId } from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import {
-  CONSENT_CONTEXT,
-  INRUPT_CONSENT_SERVICE,
-  CREDENTIAL_TYPE,
-  RESOURCE_ACCESS_MODE_READ,
-  RESOURCE_ACCESS_MODE_APPEND,
-  RESOURCE_ACCESS_MODE_WRITE,
-  RESOURCE_ACCESS_MODE_CONTROL,
-} from "../constants";
-import type { ResourceAccessMode } from "../type/ResourceAccessMode";
+import { CONSENT_CONTEXT, CREDENTIAL_TYPE } from "../constants";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import { getDefaultSessionFetch } from "./getDefaultSessionFetch";
+import { getSessionFetch } from "./getSessionFetch";
 import type {
   AccessGrantBody,
   AccessRequestBody,
@@ -58,66 +42,12 @@ import type {
   ConsentGrantParameters,
   AccessGrantParameters,
 } from "../type/Parameter";
-
-export function accessToConsentRequestModes(
-  desiredAccess: Partial<access.Access>
-): ResourceAccessMode[] {
-  const modes: ResourceAccessMode[] = [];
-  if (desiredAccess.read === true) {
-    modes.push(RESOURCE_ACCESS_MODE_READ);
-  }
-  if (desiredAccess.append === true) {
-    modes.push(RESOURCE_ACCESS_MODE_APPEND);
-  }
-  if (desiredAccess.write === true) {
-    modes.push(RESOURCE_ACCESS_MODE_WRITE);
-  }
-  if (
-    desiredAccess.controlRead === true ||
-    desiredAccess.controlWrite === true
-  ) {
-    modes.push(RESOURCE_ACCESS_MODE_CONTROL);
-  }
-  return modes;
-}
-
-export async function getConsentEndpointForResource(
-  resource: UrlString,
-  fetcher: typeof fetch
-): Promise<UrlString> {
-  const wellKnown = await getWellKnownSolid(resource, {
-    fetch: fetcher,
-  });
-  const wellKnownSubjects = getThingAll(wellKnown);
-  if (wellKnownSubjects.length === 0) {
-    throw new Error(
-      `Cannot discover consent endpoint from [${getSourceIri(
-        wellKnown
-      )}]: the well-known document is empty.`
-    );
-  }
-  // There should only be 1 subject in the .well-known/solid document, and if there
-  // are multiple, we arbitrarily pick the first one.
-  const wellKnownSubject = wellKnownSubjects[0];
-  const consentIri = getIri(wellKnownSubject, INRUPT_CONSENT_SERVICE);
-  if (consentIri === null) {
-    throw new Error(
-      `Cannot discover consent endpoint from [${getSourceIri(
-        wellKnown
-      )}]: the well-known document contains no value for property [${INRUPT_CONSENT_SERVICE}].`
-    );
-  }
-  return consentIri;
-}
-
-function isConsentRequestParameters(
-  params: unknown | AccessRequestParameters | ConsentRequestParameters
-): params is ConsentRequestParameters {
-  return (params as ConsentRequestParameters).purpose !== undefined;
-}
+import { getConsentApiEndpoint } from "../utility/getConsentApiEndpoint";
+import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArray";
+import { isConsentRequestParameters } from "../guard/isConsentRequestParameters";
 
 function getBaseBody(params: BaseRequestParameters): BaseAccessBody {
-  const modes = accessToConsentRequestModes(params.access);
+  const modes = accessToResourceAccessModeArray(params.access);
   return {
     "@context": CONSENT_CONTEXT,
     type: [CREDENTIAL_TYPE],
@@ -188,38 +118,25 @@ export function getGrantBody(
   return grant as AccessGrantBody;
 }
 
-async function getConsentEndpointUrl(
-  consentEndpoint: URL | UrlString | undefined,
-  resource: UrlString,
-  fetcher: typeof fetch
-): Promise<URL> {
-  // TODO: complete code coverage
-  /* istanbul ignore if */
-  if (consentEndpoint instanceof URL) {
-    return consentEndpoint;
-  }
-  if (consentEndpoint) {
-    return new URL(consentEndpoint);
-  }
-  return new URL(
-    "issue",
-    await getConsentEndpointForResource(resource, fetcher)
-  );
-}
-
 export async function issueAccessOrConsentVc(
   requestor: WebId,
   vcBody: BaseAccessBody | BaseConsentBody,
   options: ConsentApiBaseOptions
 ): Promise<VerifiableCredential> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  const consentEndpoint = await getConsentEndpointUrl(
-    options.consentEndpoint,
-    vcBody.credentialSubject.hasConsent.forPersonalData[0],
-    fetcher
+  const fetcher = await getSessionFetch(options);
+  // TODO: find out if concatenating "issue" here is correct
+  // It seems like the issuer endpoint should be discovered from the well-known direcly
+  // And the consent endpoint should be an object with one URI per service
+  // (issuer service, verifier service... supposedly status and query and vc???)
+  const consentIssuerEndpoint = new URL(
+    "issue",
+    await getConsentApiEndpoint(
+      vcBody.credentialSubject.hasConsent.forPersonalData[0],
+      options
+    )
   );
   return issueVerifiableCredential(
-    consentEndpoint.href,
+    consentIssuerEndpoint.href,
     requestor,
     {
       "@context": vcBody["@context"],

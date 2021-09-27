@@ -17,34 +17,19 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// This rule complains about the `@jest/globals` variables overriding global vars:
-/* eslint-disable no-shadow */
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
+// This rule complains about the `@jest/globals` variables overriding global vars:
+// eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
 // This ESLint plugin seems to not be able to resolve subpackage imports:
 // eslint-disable-next-line import/no-unresolved
 import { mocked } from "ts-jest/utils";
-
 import {
   mockWellKnownNoConsent,
   mockWellKnownWithConsent,
 } from "../request/request.mock";
-import { isValidConsentGrant } from "./verify";
+import { isValidConsentGrant } from "./isValidConsentGrant";
 
-jest.mock("../internal/consent.internal.ts", () => {
-  const internalConsentModule = jest.requireActual(
-    "../internal/consent.internal.ts"
-    // TypeScript can't infer the type of modules imported via Jest;
-    // skip type checking for those:
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ) as any;
-
-  internalConsentModule.getConsentEndpointForWebId = jest.fn(
-    internalConsentModule.getConsentEndpointForWebId
-  );
-
-  return internalConsentModule;
-});
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
   // skip type checking for those:
@@ -188,13 +173,13 @@ describe("isValidConsentGrant", () => {
 
   it("gets consent endpoint using credentialSubject.id if no consentEndpoint was passed", async () => {
     mockConsentEndpoint();
-    const internalConsentModule = jest.requireActual(
-      "../internal/consent.internal"
+    const getConsentApiEndpoint = jest.requireActual(
+      "../utility/getConsentApiEndpoint"
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) as any;
     const spiedConsentEndpointLookup = jest.spyOn(
-      internalConsentModule,
-      "getConsentEndpointForResource"
+      getConsentApiEndpoint,
+      "getConsentApiEndpoint"
     );
     const mockedFetch = jest.fn().mockReturnValue({
       ok: true,

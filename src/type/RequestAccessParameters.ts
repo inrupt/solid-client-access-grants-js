@@ -30,6 +30,8 @@ import type { access, UrlString, WebId } from "@inrupt/solid-client";
  */
 // TODO: Find out about the overlap with BaseRequestParameters (differs in status and resource owner)
 // TODO: There seems to be no use of resourceOwner. Find out about it.
+// TODO: Make requestorInboxUrl optional
+// TODO: Get rid of BaseRequestParameters in favour of this
 export type RequestAccessParameters = {
   access: Partial<access.Access>;
   requestor: WebId;

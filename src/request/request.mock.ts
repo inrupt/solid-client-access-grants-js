@@ -17,6 +17,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+// eslint-disable-next-line no-shadow
+import { jest } from "@jest/globals";
 import {
   buildThing,
   mockSolidDatasetFrom,
@@ -30,6 +32,9 @@ import { CONSENT_CONTEXT, PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
 export const MOCKED_CREDENTIAL_ID = "https://some.credential";
 export const MOCKED_ISSUANCE_DATE = "2021-09-07T09:59:00Z";
+export const MOCK_REQUESTOR_IRI = "https://some.pod/profile#me";
+export const MOCK_REQUESTOR_INBOX = "https://some.pod/consent/inbox";
+export const MOCK_REQUESTEE_IRI = "https://some.pod/profile#you";
 
 export const mockAccessGrant = (
   issuer: string,
@@ -109,4 +114,15 @@ export const mockWebIdWithUi = (
     profile.addIri(PREFERRED_CONSENT_MANAGEMENT_UI, MOCKED_CONSENT_UI_IRI);
   }
   return setThing(mockSolidDatasetFrom(webId), profile.build());
+};
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export const mockConsentEndpoint = (withConsent = true) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
+  solidClientModule.getWellKnownSolid.mockResolvedValue(
+    (withConsent
+      ? mockWellKnownWithConsent()
+      : mockWellKnownNoConsent()) as never
+  );
 };

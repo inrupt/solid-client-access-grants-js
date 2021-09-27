@@ -18,30 +18,13 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import {
-  getIri,
-  getThingAll,
-  getWellKnownSolid,
-  UrlString,
-} from "@inrupt/solid-client";
-import { PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
+  ConsentRequestParameters,
+  AccessRequestParameters,
+} from "../type/Parameter";
 
 // eslint-disable-next-line import/prefer-default-export
-export async function getConsentApiEndpointFromWellKnown(
-  storage: UrlString | undefined,
-  options: { fetch: typeof global.fetch }
-): Promise<UrlString | undefined> {
-  if (storage === undefined) {
-    return undefined;
-  }
-  const wellKnown = await getWellKnownSolid(storage, {
-    fetch: options.fetch,
-  });
-  if (getThingAll(wellKnown).length === 0) {
-    return undefined;
-  }
-  const wellKnownConsentUi = getIri(
-    getThingAll(wellKnown)[0],
-    PREFERRED_CONSENT_MANAGEMENT_UI
-  );
-  return wellKnownConsentUi ?? undefined;
+export function isConsentRequestParameters(
+  params: unknown | AccessRequestParameters | ConsentRequestParameters
+): params is ConsentRequestParameters {
+  return (params as ConsentRequestParameters).purpose !== undefined;
 }

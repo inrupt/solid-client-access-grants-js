@@ -23,8 +23,8 @@ import {
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import { getConsentEndpointForResource } from "../internal/consent.internal";
-import { getDefaultSessionFetch } from "../internal/getDefaultSessionFetch";
+import { getSessionFetch } from "../internal/getSessionFetch";
+import { getConsentApiEndpoint } from "../utility/getConsentApiEndpoint";
 
 /**
  * Makes a request to the consent server to verify the validity of a given VC.
@@ -33,12 +33,14 @@ import { getDefaultSessionFetch } from "../internal/getDefaultSessionFetch";
  * @param options Optional properties to customise the request behaviour.
  * @returns An object containing checks, warnings, and errors.
  */
+// TODO: Accept the standard VerifiableCredential | URL | UrlString
+// TODO: Push verification further as this just checks it's a valid VC should we not type check the consent grant?
 // eslint-disable-next-line import/prefer-default-export
 export async function isValidConsentGrant(
   vc: VerifiableCredential | UrlString,
   options: ConsentApiBaseOptions = {}
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
+  const fetcher = await getSessionFetch(options);
 
   let vcObject = vc;
   if (typeof vc === "string") {
@@ -59,7 +61,7 @@ export async function isValidConsentGrant(
 
   const consentEndpoint =
     options.consentEndpoint ??
-    (await getConsentEndpointForResource(credentialSubjectId, fetcher));
+    (await getConsentApiEndpoint(credentialSubjectId, { fetch: fetcher }));
   const consentVerifyEndpoint = `${consentEndpoint}/verify`;
 
   const response = await fetcher(consentVerifyEndpoint, {

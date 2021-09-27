@@ -18,24 +18,35 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import type { UrlString } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { revokeAccess } from "../manage/revokeAccess";
+import {
+  revokeVerifiableCredential,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
+import { getSessionFetch } from "../internal/getSessionFetch";
 
 /**
- * Cancel a request for access to data (with explicit or implicit consent) before
- * the person being asked for consent has replied.
- * This is equivalent to revoking a consent grant.
+ * Makes a request to the consent server to revoke a given VC.
  *
- * @param vc The access request, either in the form of a VC URL or a full-fledged VC.
- * @param options Optional properties to customise the access request behaviour.
- * @returns A void promise
- * @since Unreleased
+ * @param vc Either a VC, or a URL to a VC, to be revoked.
+ * @param options Optional properties to customise the request behaviour.
+ * @returns A void promise.
  */
 // eslint-disable-next-line import/prefer-default-export
-export async function cancelAccessRequest(
+export async function revokeAccess(
   vc: VerifiableCredential | URL | UrlString,
   options: ConsentApiBaseOptions = {}
 ): Promise<void> {
-  return revokeAccess(vc, options);
+  const credential = await getBaseAccessVerifiableCredential(vc, options);
+  // TODO: Find out if this should take the optional consentEndpoint
+  // Potentially factor out the getConsentEndpoint taking VC or URL or UrlString and options
+  // TODO: Find out about the overlap with getConsentApiEndpoint
+  return revokeVerifiableCredential(
+    new URL("status", credential.issuer).href,
+    credential.id,
+    {
+      fetch: await getSessionFetch(options),
+    }
+  );
 }

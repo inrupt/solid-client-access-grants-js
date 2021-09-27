@@ -118,7 +118,7 @@ describe("approveAccessRequest", () => {
       fetch: jest.fn(),
     });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      "https://some.consent-endpoint.override/",
+      "https://some.consent-endpoint.override/".concat("issue"),
       expect.anything(),
       expect.anything(),
       expect.anything(),

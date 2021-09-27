@@ -17,36 +17,30 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import type { UrlString } from "@inrupt/solid-client";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import {
-  revokeVerifiableCredential,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
-import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
-import { getDefaultSessionFetch } from "../internal/getDefaultSessionFetch";
+  getRequestBody,
+  issueAccessOrConsentVc,
+} from "../internal/issueAccessOrConsentVc";
+import { CONSENT_STATUS_REQUESTED } from "../constants";
+import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import { RequestAccessWithConsentParameters } from "../type/RequestAccessWithConsentParameters";
 
 /**
- * Makes a request to the consent server to revoke a given VC.
+ * Request access to a given Resource and proof that consent for a given use of that access was granted.
  *
- * @param vc Either a VC, or a URL to a VC, to be revoked.
- * @param options Optional properties to customise the request behaviour.
- * @returns A void promise.
+ * @param params Access to request and constraints on how that access will be used.
+ * @param options Optional properties to customise the access request behaviour.
+ * @returns A signed verifiable credential representing the access and consent request.
  */
 // eslint-disable-next-line import/prefer-default-export
-export async function revokeAccess(
-  vc: VerifiableCredential | URL | UrlString,
+export async function requestAccessWithConsent(
+  params: RequestAccessWithConsentParameters,
   options: ConsentApiBaseOptions = {}
-): Promise<void> {
-  const credential = await getBaseAccessVerifiableCredential(vc, options);
-  // TODO: Find out if this should take the optional consentEndpoint
-  // Potentially factor out the getConsentEndpoint taking VC or URL or UrlString and options
-  // TODO: Find out about the overlap with getConsentApiEndpoint
-  return revokeVerifiableCredential(
-    new URL("status", credential.issuer).href,
-    credential.id,
-    {
-      fetch: options.fetch ?? (await getDefaultSessionFetch()),
-    }
-  );
+): Promise<VerifiableCredential> {
+  const consentRequest = getRequestBody({
+    ...params,
+    status: CONSENT_STATUS_REQUESTED,
+  });
+  return issueAccessOrConsentVc(params.requestor, consentRequest, options);
 }

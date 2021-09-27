@@ -20,11 +20,8 @@
 /* eslint-disable no-shadow */
 import { jest, it, describe, expect } from "@jest/globals";
 import { denyAccessRequest } from "./denyAccessRequest";
-import {
-  mockAccessRequestVc,
-  mockConsentEndpoint,
-} from "../approve/approve.mock";
-import { MOCKED_CONSENT_ISSUER } from "./request.mock";
+import { mockAccessRequestVc, mockConsentEndpoint } from "./approve.mock";
+import { MOCKED_CONSENT_ISSUER } from "../request/request.mock";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -100,7 +97,7 @@ describe("denyAccessRequest", () => {
       fetch: jest.fn(),
     });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      "https://some.consent-endpoint.override/",
+      "https://some.consent-endpoint.override/".concat("issue"),
       expect.anything(),
       expect.anything(),
       expect.anything(),

@@ -22,16 +22,14 @@ export type { RequestAccessParameters } from "./type/RequestAccessParameters";
 export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
 
 export {
-  requestAccess,
-  requestAccessWithConsent,
-  getConsentApiEndpoint,
-} from "./request/request";
-
-export {
   approveAccessRequest,
   approveAccessRequestWithConsent,
-} from "./approve/approve";
+} from "./manage/approve";
 export { cancelAccessRequest } from "./request/cancelAccessRequest";
-export { denyAccessRequest } from "./request/denyAccessRequest";
-export { revokeAccess as revokeConsentGrant } from "./request/revokeAccess";
-export { isValidConsentGrant } from "./verify/verify";
+export { denyAccessRequest } from "./manage/denyAccessRequest";
+export { getConsentApiEndpoint } from "./utility/getConsentApiEndpoint";
+export { getConsentManagementUi } from "./utility/getConsentManagementUi";
+export { requestAccess } from "./request/requestAccess";
+export { requestAccessWithConsent } from "./request/requestAccessWithConsent";
+export { revokeAccess } from "./manage/revokeAccess";
+export { isValidConsentGrant } from "./verify/isValidConsentGrant";
