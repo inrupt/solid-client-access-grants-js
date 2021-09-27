@@ -38,7 +38,7 @@ import type {
   ConsentRequestBody,
 } from "../type/AccessVerifiableCredential";
 import type { ResourceAccessMode } from "../type/ResourceAccessMode";
-import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
   return requestVc.credentialSubject.id;
@@ -155,7 +155,7 @@ export async function approveAccessRequest(
     resources: Array<UrlString>;
     requestorInboxIri: UrlString;
   }>,
-  options?: ConsentGrantBaseOptions
+  options?: ConsentApiBaseOptions
 ): Promise<VerifiableCredential>;
 /**
  * Approve an access request. The content of the approved access request is provided
@@ -176,7 +176,7 @@ export async function approveAccessRequest(
     resources: Array<UrlString>;
     requestorInboxIri: UrlString;
   },
-  options?: ConsentGrantBaseOptions
+  options?: ConsentApiBaseOptions
 ): Promise<VerifiableCredential>;
 export async function approveAccessRequest(
   requestVc?: VerifiableCredential | UrlString,
@@ -186,7 +186,7 @@ export async function approveAccessRequest(
     resources: Array<UrlString>;
     requestorInboxIri: UrlString;
   }>,
-  options: ConsentGrantBaseOptions = {}
+  options: ConsentApiBaseOptions = {}
 ): Promise<VerifiableCredential> {
   const requestCredential =
     typeof requestVc !== "undefined"
@@ -239,7 +239,7 @@ export async function approveAccessRequestWithConsent(
     issuanceDate: Date;
     expirationDate: Date;
   }>,
-  options?: ConsentGrantBaseOptions
+  options?: ConsentApiBaseOptions
 ): Promise<VerifiableCredential>;
 /**
  * Approve a consent request. The content of the approved consent request is provided
@@ -263,7 +263,7 @@ export async function approveAccessRequestWithConsent(
     issuanceDate: Date;
     expirationDate: Date;
   },
-  options?: ConsentGrantBaseOptions
+  options?: ConsentApiBaseOptions
 ): Promise<VerifiableCredential>;
 export async function approveAccessRequestWithConsent(
   requestVc?: VerifiableCredential | URL | UrlString,
@@ -276,7 +276,7 @@ export async function approveAccessRequestWithConsent(
     issuanceDate: Date;
     expirationDate: Date;
   }>,
-  options: ConsentGrantBaseOptions = {}
+  options: ConsentApiBaseOptions = {}
 ): Promise<VerifiableCredential> {
   const requestCredential =
     typeof requestVc !== "undefined"

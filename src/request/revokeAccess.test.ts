@@ -21,8 +21,8 @@
 /* eslint-disable no-shadow */
 import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { jest, describe, it, expect } from "@jest/globals";
-import { revokeConsentGrant } from "./revoke";
-import { mockAccessGrant, MOCKED_CREDENTIAL_ID } from "../request/request.mock";
+import { revokeAccess } from "./revokeAccess";
+import { mockAccessGrant, MOCKED_CREDENTIAL_ID } from "./request.mock";
 
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
@@ -48,7 +48,7 @@ describe("revokeConsentGrant", () => {
       mockedVcModule,
       "revokeVerifiableCredential"
     );
-    await revokeConsentGrant("https://some.credential");
+    await revokeAccess("https://some.credential");
     expect(spiedRevoke).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
@@ -75,7 +75,7 @@ describe("revokeConsentGrant", () => {
           )
         )
       );
-    await revokeConsentGrant("https://some.credential", {
+    await revokeAccess("https://some.credential", {
       fetch: mockedFetch,
     });
     expect(spiedRevoke).toHaveBeenCalledWith(
@@ -102,7 +102,7 @@ describe("revokeConsentGrant", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValue(new Response(JSON.stringify(mockedVc)));
-    await revokeConsentGrant(MOCKED_CREDENTIAL_ID, {
+    await revokeAccess(MOCKED_CREDENTIAL_ID, {
       fetch: mockedFetch,
     });
     expect(mockedFetch).toHaveBeenCalledWith(MOCKED_CREDENTIAL_ID);
@@ -121,7 +121,7 @@ describe("revokeConsentGrant", () => {
       })
     );
     await expect(
-      revokeConsentGrant("https://some.credential", { fetch: mockedFetch })
+      revokeAccess("https://some.credential", { fetch: mockedFetch })
     ).rejects.toThrow(/\[https:\/\/some.credential\].*401.*Unauthorized/);
   });
 
@@ -134,7 +134,7 @@ describe("revokeConsentGrant", () => {
       "revokeVerifiableCredential"
     );
     const mockedFetch = jest.fn(global.fetch);
-    await revokeConsentGrant(
+    await revokeAccess(
       mockAccessGrant("https://some.issuer", "https://some.subject"),
       {
         fetch: mockedFetch,

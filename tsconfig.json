@@ -75,6 +75,7 @@
       "src/deny/deny.ts",
       "src/request/request.ts",
       "src/revoke/revoke.ts",
+      "src/type/ConsentApiBaseOptions.ts",
       "src/verify/verify.ts",
     ],
     "exclude": [

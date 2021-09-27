@@ -17,6 +17,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
 export type { RequestAccessParameters } from "./type/RequestAccessParameters";
 export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
 
@@ -30,7 +31,7 @@ export {
   approveAccessRequest,
   approveAccessRequestWithConsent,
 } from "./approve/approve";
-export { cancelAccessRequest } from "./cancel/cancel";
-export { denyAccessRequest } from "./deny/deny";
-export { revokeConsentGrant } from "./revoke/revoke";
+export { cancelAccessRequest } from "./request/cancelAccessRequest";
+export { denyAccessRequest } from "./request/denyAccessRequest";
+export { revokeAccess as revokeConsentGrant } from "./request/revokeAccess";
 export { isValidConsentGrant } from "./verify/verify";

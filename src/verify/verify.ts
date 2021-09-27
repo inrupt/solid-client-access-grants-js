@@ -22,7 +22,7 @@ import {
   isVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { getConsentEndpointForResource } from "../internal/consent.internal";
 import { getDefaultSessionFetch } from "../internal/getDefaultSessionFetch";
 
@@ -36,7 +36,7 @@ import { getDefaultSessionFetch } from "../internal/getDefaultSessionFetch";
 // eslint-disable-next-line import/prefer-default-export
 export async function isValidConsentGrant(
   vc: VerifiableCredential | UrlString,
-  options: ConsentGrantBaseOptions = {}
+  options: ConsentApiBaseOptions = {}
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
   const fetcher = options.fetch ?? (await getDefaultSessionFetch());
 

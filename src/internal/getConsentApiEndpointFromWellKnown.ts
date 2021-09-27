@@ -17,19 +17,31 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import type { UrlString } from "@inrupt/solid-client";
+import {
+  getIri,
+  getThingAll,
+  getWellKnownSolid,
+  UrlString,
+} from "@inrupt/solid-client";
+import { PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
-/**
- * Optional parameters to customise the behaviour of consent requests.
- *
- * - `fetch`: Pass in a function with a signature compatible with the WHATWG
- *            Fetch API, which will be used to make HTTP requests. Primarily
- *            useful when requests need to be authenticated.
- *            When `@inrupt/solid-client-authn-browser` is available and this
- *            property is not set, `fetch` will be imported from there.
- *            Otherwise, the HTTP requests will be unauthenticated.
- */
-export type ConsentGrantBaseOptions = {
-  fetch?: typeof fetch;
-  consentEndpoint?: UrlString;
-};
+// eslint-disable-next-line import/prefer-default-export
+export async function getConsentApiEndpointFromWellKnown(
+  storage: UrlString | undefined,
+  options: { fetch: typeof global.fetch }
+): Promise<UrlString | undefined> {
+  if (storage === undefined) {
+    return undefined;
+  }
+  const wellKnown = await getWellKnownSolid(storage, {
+    fetch: options.fetch,
+  });
+  if (getThingAll(wellKnown).length === 0) {
+    return undefined;
+  }
+  const wellKnownConsentUi = getIri(
+    getThingAll(wellKnown)[0],
+    PREFERRED_CONSENT_MANAGEMENT_UI
+  );
+  return wellKnownConsentUi ?? undefined;
+}

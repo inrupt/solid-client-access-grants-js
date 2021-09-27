@@ -36,7 +36,7 @@ import {
   requestAccess,
   requestAccessWithConsent,
 } from "./request";
-import { cancelAccessRequest } from "../cancel/cancel";
+import { cancelAccessRequest } from "./cancelAccessRequest";
 import {
   getConsentEndpointForResource,
   getRequestBody,

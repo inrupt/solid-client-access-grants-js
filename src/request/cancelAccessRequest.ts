@@ -16,10 +16,11 @@
 // HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-import { UrlString } from "@inrupt/solid-client";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { revokeConsentGrant } from "../revoke/revoke";
-import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+
+import type { UrlString } from "@inrupt/solid-client";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { revokeAccess } from "./revokeAccess";
+import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 
 /**
  * Cancel a request for access to data (with explicit or implicit consent) before
@@ -34,7 +35,7 @@ import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
 // eslint-disable-next-line import/prefer-default-export
 export async function cancelAccessRequest(
   accessRequest: VerifiableCredential | URL | UrlString,
-  options: ConsentGrantBaseOptions = {}
+  options: ConsentApiBaseOptions = {}
 ): Promise<void> {
-  return revokeConsentGrant(accessRequest, options);
+  return revokeAccess(accessRequest, options);
 }

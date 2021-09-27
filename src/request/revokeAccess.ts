@@ -17,40 +17,36 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
-import { CONSENT_STATUS_DENIED } from "../constants";
-import { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
-import { issueAccessOrConsentVc } from "../internal/consent.internal";
+import {
+  revokeVerifiableCredential,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
+import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
-import { setAccessVerifiableCredentialStatus } from "../internal/setAccessVerifiableCredentialStatus";
+import { getDefaultSessionFetch } from "../internal/getDefaultSessionFetch";
 
 /**
- * Deny an access request. The content of the denied access request is provided
- * as a Verifiable Credential.
+ * Makes a request to the consent server to revoke a given VC.
  *
- * @param vc The Verifiable Credential representing the Access Request. If
- * not conform to an Access Request, the function will throw.
- * @param options Optional properties to customise the access denial behaviour.
- * @returns A Verifiable Credential representing the denied access.
- * @since Unreleased.
+ * @param vc Either a VC, or a URL to a VC, to be revoked.
+ * @param options Optional properties to customise the request behaviour.
+ * @returns A void promise.
  */
 // eslint-disable-next-line import/prefer-default-export
-export async function denyAccessRequest(
+export async function revokeAccess(
   vc: VerifiableCredential | URL | UrlString,
-  options: ConsentGrantBaseOptions = {}
-): Promise<VerifiableCredential> {
-  const baseAccessVerifiableCredential =
-    await getBaseAccessVerifiableCredential(vc, options);
-
-  const deniedAccessOrConsentVc = setAccessVerifiableCredentialStatus(
-    baseAccessVerifiableCredential,
-    CONSENT_STATUS_DENIED
-  );
-
-  return issueAccessOrConsentVc(
-    deniedAccessOrConsentVc.credentialSubject.id,
-    deniedAccessOrConsentVc,
-    options
+  options: ConsentApiBaseOptions = {}
+): Promise<void> {
+  const credential = await getBaseAccessVerifiableCredential(vc, options);
+  // TODO: Find out if this should take the optional consentEndpoint
+  // Potentially factor out the getConsentEndpoint taking VC or URL or UrlString and options
+  // TODO: Find out about the overlap with getConsentApiEndpoint
+  return revokeVerifiableCredential(
+    new URL("status", credential.issuer).href,
+    credential.id,
+    {
+      fetch: options.fetch ?? (await getDefaultSessionFetch()),
+    }
   );
 }

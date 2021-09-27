@@ -17,33 +17,25 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { CONSENT_CONTEXT } from "../constants";
-import { BaseAccessBody } from "../type/AccessVerifiableCredential";
+import type { UrlString } from "@inrupt/solid-client";
 
-// eslint-disable-next-line import/prefer-default-export
-export const mockDenyAccessVc = (): VerifiableCredential & BaseAccessBody => {
-  return {
-    "@context": CONSENT_CONTEXT,
-    id: "https://some.credential",
-    credentialSubject: {
-      id: "https://some.requestor",
-      hasConsent: {
-        forPersonalData: ["https://some.resource"],
-        hasStatus: "ConsentStatusRequested",
-        mode: ["Read"],
-      },
-      inbox: "https://some.inbox",
-    },
-    issuanceDate: "some ISO date",
-    issuer: "https://some.issuer",
-    proof: {
-      created: "some ISO date",
-      proofPurpose: "some proof purpose",
-      proofValue: "some proof",
-      type: "some proof type",
-      verificationMethod: "some method",
-    },
-    type: ["SolidConsentRequest"],
-  };
+/**
+ * Optional parameters to customise the behaviour of consent requests.
+ *
+ * - `fetch`: Pass in a function with a signature compatible with the WHATWG
+ *   Fetch API, which will be used to make HTTP requests. Primarily useful when
+ *   requests need to be authenticated. When `@inrupt/solid-client-authn-browser`
+ *   is available and this property is not set, `fetch` will be imported from
+ *   there. Otherwise, the HTTP requests will be unauthenticated.
+ * - `consentEndpoint`: A base URL used when determining the location of consent
+ *   API calls. If not given, it is attempted to be found by determining the
+ *   server URL from the resource involved in the request and reading its
+ *   `.well-known/solid` file for a ConsentAPI entry.
+ * - `podHost`: The URL of the pod host, from which the `.well-known/solid` file
+ *   can be derived.
+ */
+export type ConsentApiBaseOptions = {
+  fetch?: typeof fetch;
+  consentEndpoint?: URL | UrlString;
+  podHost?: URL | UrlString;
 };

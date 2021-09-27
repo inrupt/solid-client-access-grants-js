@@ -39,7 +39,7 @@ import {
   RESOURCE_ACCESS_MODE_CONTROL,
 } from "../constants";
 import type { ResourceAccessMode } from "../type/ResourceAccessMode";
-import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { getDefaultSessionFetch } from "./getDefaultSessionFetch";
 import type {
   AccessGrantBody,
@@ -188,21 +188,36 @@ export function getGrantBody(
   return grant as AccessGrantBody;
 }
 
+async function getConsentEndpointUrl(
+  consentEndpoint: URL | UrlString | undefined,
+  resource: UrlString,
+  fetcher: typeof fetch
+): Promise<URL> {
+  // TODO: complete code coverage
+  /* istanbul ignore if */
+  if (consentEndpoint instanceof URL) {
+    return consentEndpoint;
+  }
+  if (consentEndpoint) {
+    return new URL(consentEndpoint);
+  }
+  return new URL(
+    "issue",
+    await getConsentEndpointForResource(resource, fetcher)
+  );
+}
+
 export async function issueAccessOrConsentVc(
   requestor: WebId,
   vcBody: BaseAccessBody | BaseConsentBody,
-  options: ConsentGrantBaseOptions
+  options: ConsentApiBaseOptions
 ): Promise<VerifiableCredential> {
   const fetcher = options.fetch ?? (await getDefaultSessionFetch());
-  const consentEndpoint = options.consentEndpoint
-    ? new URL(options.consentEndpoint)
-    : new URL(
-        "issue",
-        await getConsentEndpointForResource(
-          vcBody.credentialSubject.hasConsent.forPersonalData[0],
-          fetcher
-        )
-      );
+  const consentEndpoint = await getConsentEndpointUrl(
+    options.consentEndpoint,
+    vcBody.credentialSubject.hasConsent.forPersonalData[0],
+    fetcher
+  );
   return issueVerifiableCredential(
     consentEndpoint.href,
     requestor,

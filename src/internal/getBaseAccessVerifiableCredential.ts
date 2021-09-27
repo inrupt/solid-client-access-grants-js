@@ -19,7 +19,7 @@
 
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
-import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import type { BaseAccessBody } from "../type/AccessVerifiableCredential";
 import { getDefaultSessionFetch } from "./getDefaultSessionFetch";
 import { isBaseAccessVerifiableCredential } from "../guard/isBaseAccessVerifiableCredential";
@@ -42,7 +42,7 @@ async function getVerifiableCredential(
 // eslint-disable-next-line import/prefer-default-export
 export async function getBaseAccessVerifiableCredential(
   vc: VerifiableCredential | URL | UrlString,
-  options: ConsentGrantBaseOptions
+  options: ConsentApiBaseOptions
 ): Promise<BaseAccessBody & VerifiableCredential> {
   // TODO: Actually test the getDefaultSessionFetch() gets called by default (refactor)
   const fetcher = options.fetch ?? (await getDefaultSessionFetch());

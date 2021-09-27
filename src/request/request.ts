@@ -21,10 +21,9 @@ import {
   getIri,
   getSolidDataset,
   getThing,
-  getThingAll,
-  getWellKnownSolid,
   UrlString,
 } from "@inrupt/solid-client";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   getRequestBody,
   issueAccessOrConsentVc,
@@ -35,9 +34,10 @@ import {
   PREFERRED_CONSENT_MANAGEMENT_UI,
   CONSENT_STATUS_REQUESTED,
 } from "../constants";
-import type { ConsentGrantBaseOptions } from "../type/ConsentGrantBaseOptions";
+import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import type { RequestAccessParameters } from "../type/RequestAccessParameters";
 import type { RequestAccessWithConsentParameters } from "../type/RequestAccessWithConsentParameters";
+import { getConsentApiEndpointFromWellKnown } from "../internal/getConsentApiEndpointFromWellKnown";
 
 /**
  * Request access to a given Resource.
@@ -48,8 +48,8 @@ import type { RequestAccessWithConsentParameters } from "../type/RequestAccessWi
  */
 export async function requestAccess(
   params: RequestAccessParameters,
-  options: ConsentGrantBaseOptions = {}
-): Promise<unknown> {
+  options: ConsentApiBaseOptions = {}
+): Promise<VerifiableCredential> {
   const consentRequest = getRequestBody({
     ...params,
     status: CONSENT_STATUS_REQUESTED,
@@ -67,8 +67,8 @@ export async function requestAccess(
  */
 export async function requestAccessWithConsent(
   params: RequestAccessWithConsentParameters,
-  options: ConsentGrantBaseOptions = {}
-): Promise<unknown> {
+  options: ConsentApiBaseOptions = {}
+): Promise<VerifiableCredential> {
   const consentRequest = getRequestBody({
     ...params,
     status: CONSENT_STATUS_REQUESTED,
@@ -107,26 +107,6 @@ async function getConsentApiEndpointFromProfile(
   return result;
 }
 
-async function getConsentApiEndpointFromWellKnown(
-  storage: UrlString | undefined,
-  options: { fetch: typeof global.fetch }
-): Promise<UrlString | undefined> {
-  if (storage === undefined) {
-    return undefined;
-  }
-  const wellKnown = await getWellKnownSolid(storage, {
-    fetch: options.fetch,
-  });
-  if (getThingAll(wellKnown).length === 0) {
-    return undefined;
-  }
-  const wellKnownConsentUi = getIri(
-    getThingAll(wellKnown)[0],
-    PREFERRED_CONSENT_MANAGEMENT_UI
-  );
-  return wellKnownConsentUi ?? undefined;
-}
-
 /**
  * Get the endpoint where the user prefers to be redirected when asked for consent.
  * If the user does not specify an endpoint, this function attemps to discover the
@@ -137,7 +117,7 @@ async function getConsentApiEndpointFromWellKnown(
  */
 export async function getConsentApiEndpoint(
   webId: UrlString,
-  options: { fetch?: ConsentGrantBaseOptions["fetch"] } = {}
+  options: { fetch?: ConsentApiBaseOptions["fetch"] } = {}
 ): Promise<UrlString | undefined> {
   const fetcher = options.fetch ?? (await getDefaultSessionFetch());
   const { consentEndpoint, storage } = await getConsentApiEndpointFromProfile(
