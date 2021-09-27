@@ -42,7 +42,7 @@ import type {
   ConsentGrantParameters,
   AccessGrantParameters,
 } from "../type/Parameter";
-import { getConsentApiEndpoint } from "../utility/getConsentApiEndpoint";
+import { getConsentApiEndpoint } from "../discovery/getConsentApiEndpoint";
 import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArray";
 import { isConsentRequestParameters } from "../guard/isConsentRequestParameters";
 

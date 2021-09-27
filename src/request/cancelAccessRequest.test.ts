@@ -23,9 +23,6 @@ import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { cancelAccessRequest } from "./cancelAccessRequest";
 import { mockAccessGrant, MOCKED_CREDENTIAL_ID } from "./request.mock";
 
-jest.mock("../utility/getConsentApiEndpoint", () => {
-  return jest.requireActual("../utility/getConsentApiEndpoint");
-});
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
   // skip type checking for those:
