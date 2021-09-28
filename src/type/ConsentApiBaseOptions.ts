@@ -19,6 +19,8 @@
 
 import type { UrlString } from "@inrupt/solid-client";
 
+// TODO: Verify whether we need to support the podHost parameter and implement
+// podHost?: URL | UrlString;
 /**
  * Optional parameters to customise the behaviour of consent requests.
  *
@@ -37,5 +39,4 @@ import type { UrlString } from "@inrupt/solid-client";
 export type ConsentApiBaseOptions = {
   fetch?: typeof fetch;
   consentEndpoint?: URL | UrlString;
-  podHost?: URL | UrlString;
 };

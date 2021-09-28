@@ -90,7 +90,7 @@ async function getConsentManagementUiFromWellKnown(
  */
 async function getConsentManagementUi(
   webId: URL | UrlString,
-  options: { fetch?: ConsentApiBaseOptions["fetch"] } = {}
+  options: Pick<ConsentApiBaseOptions, "fetch"> = {}
 ): Promise<UrlString | undefined> {
   const fetcher = await getSessionFetch(options);
   // TODO: Complete code coverage for URL argument
