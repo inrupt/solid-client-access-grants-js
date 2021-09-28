@@ -84,7 +84,7 @@ jobs:
         TAG_SLUG: ${{ needs.prepare-deployment.outputs.tag-slug }}
     - run: npm ci
     - name: Publish an npm tag for this branch
-      if: github.actor != 'dependabot[bot]' && false
+      if: github.actor != 'dependabot[bot]'
       run: |
         # Unfortunately GitHub Actions does not currently let us do something like
         #     if: secrets.NPM_TOKEN != ''
