@@ -26,8 +26,9 @@ import { isBaseAccessVerifiableCredential } from "../guard/isBaseAccessVerifiabl
 
 async function getVerifiableCredential(
   vc: URL | UrlString,
-  fetcher: typeof fetch
+  options: ConsentApiBaseOptions
 ): Promise<VerifiableCredential> {
+  const fetcher = await getSessionFetch(options);
   const vcAsUrlString = vc instanceof URL ? vc.toString() : vc;
   const issuerResponse = await fetcher(vcAsUrlString);
   if (!issuerResponse.ok) {
@@ -44,11 +45,9 @@ export async function getBaseAccessVerifiableCredential(
   vc: VerifiableCredential | URL | UrlString,
   options: ConsentApiBaseOptions
 ): Promise<BaseAccessBody & VerifiableCredential> {
-  // TODO: Actually test the getDefaultSessionFetch() gets called by default (refactor)
-  const fetcher = await getSessionFetch(options);
   const fetchedVerifiableCredential =
     typeof vc === "string" || vc instanceof URL
-      ? await getVerifiableCredential(vc, fetcher)
+      ? await getVerifiableCredential(vc, options)
       : vc;
 
   if (!isBaseAccessVerifiableCredential(fetchedVerifiableCredential)) {
