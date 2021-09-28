@@ -33,11 +33,11 @@ import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
  * @param options Optional properties to customise the request behaviour.
  * @returns An object containing checks, warnings, and errors.
  */
-// TODO: Accept the standard VerifiableCredential | URL | UrlString
+// TODO: Rename to isValidAccessCredential and add isValidAccessWithConsentCredential
 // TODO: Push verification further as this just checks it's a valid VC should we not type check the consent grant?
 // eslint-disable-next-line import/prefer-default-export
 export async function isValidConsentGrant(
-  vc: VerifiableCredential | UrlString,
+  vc: VerifiableCredential | URL | UrlString,
   options: ConsentApiBaseOptions = {}
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
   const fetcher = await getSessionFetch(options);
