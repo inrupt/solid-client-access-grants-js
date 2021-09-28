@@ -26,7 +26,6 @@ import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
  *
  * @returns fetch function
  */
-// eslint-disable-next-line import/prefer-default-export
 export async function getSessionFetch(
   options: ConsentApiBaseOptions
 ): Promise<typeof fetch> {

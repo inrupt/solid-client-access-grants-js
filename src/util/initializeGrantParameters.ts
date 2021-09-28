@@ -78,7 +78,6 @@ function getExpirationFromConsentRequest(
     : undefined;
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export function initializeGrantParameters(
   requestVc?:
     | (AccessRequestBody & { issuanceDate: string })

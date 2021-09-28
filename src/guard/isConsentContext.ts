@@ -20,7 +20,6 @@
 import { CONSENT_CONTEXT } from "../constants";
 import { ConsentContext } from "../type/ConsentContext";
 
-// eslint-disable-next-line import/prefer-default-export
 export function isConsentContext(x: unknown): x is ConsentContext {
   return (
     Array.isArray(x) &&

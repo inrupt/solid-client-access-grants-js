@@ -23,5 +23,4 @@
  * - `isValidConsentGrant`: Verifying an access grant.
  */
 // TODO: Make name more explicit and allow verification of different types of consent & access grants
-// eslint-disable-next-line import/prefer-default-export
 export { isValidConsentGrant } from "./isValidConsentGrant";

@@ -88,8 +88,7 @@ async function getConsentManagementUiFromWellKnown(
  * @param webId The WebID of the user asked for consent.
  * @param options Optional properties to customise the access request behaviour.
  */
-// eslint-disable-next-line import/prefer-default-export
-export async function getConsentManagementUi(
+async function getConsentManagementUi(
   webId: URL | UrlString,
   options: { fetch?: ConsentApiBaseOptions["fetch"] } = {}
 ): Promise<UrlString | undefined> {
@@ -105,3 +104,7 @@ export async function getConsentManagementUi(
     getConsentManagementUiFromWellKnown(storage, { fetch: fetcher })
   );
 }
+
+export { getConsentManagementUi };
+export default getConsentManagementUi;
+export type { ConsentApiBaseOptions, UrlString };

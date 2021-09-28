@@ -20,7 +20,6 @@
 import { CONSENT_STATUS } from "../constants";
 import { ConsentStatus } from "../type/ConsentStatus";
 
-// eslint-disable-next-line import/prefer-default-export
 export function isConsentStatus(x: unknown): x is ConsentStatus {
   return typeof x === "string" && (CONSENT_STATUS as Set<string>).has(x);
 }

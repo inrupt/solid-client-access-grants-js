@@ -26,7 +26,6 @@ import {
 } from "../constants";
 import { ResourceAccessMode } from "../type/ResourceAccessMode";
 
-// eslint-disable-next-line import/prefer-default-export
 export function accessToResourceAccessModeArray(
   desiredAccess: Partial<access.Access>
 ): ResourceAccessMode[] {

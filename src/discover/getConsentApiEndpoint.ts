@@ -57,8 +57,7 @@ async function getConsentEndpointForResource(
   return consentIri;
 }
 
-// eslint-disable-next-line import/prefer-default-export
-export async function getConsentApiEndpoint(
+async function getConsentApiEndpoint(
   resource: URL | UrlString,
   options: ConsentApiBaseOptions
 ): Promise<UrlString> {
@@ -76,3 +75,7 @@ export async function getConsentApiEndpoint(
     await getSessionFetch(options)
   );
 }
+
+export { getConsentApiEndpoint };
+export default getConsentApiEndpoint;
+export type { ConsentApiBaseOptions, UrlString };

@@ -24,7 +24,6 @@ import { isConsentContext } from "./isConsentContext";
 import { isConsentStatus } from "./isConsentStatus";
 
 // TODO: Fix type checking
-// eslint-disable-next-line import/prefer-default-export
 export function isBaseAccessVerifiableCredential(
   x: unknown
 ): x is BaseAccessBody {

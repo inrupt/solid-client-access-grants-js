@@ -21,7 +21,6 @@ import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { BaseAccessBody } from "../type/AccessVerifiableCredential";
 import type { ConsentStatus } from "../type/ConsentStatus";
 
-// eslint-disable-next-line import/prefer-default-export
 export function setAccessVerifiableCredentialStatus<
   T extends BaseAccessBody & VerifiableCredential
 >(vc: T, consentStatus: ConsentStatus): T {

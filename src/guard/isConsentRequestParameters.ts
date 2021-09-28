@@ -22,7 +22,6 @@ import {
   AccessRequestParameters,
 } from "../type/Parameter";
 
-// eslint-disable-next-line import/prefer-default-export
 export function isConsentRequestParameters(
   params: unknown | AccessRequestParameters | ConsentRequestParameters
 ): params is ConsentRequestParameters {

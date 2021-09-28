@@ -33,7 +33,6 @@ import { RequestAccessWithConsentParameters } from "../type/RequestAccessWithCon
  * @param options Optional properties to customise the access request behaviour.
  * @returns A signed verifiable credential representing the access and consent request.
  */
-// eslint-disable-next-line import/prefer-default-export
 async function requestAccessWithConsent(
   params: RequestAccessWithConsentParameters,
   options: ConsentApiBaseOptions = {}

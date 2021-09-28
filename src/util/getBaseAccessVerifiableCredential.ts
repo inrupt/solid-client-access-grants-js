@@ -40,7 +40,6 @@ async function getVerifiableCredential(
   return (await issuerResponse.json()) as VerifiableCredential;
 }
 
-// eslint-disable-next-line import/prefer-default-export
 export async function getBaseAccessVerifiableCredential(
   vc: VerifiableCredential | URL | UrlString,
   options: ConsentApiBaseOptions

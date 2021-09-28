@@ -22,7 +22,6 @@ import {
   BaseConsentBody,
 } from "../type/AccessVerifiableCredential";
 
-// eslint-disable-next-line import/prefer-default-export
 export function isConsentRequest(
   request: BaseAccessBody | BaseConsentBody
 ): request is BaseConsentBody {

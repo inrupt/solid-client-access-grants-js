@@ -21,7 +21,6 @@ import { CONSENT_STATUS_REQUESTED } from "../constants";
 import { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import { isBaseAccessVerifiableCredential } from "./isBaseAccessVerifiableCredential";
 
-// eslint-disable-next-line import/prefer-default-export
 export function isAccessRequest(
   x: unknown
 ): x is AccessRequestBody & { issuanceDate: string } {
