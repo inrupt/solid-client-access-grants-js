@@ -29,8 +29,8 @@ import type { access, UrlString, WebId } from "@inrupt/solid-client";
  * - `resources`: Array of URLs of the Resources to which access is requested.
  */
 // TODO: Find out about the overlap with BaseRequestParameters (differs in status and resource owner)
-// TODO: There seems to be no use of resourceOwner. Find out about it.
-// TODO: Make requestorInboxUrl optional
+// TODO: Make requestorInboxUrl optional or align with the design document
+// This parameter if not present should be fetched from the profile according to the design document
 // TODO: Get rid of BaseRequestParameters in favour of this
 export type RequestAccessParameters = {
   access: Partial<access.Access>;
