@@ -23,7 +23,7 @@ import {
 } from "../type/Parameter";
 
 export function isConsentRequestParameters(
-  params: unknown | AccessRequestParameters | ConsentRequestParameters
+  params: AccessRequestParameters | ConsentRequestParameters
 ): params is ConsentRequestParameters {
   return (params as ConsentRequestParameters).purpose !== undefined;
 }

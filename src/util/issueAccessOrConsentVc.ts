@@ -111,9 +111,13 @@ export function getGrantBody(
   grant.credentialSubject.hasConsent.hasStatus = params.status;
   (grant as AccessGrantBody).credentialSubject.hasConsent.isProvidedTo =
     params.requestor;
-  if (isConsentRequestParameters(params)) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (isConsentRequestParameters(params as any)) {
     // This makes request a ConsentGrantBody
-    return getConsentBody(params, grant) as ConsentGrantBody;
+    return getConsentBody(
+      params as ConsentGrantParameters,
+      grant
+    ) as ConsentGrantBody;
   }
   return grant as AccessGrantBody;
 }
