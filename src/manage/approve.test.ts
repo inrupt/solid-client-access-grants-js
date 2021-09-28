@@ -24,10 +24,8 @@ import type {
   ConsentGrantBody,
 } from "../type/AccessVerifiableCredential";
 import { MOCKED_CONSENT_ISSUER } from "../request/request.mock";
-import {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-} from "./approve";
+import { approveAccessRequestWithConsent } from "./approveAccessRequestWithConsent";
+import { approveAccessRequest } from "./approveAccessRequest";
 import {
   mockAccessRequestVc,
   mockConsentEndpoint,

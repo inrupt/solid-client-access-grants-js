@@ -17,23 +17,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
-export type { RequestAccessParameters } from "./type/RequestAccessParameters";
-export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
-
-export {
-  cancelAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./request";
-
-export {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  revokeAccess,
-} from "./manage";
-
-export { isValidConsentGrant } from "./verify";
-
-export { getConsentApiEndpoint, getConsentManagementUi } from "./discover";
+/**
+ * Import this module for the consent API functions available to an entity
+ * requesting access over a resource:
+ * - `requestAccess`: A simple access request for a non-commercial entity;
+ * - `requestAccessWithConsent`: An access request including a purpose for
+ *   legally binding consent to access a resource;
+ * - `cancelAccessRequest`: For retracting an access request.
+ */
+export { cancelAccessRequest } from "./cancelAccessRequest";
+export { requestAccess } from "./requestAccess";
+export { requestAccessWithConsent } from "./requestAccessWithConsent";

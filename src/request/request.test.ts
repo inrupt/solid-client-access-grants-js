@@ -26,7 +26,7 @@ import {
 } from "@inrupt/solid-client-vc";
 import { requestAccess } from "./requestAccess";
 import { requestAccessWithConsent } from "./requestAccessWithConsent";
-import { getRequestBody } from "../internal/issueAccessOrConsentVc";
+import { getRequestBody } from "../util/issueAccessOrConsentVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import {
   mockAccessGrant,

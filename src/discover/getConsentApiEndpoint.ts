@@ -26,7 +26,7 @@ import {
 } from "@inrupt/solid-client";
 import { INRUPT_CONSENT_SERVICE } from "../constants";
 import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import { getSessionFetch } from "../internal/getSessionFetch";
+import { getSessionFetch } from "../util/getSessionFetch";
 
 async function getConsentEndpointForResource(
   resource: UrlString,

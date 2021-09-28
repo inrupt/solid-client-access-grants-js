@@ -21,9 +21,9 @@ import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
 import { CONSENT_STATUS_DENIED } from "../constants";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import { issueAccessOrConsentVc } from "../internal/issueAccessOrConsentVc";
-import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
-import { setAccessVerifiableCredentialStatus } from "../internal/setAccessVerifiableCredentialStatus";
+import { issueAccessOrConsentVc } from "../util/issueAccessOrConsentVc";
+import { getBaseAccessVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
+import { setAccessVerifiableCredentialStatus } from "../util/setAccessVerifiableCredentialStatus";
 
 /**
  * Deny an access request. The content of the denied access request is provided
@@ -35,8 +35,7 @@ import { setAccessVerifiableCredentialStatus } from "../internal/setAccessVerifi
  * @returns A Verifiable Credential representing the denied access.
  * @since Unreleased.
  */
-// eslint-disable-next-line import/prefer-default-export
-export async function denyAccessRequest(
+async function denyAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
   options: ConsentApiBaseOptions = {}
 ): Promise<VerifiableCredential> {
@@ -54,3 +53,7 @@ export async function denyAccessRequest(
     options
   );
 }
+
+export { denyAccessRequest };
+export default denyAccessRequest;
+export type { ConsentApiBaseOptions, VerifiableCredential, UrlString };

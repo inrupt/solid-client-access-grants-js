@@ -32,10 +32,10 @@
       "require": "./dist/index.js",
       "import": "./dist/index.mjs"
     },
-    "./approve": "./dist/approve/approve.mjs",
-    "./request": "./dist/request/request.mjs",
-    "./revoke": "./dist/request/revoke.mjs",
-    "./verify": "./dist/verify/verify.mjs"
+    "./discover": "./dist/discover/index.mjs",
+    "./manage": "./dist/manage/index.mjs",
+    "./request": "./dist/request/index.mjs",
+    "./verify": "./dist/verify/index.mjs"
   },
   "files": [
     "dist",

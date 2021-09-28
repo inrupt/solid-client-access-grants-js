@@ -23,8 +23,8 @@ import {
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import { getBaseAccessVerifiableCredential } from "../internal/getBaseAccessVerifiableCredential";
-import { getSessionFetch } from "../internal/getSessionFetch";
+import { getBaseAccessVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
+import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
  * Makes a request to the consent server to revoke a given VC.
@@ -33,15 +33,12 @@ import { getSessionFetch } from "../internal/getSessionFetch";
  * @param options Optional properties to customise the request behaviour.
  * @returns A void promise.
  */
-// eslint-disable-next-line import/prefer-default-export
-export async function revokeAccess(
+async function revokeAccess(
   vc: VerifiableCredential | URL | UrlString,
   options: ConsentApiBaseOptions = {}
 ): Promise<void> {
   const credential = await getBaseAccessVerifiableCredential(vc, options);
-  // TODO: Find out if this should take the optional consentEndpoint
-  // Potentially factor out the getConsentEndpoint taking VC or URL or UrlString and options
-  // TODO: Find out about the overlap with getConsentApiEndpoint
+
   return revokeVerifiableCredential(
     new URL("status", credential.issuer).href,
     credential.id,
@@ -50,3 +47,7 @@ export async function revokeAccess(
     }
   );
 }
+
+export { revokeAccess };
+export default revokeAccess;
+export type { ConsentApiBaseOptions, UrlString, VerifiableCredential };

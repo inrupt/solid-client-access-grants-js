@@ -21,7 +21,7 @@ import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   getRequestBody,
   issueAccessOrConsentVc,
-} from "../internal/issueAccessOrConsentVc";
+} from "../util/issueAccessOrConsentVc";
 import { CONSENT_STATUS_REQUESTED } from "../constants";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import type { RequestAccessParameters } from "../type/RequestAccessParameters";
@@ -33,8 +33,7 @@ import type { RequestAccessParameters } from "../type/RequestAccessParameters";
  * @param options Optional properties to customise the access request behaviour.
  * @returns A signed Verifiable Credential representing the access request.
  */
-// eslint-disable-next-line import/prefer-default-export
-export async function requestAccess(
+async function requestAccess(
   params: RequestAccessParameters,
   options: ConsentApiBaseOptions = {}
 ): Promise<VerifiableCredential> {
@@ -45,3 +44,11 @@ export async function requestAccess(
 
   return issueAccessOrConsentVc(params.requestor, consentRequest, options);
 }
+
+export { requestAccess };
+export default requestAccess;
+export type {
+  ConsentApiBaseOptions,
+  RequestAccessParameters,
+  VerifiableCredential,
+};

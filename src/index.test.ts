@@ -21,15 +21,15 @@
 /* eslint-disable no-shadow */
 import { describe, it, expect } from "@jest/globals";
 import {
+  approveAccessRequest,
+  approveAccessRequestWithConsent,
+  cancelAccessRequest,
+  denyAccessRequest,
+  getConsentApiEndpoint,
+  getConsentManagementUi,
   isValidConsentGrant,
   requestAccess,
   requestAccessWithConsent,
-  cancelAccessRequest,
-  getConsentApiEndpoint,
-  getConsentManagementUi,
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
   revokeAccess,
 } from "./index";
 

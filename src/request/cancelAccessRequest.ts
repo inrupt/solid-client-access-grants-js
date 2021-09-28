@@ -19,8 +19,8 @@
 
 import type { UrlString } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { revokeAccess } from "../manage/revokeAccess";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import { revokeAccess } from "../manage/revokeAccess";
 
 /**
  * Cancel a request for access to data (with explicit or implicit consent) before
@@ -32,10 +32,13 @@ import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
  * @returns A void promise
  * @since Unreleased
  */
-// eslint-disable-next-line import/prefer-default-export
-export async function cancelAccessRequest(
+async function cancelAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
   options: ConsentApiBaseOptions = {}
 ): Promise<void> {
   return revokeAccess(vc, options);
 }
+
+export { cancelAccessRequest };
+export default cancelAccessRequest;
+export type { ConsentApiBaseOptions, VerifiableCredential, UrlString };

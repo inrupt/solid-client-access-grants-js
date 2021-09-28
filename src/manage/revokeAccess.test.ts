@@ -27,7 +27,7 @@ import { mockAccessGrant, MOCKED_CREDENTIAL_ID } from "../request/request.mock";
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
 
-describe("revokeConsentGrant", () => {
+describe("revokeAccess", () => {
   it("defaults to the authenticated fetch from solid-client-authn-browser", async () => {
     const sca = jest.requireMock("@inrupt/solid-client-authn-browser") as {
       fetch: typeof global.fetch;
