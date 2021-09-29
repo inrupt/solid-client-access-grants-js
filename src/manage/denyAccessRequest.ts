@@ -33,7 +33,7 @@ import { setAccessVerifiableCredentialStatus } from "../util/setAccessVerifiable
  * not conform to an Access Request, the function will throw.
  * @param options Optional properties to customise the access denial behaviour.
  * @returns A Verifiable Credential representing the denied access.
- * @since Unreleased.
+ * @since 0.0.1
  */
 async function denyAccessRequest(
   vc: VerifiableCredential | URL | UrlString,

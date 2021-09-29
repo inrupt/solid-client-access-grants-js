@@ -38,7 +38,7 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
  * @param requestOverride Elements overriding information from the provided Verifiable Credential.
  * @param options Optional properties to customise the access grant behaviour.
  * @returns A Verifiable Credential representing the granted access.
- * @since Unreleased.
+ * @since 0.0.1.
  */
 export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
@@ -59,7 +59,7 @@ export async function approveAccessRequest(
  * @param requestOverride Claims constructing the Access Grant.
  * @param options Optional properties to customise the access grant behaviour.
  * @returns A Verifiable Credential representing the granted access.
- * @since Unreleased.
+ * @since 0.0.1.
  */
 export async function approveAccessRequest(
   requestVc: undefined,

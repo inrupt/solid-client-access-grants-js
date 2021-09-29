@@ -32,6 +32,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
  * @param vc Either a VC, or a URL to a VC, to be revoked.
  * @param options Optional properties to customise the request behaviour.
  * @returns A void promise.
+ * @since 0.0.1
  */
 async function revokeAccess(
   vc: VerifiableCredential | URL | UrlString,

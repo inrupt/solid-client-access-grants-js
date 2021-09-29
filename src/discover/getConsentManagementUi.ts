@@ -87,6 +87,8 @@ async function getConsentManagementUiFromWellKnown(
  *
  * @param webId The WebID of the user asked for consent.
  * @param options Optional properties to customise the access request behaviour.
+ * @returns The URL where the user should be redirected, if discoverable.
+ * @since 0.0.1
  */
 async function getConsentManagementUi(
   webId: URL | UrlString,

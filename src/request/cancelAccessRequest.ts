@@ -30,7 +30,7 @@ import { revokeAccess } from "../manage/revokeAccess";
  * @param vc The access request, either in the form of a VC URL or a full-fledged VC.
  * @param options Optional properties to customise the access request behaviour.
  * @returns A void promise
- * @since Unreleased
+ * @since 0.0.1
  */
 async function cancelAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
