@@ -32,6 +32,7 @@ import { RequestAccessWithConsentParameters } from "../type/RequestAccessWithCon
  * @param params Access to request and constraints on how that access will be used.
  * @param options Optional properties to customise the access request behaviour.
  * @returns A signed verifiable credential representing the access and consent request.
+ * @since 0.0.1
  */
 async function requestAccessWithConsent(
   params: RequestAccessWithConsentParameters,

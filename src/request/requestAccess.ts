@@ -32,6 +32,7 @@ import type { RequestAccessParameters } from "../type/RequestAccessParameters";
  * @param params Access to request.
  * @param options Optional properties to customise the access request behaviour.
  * @returns A signed Verifiable Credential representing the access request.
+ * @since 0.0.1
  */
 async function requestAccess(
   params: RequestAccessParameters,

@@ -57,6 +57,14 @@ async function getConsentEndpointForResource(
   return consentIri;
 }
 
+/**
+ * Discovers the endpoint where access requests may be created for a given resource.
+ *
+ * @param resource The resource for which access may be requested.
+ * @param options Optional properties to customise the access request behaviour.
+ * @returns The URL of the access request server.
+ * @since 0.0.1
+ */
 async function getConsentApiEndpoint(
   resource: URL | UrlString,
   options: ConsentApiBaseOptions

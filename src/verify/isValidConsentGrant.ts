@@ -32,6 +32,7 @@ import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
  * @param vc Either a VC, or a URL to a VC, to be verified.
  * @param options Optional properties to customise the request behaviour.
  * @returns An object containing checks, warnings, and errors.
+ * @since 0.0.1
  */
 // TODO: Rename to isValidAccessCredential and add isValidAccessWithConsentCredential
 // TODO: Push verification further as this just checks it's a valid VC should we not type check the consent grant?
