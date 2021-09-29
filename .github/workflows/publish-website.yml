@@ -38,7 +38,7 @@ jobs:
       run: |
         git config user.name $GITHUB_ACTOR
         git config user.email $GITHUB_ACTOR@users.noreply.github.com
-        git remote add gh-pages-remote https://x-access-token:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY.git
+        git remote add gh-pages-remote https://x-access-token:$GH_TOKEN@github.com/$GITHUB_REPOSITORY.git
         git fetch --no-recurse-submodules
         cd docs
         git worktree add ./gh-pages gh-pages
@@ -49,5 +49,5 @@ jobs:
         git commit --message="Deploying to GitHub Pages from $GITHUB_SHA"
         git push gh-pages-remote gh-pages:gh-pages
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         GITHUB_REPOSITORY: ${{ github.repository }}
