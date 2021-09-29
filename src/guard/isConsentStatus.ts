@@ -17,23 +17,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
-export type { RequestAccessParameters } from "./type/RequestAccessParameters";
-export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
+import { CONSENT_STATUS } from "../constants";
+import { ConsentStatus } from "../type/ConsentStatus";
 
-export {
-  cancelAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./request";
-
-export {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  revokeAccess,
-} from "./manage";
-
-export { isValidConsentGrant } from "./verify";
-
-export { getConsentApiEndpoint, getConsentManagementUi } from "./discover";
+export function isConsentStatus(x: unknown): x is ConsentStatus {
+  return typeof x === "string" && (CONSENT_STATUS as Set<string>).has(x);
+}

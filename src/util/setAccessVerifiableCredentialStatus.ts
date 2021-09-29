@@ -17,23 +17,21 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
-export type { RequestAccessParameters } from "./type/RequestAccessParameters";
-export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { BaseAccessBody } from "../type/AccessVerifiableCredential";
+import type { ConsentStatus } from "../type/ConsentStatus";
 
-export {
-  cancelAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./request";
-
-export {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  revokeAccess,
-} from "./manage";
-
-export { isValidConsentGrant } from "./verify";
-
-export { getConsentApiEndpoint, getConsentManagementUi } from "./discover";
+export function setAccessVerifiableCredentialStatus<
+  T extends BaseAccessBody & VerifiableCredential
+>(vc: T, consentStatus: ConsentStatus): T {
+  return {
+    ...vc,
+    credentialSubject: {
+      ...vc.credentialSubject,
+      hasConsent: {
+        ...vc.credentialSubject.hasConsent,
+        hasStatus: consentStatus,
+      },
+    },
+  };
+}

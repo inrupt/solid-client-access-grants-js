@@ -17,23 +17,37 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
-export type { RequestAccessParameters } from "./type/RequestAccessParameters";
-export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
+import type { access, UrlString } from "@inrupt/solid-client";
+import type {
+  CONSENT_STATUS_REQUESTED,
+  CONSENT_STATUS_EXPLICITLY_GIVEN,
+} from "../constants";
+import type { ConsentStatus } from "./ConsentStatus";
 
-export {
-  cancelAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./request";
+export type BaseRequestParameters = {
+  access: Partial<access.Access>;
+  requestor: UrlString;
+  requestorInboxUrl: UrlString;
+  resources: Array<UrlString>;
+  status: ConsentStatus;
+};
 
-export {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  revokeAccess,
-} from "./manage";
+export type BaseConsentParameters = {
+  purpose: Array<UrlString>;
+  issuanceDate?: Date;
+  expirationDate?: Date;
+};
 
-export { isValidConsentGrant } from "./verify";
+export type AccessRequestParameters = BaseRequestParameters & {
+  status: typeof CONSENT_STATUS_REQUESTED;
+};
 
-export { getConsentApiEndpoint, getConsentManagementUi } from "./discover";
+export type ConsentRequestParameters = AccessRequestParameters &
+  BaseConsentParameters;
+
+export type AccessGrantParameters = BaseRequestParameters & {
+  status: typeof CONSENT_STATUS_EXPLICITLY_GIVEN;
+};
+
+export type ConsentGrantParameters = AccessGrantParameters &
+  BaseConsentParameters;

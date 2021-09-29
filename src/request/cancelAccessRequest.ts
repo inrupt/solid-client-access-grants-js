@@ -17,23 +17,28 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
-export type { RequestAccessParameters } from "./type/RequestAccessParameters";
-export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
+import type { UrlString } from "@inrupt/solid-client";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import { revokeAccess } from "../manage/revokeAccess";
 
-export {
-  cancelAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./request";
+/**
+ * Cancel a request for access to data (with explicit or implicit consent) before
+ * the person being asked for consent has replied.
+ * This is equivalent to revoking a consent grant.
+ *
+ * @param vc The access request, either in the form of a VC URL or a full-fledged VC.
+ * @param options Optional properties to customise the access request behaviour.
+ * @returns A void promise
+ * @since Unreleased
+ */
+async function cancelAccessRequest(
+  vc: VerifiableCredential | URL | UrlString,
+  options: ConsentApiBaseOptions = {}
+): Promise<void> {
+  return revokeAccess(vc, options);
+}
 
-export {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  revokeAccess,
-} from "./manage";
-
-export { isValidConsentGrant } from "./verify";
-
-export { getConsentApiEndpoint, getConsentManagementUi } from "./discover";
+export { cancelAccessRequest };
+export default cancelAccessRequest;
+export type { ConsentApiBaseOptions, VerifiableCredential, UrlString };

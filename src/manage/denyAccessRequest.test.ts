@@ -19,9 +19,8 @@
 
 /* eslint-disable no-shadow */
 import { jest, it, describe, expect } from "@jest/globals";
-import { denyAccessRequest } from "./deny";
-import { mockConsentEndpoint } from "../approve/approve.mock";
-import { mockDenyAccessVc } from "./deny.mock";
+import { denyAccessRequest } from "./denyAccessRequest";
+import { mockAccessRequestVc, mockConsentEndpoint } from "./approve.mock";
 import { MOCKED_CONSENT_ISSUER } from "../request/request.mock";
 
 jest.mock("@inrupt/solid-client", () => {
@@ -53,7 +52,7 @@ describe("denyAccessRequest", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
 
-    await denyAccessRequest(mockDenyAccessVc());
+    await denyAccessRequest(mockAccessRequestVc());
 
     expect(mockedIssue).toHaveBeenCalledWith(
       expect.anything(),
@@ -70,7 +69,7 @@ describe("denyAccessRequest", () => {
     mockConsentEndpoint();
     await expect(
       denyAccessRequest({
-        ...mockDenyAccessVc(),
+        ...mockAccessRequestVc(),
         type: ["NotASolidConsentRequest"],
       })
     ).rejects.toThrow(
@@ -80,7 +79,7 @@ describe("denyAccessRequest", () => {
 
   it("throws if there is no well known consent endpoint", async () => {
     mockConsentEndpoint(false);
-    await expect(denyAccessRequest(mockDenyAccessVc())).rejects.toThrow(
+    await expect(denyAccessRequest(mockAccessRequestVc())).rejects.toThrow(
       "Cannot discover consent endpoint from [https://pod-provider.iri/resource/.well-known/solid]: the well-known document contains no value for property [http://inrupt.com/ns/ess#consentIssuer]."
     );
   });
@@ -93,12 +92,12 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await denyAccessRequest(mockDenyAccessVc(), {
+    await denyAccessRequest(mockAccessRequestVc(), {
       consentEndpoint: "https://some.consent-endpoint.override/",
       fetch: jest.fn(),
     });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      "https://some.consent-endpoint.override/",
+      "https://some.consent-endpoint.override/".concat("issue"),
       expect.anything(),
       expect.anything(),
       expect.anything(),
@@ -116,7 +115,7 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await denyAccessRequest(mockDenyAccessVc(), {
+    await denyAccessRequest(mockAccessRequestVc(), {
       fetch: mockedFetch,
     });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -137,21 +136,21 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await denyAccessRequest(mockDenyAccessVc(), {
+    await denyAccessRequest(mockAccessRequestVc(), {
       fetch: jest.fn(global.fetch),
     });
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      mockDenyAccessVc().credentialSubject.id,
+      mockAccessRequestVc().credentialSubject.id,
       expect.objectContaining({
         hasConsent: {
-          mode: mockDenyAccessVc().credentialSubject.hasConsent.mode,
+          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "ConsentStatusDenied",
           forPersonalData:
-            mockDenyAccessVc().credentialSubject.hasConsent.forPersonalData,
+            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
         },
-        inbox: mockDenyAccessVc().credentialSubject.inbox,
+        inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidConsentRequest"],
@@ -171,23 +170,25 @@ describe("denyAccessRequest", () => {
     );
     const mockedFetch = jest
       .fn(global.fetch)
-      .mockResolvedValueOnce(new Response(JSON.stringify(mockDenyAccessVc())));
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(mockAccessRequestVc()))
+      );
     await denyAccessRequest("https://some.credential", {
       fetch: mockedFetch,
     });
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      mockDenyAccessVc().credentialSubject.id,
+      mockAccessRequestVc().credentialSubject.id,
       expect.objectContaining({
-        id: mockDenyAccessVc().credentialSubject.id,
+        id: mockAccessRequestVc().credentialSubject.id,
         hasConsent: {
-          mode: mockDenyAccessVc().credentialSubject.hasConsent.mode,
+          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "ConsentStatusDenied",
           forPersonalData:
-            mockDenyAccessVc().credentialSubject.hasConsent.forPersonalData,
+            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
         },
-        inbox: mockDenyAccessVc().credentialSubject.inbox,
+        inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidConsentRequest"],
@@ -207,23 +208,25 @@ describe("denyAccessRequest", () => {
     );
     const mockedFetch = jest
       .fn(global.fetch)
-      .mockResolvedValueOnce(new Response(JSON.stringify(mockDenyAccessVc())));
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(mockAccessRequestVc()))
+      );
     await denyAccessRequest(new URL("https://some.credential"), {
       fetch: mockedFetch,
     });
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      mockDenyAccessVc().credentialSubject.id,
+      mockAccessRequestVc().credentialSubject.id,
       expect.objectContaining({
-        id: mockDenyAccessVc().credentialSubject.id,
+        id: mockAccessRequestVc().credentialSubject.id,
         hasConsent: {
-          mode: mockDenyAccessVc().credentialSubject.hasConsent.mode,
+          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "ConsentStatusDenied",
           forPersonalData:
-            mockDenyAccessVc().credentialSubject.hasConsent.forPersonalData,
+            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
         },
-        inbox: mockDenyAccessVc().credentialSubject.inbox,
+        inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidConsentRequest"],

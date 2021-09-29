@@ -16,22 +16,10 @@
 // HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+import type { RESOURCE_ACCESS_MODE } from "../constants";
 
-import { UrlString } from "@inrupt/solid-client";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { revokeVc } from "../consent.internal";
-import { ConsentGrantBaseOptions } from "../constants";
-
-/**
- * Makes a request to the consent server to revoke a given VC.
- *
- * @param vc Either a VC, or a URL to a VC, to be revoked.
- * @param options Optional properties to customise the request behaviour.
- * @returns A void promise.
- */
-export default async function revokeConsentGrant(
-  vc: VerifiableCredential | UrlString,
-  options: ConsentGrantBaseOptions = {}
-): Promise<void> {
-  return revokeVc(vc, options);
-}
+export type ResourceAccessMode = typeof RESOURCE_ACCESS_MODE extends Set<
+  infer T
+>
+  ? T
+  : never;

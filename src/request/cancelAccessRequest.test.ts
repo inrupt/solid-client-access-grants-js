@@ -17,17 +17,27 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-// This rule complains about the `@jest/globals` variables overriding global vars:
-/* eslint-disable no-shadow */
-import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
+// eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
-import revokeConsentGrant from "./revoke";
-import { mockAccessGrant, MOCKED_CREDENTIAL_ID } from "../request/request.mock";
+import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
+import { cancelAccessRequest } from "./cancelAccessRequest";
+import { mockAccessGrant, MOCKED_CREDENTIAL_ID } from "./request.mock";
 
+jest.mock("@inrupt/solid-client", () => {
+  // TypeScript can't infer the type of modules imported via Jest;
+  // skip type checking for those:
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
+  solidClientModule.getSolidDataset = jest.fn(
+    solidClientModule.getSolidDataset
+  );
+  solidClientModule.getWellKnownSolid = jest.fn();
+  return solidClientModule;
+});
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
 
-describe("revokeConsentGrant", () => {
+describe("cancelAccessRequest", () => {
   it("defaults to the authenticated fetch from solid-client-authn-browser", async () => {
     const sca = jest.requireMock("@inrupt/solid-client-authn-browser") as {
       fetch: typeof global.fetch;
@@ -48,7 +58,7 @@ describe("revokeConsentGrant", () => {
       mockedVcModule,
       "revokeVerifiableCredential"
     );
-    await revokeConsentGrant("https://some.credential");
+    await cancelAccessRequest("https://some.credential");
     expect(spiedRevoke).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
@@ -75,7 +85,7 @@ describe("revokeConsentGrant", () => {
           )
         )
       );
-    await revokeConsentGrant("https://some.credential", {
+    await cancelAccessRequest("https://some.credential", {
       fetch: mockedFetch,
     });
     expect(spiedRevoke).toHaveBeenCalledWith(
@@ -102,7 +112,7 @@ describe("revokeConsentGrant", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValue(new Response(JSON.stringify(mockedVc)));
-    await revokeConsentGrant(MOCKED_CREDENTIAL_ID, {
+    await cancelAccessRequest(MOCKED_CREDENTIAL_ID, {
       fetch: mockedFetch,
     });
     expect(mockedFetch).toHaveBeenCalledWith(MOCKED_CREDENTIAL_ID);
@@ -121,7 +131,7 @@ describe("revokeConsentGrant", () => {
       })
     );
     await expect(
-      revokeConsentGrant("https://some.credential", { fetch: mockedFetch })
+      cancelAccessRequest("https://some.credential", { fetch: mockedFetch })
     ).rejects.toThrow(/\[https:\/\/some.credential\].*401.*Unauthorized/);
   });
 
@@ -134,7 +144,7 @@ describe("revokeConsentGrant", () => {
       "revokeVerifiableCredential"
     );
     const mockedFetch = jest.fn(global.fetch);
-    await revokeConsentGrant(
+    await cancelAccessRequest(
       mockAccessGrant("https://some.issuer", "https://some.subject"),
       {
         fetch: mockedFetch,

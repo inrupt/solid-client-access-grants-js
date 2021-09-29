@@ -21,15 +21,16 @@
 /* eslint-disable no-shadow */
 import { describe, it, expect } from "@jest/globals";
 import {
+  approveAccessRequest,
+  approveAccessRequestWithConsent,
+  cancelAccessRequest,
+  denyAccessRequest,
+  getConsentApiEndpoint,
+  getConsentManagementUi,
   isValidConsentGrant,
   requestAccess,
   requestAccessWithConsent,
-  cancelAccessRequest,
-  getConsentApiEndpoint,
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  revokeConsentGrant,
+  revokeAccess,
 } from "./index";
 
 describe("Index exports", () => {
@@ -39,9 +40,10 @@ describe("Index exports", () => {
     expect(cancelAccessRequest).toBeDefined();
     expect(denyAccessRequest).toBeDefined();
     expect(getConsentApiEndpoint).toBeDefined();
+    expect(getConsentManagementUi).toBeDefined();
     expect(isValidConsentGrant).toBeDefined();
     expect(requestAccess).toBeDefined();
     expect(requestAccessWithConsent).toBeDefined();
-    expect(revokeConsentGrant).toBeDefined();
+    expect(revokeAccess).toBeDefined();
   });
 });

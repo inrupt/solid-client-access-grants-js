@@ -17,16 +17,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { UrlString } from "@inrupt/solid-client";
+import type { UrlString } from "@inrupt/solid-client";
 import {
   isVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { ConsentGrantBaseOptions } from "../constants";
-import {
-  getConsentEndpointForResource,
-  getDefaultSessionFetch,
-} from "../consent.internal";
+import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import { getSessionFetch } from "../util/getSessionFetch";
+import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
 
 /**
  * Makes a request to the consent server to verify the validity of a given VC.
@@ -35,11 +33,13 @@ import {
  * @param options Optional properties to customise the request behaviour.
  * @returns An object containing checks, warnings, and errors.
  */
-export default async function isValidConsentGrant(
-  vc: VerifiableCredential | UrlString,
-  options: ConsentGrantBaseOptions = {}
+// TODO: Rename to isValidAccessCredential and add isValidAccessWithConsentCredential
+// TODO: Push verification further as this just checks it's a valid VC should we not type check the consent grant?
+async function isValidConsentGrant(
+  vc: VerifiableCredential | URL | UrlString,
+  options: ConsentApiBaseOptions = {}
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
-  const fetcher = options.fetch ?? (await getDefaultSessionFetch());
+  const fetcher = await getSessionFetch(options);
 
   let vcObject = vc;
   if (typeof vc === "string") {
@@ -60,7 +60,7 @@ export default async function isValidConsentGrant(
 
   const consentEndpoint =
     options.consentEndpoint ??
-    (await getConsentEndpointForResource(credentialSubjectId, fetcher));
+    (await getConsentApiEndpoint(credentialSubjectId, { fetch: fetcher }));
   const consentVerifyEndpoint = `${consentEndpoint}/verify`;
 
   const response = await fetcher(consentVerifyEndpoint, {
@@ -75,3 +75,7 @@ export default async function isValidConsentGrant(
 
   return response.json();
 }
+
+export { isValidConsentGrant };
+export default isValidConsentGrant;
+export type { ConsentApiBaseOptions, UrlString, VerifiableCredential };

@@ -17,23 +17,29 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
-export type { RequestAccessParameters } from "./type/RequestAccessParameters";
-export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
+import { fetch as crossFetch } from "cross-fetch";
+import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 
-export {
-  cancelAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./request";
+/**
+ * Dynamically import solid-client-authn-browser so that
+ * this library doesn't have a hard dependency.
+ *
+ * @returns fetch function
+ */
+export async function getSessionFetch(
+  options: ConsentApiBaseOptions
+): Promise<typeof fetch> {
+  if (options.fetch) {
+    return options.fetch;
+  }
+  try {
+    const { fetch: fetchFn } = await import(
+      "@inrupt/solid-client-authn-browser"
+    );
 
-export {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  revokeAccess,
-} from "./manage";
-
-export { isValidConsentGrant } from "./verify";
-
-export { getConsentApiEndpoint, getConsentManagementUi } from "./discover";
+    return fetchFn;
+  } catch (e) {
+    /* istanbul ignore next: @inrupt/solid-client-authn-browser is a devDependency, so this path is not hit in tests: */
+    return crossFetch;
+  }
+}

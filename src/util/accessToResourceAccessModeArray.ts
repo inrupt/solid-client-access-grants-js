@@ -17,33 +17,33 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { CONSENT_CONTEXT } from "../constants";
-import { BaseAccessBody } from "../consent.internal";
+import { access } from "@inrupt/solid-client";
+import {
+  RESOURCE_ACCESS_MODE_READ,
+  RESOURCE_ACCESS_MODE_APPEND,
+  RESOURCE_ACCESS_MODE_WRITE,
+  RESOURCE_ACCESS_MODE_CONTROL,
+} from "../constants";
+import { ResourceAccessMode } from "../type/ResourceAccessMode";
 
-// eslint-disable-next-line import/prefer-default-export
-export const mockDenyAccessVc = (): VerifiableCredential & BaseAccessBody => {
-  return {
-    "@context": CONSENT_CONTEXT,
-    id: "https://some.credential",
-    credentialSubject: {
-      id: "https://some.requestor",
-      hasConsent: {
-        forPersonalData: ["https://some.resource"],
-        hasStatus: "ConsentStatusRequested",
-        mode: ["Read"],
-      },
-      inbox: "https://some.inbox",
-    },
-    issuanceDate: "some ISO date",
-    issuer: "https://some.issuer",
-    proof: {
-      created: "some ISO date",
-      proofPurpose: "some proof purpose",
-      proofValue: "some proof",
-      type: "some proof type",
-      verificationMethod: "some method",
-    },
-    type: ["SolidConsentRequest"],
-  };
-};
+export function accessToResourceAccessModeArray(
+  desiredAccess: Partial<access.Access>
+): ResourceAccessMode[] {
+  const modes: ResourceAccessMode[] = [];
+  if (desiredAccess.read === true) {
+    modes.push(RESOURCE_ACCESS_MODE_READ);
+  }
+  if (desiredAccess.append === true) {
+    modes.push(RESOURCE_ACCESS_MODE_APPEND);
+  }
+  if (desiredAccess.write === true) {
+    modes.push(RESOURCE_ACCESS_MODE_WRITE);
+  }
+  if (
+    desiredAccess.controlRead === true ||
+    desiredAccess.controlWrite === true
+  ) {
+    modes.push(RESOURCE_ACCESS_MODE_CONTROL);
+  }
+  return modes;
+}

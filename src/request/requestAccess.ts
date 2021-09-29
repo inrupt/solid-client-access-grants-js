@@ -17,23 +17,38 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
-export type { RequestAccessParameters } from "./type/RequestAccessParameters";
-export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import {
+  getRequestBody,
+  issueAccessOrConsentVc,
+} from "../util/issueAccessOrConsentVc";
+import { CONSENT_STATUS_REQUESTED } from "../constants";
+import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import type { RequestAccessParameters } from "../type/RequestAccessParameters";
 
-export {
-  cancelAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./request";
+/**
+ * Request access to a given Resource.
+ *
+ * @param params Access to request.
+ * @param options Optional properties to customise the access request behaviour.
+ * @returns A signed Verifiable Credential representing the access request.
+ */
+async function requestAccess(
+  params: RequestAccessParameters,
+  options: ConsentApiBaseOptions = {}
+): Promise<VerifiableCredential> {
+  const consentRequest = getRequestBody({
+    ...params,
+    status: CONSENT_STATUS_REQUESTED,
+  });
 
-export {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  revokeAccess,
-} from "./manage";
+  return issueAccessOrConsentVc(params.requestor, consentRequest, options);
+}
 
-export { isValidConsentGrant } from "./verify";
-
-export { getConsentApiEndpoint, getConsentManagementUi } from "./discover";
+export { requestAccess };
+export default requestAccess;
+export type {
+  ConsentApiBaseOptions,
+  RequestAccessParameters,
+  VerifiableCredential,
+};

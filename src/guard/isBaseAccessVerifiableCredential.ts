@@ -17,23 +17,29 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
-export type { RequestAccessParameters } from "./type/RequestAccessParameters";
-export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
+import { CREDENTIAL_TYPE } from "../constants";
+import { BaseAccessBody } from "../type/AccessVerifiableCredential";
+import { isUnknownObject } from "./isUnknownObject";
+import { isConsentContext } from "./isConsentContext";
+import { isConsentStatus } from "./isConsentStatus";
 
-export {
-  cancelAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./request";
-
-export {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  revokeAccess,
-} from "./manage";
-
-export { isValidConsentGrant } from "./verify";
-
-export { getConsentApiEndpoint, getConsentManagementUi } from "./discover";
+// TODO: Fix type checking
+export function isBaseAccessVerifiableCredential(
+  x: unknown
+): x is BaseAccessBody {
+  return (
+    isUnknownObject(x) &&
+    isConsentContext(x["@context"]) &&
+    Array.isArray(x.type) &&
+    x.type.includes(CREDENTIAL_TYPE) &&
+    isUnknownObject(x.credentialSubject) &&
+    typeof x.credentialSubject.id === "string" &&
+    isUnknownObject(x.credentialSubject.hasConsent) &&
+    // TODO: Add mode check
+    "mode" in x.credentialSubject.hasConsent &&
+    isConsentStatus(x.credentialSubject.hasConsent.hasStatus) &&
+    // TODO: Add Array of string check
+    Array.isArray(x.credentialSubject.hasConsent.forPersonalData) &&
+    typeof x.credentialSubject.inbox === "string"
+  );
+}

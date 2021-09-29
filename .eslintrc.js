@@ -18,6 +18,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 module.exports = {
   extends: ["@inrupt/eslint-config-lib"],
+  rules: {
+    "import/prefer-default-export": "off",
+  },
   settings: {
     "import/extensions": [".mjs", ".js"],
     "import/resolver": {

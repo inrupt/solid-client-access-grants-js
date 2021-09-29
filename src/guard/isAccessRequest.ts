@@ -17,23 +17,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
-export type { RequestAccessParameters } from "./type/RequestAccessParameters";
-export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
+import { CONSENT_STATUS_REQUESTED } from "../constants";
+import { AccessRequestBody } from "../type/AccessVerifiableCredential";
+import { isBaseAccessVerifiableCredential } from "./isBaseAccessVerifiableCredential";
 
-export {
-  cancelAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./request";
-
-export {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  revokeAccess,
-} from "./manage";
-
-export { isValidConsentGrant } from "./verify";
-
-export { getConsentApiEndpoint, getConsentManagementUi } from "./discover";
+export function isAccessRequest(
+  x: unknown
+): x is AccessRequestBody & { issuanceDate: string } {
+  return (
+    isBaseAccessVerifiableCredential(x) &&
+    x.credentialSubject.hasConsent.hasStatus === CONSENT_STATUS_REQUESTED &&
+    typeof x.issuanceDate === "string"
+  );
+}
