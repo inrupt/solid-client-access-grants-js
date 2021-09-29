@@ -6,30 +6,25 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+The following changes have been released:
+
+## [0.0.1] - 2021-09-29
+
+### New features
+
+- `requestAccess` and `requestAccessWithConsent`: As an entity wanting to access
+  data under a user's control, create an access request. The access request may
+  be associated to an explicit user consent for a given purpose.
 - `approveAccessRequest` and `approveAccessRequestWithConsent`: As a person controlling
   some data, grant access to an entity to this data, potentially with your explicit
   consent for a given purpose.
 - `cancelAccessRequest`: Cancel a pending access request.
-- `getConsentApiEndpoint`: Discover the URL of a consent app where a user prefers
+- `denyAccessRequest`: As a person controlling some data, deny access to an entity
+  to this data.
+- `getConsentApiEndpoint`: Discover the URL where access requests may be created for
+   a given resource.
+- `getConsentManagementUi`: Discover the URL of a consent app where a user prefers
   to be redirected when prompted for consent.
 - `isValidConsentGrant`: Verify if a consent grant is valid (correct signature, issuer key match...).
   The verification is done at a remote endpoint, and not client-side.
-- `revokeConsentGrant`: Revoke a consent grant.
-
-### New features
-
-## [0.0.1] - 2021-03-04
-
-=======
-
-### Dependency change
-
-- Lorem Ipsum
-
-### Bugs fixed
-
-- Dolor sit anet
-
-### New features
-
-- And so on
+- `revokeAccess`: Revoke a consent grant.
