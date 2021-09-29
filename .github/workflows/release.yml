@@ -27,7 +27,7 @@ jobs:
         # The deployment runs in parallel with CI, so status checks will never have succeeded yet:
         required_contexts: '[]'
       env:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_TOKEN: "${{ secrets.GH_TOKEN }}"
 
   publish-npm:
     runs-on: ubuntu-20.04
@@ -47,7 +47,7 @@ jobs:
         state: in_progress
         mediaType: '{"previews": ["flash", "ant-man"]}'
       env:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_TOKEN: "${{ secrets.GH_TOKEN }}"
     - name: Prepare for publication to npm
       uses: actions/setup-node@v2.1.5
       with:
@@ -56,7 +56,7 @@ jobs:
     - run: npm ci
     - name: Publish to npm
       run: |
-        npm publish --access public
+        npm publish
         echo "Package published. To install, run:"
         echo ""
         echo "    npm install @inrupt/solid-client-consent"
@@ -75,7 +75,7 @@ jobs:
         mediaType: '{"previews": ["flash", "ant-man"]}'
         state: success
       env:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_TOKEN: "${{ secrets.GH_TOKEN }}"
     - name: Mark GitHub Deployment as failed
       uses: octokit/request-action@v2.x
       if: failure()
@@ -89,7 +89,7 @@ jobs:
         mediaType: '{"previews": ["flash", "ant-man"]}'
         state: failure
       env:
-        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        GITHUB_TOKEN: "${{ secrets.GH_TOKEN }}"
     - name: Waiting for npm CDNs to update...
       run: |
         echo "Giving npm some time to make the newly-published package available…"
@@ -194,6 +194,5 @@ jobs:
         E2E_TEST_ESS_NOTIFICATION_GATEWAY: ${{secrets.E2E_TEST_ESS_PROD_NOTIFICATION_GATEWAY}}
         E2E_TEST_ESS_POD: ${{ secrets.E2E_TEST_ESS_PROD_POD }}
         E2E_TEST_ESS_IDP_URL: ${{ secrets.E2E_TEST_ESS_PROD_IDP_URL }}
-        E2E_TEST_ESS_REFRESH_TOKEN: ${{ secrets.E2E_TEST_ESS_PROD_REFRESH_TOKEN }}
         E2E_TEST_ESS_CLIENT_ID: ${{ secrets.E2E_TEST_ESS_PROD_CLIENT_ID }}
         E2E_TEST_ESS_CLIENT_SECRET: ${{ secrets.E2E_TEST_ESS_PROD_CLIENT_SECRET }}
