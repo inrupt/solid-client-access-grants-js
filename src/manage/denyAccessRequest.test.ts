@@ -146,7 +146,7 @@ describe("denyAccessRequest", () => {
       expect.objectContaining({
         hasConsent: {
           mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
-          hasStatus: "ConsentStatusDenied",
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
             mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
         },
@@ -184,7 +184,7 @@ describe("denyAccessRequest", () => {
         id: mockAccessRequestVc().credentialSubject.id,
         hasConsent: {
           mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
-          hasStatus: "ConsentStatusDenied",
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
             mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
         },
@@ -222,7 +222,7 @@ describe("denyAccessRequest", () => {
         id: mockAccessRequestVc().credentialSubject.id,
         hasConsent: {
           mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
-          hasStatus: "ConsentStatusDenied",
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
             mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
         },

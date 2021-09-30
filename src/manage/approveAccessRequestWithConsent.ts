@@ -25,7 +25,7 @@ import {
 } from "../util/issueAccessOrConsentVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import { isConsentRequest } from "../guard/isConsentRequest";
-import { CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
+import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
 import { getBaseAccessVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
@@ -114,7 +114,7 @@ export async function approveAccessRequestWithConsent(
     requestor: initialisedOptions.requestor,
     resources: initialisedOptions.resources,
     requestorInboxUrl: initialisedOptions.requestorInboxIri,
-    status: CONSENT_STATUS_EXPLICITLY_GIVEN,
+    status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
     purpose: initialisedOptions.purpose,
     issuanceDate: initialisedOptions.issuanceDate,
     expirationDate: initialisedOptions.expirationDate,

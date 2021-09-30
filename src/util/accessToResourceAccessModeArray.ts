@@ -19,10 +19,10 @@
 
 import { access } from "@inrupt/solid-client";
 import {
-  RESOURCE_ACCESS_MODE_READ,
-  RESOURCE_ACCESS_MODE_APPEND,
-  RESOURCE_ACCESS_MODE_WRITE,
-  RESOURCE_ACCESS_MODE_CONTROL,
+  ACL_RESOURCE_ACCESS_MODE_READ,
+  ACL_RESOURCE_ACCESS_MODE_APPEND,
+  ACL_RESOURCE_ACCESS_MODE_WRITE,
+  ACL_RESOURCE_ACCESS_MODE_CONTROL,
 } from "../constants";
 import { ResourceAccessMode } from "../type/ResourceAccessMode";
 
@@ -31,19 +31,19 @@ export function accessToResourceAccessModeArray(
 ): ResourceAccessMode[] {
   const modes: ResourceAccessMode[] = [];
   if (desiredAccess.read === true) {
-    modes.push(RESOURCE_ACCESS_MODE_READ);
+    modes.push(ACL_RESOURCE_ACCESS_MODE_READ);
   }
   if (desiredAccess.append === true) {
-    modes.push(RESOURCE_ACCESS_MODE_APPEND);
+    modes.push(ACL_RESOURCE_ACCESS_MODE_APPEND);
   }
   if (desiredAccess.write === true) {
-    modes.push(RESOURCE_ACCESS_MODE_WRITE);
+    modes.push(ACL_RESOURCE_ACCESS_MODE_WRITE);
   }
   if (
     desiredAccess.controlRead === true ||
     desiredAccess.controlWrite === true
   ) {
-    modes.push(RESOURCE_ACCESS_MODE_CONTROL);
+    modes.push(ACL_RESOURCE_ACCESS_MODE_CONTROL);
   }
   return modes;
 }

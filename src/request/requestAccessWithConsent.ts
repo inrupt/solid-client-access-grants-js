@@ -22,7 +22,7 @@ import {
   getRequestBody,
   issueAccessOrConsentVc,
 } from "../util/issueAccessOrConsentVc";
-import { CONSENT_STATUS_REQUESTED } from "../constants";
+import { GC_CONSENT_STATUS_REQUESTED } from "../constants";
 import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { RequestAccessWithConsentParameters } from "../type/RequestAccessWithConsentParameters";
 
@@ -40,7 +40,7 @@ async function requestAccessWithConsent(
 ): Promise<VerifiableCredential> {
   const consentRequest = getRequestBody({
     ...params,
-    status: CONSENT_STATUS_REQUESTED,
+    status: GC_CONSENT_STATUS_REQUESTED,
   });
   return issueAccessOrConsentVc(params.requestor, consentRequest, options);
 }

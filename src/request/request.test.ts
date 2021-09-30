@@ -61,7 +61,7 @@ describe("getConsentRequestBody", () => {
       access: { append: true },
       requestor: MOCK_REQUESTOR_IRI,
       resources: ["https://some.pod/resource"],
-      status: "ConsentStatusRequested",
+      status: "https://w3id.org/GConsent#ConsentStatusRequested",
       requestorInboxUrl: MOCK_REQUESTOR_INBOX,
     });
 
@@ -73,8 +73,8 @@ describe("getConsentRequestBody", () => {
       credentialSubject: {
         hasConsent: {
           forPersonalData: ["https://some.pod/resource"],
-          hasStatus: "ConsentStatusRequested",
-          mode: ["Append"],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+          mode: ["http://www.w3.org/ns/auth/acl#Append"],
         },
         id: MOCK_REQUESTOR_IRI,
         inbox: MOCK_REQUESTOR_INBOX,
@@ -97,7 +97,7 @@ describe("getConsentRequestBody", () => {
       expirationDate: new Date(Date.UTC(1990, 10, 12, 13, 37, 42, 42)),
       purpose: ["https://some.vocab/purpose#save-the-world"],
       requestorInboxUrl: "https://some.pod/inbox/",
-      status: "ConsentStatusRequested",
+      status: "https://w3id.org/GConsent#ConsentStatusRequested",
     });
 
     expect(consentRequestBody).toStrictEqual({
@@ -109,8 +109,12 @@ describe("getConsentRequestBody", () => {
         hasConsent: {
           forPersonalData: ["https://some.pod/resource"],
           forPurpose: ["https://some.vocab/purpose#save-the-world"],
-          hasStatus: "ConsentStatusRequested",
-          mode: ["Read", "Write", "Control"],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+          mode: [
+            "http://www.w3.org/ns/auth/acl#Read",
+            "http://www.w3.org/ns/auth/acl#Write",
+            "http://www.w3.org/ns/auth/acl#Control",
+          ],
         },
         id: MOCK_REQUESTOR_IRI,
         inbox: "https://some.pod/inbox/",
@@ -156,8 +160,8 @@ describe("requestAccess", () => {
       expect.objectContaining({
         id: MOCK_REQUESTOR_IRI,
         hasConsent: {
-          mode: ["Read"],
-          hasStatus: "ConsentStatusRequested",
+          mode: ["http://www.w3.org/ns/auth/acl#Read"],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
           forPersonalData: ["https://some.pod/resource"],
         },
       }),
@@ -238,8 +242,8 @@ describe("requestAccessWithConsent", () => {
       expect.objectContaining({
         id: MOCK_REQUESTOR_IRI,
         hasConsent: {
-          mode: ["Read"],
-          hasStatus: "ConsentStatusRequested",
+          mode: ["http://www.w3.org/ns/auth/acl#Read"],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
           forPersonalData: ["https://some.pod/resource"],
           forPurpose: ["https://some.vocab/purpose#save-the-world"],
         },
@@ -282,8 +286,8 @@ describe("requestAccessWithConsent", () => {
       expect.objectContaining({
         id: MOCK_REQUESTOR_IRI,
         hasConsent: {
-          mode: ["Read"],
-          hasStatus: "ConsentStatusRequested",
+          mode: ["http://www.w3.org/ns/auth/acl#Read"],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
           forPersonalData: ["https://some.pod/resource"],
           forPurpose: ["https://some.vocab/purpose#save-the-world"],
         },
@@ -367,7 +371,7 @@ describe("isAccessRequest", () => {
           id: "https://some.id",
           inbox: "https://some.inbox",
           hasConsent: {
-            hasStatus: "ConsentStatusRequested",
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
             forPersonalData: ["https://some.resource"],
           },
         },
@@ -410,7 +414,7 @@ describe("isAccessRequest", () => {
           inbox: "https://some.inbox",
           hasConsent: {
             mode: ["some mode"],
-            hasStatus: "ConsentStatusRequested",
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
           },
         },
         id: "https://some.credential",
@@ -430,7 +434,7 @@ describe("isAccessRequest", () => {
           id: "https://some.id",
           hasConsent: {
             mode: ["some mode"],
-            hasStatus: "ConsentStatusRequested",
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
             forPersonalData: ["https://some.resource"],
           },
         },
@@ -452,7 +456,7 @@ describe("isAccessRequest", () => {
           inbox: "https://some.inbox",
           hasConsent: {
             mode: ["some mode"],
-            hasStatus: "ConsentStatusRequested",
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
             forPersonalData: ["https://some.resource"],
           },
         },
@@ -474,7 +478,7 @@ describe("isAccessRequest", () => {
           inbox: "https://some.inbox",
           hasConsent: {
             mode: ["some mode"],
-            hasStatus: "ConsentStatusRequested",
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
             forPersonalData: ["https://some.resource"],
           },
         },

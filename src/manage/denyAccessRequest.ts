@@ -19,7 +19,7 @@
 
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
-import { CONSENT_STATUS_DENIED } from "../constants";
+import { GC_CONSENT_STATUS_DENIED } from "../constants";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { issueAccessOrConsentVc } from "../util/issueAccessOrConsentVc";
 import { getBaseAccessVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
@@ -44,7 +44,7 @@ async function denyAccessRequest(
 
   const deniedAccessOrConsentVc = setAccessVerifiableCredentialStatus(
     baseAccessVerifiableCredential,
-    CONSENT_STATUS_DENIED
+    GC_CONSENT_STATUS_DENIED
   );
 
   return issueAccessOrConsentVc(

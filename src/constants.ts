@@ -22,13 +22,29 @@ export const AS_ANNOUNCE = "https://www.w3.org/ns/activitystreams#Announce";
 export const AS_OBJECT = "https://www.w3.org/ns/activitystreams#object";
 export const AS_SUMMARY = "https://www.w3.org/ns/activitystreams#summary";
 
+// TODO: Check that these are actually the modes you can request.
+//       The Server API doc does refer to `acl:` as a prefix,
+//       although that is not listed in the example context.
+export const ACL_RESOURCE_ACCESS_MODE_APPEND =
+  "http://www.w3.org/ns/auth/acl#Append";
+export const ACL_RESOURCE_ACCESS_MODE_CONTROL =
+  "http://www.w3.org/ns/auth/acl#Control";
+export const ACL_RESOURCE_ACCESS_MODE_READ =
+  "http://www.w3.org/ns/auth/acl#Read";
+export const ACL_RESOURCE_ACCESS_MODE_WRITE =
+  "http://www.w3.org/ns/auth/acl#Write";
+
 export const GC_CONSENT = "https://w3id.org/GConsent#Consent";
 export const GC_FOR_PERSONAL_DATA = "https://w3id.org/GConsent#forPersonalData";
 export const GC_FOR_PURPOSE = "https://w3id.org/GConsent#forPurpose";
 export const GC_HAS_EXPIRY = "https://w3id.org/GConsent#hasExpiry";
 export const GC_HAS_STATUS = "https://w3id.org/GConsent#hasStatus";
 export const GC_IS_PROVIDED_TO = "https://w3id.org/GConsent#isProvidedTo";
-export const GC_STATUS_REQUESTED =
+export const GC_CONSENT_STATUS_DENIED =
+  "https://w3id.org/GConsent#ConsentStatusDenied";
+export const GC_CONSENT_STATUS_EXPLICITLY_GIVEN =
+  "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven";
+export const GC_CONSENT_STATUS_REQUESTED =
   "https://w3id.org/GConsent#ConsentStatusRequested";
 
 export const SOLID_VC_ISSUER = "http://www.w3.org/ns/solid/terms#vcIssuer";
@@ -51,27 +67,15 @@ export const INRUPT_CONSENT_SERVICE = "http://inrupt.com/ns/ess#consentIssuer";
 
 export const CREDENTIAL_TYPE = "SolidConsentRequest";
 
-export const CONSENT_STATUS_DENIED = "ConsentStatusDenied";
-export const CONSENT_STATUS_EXPLICITLY_GIVEN = "ConsentStatusExplicitlyGiven";
-export const CONSENT_STATUS_REQUESTED = "ConsentStatusRequested";
-
 export const CONSENT_STATUS = new Set([
-  CONSENT_STATUS_DENIED,
-  CONSENT_STATUS_EXPLICITLY_GIVEN,
-  CONSENT_STATUS_REQUESTED,
+  GC_CONSENT_STATUS_DENIED,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+  GC_CONSENT_STATUS_REQUESTED,
 ] as const);
 
-// TODO: Check that these are actually the modes you can request.
-//       The Server API doc does refer to `acl:` as a prefix,
-//       although that is not listed in the example context.
-export const RESOURCE_ACCESS_MODE_APPEND = "Append";
-export const RESOURCE_ACCESS_MODE_CONTROL = "Control";
-export const RESOURCE_ACCESS_MODE_READ = "Read";
-export const RESOURCE_ACCESS_MODE_WRITE = "Write";
-
 export const RESOURCE_ACCESS_MODE = new Set([
-  RESOURCE_ACCESS_MODE_APPEND,
-  RESOURCE_ACCESS_MODE_CONTROL,
-  RESOURCE_ACCESS_MODE_READ,
-  RESOURCE_ACCESS_MODE_WRITE,
+  ACL_RESOURCE_ACCESS_MODE_APPEND,
+  ACL_RESOURCE_ACCESS_MODE_CONTROL,
+  ACL_RESOURCE_ACCESS_MODE_READ,
+  ACL_RESOURCE_ACCESS_MODE_WRITE,
 ] as const);

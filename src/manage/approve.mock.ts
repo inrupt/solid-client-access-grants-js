@@ -49,8 +49,8 @@ export const mockAccessRequestVc = (): VerifiableCredential &
       id: "https://some.requestor",
       hasConsent: {
         forPersonalData: ["https://some.resource"],
-        hasStatus: "ConsentStatusRequested",
-        mode: ["Read"],
+        hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+        mode: ["http://www.w3.org/ns/auth/acl#Read"],
       },
       inbox: "https://some.inbox",
     },
