@@ -57,5 +57,10 @@ export default {
       },
     }),
   ],
-  external: [],
+  external: [
+    "@inrupt/solid-client",
+    "@inrupt/solid-client-authn-browser",
+    "@inrupt/solid-client-vc",
+    "cross-fetch",
+  ],
 };
