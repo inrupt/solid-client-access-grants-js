@@ -8,6 +8,12 @@ The following changes have been implemented but not released yet:
 
 The following changes have been released:
 
+## [0.0.2] - 2021-09-30
+
+### Bugfix
+
+- Fixed missing dependencies which failed the build using bundlers such as Webpack or Parcel.
+
 ## [0.0.1] - 2021-09-29
 
 ### New features
@@ -22,7 +28,7 @@ The following changes have been released:
 - `denyAccessRequest`: As a person controlling some data, deny access to an entity
   to this data.
 - `getConsentApiEndpoint`: Discover the URL where access requests may be created for
-   a given resource.
+  a given resource.
 - `getConsentManagementUi`: Discover the URL of a consent app where a user prefers
   to be redirected when prompted for consent.
 - `isValidConsentGrant`: Verify if a consent grant is valid (correct signature, issuer key match...).
