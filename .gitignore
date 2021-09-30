@@ -12,3 +12,4 @@ docs/dist/
 docs/.DS_Store
 .env*.local
 .cache
+.github/workflows/cd-packaging-tests/node/package-lock.json
