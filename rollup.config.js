@@ -58,9 +58,7 @@ export default {
     }),
   ],
   external: [
-    "@inrupt/solid-client",
+    ...Object.keys(pkg.dependencies || {}),
     "@inrupt/solid-client-authn-browser",
-    "@inrupt/solid-client-vc",
-    "cross-fetch",
   ],
 };
