@@ -19,8 +19,8 @@
 
 import type { access, UrlString } from "@inrupt/solid-client";
 import type {
-  CONSENT_STATUS_REQUESTED,
-  CONSENT_STATUS_EXPLICITLY_GIVEN,
+  GC_CONSENT_STATUS_REQUESTED,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
 import type { ConsentStatus } from "./ConsentStatus";
 
@@ -39,14 +39,14 @@ export type BaseConsentParameters = {
 };
 
 export type AccessRequestParameters = BaseRequestParameters & {
-  status: typeof CONSENT_STATUS_REQUESTED;
+  status: typeof GC_CONSENT_STATUS_REQUESTED;
 };
 
 export type ConsentRequestParameters = AccessRequestParameters &
   BaseConsentParameters;
 
 export type AccessGrantParameters = BaseRequestParameters & {
-  status: typeof CONSENT_STATUS_EXPLICITLY_GIVEN;
+  status: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
 };
 
 export type ConsentGrantParameters = AccessGrantParameters &

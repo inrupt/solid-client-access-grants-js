@@ -68,7 +68,7 @@ describe("isValidConsentGrant", () => {
     credentialSubject: {
       id: "https://pod.inrupt.com/alice/profile/card#me",
       providedConsent: {
-        mode: ["Read"],
+        mode: ["http://www.w3.org/ns/auth/acl#Read"],
         hasStatus: "ConsentStatusExplicitlyGiven",
         forPersonalData: "https://pod.inrupt.com/alice/private/data",
         forPurpose: "https://example.com/SomeSpecificPurpose",

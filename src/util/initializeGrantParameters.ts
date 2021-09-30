@@ -20,10 +20,10 @@
 import { Access, UrlString, WebId } from "@inrupt/solid-client";
 import { isConsentRequest } from "../guard/isConsentRequest";
 import {
-  RESOURCE_ACCESS_MODE_APPEND,
-  RESOURCE_ACCESS_MODE_CONTROL,
-  RESOURCE_ACCESS_MODE_READ,
-  RESOURCE_ACCESS_MODE_WRITE,
+  ACL_RESOURCE_ACCESS_MODE_APPEND,
+  ACL_RESOURCE_ACCESS_MODE_CONTROL,
+  ACL_RESOURCE_ACCESS_MODE_READ,
+  ACL_RESOURCE_ACCESS_MODE_WRITE,
 } from "../constants";
 import type {
   AccessRequestBody,
@@ -43,10 +43,10 @@ function getModesFromRequest(
 
 function modesToAccess(modes: ResourceAccessMode[]): Partial<Access> {
   const access: Partial<Access> = {};
-  access.append = modes.includes(RESOURCE_ACCESS_MODE_APPEND);
-  access.control = modes.includes(RESOURCE_ACCESS_MODE_CONTROL);
-  access.read = modes.includes(RESOURCE_ACCESS_MODE_READ);
-  access.write = modes.includes(RESOURCE_ACCESS_MODE_WRITE);
+  access.append = modes.includes(ACL_RESOURCE_ACCESS_MODE_APPEND);
+  access.control = modes.includes(ACL_RESOURCE_ACCESS_MODE_CONTROL);
+  access.read = modes.includes(ACL_RESOURCE_ACCESS_MODE_READ);
+  access.write = modes.includes(ACL_RESOURCE_ACCESS_MODE_WRITE);
   return access;
 }
 

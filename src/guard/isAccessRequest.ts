@@ -17,7 +17,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { CONSENT_STATUS_REQUESTED } from "../constants";
+import { GC_CONSENT_STATUS_REQUESTED } from "../constants";
 import { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import { isBaseAccessVerifiableCredential } from "./isBaseAccessVerifiableCredential";
 
@@ -26,7 +26,7 @@ export function isAccessRequest(
 ): x is AccessRequestBody & { issuanceDate: string } {
   return (
     isBaseAccessVerifiableCredential(x) &&
-    x.credentialSubject.hasConsent.hasStatus === CONSENT_STATUS_REQUESTED &&
+    x.credentialSubject.hasConsent.hasStatus === GC_CONSENT_STATUS_REQUESTED &&
     typeof x.issuanceDate === "string"
   );
 }

@@ -24,7 +24,7 @@ import {
   issueAccessOrConsentVc,
 } from "../util/issueAccessOrConsentVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
-import { CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
+import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
 import { getBaseAccessVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
@@ -101,7 +101,7 @@ export async function approveAccessRequest(
     requestor: internalOptions.requestor,
     resources: internalOptions.resources,
     requestorInboxUrl: internalOptions.requestorInboxIri,
-    status: CONSENT_STATUS_EXPLICITLY_GIVEN,
+    status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   });
   return issueAccessOrConsentVc(
     internalOptions.requestor,

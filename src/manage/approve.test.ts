@@ -96,7 +96,7 @@ describe("approveAccessRequest", () => {
           ...accessRequest.credentialSubject,
           hasConsent: {
             ...accessRequest.credentialSubject.hasConsent,
-            hasStatus: "ConsentStatusDenied",
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           },
         },
       })
@@ -166,7 +166,7 @@ describe("approveAccessRequest", () => {
         hasConsent: {
           mode: (mockAccessRequestVc() as unknown as AccessGrantBody)
             .credentialSubject.hasConsent.mode,
-          hasStatus: "ConsentStatusExplicitlyGiven",
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: (mockAccessRequestVc() as unknown as AccessGrantBody)
             .credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: mockAccessRequestVc().credentialSubject.id,
@@ -207,8 +207,8 @@ describe("approveAccessRequest", () => {
       "https://some-custom.requestor",
       expect.objectContaining({
         hasConsent: {
-          mode: ["Append"],
-          hasStatus: "ConsentStatusExplicitlyGiven",
+          mode: ["http://www.w3.org/ns/auth/acl#Append"],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: ["https://some-custom.resource"],
           isProvidedTo: "https://some-custom.requestor",
         },
@@ -247,7 +247,7 @@ describe("approveAccessRequest", () => {
         hasConsent: {
           mode: (mockAccessRequestVc() as unknown as AccessGrantBody)
             .credentialSubject.hasConsent.mode,
-          hasStatus: "ConsentStatusExplicitlyGiven",
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: ["https://some-custom.resource"],
           isProvidedTo: mockAccessRequestVc().credentialSubject.id,
         },
@@ -284,7 +284,7 @@ describe("approveAccessRequest", () => {
       expect.objectContaining({
         hasConsent: {
           mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
-          hasStatus: "ConsentStatusExplicitlyGiven",
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData:
             mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: mockAccessRequestVc().credentialSubject.id,
@@ -348,7 +348,7 @@ describe("approveAccessRequestWithConsent", () => {
           ...accessRequestWithConsent.credentialSubject,
           hasConsent: {
             ...accessRequestWithConsent.credentialSubject.hasConsent,
-            hasStatus: "ConsentStatusDenied",
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           },
         },
       })
@@ -377,7 +377,7 @@ describe("approveAccessRequestWithConsent", () => {
             mockConsentRequestVc()
               .credentialSubject as ConsentGrantBody["credentialSubject"]
           ).hasConsent.mode,
-          hasStatus: "ConsentStatusExplicitlyGiven",
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: (
             mockConsentRequestVc()
               .credentialSubject as ConsentGrantBody["credentialSubject"]
@@ -430,8 +430,8 @@ describe("approveAccessRequestWithConsent", () => {
       "https://some-custom.requestor",
       expect.objectContaining({
         hasConsent: {
-          mode: ["Append"],
-          hasStatus: "ConsentStatusExplicitlyGiven",
+          mode: ["http://www.w3.org/ns/auth/acl#Append"],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: ["https://some-custom.resource"],
           isProvidedTo: "https://some-custom.requestor",
           forPurpose: ["https://some-custom.purpose"],
@@ -475,8 +475,8 @@ describe("approveAccessRequestWithConsent", () => {
       "https://some-custom.requestor",
       expect.objectContaining({
         hasConsent: {
-          mode: ["Append"],
-          hasStatus: "ConsentStatusExplicitlyGiven",
+          mode: ["http://www.w3.org/ns/auth/acl#Append"],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: ["https://some-custom.resource"],
           isProvidedTo: "https://some-custom.requestor",
           forPurpose: ["https://some-custom.purpose"],
@@ -516,7 +516,7 @@ describe("approveAccessRequestWithConsent", () => {
         hasConsent: {
           mode: (mockConsentRequestVc() as unknown as ConsentGrantBody)
             .credentialSubject.hasConsent.mode,
-          hasStatus: "ConsentStatusExplicitlyGiven",
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: (
             mockConsentRequestVc() as unknown as ConsentGrantBody
           ).credentialSubject.hasConsent.forPersonalData,
@@ -561,7 +561,7 @@ describe("approveAccessRequestWithConsent", () => {
         hasConsent: {
           mode: (mockConsentRequestVc() as unknown as ConsentGrantBody)
             .credentialSubject.hasConsent.mode,
-          hasStatus: "ConsentStatusExplicitlyGiven",
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: (
             mockConsentRequestVc() as unknown as ConsentGrantBody
           ).credentialSubject.hasConsent.forPersonalData,
@@ -607,7 +607,7 @@ describe("approveAccessRequestWithConsent", () => {
         hasConsent: {
           mode: (mockConsentRequestVc() as unknown as ConsentGrantBody)
             .credentialSubject.hasConsent.mode,
-          hasStatus: "ConsentStatusExplicitlyGiven",
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: (
             mockConsentRequestVc() as unknown as ConsentGrantBody
           ).credentialSubject.hasConsent.forPersonalData,
@@ -656,7 +656,7 @@ describe("approveAccessRequestWithConsent", () => {
             mockConsentRequestVc()
               .credentialSubject as ConsentGrantBody["credentialSubject"]
           ).hasConsent.mode,
-          hasStatus: "ConsentStatusExplicitlyGiven",
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: (
             mockConsentRequestVc()
               .credentialSubject as ConsentGrantBody["credentialSubject"]
