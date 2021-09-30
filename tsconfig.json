@@ -104,7 +104,7 @@
     "readme": "none",
     "entryDocument": "index.md",
   },
-  "include": [ "src/index.ts" ],
+  "include": [ "src/index.ts", ".eslintrc.js" ],
   "exclude": [
     "**/node_modules",
     // These end-to-end tests reference code in `.codesandbox`,
