@@ -37,6 +37,14 @@
     "./request": "./dist/request/index.mjs",
     "./verify": "./dist/verify/index.mjs"
   },
+  "typesVersions": {
+    "*": {
+      "discover": ["dist/discover/index.d.ts"],
+      "manage": ["dist/manage/index.d.ts"],
+      "request": ["dist/request/index.d.ts"],
+      "verify": ["dist/verify/index.d.ts"]
+    }
+  },
   "files": [
     "dist",
     "src",
