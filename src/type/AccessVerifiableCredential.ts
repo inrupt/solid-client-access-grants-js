@@ -20,9 +20,9 @@
 import type { UrlString } from "@inrupt/solid-client";
 import type {
   CONSENT_CONTEXT,
-  CONSENT_STATUS_DENIED,
-  CONSENT_STATUS_EXPLICITLY_GIVEN,
-  CONSENT_STATUS_REQUESTED,
+  GC_CONSENT_STATUS_DENIED,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+  GC_CONSENT_STATUS_REQUESTED,
   CREDENTIAL_TYPE,
 } from "../constants";
 import type { ResourceAccessMode } from "./ResourceAccessMode";
@@ -57,7 +57,7 @@ export type BaseConsentBody = BaseAccessBody & {
 export type AccessRequestBody = BaseAccessBody & {
   credentialSubject: {
     hasConsent: {
-      hasStatus: typeof CONSENT_STATUS_REQUESTED;
+      hasStatus: typeof GC_CONSENT_STATUS_REQUESTED;
     };
   };
 };
@@ -67,7 +67,7 @@ export type ConsentRequestBody = AccessRequestBody & BaseConsentBody;
 export type AccessDeniedBody = BaseAccessBody & {
   credentialSubject: {
     hasConsent: {
-      hasStatus: typeof CONSENT_STATUS_DENIED;
+      hasStatus: typeof GC_CONSENT_STATUS_DENIED;
     };
   };
 };
@@ -77,7 +77,7 @@ export type ConsentDeniedBody = AccessRequestBody & BaseConsentBody;
 export type AccessGrantBody = BaseAccessBody & {
   credentialSubject: {
     hasConsent: {
-      hasStatus: typeof CONSENT_STATUS_EXPLICITLY_GIVEN;
+      hasStatus: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
       isProvidedTo: UrlString;
     };
   };

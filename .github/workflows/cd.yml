@@ -146,7 +146,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
     - name: Install the preview release of solid-client-consent in the packaging test project
-      if: github.actor != 'dependabot[bot]' && false
+      if: github.actor != 'dependabot[bot]'
       run: |
         cd .github/workflows/cd-packaging-tests/node
         npm install @inrupt/solid-client @inrupt/solid-client-consent@$VERSION_NR
@@ -173,7 +173,7 @@ jobs:
         node-version: '14.x'
         registry-url: 'https://registry.npmjs.org'
     - name: Verify that the package can be imported in a Parcel project
-      if: github.actor != 'dependabot[bot]' && false
+      if: github.actor != 'dependabot[bot]'
       run: |
         cd .github/workflows/cd-packaging-tests/bundler-parcel
         npm install
@@ -200,7 +200,7 @@ jobs:
         node-version: '14.x'
         registry-url: 'https://registry.npmjs.org'
     - name: Verify that the package can be imported in a Webpack project
-      if: github.actor != 'dependabot[bot]' && false
+      if: github.actor != 'dependabot[bot]'
       run: |
         cd .github/workflows/cd-packaging-tests/bundler-webpack
         npm install @inrupt/solid-client @inrupt/solid-client-consent@$VERSION_NR

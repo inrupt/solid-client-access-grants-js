@@ -2,6 +2,7 @@
   "name": "cd-packaging-test-node",
   "private": true,
   "dependencies": {
-    "@inrupt/solid-client-consent": "*"
+    "@inrupt/solid-client-consent": "*",
+    "@inrupt/solid-client": "^1.13.0"
   }
 }
