@@ -43,9 +43,37 @@ jest.mock("../discover/getConsentApiEndpoint", () => {
 });
 
 describe("getAccessWithConsentAll", () => {
-  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right parameters", async () => {
-    const resource = new URL("https://some.resource");
+  const resource = new URL("https://some.resource");
 
+  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right default parameters", async () => {
+    const expectedDefaultVcShape = {
+      credentialSubject: {
+        id: undefined,
+        hasConsent: {
+          mode: [],
+          forPersonalData: [resource.href],
+          forPurpose: undefined,
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+        },
+      },
+    };
+
+    await getAccessWithConsentAll(resource.href);
+
+    expect(getConsentApiEndpoint).toHaveBeenCalledTimes(1);
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(1);
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      "https://some.api.endpoint/derive",
+      expectedDefaultVcShape,
+      {
+        fetch: "solid-client-authn-browser-fetch",
+      }
+    );
+  });
+
+  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right passed in parameters", async () => {
     const paramsInput: Partial<RequestAccessWithConsentParameters> = {
       purpose: ["https://some.purpose"],
       access: { read: true },
@@ -64,7 +92,10 @@ describe("getAccessWithConsentAll", () => {
       },
     };
 
-    await getAccessWithConsentAll(resource, paramsInput);
+    await getAccessWithConsentAll(resource, paramsInput, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      fetch: "other-fetch" as any,
+    });
 
     expect(getConsentApiEndpoint).toHaveBeenCalledTimes(1);
 
@@ -74,7 +105,7 @@ describe("getAccessWithConsentAll", () => {
       "https://some.api.endpoint/derive",
       expectedVcShape,
       {
-        fetch: "solid-client-authn-browser-fetch",
+        fetch: "other-fetch",
       }
     );
   });
