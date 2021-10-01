@@ -85,6 +85,7 @@ export default [
       "./src/type/ConsentContext.ts",
       "./src/type/ConsentStatus.ts",
       "./src/type/Parameter.ts",
+      "./src/type/RecursivePartial.ts",
       "./src/type/RequestAccessParameters.ts",
       "./src/type/RequestAccessWithConsentParameters.ts",
       "./src/type/ResourceAccessMode.ts",

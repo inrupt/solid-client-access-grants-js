@@ -31,6 +31,7 @@ export {
   approveAccessRequest,
   approveAccessRequestWithConsent,
   denyAccessRequest,
+  getAccessWithConsentAll,
   revokeAccess,
 } from "./manage";
 
