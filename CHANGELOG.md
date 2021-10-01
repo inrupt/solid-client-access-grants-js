@@ -8,6 +8,14 @@ The following changes have been implemented but not released yet:
 
 The following changes have been released:
 
+## [0.0.3] - 2021-10-01
+
+### Bugfix
+
+- Use complete IRIs as values for VC properties instead of shorthand that are not
+  expanded, and therefore fail shape validation of the consent service.
+- Fixes node imports as well as webpack, rollup and parcel builds
+
 ## [0.0.2] - 2021-09-30
 
 ### Bugfix
