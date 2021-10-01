@@ -84,7 +84,7 @@ export default [
       "./src/type/ConsentApiBaseOptions.ts",
       "./src/type/ConsentContext.ts",
       "./src/type/ConsentStatus.ts",
-      "./src/type/Parameters.ts",
+      "./src/type/Parameter.ts",
       "./src/type/RequestAccessParameters.ts",
       "./src/type/RequestAccessWithConsentParameters.ts",
       "./src/type/ResourceAccessMode.ts",
