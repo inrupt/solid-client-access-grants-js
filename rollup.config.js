@@ -78,4 +78,23 @@ export default [
     },
     ...rollupDefaultConfig,
   },
+  {
+    input: [
+      "./src/type/AccessVerifiableCredential.ts",
+      "./src/type/ConsentApiBaseOptions.ts",
+      "./src/type/ConsentContext.ts",
+      "./src/type/ConsentStatus.ts",
+      "./src/type/Parameters.ts",
+      "./src/type/RequestAccessParameters.ts",
+      "./src/type/RequestAccessWithConsentParameters.ts",
+      "./src/type/ResourceAccessMode.ts",
+    ],
+    output: {
+      dir: "dist",
+      entryFileNames: "[name].d.ts",
+      format: "esm",
+      preserveModules: true,
+    },
+    ...rollupDefaultConfig,
+  },
 ];
