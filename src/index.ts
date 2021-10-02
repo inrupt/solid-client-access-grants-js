@@ -36,4 +36,8 @@ export {
 
 export { isValidConsentGrant } from "./verify";
 
-export { getConsentApiEndpoint, getConsentManagementUi } from "./discover";
+export {
+  getConsentApiEndpoint,
+  getConsentManagementUi,
+  redirectToConsentManagementUi,
+} from "./discover";

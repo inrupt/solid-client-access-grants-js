@@ -60,7 +60,10 @@ async function getConsentManagementUiFromProfile(
   return result;
 }
 
-async function getConsentManagementUiFromWellKnown(
+/**
+ * @hidden
+ */
+export async function getConsentManagementUiFromWellKnown(
   storage: UrlString | undefined,
   options: { fetch: typeof global.fetch }
 ): Promise<UrlString | undefined> {

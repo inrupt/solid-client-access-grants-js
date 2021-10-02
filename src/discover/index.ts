@@ -25,3 +25,4 @@
  */
 export { getConsentApiEndpoint } from "./getConsentApiEndpoint";
 export { getConsentManagementUi } from "./getConsentManagementUi";
+export { redirectToConsentManagementUi } from "./redirectToConsentManagementUi";
