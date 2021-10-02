@@ -6,6 +6,11 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### New feature
+
+- `redirectToConsentManagementUi` enables discovering a user's preferred consent
+  management app, and redirecting them to it.
+
 The following changes have been released:
 
 ## [0.0.3] - 2021-10-01

@@ -31,6 +31,7 @@ import {
   requestAccess,
   requestAccessWithConsent,
   revokeAccess,
+  redirectToConsentManagementUi,
 } from "./index";
 
 describe("Index exports", () => {
@@ -45,5 +46,6 @@ describe("Index exports", () => {
     expect(requestAccess).toBeDefined();
     expect(requestAccessWithConsent).toBeDefined();
     expect(revokeAccess).toBeDefined();
+    expect(redirectToConsentManagementUi).toBeDefined();
   });
 });
