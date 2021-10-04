@@ -35,7 +35,7 @@ async function getConsentEndpointForResource(
   const wellKnown = await getWellKnownSolid(resource, {
     fetch: fetcher,
   });
-  const wellKnownSubjects = getThingAll(wellKnown);
+  const wellKnownSubjects = getThingAll(wellKnown, { acceptBlankNodes: true });
   if (wellKnownSubjects.length === 0) {
     throw new Error(
       `Cannot discover consent endpoint from [${getSourceIri(

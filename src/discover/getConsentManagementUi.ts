@@ -73,11 +73,11 @@ export async function getConsentManagementUiFromWellKnown(
   const wellKnown = await getWellKnownSolid(storage, {
     fetch: options.fetch,
   });
-  if (getThingAll(wellKnown).length === 0) {
+  if (getThingAll(wellKnown, { acceptBlankNodes: true }).length === 0) {
     return undefined;
   }
   const wellKnownConsentUi = getIri(
-    getThingAll(wellKnown)[0],
+    getThingAll(wellKnown, { acceptBlankNodes: true })[0],
     PREFERRED_CONSENT_MANAGEMENT_UI
   );
   return wellKnownConsentUi ?? undefined;
