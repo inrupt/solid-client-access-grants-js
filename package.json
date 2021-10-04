@@ -39,10 +39,18 @@
   },
   "typesVersions": {
     "*": {
-      "discover": ["dist/discover/index.d.ts"],
-      "manage": ["dist/manage/index.d.ts"],
-      "request": ["dist/request/index.d.ts"],
-      "verify": ["dist/verify/index.d.ts"]
+      "discover": [
+        "dist/discover/index.d.ts"
+      ],
+      "manage": [
+        "dist/manage/index.d.ts"
+      ],
+      "request": [
+        "dist/request/index.d.ts"
+      ],
+      "verify": [
+        "dist/verify/index.d.ts"
+      ]
     }
   },
   "files": [
