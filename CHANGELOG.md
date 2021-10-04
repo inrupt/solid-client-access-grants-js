@@ -6,6 +6,12 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### Bugfix
+
+- `getConsentApiEndpoint` had an incorrect assumption about some behaviour of
+  `solid-client`, which resulted in throwing an exception, and was fixed in its
+  version 1.13.1.
+
 ### New feature
 
 - `redirectToConsentManagementUi` enables discovering a user's preferred consent
