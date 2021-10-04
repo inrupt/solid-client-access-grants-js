@@ -26,8 +26,10 @@ import {
 } from "./getAccessWithConsentAll";
 import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
 
+const clientAuthnFetch = jest.fn(global.fetch);
+const otherFetch = jest.fn(global.fetch);
 jest.mock("@inrupt/solid-client-authn-browser", () => {
-  return { fetch: "solid-client-authn-browser-fetch" };
+  return { fetch: clientAuthnFetch };
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
@@ -48,7 +50,6 @@ describe("getAccessWithConsentAll", () => {
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right default parameters", async () => {
     const expectedDefaultVcShape = {
       credentialSubject: {
-        id: undefined,
         hasConsent: {
           mode: [],
           forPersonalData: [resource.href],
@@ -68,7 +69,7 @@ describe("getAccessWithConsentAll", () => {
       "https://some.api.endpoint/derive",
       expectedDefaultVcShape,
       {
-        fetch: "solid-client-authn-browser-fetch",
+        fetch: clientAuthnFetch,
       }
     );
   });
@@ -93,8 +94,7 @@ describe("getAccessWithConsentAll", () => {
     };
 
     await getAccessWithConsentAll(resource, paramsInput, {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      fetch: "other-fetch" as any,
+      fetch: otherFetch,
     });
 
     expect(getConsentApiEndpoint).toHaveBeenCalledTimes(1);
@@ -105,7 +105,7 @@ describe("getAccessWithConsentAll", () => {
       "https://some.api.endpoint/derive",
       expectedVcShape,
       {
-        fetch: "other-fetch",
+        fetch: otherFetch,
       }
     );
   });
