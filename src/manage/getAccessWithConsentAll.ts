@@ -51,9 +51,10 @@ async function getAccessWithConsentAll(
   const sessionFetch = await getSessionFetch(options);
 
   // TODO: Fix consent API endpoint retrieval (should include all the different API endpoints)
-  const holderEndpoint = (
+  const holderEndpoint = new URL(
+    "derive",
     await getConsentApiEndpoint(resource, options)
-  ).concat("/derive");
+  );
 
   const vcShape: RecursivePartial<BaseConsentBody & VerifiableCredential> = {
     credentialSubject: {
@@ -69,7 +70,7 @@ async function getAccessWithConsentAll(
 
   // TODO: Fix up the type of accepted arguments (this function should allow deep partial)
   return getVerifiableCredentialAllFromShape(
-    holderEndpoint,
+    holderEndpoint.href,
     vcShape as Partial<VerifiableCredential>,
     {
       fetch: sessionFetch,
