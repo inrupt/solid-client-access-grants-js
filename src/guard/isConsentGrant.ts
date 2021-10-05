@@ -17,29 +17,19 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
-export type { RequestAccessParameters } from "./type/RequestAccessParameters";
-export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
+import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
+import {
+  AccessGrantBody,
+  BaseAccessBody,
+} from "../type/AccessVerifiableCredential";
 
-export {
-  cancelAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./request";
-
-export {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-  denyAccessRequest,
-  getAccessWithConsentAll,
-  revokeAccess,
-  getAccessWithConsent,
-} from "./manage";
-
-export { isValidConsentGrant } from "./verify";
-
-export {
-  getConsentApiEndpoint,
-  getConsentManagementUi,
-  redirectToConsentManagementUi,
-} from "./discover";
+export function isAccessGrant(
+  vc: BaseAccessBody
+): vc is BaseAccessBody & AccessGrantBody {
+  return (
+    vc.credentialSubject.hasConsent.hasStatus ===
+      GC_CONSENT_STATUS_EXPLICITLY_GIVEN &&
+    typeof (vc as AccessGrantBody).credentialSubject.hasConsent.isProvidedTo ===
+      "string"
+  );
+}

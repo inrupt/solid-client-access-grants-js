@@ -32,3 +32,4 @@ export { approveAccessRequestWithConsent } from "./approveAccessRequestWithConse
 export { denyAccessRequest } from "./denyAccessRequest";
 export { getAccessWithConsentAll } from "./getAccessWithConsentAll";
 export { revokeAccess } from "./revokeAccess";
+export { getAccessWithConsent } from "./getAccessWithConsent";

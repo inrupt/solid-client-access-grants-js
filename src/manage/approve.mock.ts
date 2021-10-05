@@ -67,6 +67,33 @@ export const mockAccessRequestVc = (): VerifiableCredential &
   };
 };
 
+export const mockAccessGrantVc = (): VerifiableCredential & BaseAccessBody => {
+  return {
+    "@context": CONSENT_CONTEXT,
+    id: "https://some.credential",
+    credentialSubject: {
+      id: "https://some.resource.owner",
+      hasConsent: {
+        forPersonalData: ["https://some.resource"],
+        hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+        mode: ["http://www.w3.org/ns/auth/acl#Read"],
+        isProvidedTo: "https://some.requestor",
+      },
+      inbox: "https://some.inbox",
+    },
+    issuanceDate: "some ISO date",
+    issuer: "https://some.issuer",
+    proof: {
+      created: "some ISO date",
+      proofPurpose: "some proof purpose",
+      proofValue: "some proof",
+      type: "some proof type",
+      verificationMethod: "some method",
+    },
+    type: ["SolidConsentRequest"],
+  };
+};
+
 export const mockConsentRequestVc = (): VerifiableCredential &
   BaseConsentBody => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
