@@ -14,6 +14,8 @@ The following changes have been implemented but not released yet:
 
 ### New feature
 
+- `getAccessWithConsent` looks up an access grant from its IRI, and performs some
+  validation on it.
 - `getAccessWithConsentAll` enables retrieving all consent grants issued over a
   specific resource.
 - `redirectToConsentManagementUi` enables discovering a user's preferred consent
