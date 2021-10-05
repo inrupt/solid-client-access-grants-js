@@ -19,6 +19,7 @@
 
 import { UrlString } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { isVerifiableCredential } from "@inrupt/solid-client-vc";
 import { isBaseAccessVerifiableCredential } from "../guard/isBaseAccessVerifiableCredential";
 import { isAccessGrant } from "../guard/isConsentGrant";
 import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
@@ -56,13 +57,16 @@ export async function getAccessWithConsent(
       `Unexpected response when resolving [${vcUrl}], the result is not a Verifiable Credential: ${await responseErrorClone.text()}`
     );
   }
-  if (!isBaseAccessVerifiableCredential(data) || !isAccessGrant(data)) {
+  if (
+    !isVerifiableCredential(data) ||
+    !isBaseAccessVerifiableCredential(data) ||
+    !isAccessGrant(data)
+  ) {
     throw new Error(
       `Unexpected response when resolving [${vcUrl}], the result is not an Access Grant: ${JSON.stringify(
         data
       )}`
     );
   }
-  // TODO: export type checking from VC library, and import it here.
-  return data as VerifiableCredential & AccessGrantBody;
+  return data;
 }

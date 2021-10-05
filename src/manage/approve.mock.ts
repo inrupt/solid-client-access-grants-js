@@ -81,10 +81,10 @@ export const mockAccessGrantVc = (): VerifiableCredential & BaseAccessBody => {
       },
       inbox: "https://some.inbox",
     },
-    issuanceDate: "some ISO date",
+    issuanceDate: "1965-08-28",
     issuer: "https://some.issuer",
     proof: {
-      created: "some ISO date",
+      created: "2021-10-05",
       proofPurpose: "some proof purpose",
       proofValue: "some proof",
       type: "some proof type",
