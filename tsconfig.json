@@ -78,6 +78,7 @@
       "src/manage/approveAccessRequest.ts",
       "src/manage/approveAccessRequestWithConsent.ts",
       "src/manage/denyAccessRequest.ts",
+      "src/manage/getAccessWithConsentAll.ts",
       "src/manage/revokeAccess.ts",
       "src/request/index.ts",
       "src/request/cancelAccessRequest.ts",

@@ -14,6 +14,8 @@ The following changes have been implemented but not released yet:
 
 ### New feature
 
+- `getAccessWithConsentAll` enables retrieving all consent grants issued over a
+  specific resource.
 - `redirectToConsentManagementUi` enables discovering a user's preferred consent
   management app, and redirecting them to it.
 

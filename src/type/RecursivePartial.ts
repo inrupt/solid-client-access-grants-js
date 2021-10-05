@@ -17,18 +17,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-/**
- * Import this module for the consent API functions available to an entity
- * managing access requests over resources:
- * - `approveAccessRequest`: Approve an access request for a non-commercial entity;
- * - `approveAccessRequestWithConsent`: Approve an access request including a purpose for
- *   legally binding consent to access a resource;
- * - `denyAccessRequest`: Deny access over a resource;
- * - `getAccessWithConsentAll`: Retrieve consent grants issued over a resource;
- * - `revokeAccess`: Revoke previously granted access over a resource.
- */
-export { approveAccessRequest } from "./approveAccessRequest";
-export { approveAccessRequestWithConsent } from "./approveAccessRequestWithConsent";
-export { denyAccessRequest } from "./denyAccessRequest";
-export { getAccessWithConsentAll } from "./getAccessWithConsentAll";
-export { revokeAccess } from "./revokeAccess";
+export type RecursivePartial<T> = {
+  [P in keyof T]?: RecursivePartial<T[P]>;
+};
