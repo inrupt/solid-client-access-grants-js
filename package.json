@@ -35,7 +35,9 @@
     "./discover": "./dist/discover/index.mjs",
     "./manage": "./dist/manage/index.mjs",
     "./request": "./dist/request/index.mjs",
-    "./verify": "./dist/verify/index.mjs"
+    "./verify": "./dist/verify/index.mjs",
+    "./resource": "./dist/resource/index.mjs",
+    "./fetch": "./dist/resource/index.mjs"
   },
   "typesVersions": {
     "*": {
@@ -50,6 +52,12 @@
       ],
       "verify": [
         "dist/verify/index.d.ts"
+      ],
+      "resource": [
+        "dist/resource/index.d.ts"
+      ],
+      "fetch": [
+        "dist/fetch/index.d.ts"
       ]
     }
   },
@@ -68,6 +76,7 @@
     "@inrupt/eslint-config-lib": "^0.2.0-alpha.1",
     "@inrupt/solid-client-authn-browser": "^1.8.1",
     "@inrupt/solid-client-authn-node": "^1.11.2",
+    "@rdfjs/data-model": "^1.3.3",
     "@skypack/package-check": "^0.2.2",
     "@testing-library/testcafe": "^4.4.0",
     "@types/auth-header": "^1.0.2",
@@ -103,6 +112,7 @@
     "@inrupt/solid-client": "^1.14.0",
     "@inrupt/solid-client-vc": "^0.2.1",
     "auth-header": "^1.0.0",
+    "@inrupt/solid-client-authn-core": "^1.11.2",
     "cross-fetch": "^3.1.4",
     "events": "^3.3.0",
     "parse-link-header": "^1.0.1",

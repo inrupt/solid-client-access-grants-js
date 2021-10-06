@@ -75,7 +75,7 @@ export async function getUmaConfiguration(
  */
 export async function exchangeTicketForAccessToken(
   tokenEndpoint: UrlString,
-  vc: VerifiableCredential,
+  accessGrant: VerifiableCredential,
   authTicket: string
 ): Promise<string | null> {
   const response = await crossFetch(tokenEndpoint, {
@@ -84,7 +84,7 @@ export async function exchangeTicketForAccessToken(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      claim_token: JSON.stringify(vc),
+      claim_token: JSON.stringify(accessGrant),
       claim_token_type: VC_CLAIM_TOKEN_TYPE,
       grant_type: UMA_GRANT_TYPE,
       ticket: authTicket,
@@ -113,9 +113,11 @@ export function boundFetch(accessToken: string): typeof fetch {
   };
 }
 
-export async function fetchWithVC(
+export async function fetchWithVc(
+  // Why UrlString instead of UrlString | Url? Because Urls aren't compatible
+  // with the fetch return type.
   resourceIri: UrlString,
-  vc: VerifiableCredential,
+  accessGrant: VerifiableCredential,
   options: FetchOptions
 ): Promise<typeof fetch> {
   // Use an authenticated session to fetch the resoruce so that we can parse
@@ -145,7 +147,7 @@ export async function fetchWithVC(
 
   const accessToken = await exchangeTicketForAccessToken(
     tokenEndpoint,
-    vc,
+    accessGrant,
     authTicket
   );
 

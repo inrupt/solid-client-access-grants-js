@@ -100,6 +100,8 @@ The following changes have been released:
 
 - `getAccessWithConsent` looks up an access grant from its IRI, and performs some
   validation on it.
+- `getSolidDataset` fetches a dataset from a Solid Pod, using an Acces Grant to
+  prove the caller is entitled to access to the target resource.
 - `getAccessWithConsentAll` enables retrieving all consent grants issued over a
   specific resource.
 - `redirectToConsentManagementUi` enables discovering a user's preferred consent

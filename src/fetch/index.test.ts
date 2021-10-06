@@ -35,7 +35,7 @@ import {
   getUmaConfiguration,
   exchangeTicketForAccessToken,
   boundFetch,
-  fetchWithVC,
+  fetchWithVc,
 } from "./index";
 
 jest.mock("cross-fetch");
@@ -228,7 +228,7 @@ describe("boundFetch", () => {
   });
 });
 
-describe("fetchWithVC", () => {
+describe("fetchWithVc", () => {
   // These tests may be fairly brittle due to the nature of the mocked calls.
   it("throws an error if no www-authentication header is found", async () => {
     const resourceIri = "https://fake.url/some-resource";
@@ -242,7 +242,7 @@ describe("fetchWithVC", () => {
     } as any);
 
     await expect(
-      fetchWithVC(resourceIri, MOCK_VC, {
+      fetchWithVc(resourceIri, MOCK_VC, {
         fetch: crossFetch,
       })
     ).rejects.toThrow("No www-authentication header found");
@@ -261,7 +261,7 @@ describe("fetchWithVC", () => {
     } as any);
 
     await expect(
-      fetchWithVC(resourceIri, MOCK_VC, {
+      fetchWithVc(resourceIri, MOCK_VC, {
         fetch: crossFetch,
       })
     ).rejects.toThrow('did not include "ticket"');
@@ -280,7 +280,7 @@ describe("fetchWithVC", () => {
     } as any);
 
     await expect(
-      fetchWithVC(resourceIri, MOCK_VC, {
+      fetchWithVc(resourceIri, MOCK_VC, {
         fetch: crossFetch,
       })
     ).rejects.toThrow('did not include "as_uri"');
@@ -311,7 +311,7 @@ describe("fetchWithVC", () => {
         }),
       } as any);
 
-    await fetchWithVC(resourceIri, MOCK_VC, {
+    await fetchWithVc(resourceIri, MOCK_VC, {
       fetch: crossFetch,
     });
 
@@ -344,7 +344,7 @@ describe("fetchWithVC", () => {
       } as any);
 
     await expect(
-      fetchWithVC(resourceIri, MOCK_VC, {
+      fetchWithVc(resourceIri, MOCK_VC, {
         fetch: crossFetch,
       })
     ).rejects.toThrow("No access token was returned");

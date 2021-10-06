@@ -33,6 +33,7 @@ import {
   issueAccessRequest,
   redirectToAccessManagementUi,
   revokeAccessGrant,
+  fetchWithVC,
   // Deprecated APIs:
   getConsentApiEndpoint,
   getConsentManagementUi,
@@ -59,7 +60,7 @@ describe("Index exports", () => {
     expect(issueAccessRequest).toBeDefined();
     expect(redirectToAccessManagementUi).toBeDefined();
     expect(revokeAccessGrant).toBeDefined();
-
+    expect(fetchWithVC).toBeDefined();
     // Deprecated APIs:
     expect(getConsentApiEndpoint).toBeDefined();
     expect(getConsentManagementUi).toBeDefined();
