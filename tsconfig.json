@@ -87,6 +87,7 @@
       "src/type/ConsentApiBaseOptions.ts",
       "src/verify/index.ts",
       "src/verify/isValidConsentGrant.ts",
+      "src/resource/index.ts"
     ],
     "exclude": [
       "node_modules/**",

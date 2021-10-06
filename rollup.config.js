@@ -68,6 +68,7 @@ export default [
       "./src/discover/index.ts",
       "./src/manage/index.ts",
       "./src/request/index.ts",
+      "./src/resource/index.ts",
       "./src/verify/index.ts",
     ],
     output: {
