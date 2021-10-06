@@ -25,6 +25,7 @@ import {
   approveAccessRequestWithConsent,
   cancelAccessRequest,
   denyAccessRequest,
+  getAccessWithConsent,
   getAccessWithConsentAll,
   getConsentApiEndpoint,
   getConsentManagementUi,
@@ -41,6 +42,7 @@ describe("Index exports", () => {
     expect(approveAccessRequestWithConsent).toBeDefined();
     expect(cancelAccessRequest).toBeDefined();
     expect(denyAccessRequest).toBeDefined();
+    expect(getAccessWithConsent).toBeDefined();
     expect(getAccessWithConsentAll).toBeDefined();
     expect(getConsentApiEndpoint).toBeDefined();
     expect(getConsentManagementUi).toBeDefined();
