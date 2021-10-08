@@ -40,6 +40,8 @@ The following changes have been released:
   validation on it.
 - `getSolidDataset` fetches a dataset from a Solid Pod, using an Acces Grant to
   prove the caller is entitled to access to the target resource.
+- `getFile` fetches a file (i.e. a non-RDF document) from a Solid Pod, using an
+  Acces Grant to prove the caller is entitled to access to the target resource.
 - `getAccessWithConsentAll` enables retrieving all consent grants issued over a
   specific resource.
 - `redirectToConsentManagementUi` enables discovering a user's preferred consent

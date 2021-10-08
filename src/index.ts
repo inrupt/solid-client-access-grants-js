@@ -44,4 +44,4 @@ export {
   redirectToConsentManagementUi,
 } from "./discover";
 
-export { getSolidDataset } from "./resource";
+export { getSolidDataset, getFile } from "./resource";

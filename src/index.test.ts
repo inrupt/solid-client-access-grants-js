@@ -29,6 +29,7 @@ import {
   getAccessWithConsentAll,
   getConsentApiEndpoint,
   getConsentManagementUi,
+  getFile,
   getSolidDataset,
   isValidConsentGrant,
   requestAccess,
@@ -47,6 +48,7 @@ describe("Index exports", () => {
     expect(getAccessWithConsentAll).toBeDefined();
     expect(getConsentApiEndpoint).toBeDefined();
     expect(getConsentManagementUi).toBeDefined();
+    expect(getFile).toBeDefined();
     expect(getSolidDataset).toBeDefined();
     expect(isValidConsentGrant).toBeDefined();
     expect(requestAccess).toBeDefined();

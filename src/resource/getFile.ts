@@ -17,5 +17,28 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export { getSolidDataset } from "./getSolidDataset";
-export { getFile } from "./getFile";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { getFile as _getFile, Url, UrlString } from "@inrupt/solid-client";
+import { wrapSolidClientFunction } from "./getSolidDataset";
+
+/**
+ * Retrieve a File from a Solid Pod using an Access Grant to prove the caller
+ * is authorized to access the target dataset.
+ *
+ * @param fileUrl The URL of the target file.
+ * @param accessGrant The Access Grant VC proving the caller is authorized.
+ * @param options Optional properties to customise the request behaviour.
+ * @returns A promise that resolves to a File if successful, and that rejects otherwise.
+ */
+export async function getFile(
+  fileUrl: UrlString | Url,
+  accessGrant: VerifiableCredential,
+  options?: { fetch: typeof global.fetch }
+): ReturnType<typeof _getFile> {
+  return wrapSolidClientFunction(
+    accessGrant,
+    _getFile,
+    [typeof fileUrl === "string" ? fileUrl : fileUrl.value],
+    options
+  );
+}
