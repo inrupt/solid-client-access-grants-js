@@ -19,11 +19,17 @@
 
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
-import { GC_CONSENT_STATUS_DENIED } from "../constants";
+import {
+  GC_CONSENT_STATUS_DENIED,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+} from "../constants";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import { issueAccessOrConsentVc } from "../util/issueAccessOrConsentVc";
-import { getBaseAccessVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
-import { setAccessVerifiableCredentialStatus } from "../util/setAccessVerifiableCredentialStatus";
+import {
+  getGrantBody,
+  issueAccessOrConsentVc,
+} from "../util/issueAccessOrConsentVc";
+import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
+import { initializeGrantParameters } from "../util/initializeGrantParameters";
 
 /**
  * Deny an access request. The content of the denied access request is provided
@@ -40,16 +46,25 @@ async function denyAccessRequest(
   options: ConsentApiBaseOptions = {}
 ): Promise<VerifiableCredential> {
   const baseAccessVerifiableCredential =
-    await getBaseAccessVerifiableCredential(vc, options);
+    await getBaseAccessRequestVerifiableCredential(vc, options);
 
-  const deniedAccessOrConsentVc = setAccessVerifiableCredentialStatus(
-    baseAccessVerifiableCredential,
-    GC_CONSENT_STATUS_DENIED
+  const internalOptions = initializeGrantParameters(
+    baseAccessVerifiableCredential
   );
+  const requestBody = getGrantBody({
+    access: internalOptions.access,
+    requestor: internalOptions.requestor,
+    resources: internalOptions.resources,
+    requestorInboxUrl: internalOptions.requestorInboxIri,
+    status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  }) as any; // FIXME
+  requestBody.credentialSubject.providedConsent.hasStatus =
+    GC_CONSENT_STATUS_DENIED;
 
   return issueAccessOrConsentVc(
-    deniedAccessOrConsentVc.credentialSubject.id,
-    deniedAccessOrConsentVc,
+    requestBody.credentialSubject.id,
+    requestBody,
     options
   );
 }

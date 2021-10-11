@@ -19,16 +19,13 @@
 
 /* eslint-disable no-shadow */
 import { jest, it, describe, expect } from "@jest/globals";
-import type {
-  AccessGrantBody,
-  ConsentGrantBody,
-} from "../type/AccessVerifiableCredential";
 import { MOCKED_CONSENT_ISSUER } from "../request/request.mock";
 import { approveAccessRequestWithConsent } from "./approveAccessRequestWithConsent";
 import { approveAccessRequest } from "./approveAccessRequest";
 import {
   mockAccessRequestVc,
   mockConsentEndpoint,
+  mockConsentGrantVc,
   mockConsentRequestVc,
 } from "./approve.mock";
 
@@ -164,12 +161,11 @@ describe("approveAccessRequest", () => {
       `${MOCKED_CONSENT_ISSUER}/issue`,
       mockAccessRequestVc().credentialSubject.id,
       expect.objectContaining({
-        hasConsent: {
-          mode: (mockAccessRequestVc() as unknown as AccessGrantBody)
-            .credentialSubject.hasConsent.mode,
+        providedConsent: {
+          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          forPersonalData: (mockAccessRequestVc() as unknown as AccessGrantBody)
-            .credentialSubject.hasConsent.forPersonalData,
+          forPersonalData:
+            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: mockAccessRequestVc().credentialSubject.id,
         },
         inbox: mockAccessRequestVc().credentialSubject.inbox,
@@ -207,7 +203,7 @@ describe("approveAccessRequest", () => {
       `${MOCKED_CONSENT_ISSUER}/issue`,
       "https://some-custom.requestor",
       expect.objectContaining({
-        hasConsent: {
+        providedConsent: {
           mode: ["http://www.w3.org/ns/auth/acl#Append"],
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: ["https://some-custom.resource"],
@@ -245,9 +241,8 @@ describe("approveAccessRequest", () => {
       `${MOCKED_CONSENT_ISSUER}/issue`,
       mockAccessRequestVc().credentialSubject.id,
       expect.objectContaining({
-        hasConsent: {
-          mode: (mockAccessRequestVc() as unknown as AccessGrantBody)
-            .credentialSubject.hasConsent.mode,
+        providedConsent: {
+          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: ["https://some-custom.resource"],
           isProvidedTo: mockAccessRequestVc().credentialSubject.id,
@@ -283,7 +278,7 @@ describe("approveAccessRequest", () => {
       `${MOCKED_CONSENT_ISSUER}/issue`,
       mockAccessRequestVc().credentialSubject.id,
       expect.objectContaining({
-        hasConsent: {
+        providedConsent: {
           mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData:
@@ -374,26 +369,17 @@ describe("approveAccessRequestWithConsent", () => {
       `${MOCKED_CONSENT_ISSUER}/issue`,
       mockConsentRequestVc().credentialSubject.id,
       expect.objectContaining({
-        hasConsent: {
-          mode: (
-            mockConsentRequestVc()
-              .credentialSubject as ConsentGrantBody["credentialSubject"]
-          ).hasConsent.mode,
+        providedConsent: {
+          mode: mockConsentGrantVc().credentialSubject.providedConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          forPersonalData: (
-            mockConsentRequestVc()
-              .credentialSubject as ConsentGrantBody["credentialSubject"]
-          ).hasConsent.forPersonalData,
+          forPersonalData:
+            mockConsentGrantVc().credentialSubject.providedConsent
+              .forPersonalData,
           isProvidedTo: mockConsentRequestVc().credentialSubject.id,
-          forPurpose: (
-            mockConsentRequestVc()
-              .credentialSubject as ConsentGrantBody["credentialSubject"]
-          ).hasConsent.forPurpose,
+          forPurpose:
+            mockConsentGrantVc().credentialSubject.providedConsent.forPurpose,
         },
-        inbox: (
-          mockConsentRequestVc()
-            .credentialSubject as ConsentGrantBody["credentialSubject"]
-        ).inbox,
+        inbox: mockConsentGrantVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidConsentRequest"],
@@ -431,7 +417,7 @@ describe("approveAccessRequestWithConsent", () => {
       `${MOCKED_CONSENT_ISSUER}/issue`,
       "https://some-custom.requestor",
       expect.objectContaining({
-        hasConsent: {
+        providedConsent: {
           mode: ["http://www.w3.org/ns/auth/acl#Append"],
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: ["https://some-custom.resource"],
@@ -476,7 +462,7 @@ describe("approveAccessRequestWithConsent", () => {
       `${MOCKED_CONSENT_ISSUER}/issue`,
       "https://some-custom.requestor",
       expect.objectContaining({
-        hasConsent: {
+        providedConsent: {
           mode: ["http://www.w3.org/ns/auth/acl#Append"],
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
           forPersonalData: ["https://some-custom.resource"],
@@ -515,16 +501,15 @@ describe("approveAccessRequestWithConsent", () => {
       `${MOCKED_CONSENT_ISSUER}/issue`,
       mockConsentRequestVc().credentialSubject.id,
       expect.objectContaining({
-        hasConsent: {
-          mode: (mockConsentRequestVc() as unknown as ConsentGrantBody)
-            .credentialSubject.hasConsent.mode,
+        providedConsent: {
+          mode: mockConsentGrantVc().credentialSubject.providedConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          forPersonalData: (
-            mockConsentRequestVc() as unknown as ConsentGrantBody
-          ).credentialSubject.hasConsent.forPersonalData,
+          forPersonalData:
+            mockConsentGrantVc().credentialSubject.providedConsent
+              .forPersonalData,
           isProvidedTo: mockConsentRequestVc().credentialSubject.id,
-          forPurpose: (mockConsentRequestVc() as unknown as ConsentGrantBody)
-            .credentialSubject.hasConsent.forPurpose,
+          forPurpose:
+            mockConsentGrantVc().credentialSubject.providedConsent.forPurpose,
         },
         inbox: mockConsentRequestVc().credentialSubject.inbox,
       }),
@@ -560,16 +545,14 @@ describe("approveAccessRequestWithConsent", () => {
       `${MOCKED_CONSENT_ISSUER}/issue`,
       mockConsentRequestVc().credentialSubject.id,
       expect.objectContaining({
-        hasConsent: {
-          mode: (mockConsentRequestVc() as unknown as ConsentGrantBody)
-            .credentialSubject.hasConsent.mode,
+        providedConsent: {
+          mode: mockConsentRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          forPersonalData: (
-            mockConsentRequestVc() as unknown as ConsentGrantBody
-          ).credentialSubject.hasConsent.forPersonalData,
+          forPersonalData:
+            mockConsentRequestVc().credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: mockConsentRequestVc().credentialSubject.id,
-          forPurpose: (mockConsentRequestVc() as unknown as ConsentGrantBody)
-            .credentialSubject.hasConsent.forPurpose,
+          forPurpose:
+            mockConsentRequestVc().credentialSubject.hasConsent.forPurpose,
         },
         inbox: mockConsentRequestVc().credentialSubject.inbox,
       }),
@@ -606,16 +589,14 @@ describe("approveAccessRequestWithConsent", () => {
       `${MOCKED_CONSENT_ISSUER}/issue`,
       mockConsentRequestVc().credentialSubject.id,
       expect.objectContaining({
-        hasConsent: {
-          mode: (mockConsentRequestVc() as unknown as ConsentGrantBody)
-            .credentialSubject.hasConsent.mode,
+        providedConsent: {
+          mode: mockConsentRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          forPersonalData: (
-            mockConsentRequestVc() as unknown as ConsentGrantBody
-          ).credentialSubject.hasConsent.forPersonalData,
+          forPersonalData:
+            mockConsentRequestVc().credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: mockConsentRequestVc().credentialSubject.id,
-          forPurpose: (mockConsentRequestVc() as unknown as ConsentGrantBody)
-            .credentialSubject.hasConsent.forPurpose,
+          forPurpose:
+            mockConsentRequestVc().credentialSubject.hasConsent.forPurpose,
         },
         inbox: mockConsentRequestVc().credentialSubject.inbox,
       }),
@@ -642,7 +623,7 @@ describe("approveAccessRequestWithConsent", () => {
         new Response(JSON.stringify(mockConsentRequestVc()))
       );
     await approveAccessRequestWithConsent(
-      "https://some.credential",
+      new URL("https://some.credential"),
       undefined,
       {
         fetch: mockedFetch,
@@ -653,26 +634,16 @@ describe("approveAccessRequestWithConsent", () => {
       `${MOCKED_CONSENT_ISSUER}/issue`,
       mockConsentRequestVc().credentialSubject.id,
       expect.objectContaining({
-        hasConsent: {
-          mode: (
-            mockConsentRequestVc()
-              .credentialSubject as ConsentGrantBody["credentialSubject"]
-          ).hasConsent.mode,
+        providedConsent: {
+          mode: mockConsentRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          forPersonalData: (
-            mockConsentRequestVc()
-              .credentialSubject as ConsentGrantBody["credentialSubject"]
-          ).hasConsent.forPersonalData,
+          forPersonalData:
+            mockConsentRequestVc().credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: mockConsentRequestVc().credentialSubject.id,
-          forPurpose: (
-            mockConsentRequestVc()
-              .credentialSubject as ConsentGrantBody["credentialSubject"]
-          ).hasConsent.forPurpose,
+          forPurpose:
+            mockConsentRequestVc().credentialSubject.hasConsent.forPurpose,
         },
-        inbox: (
-          mockConsentRequestVc()
-            .credentialSubject as ConsentGrantBody["credentialSubject"]
-        ).inbox,
+        inbox: mockConsentRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidConsentRequest"],

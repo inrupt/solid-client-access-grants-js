@@ -18,15 +18,31 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import {
-  BaseAccessBody,
-  BaseConsentBody,
+  BaseBody,
+  BaseConsentGrantBody,
+  BaseConsentRequestBody,
 } from "../type/AccessVerifiableCredential";
 
 export function isConsentRequest(
-  request: BaseAccessBody | BaseConsentBody
-): request is BaseConsentBody {
-  return (
-    (request as BaseConsentBody).credentialSubject.hasConsent.forPurpose !==
+  request: BaseBody | BaseConsentGrantBody
+): request is BaseConsentGrantBody;
+export function isConsentRequest(
+  request: BaseBody | BaseConsentRequestBody
+): request is BaseConsentRequestBody;
+export function isConsentRequest(
+  request: BaseBody | BaseConsentRequestBody | BaseConsentGrantBody
+): request is BaseConsentRequestBody | BaseConsentGrantBody {
+  if (
+    (request as BaseConsentRequestBody).credentialSubject.hasConsent !==
     undefined
+  ) {
+    return (
+      (request as BaseConsentRequestBody).credentialSubject.hasConsent
+        .forPurpose !== undefined
+    );
+  }
+  return (
+    (request as BaseConsentGrantBody).credentialSubject.providedConsent
+      .forPurpose !== undefined
   );
 }

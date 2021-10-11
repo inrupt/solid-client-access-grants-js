@@ -24,7 +24,7 @@ import {
 } from "@inrupt/solid-client-vc";
 import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
 import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
-import { BaseConsentBody } from "../type/AccessVerifiableCredential";
+import { BaseConsentRequestBody } from "../type/AccessVerifiableCredential";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import type { RecursivePartial } from "../type/RecursivePartial";
 import type { RequestAccessWithConsentParameters } from "../type/RequestAccessWithConsentParameters";
@@ -56,7 +56,9 @@ async function getAccessWithConsentAll(
     await getConsentApiEndpoint(resource, options)
   );
 
-  const vcShape: RecursivePartial<BaseConsentBody & VerifiableCredential> = {
+  const vcShape: RecursivePartial<
+    BaseConsentRequestBody & VerifiableCredential
+  > = {
     credentialSubject: {
       id: params.requestor,
       hasConsent: {
