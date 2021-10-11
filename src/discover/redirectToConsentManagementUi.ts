@@ -33,6 +33,7 @@ const REDIRECT_URL_PARAM_NAME = "redirectUrl";
  * @param accessRequestVc The VC containing the Access Request to a resource.
  * @param redirectUrl The URL where the user should be redirected back after having granted access.
  * @param options If you are in a NodeJS environment, you must specify a callback to handle the redirection.
+ * @since 0.1.0
  */
 export async function redirectToConsentManagementUi(
   accessRequestVc: VerifiableCredential | UrlString | URL,
