@@ -113,10 +113,11 @@ export function initializeGrantParameters(
       internalOptions = {
         ...internalOptions,
         purpose:
-          requestOverride?.purpose ?? getPurposeFromConsentRequest(requestVc),
+          requestOverride?.purpose ??
+          getPurposeFromConsentRequest(requestVc as ConsentRequestBody),
         expirationDate:
           requestOverride?.expirationDate ??
-          getExpirationFromConsentRequest(requestVc),
+          getExpirationFromConsentRequest(requestVc as ConsentRequestBody),
       };
     }
   }

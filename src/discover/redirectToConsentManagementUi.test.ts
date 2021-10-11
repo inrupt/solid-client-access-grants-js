@@ -100,6 +100,26 @@ describe("redirectToConsentManagementUi", () => {
       );
     });
 
+    it("supports the VC to be provided as an IRI", async () => {
+      mockConsentManagementUiDiscovery("https://some.consent.ui");
+      const mockedFetch = jest
+        .fn(global.fetch)
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify(mockAccessRequestVc()))
+        );
+      await redirectToConsentManagementUi(
+        "https://some.request-vc.url",
+        new URL("https://some.redirect.iri"),
+        {
+          fetch: mockedFetch,
+        }
+      );
+      const targetIri = new URL(window.location.href);
+      expect(targetIri.searchParams.get("redirectUrl")).toBe(
+        "https://some.redirect.iri/"
+      );
+    });
+
     it("supports the redirect IRI being a URL object", async () => {
       mockConsentManagementUiDiscovery("https://some.consent.ui");
       await redirectToConsentManagementUi(

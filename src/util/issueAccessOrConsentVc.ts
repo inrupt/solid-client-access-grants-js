@@ -28,8 +28,11 @@ import { getSessionFetch } from "./getSessionFetch";
 import type {
   AccessGrantBody,
   AccessRequestBody,
-  BaseAccessBody,
-  BaseConsentBody,
+  BaseBody,
+  BaseConsentGrantBody,
+  BaseConsentRequestBody,
+  BaseGrantBody,
+  BaseRequestBody,
   ConsentGrantBody,
   ConsentRequestBody,
 } from "../type/AccessVerifiableCredential";
@@ -45,41 +48,54 @@ import type {
 import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
 import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArray";
 import { isConsentRequestParameters } from "../guard/isConsentRequestParameters";
+import { isBaseRequest } from "../guard/isBaseRequest";
 
-function getBaseBody(params: BaseRequestParameters): BaseAccessBody {
-  const modes = accessToResourceAccessModeArray(params.access);
+function getBaseBody(params: BaseRequestParameters): BaseBody {
   return {
     "@context": CONSENT_CONTEXT,
     type: [CREDENTIAL_TYPE],
     credentialSubject: {
       id: params.requestor,
-      hasConsent: {
-        mode: modes,
-        hasStatus: params.status,
-        forPersonalData: params.resources,
-      },
       inbox: params.requestorInboxUrl,
     },
   };
 }
 
-function getConsentBody(
+function getConsentBaseBody(
   params: BaseConsentParameters,
-  baseBody: BaseAccessBody
-): BaseConsentBody {
+  baseBody: BaseGrantBody | BaseRequestBody
+) {
   const request = { ...baseBody };
-  // This makes request a ConsentRequestBody
+  // This makes request a ConsentGrantBody
   if (params.issuanceDate) {
-    (request as BaseConsentBody).issuanceDate =
+    (request as ConsentGrantBody).issuanceDate =
       params.issuanceDate.toISOString();
   }
   if (params.expirationDate) {
-    (request as BaseConsentBody).expirationDate =
+    (request as ConsentGrantBody).expirationDate =
       params.expirationDate.toISOString();
   }
-  (request as BaseConsentBody).credentialSubject.hasConsent.forPurpose =
+  return request;
+}
+
+function getConsentGrantBody(
+  params: BaseConsentParameters,
+  baseBody: BaseGrantBody
+): ConsentGrantBody {
+  const request = getConsentBaseBody(params, baseBody);
+  (request as ConsentGrantBody).credentialSubject.providedConsent.forPurpose =
     params.purpose;
-  return request as BaseConsentBody;
+  return request as ConsentGrantBody;
+}
+
+function getConsentRequestBody(
+  params: BaseConsentParameters,
+  baseBody: BaseRequestBody
+): ConsentRequestBody {
+  const request = getConsentBaseBody(params, baseBody);
+  (request as ConsentRequestBody).credentialSubject.hasConsent.forPurpose =
+    params.purpose;
+  return request as ConsentRequestBody;
 }
 
 export function getRequestBody(
@@ -91,14 +107,24 @@ export function getRequestBody(
 export function getRequestBody(
   params: AccessRequestParameters | ConsentRequestParameters
 ): AccessRequestBody | ConsentRequestBody {
-  const request = getBaseBody(params);
-  // From this point on, request is an AccessRequestBody
-  request.credentialSubject.hasConsent.hasStatus = params.status;
+  const modes = accessToResourceAccessModeArray(params.access);
+  const requestBody = getBaseBody(params);
+  (requestBody as AccessRequestBody).credentialSubject = {
+    ...requestBody.credentialSubject,
+    hasConsent: {
+      mode: modes,
+      hasStatus: params.status,
+      forPersonalData: params.resources,
+    },
+  };
   if (isConsentRequestParameters(params)) {
     // This makes request a ConsentRequestBody
-    return getConsentBody(params, request) as ConsentRequestBody;
+    return getConsentRequestBody(
+      params,
+      requestBody as BaseRequestBody
+    ) as ConsentRequestBody;
   }
-  return request as AccessRequestBody;
+  return requestBody as AccessRequestBody;
 }
 
 export function getGrantBody(params: ConsentGrantParameters): ConsentGrantBody;
@@ -106,38 +132,49 @@ export function getGrantBody(params: AccessGrantParameters): AccessGrantBody;
 export function getGrantBody(
   params: AccessGrantParameters | ConsentGrantParameters
 ): AccessGrantBody | ConsentGrantBody {
-  const grant = getBaseBody(params);
-  // From this point on, request is an AccessGrantBody
-  grant.credentialSubject.hasConsent.hasStatus = params.status;
-  (grant as AccessGrantBody).credentialSubject.hasConsent.isProvidedTo =
-    params.requestor;
+  const modes = accessToResourceAccessModeArray(params.access);
+  const grantBody = getBaseBody(params);
+  (grantBody as AccessGrantBody).credentialSubject = {
+    ...grantBody.credentialSubject,
+    providedConsent: {
+      mode: modes,
+      hasStatus: params.status,
+      forPersonalData: params.resources,
+      isProvidedTo: params.requestor,
+    },
+  };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (isConsentRequestParameters(params as any)) {
     // This makes request a ConsentGrantBody
-    return getConsentBody(
+    return getConsentGrantBody(
       params as ConsentGrantParameters,
-      grant
-    ) as ConsentGrantBody;
+      grantBody as ConsentGrantBody
+    );
   }
-  return grant as AccessGrantBody;
+  return grantBody as AccessGrantBody;
 }
 
 export async function issueAccessOrConsentVc(
   requestor: WebId,
-  vcBody: BaseAccessBody | BaseConsentBody,
+  vcBody:
+    | BaseRequestBody
+    | BaseGrantBody
+    | BaseConsentRequestBody
+    | BaseConsentGrantBody,
   options: ConsentApiBaseOptions
 ): Promise<VerifiableCredential> {
   const fetcher = await getSessionFetch(options);
+  const targetResourceIri = isBaseRequest(vcBody)
+    ? vcBody.credentialSubject.hasConsent.forPersonalData[0]
+    : (vcBody as ConsentGrantBody).credentialSubject.providedConsent
+        .forPersonalData[0];
   // TODO: find out if concatenating "issue" here is correct
   // It seems like the issuer endpoint should be discovered from the well-known direcly
   // And the consent endpoint should be an object with one URI per service
   // (issuer service, verifier service... supposedly status and query and vc???)
   const consentIssuerEndpoint = new URL(
     "issue",
-    await getConsentApiEndpoint(
-      vcBody.credentialSubject.hasConsent.forPersonalData[0],
-      options
-    )
+    await getConsentApiEndpoint(targetResourceIri, options)
   );
   return issueVerifiableCredential(
     consentIssuerEndpoint.href,

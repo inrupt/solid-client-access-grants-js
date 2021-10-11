@@ -19,13 +19,13 @@
 
 import { GC_CONSENT_STATUS_REQUESTED } from "../constants";
 import { AccessRequestBody } from "../type/AccessVerifiableCredential";
-import { isBaseAccessVerifiableCredential } from "./isBaseAccessVerifiableCredential";
+import { isBaseRequestVerifiableCredential } from "./isBaseAccessVerifiableCredential";
 
 export function isAccessRequest(
   x: unknown
 ): x is AccessRequestBody & { issuanceDate: string } {
   return (
-    isBaseAccessVerifiableCredential(x) &&
+    isBaseRequestVerifiableCredential(x) &&
     x.credentialSubject.hasConsent.hasStatus === GC_CONSENT_STATUS_REQUESTED &&
     typeof x.issuanceDate === "string"
   );

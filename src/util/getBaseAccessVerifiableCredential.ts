@@ -20,10 +20,13 @@
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import type { BaseAccessBody } from "../type/AccessVerifiableCredential";
+import type {
+  AccessGrantBody,
+  AccessRequestBody,
+} from "../type/AccessVerifiableCredential";
 import { getSessionFetch } from "./getSessionFetch";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { isBaseAccessVerifiableCredential } from "../guard/isBaseAccessVerifiableCredential";
+import { isBaseRequestVerifiableCredential } from "../guard/isBaseAccessVerifiableCredential";
 
 async function getVerifiableCredential(
   vc: URL | UrlString,
@@ -41,10 +44,10 @@ async function getVerifiableCredential(
   return (await issuerResponse.json()) as VerifiableCredential;
 }
 
-export async function getBaseAccessVerifiableCredential(
+export async function getBaseAccessGrantVerifiableCredential(
   vc: VerifiableCredential | URL | UrlString,
   options: ConsentApiBaseOptions
-): Promise<BaseAccessBody & VerifiableCredential> {
+): Promise<AccessGrantBody & VerifiableCredential> {
   const fetchedVerifiableCredential =
     typeof vc === "string" || vc instanceof URL
       ? await getVerifiableCredential(vc, options)
@@ -55,5 +58,23 @@ export async function getBaseAccessVerifiableCredential(
   //     `An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential.`
   //   );
   // }
-  return fetchedVerifiableCredential as BaseAccessBody & VerifiableCredential;
+  return fetchedVerifiableCredential as AccessGrantBody & VerifiableCredential;
+}
+
+export async function getBaseAccessRequestVerifiableCredential(
+  vc: VerifiableCredential | URL | UrlString,
+  options: ConsentApiBaseOptions
+): Promise<AccessRequestBody & VerifiableCredential> {
+  const fetchedVerifiableCredential =
+    typeof vc === "string" || vc instanceof URL
+      ? await getVerifiableCredential(vc, options)
+      : vc;
+  // TODO: This test is failing on legitimate VCs and should be fixed.
+  // if (!isBaseAccessVerifiableCredential(fetchedVerifiableCredential)) {
+  //   throw new Error(
+  //     `An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential.`
+  //   );
+  // }
+  return fetchedVerifiableCredential as AccessRequestBody &
+    VerifiableCredential;
 }

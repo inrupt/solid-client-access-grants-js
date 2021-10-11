@@ -19,7 +19,7 @@
 
 import { UrlString } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { getBaseAccessVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
+import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
 import { getConsentManagementUiFromWellKnown } from "./getConsentManagementUi";
 
@@ -39,12 +39,12 @@ export async function redirectToConsentManagementUi(
   redirectUrl: UrlString | URL,
   options?: {
     redirectCallback?: (url: string) => unknown;
+    fetch?: typeof global.fetch;
   }
 ): Promise<void> {
-  // TODO: should a fetch be provided to have authenticated VC lookup ?
-  const requestVc = await getBaseAccessVerifiableCredential(
+  const requestVc = await getBaseAccessRequestVerifiableCredential(
     accessRequestVc,
-    {}
+    { fetch: options?.fetch }
   );
   const consentManagementUi = await getConsentManagementUiFromWellKnown(
     requestVc.credentialSubject.hasConsent.forPersonalData[0],

@@ -17,21 +17,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import type { BaseAccessBody } from "../type/AccessVerifiableCredential";
-import type { ConsentStatus } from "../type/ConsentStatus";
+import { BaseBody, BaseRequestBody } from "../type/AccessVerifiableCredential";
 
-export function setAccessVerifiableCredentialStatus<
-  T extends BaseAccessBody & VerifiableCredential
->(vc: T, consentStatus: ConsentStatus): T {
-  return {
-    ...vc,
-    credentialSubject: {
-      ...vc.credentialSubject,
-      hasConsent: {
-        ...vc.credentialSubject.hasConsent,
-        hasStatus: consentStatus,
-      },
-    },
-  };
+export function isBaseRequest(vc: BaseBody): vc is BaseBody & BaseRequestBody {
+  return (vc as BaseRequestBody).credentialSubject.hasConsent !== undefined;
 }

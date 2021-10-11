@@ -18,18 +18,14 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
-import {
-  AccessGrantBody,
-  BaseAccessBody,
-} from "../type/AccessVerifiableCredential";
+import { AccessGrantBody, BaseBody } from "../type/AccessVerifiableCredential";
 
-export function isAccessGrant(
-  vc: BaseAccessBody
-): vc is BaseAccessBody & AccessGrantBody {
+export function isAccessGrant(vc: BaseBody): vc is BaseBody & AccessGrantBody {
   return (
-    vc.credentialSubject.hasConsent.hasStatus ===
+    (vc as AccessGrantBody).credentialSubject.providedConsent !== undefined &&
+    (vc as AccessGrantBody).credentialSubject.providedConsent.hasStatus ===
       GC_CONSENT_STATUS_EXPLICITLY_GIVEN &&
-    typeof (vc as AccessGrantBody).credentialSubject.hasConsent.isProvidedTo ===
-      "string"
+    typeof (vc as AccessGrantBody).credentialSubject.providedConsent
+      .isProvidedTo === "string"
   );
 }

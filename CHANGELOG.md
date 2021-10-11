@@ -8,6 +8,8 @@ The following changes have been implemented but not released yet:
 
 ### Bugfix
 
+- The shape of the consent VC obtained when approving a request wasn't valid as
+  per the consent service expectations.
 - `getConsentApiEndpoint` had an incorrect assumption about some behaviour of
   `solid-client`, which resulted in throwing an exception, and was fixed in its
   version 1.13.1.

@@ -23,7 +23,7 @@ import {
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import { getBaseAccessVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
+import { getBaseAccessGrantVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
@@ -38,7 +38,7 @@ async function revokeAccess(
   vc: VerifiableCredential | URL | UrlString,
   options: Omit<ConsentApiBaseOptions, "consentEndpoint"> = {}
 ): Promise<void> {
-  const credential = await getBaseAccessVerifiableCredential(vc, options);
+  const credential = await getBaseAccessGrantVerifiableCredential(vc, options);
 
   return revokeVerifiableCredential(
     new URL("status", credential.issuer).href,
