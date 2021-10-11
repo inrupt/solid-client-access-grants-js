@@ -42,7 +42,6 @@ export async function redirectToConsentManagementUi(
     fetch?: typeof global.fetch;
   }
 ): Promise<void> {
-  // TODO: should a fetch be provided to have authenticated VC lookup ?
   const requestVc = await getBaseAccessRequestVerifiableCredential(
     accessRequestVc,
     { fetch: options?.fetch }
