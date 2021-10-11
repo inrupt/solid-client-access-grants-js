@@ -8,6 +8,13 @@ The following changes have been implemented but not released yet:
 
 The following changes have been released:
 
+## [0.2.0] - 2021-10-11
+
+### Bugfix
+
+- The 0.1.0 version had been accidentally released some time ago, creating a conflict.
+  This just bumpts the version number to clean this up.
+
 ## [0.1.0] - 2021-10-11
 
 ### Bugfix
