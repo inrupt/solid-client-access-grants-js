@@ -26,7 +26,7 @@ import {
 import { isAccessRequest } from "../guard/isAccessRequest";
 import { isConsentRequest } from "../guard/isConsentRequest";
 import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
-import { getBaseAccessGrantVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
+import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 
@@ -94,7 +94,7 @@ export async function approveAccessRequestWithConsent(
 ): Promise<VerifiableCredential> {
   const requestCredential =
     typeof requestVc !== "undefined"
-      ? await getBaseAccessGrantVerifiableCredential(requestVc, options)
+      ? await getBaseAccessRequestVerifiableCredential(requestVc, options)
       : requestVc;
 
   if (

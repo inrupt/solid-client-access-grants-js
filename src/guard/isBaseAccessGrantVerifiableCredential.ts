@@ -17,16 +17,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { GC_CONSENT_STATUS_REQUESTED } from "../constants";
-import { AccessRequestBody } from "../type/AccessVerifiableCredential";
-import { isBaseAccessRequestVerifiableCredential } from "./isBaseAccessRequestVerifiableCredential";
+import { BaseGrantBody } from "../type/AccessVerifiableCredential";
+import { isConsentStatus } from "./isConsentStatus";
+import { isBaseVc } from "./isBaseVc";
 
-export function isAccessRequest(
+// TODO: Fix type checking
+export function isBaseAccessGrantVerifiableCredential(
   x: unknown
-): x is AccessRequestBody & { issuanceDate: string } {
+): x is BaseGrantBody {
   return (
-    isBaseAccessRequestVerifiableCredential(x) &&
-    x.credentialSubject.hasConsent.hasStatus === GC_CONSENT_STATUS_REQUESTED &&
-    typeof x.issuanceDate === "string"
+    isBaseVc(x) &&
+    (x as BaseGrantBody).credentialSubject.providedConsent !== undefined &&
+    // TODO: Add mode check
+    (x as BaseGrantBody).credentialSubject.providedConsent.mode !== undefined &&
+    isConsentStatus(
+      (x as BaseGrantBody).credentialSubject.providedConsent.hasStatus
+    ) &&
+    // TODO: Add Array of string check
+    Array.isArray(
+      (x as BaseGrantBody).credentialSubject.providedConsent.forPersonalData
+    ) &&
+    typeof x.credentialSubject.inbox === "string"
   );
 }

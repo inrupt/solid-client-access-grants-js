@@ -25,8 +25,8 @@ import type {
   AccessRequestBody,
 } from "../type/AccessVerifiableCredential";
 import { getSessionFetch } from "./getSessionFetch";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { isBaseRequestVerifiableCredential } from "../guard/isBaseAccessVerifiableCredential";
+import { isBaseAccessRequestVerifiableCredential } from "../guard/isBaseAccessRequestVerifiableCredential";
+import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 
 async function getVerifiableCredential(
   vc: URL | UrlString,
@@ -52,12 +52,11 @@ export async function getBaseAccessGrantVerifiableCredential(
     typeof vc === "string" || vc instanceof URL
       ? await getVerifiableCredential(vc, options)
       : vc;
-  // TODO: This test is failing on legitimate VCs and should be fixed.
-  // if (!isBaseAccessVerifiableCredential(fetchedVerifiableCredential)) {
-  //   throw new Error(
-  //     `An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential.`
-  //   );
-  // }
+  if (!isBaseAccessGrantVerifiableCredential(fetchedVerifiableCredential)) {
+    throw new Error(
+      `An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential.`
+    );
+  }
   return fetchedVerifiableCredential as AccessGrantBody & VerifiableCredential;
 }
 
@@ -69,12 +68,11 @@ export async function getBaseAccessRequestVerifiableCredential(
     typeof vc === "string" || vc instanceof URL
       ? await getVerifiableCredential(vc, options)
       : vc;
-  // TODO: This test is failing on legitimate VCs and should be fixed.
-  // if (!isBaseAccessVerifiableCredential(fetchedVerifiableCredential)) {
-  //   throw new Error(
-  //     `An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential.`
-  //   );
-  // }
+  if (!isBaseAccessRequestVerifiableCredential(fetchedVerifiableCredential)) {
+    throw new Error(
+      `An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential.`
+    );
+  }
   return fetchedVerifiableCredential as AccessRequestBody &
     VerifiableCredential;
 }
