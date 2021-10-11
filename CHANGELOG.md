@@ -6,6 +6,10 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### Bugfix
+
+- The access VC issued are type checked at compile time in the library.
+
 The following changes have been released:
 
 ## [0.2.0] - 2021-10-11
