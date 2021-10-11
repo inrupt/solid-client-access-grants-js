@@ -39,7 +39,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
  * @param grantShape The properties of grants to filter results.
  * @param options Optional properties to customise the request behaviour.
  * @returns A void promise.
- * @since 0.0.1
+ * @since 0.1.0
  */
 async function getAccessWithConsentAll(
   resource: URL | UrlString,

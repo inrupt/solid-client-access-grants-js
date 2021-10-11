@@ -6,6 +6,10 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+The following changes have been released:
+
+## [0.1.0] - 2021-10-11
+
 ### Bugfix
 
 - The shape of the consent VC obtained when approving a request wasn't valid as
@@ -22,8 +26,6 @@ The following changes have been implemented but not released yet:
   specific resource.
 - `redirectToConsentManagementUi` enables discovering a user's preferred consent
   management app, and redirecting them to it.
-
-The following changes have been released:
 
 ## [0.0.3] - 2021-10-01
 
