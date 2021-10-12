@@ -28,7 +28,6 @@ import { getSessionFetch } from "./getSessionFetch";
 import type {
   AccessGrantBody,
   AccessRequestBody,
-  BaseAccessVcBody,
   BaseConsentGrantBody,
   BaseConsentRequestBody,
   BaseGrantBody,
