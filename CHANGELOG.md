@@ -8,6 +8,11 @@ The following changes have been implemented but not released yet:
 
 The following changes have been released:
 
+## [0.2.1] - 2021-10-12
+
+- An [NPM incident](https://status.npmjs.org/incidents/wy4002vc8ryc) made version
+  0.2.0 uninstallable, and publishing a new version was necessary to resolve the issue.
+
 ## [0.2.0] - 2021-10-11
 
 ### Bugfix
