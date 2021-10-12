@@ -21,7 +21,7 @@
 import { it, describe, expect } from "@jest/globals";
 import { isBaseAccessGrantVerifiableCredential } from "./isBaseAccessGrantVerifiableCredential";
 
-const validAccessRequestVerifiableCredential = {
+const validAccessGrantVerifiableCredential = {
   "@context": [
     "https://www.w3.org/2018/credentials/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1",
@@ -57,8 +57,42 @@ describe("isBaseAccessGrantVerifiableCredential", () => {
   it("Returns true on valid Access Grant VC", () => {
     expect(
       isBaseAccessGrantVerifiableCredential(
-        validAccessRequestVerifiableCredential
+        validAccessGrantVerifiableCredential
       )
+    ).toBe(true);
+  });
+
+  it("Returns false on invalid Access Grant VC", () => {
+    expect(
+      isBaseAccessGrantVerifiableCredential({
+        ...validAccessGrantVerifiableCredential,
+        credentialSubject: {
+          ...validAccessGrantVerifiableCredential.credentialSubject,
+          providedConsent: {
+            ...validAccessGrantVerifiableCredential.credentialSubject
+              .providedConsent,
+            forPersonalData: ["https://example.pod/resourceX", {}],
+          },
+        },
+      })
+    ).toBe(false);
+  });
+
+  it("Returns false on invalid issuance date", () => {
+    expect(
+      isBaseAccessGrantVerifiableCredential({
+        ...validAccessGrantVerifiableCredential,
+        issuanceDate: [],
+      })
+    ).toBe(false);
+  });
+
+  it("Returns true on undefined issuance date", () => {
+    expect(
+      isBaseAccessGrantVerifiableCredential({
+        ...validAccessGrantVerifiableCredential,
+        issuanceDate: undefined,
+      })
     ).toBe(true);
   });
 });

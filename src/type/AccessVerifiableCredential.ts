@@ -28,34 +28,50 @@ import type {
 import type { ResourceAccessMode } from "./ResourceAccessMode";
 import type { ConsentStatus } from "./ConsentStatus";
 
-export type BaseBody = {
+export type ConsentAttributes = {
+  mode: ResourceAccessMode[];
+  hasStatus: ConsentStatus;
+  forPersonalData: UrlString[];
+};
+
+export type ConsentGrantAttributes = ConsentAttributes & {
+  isProvidedTo: UrlString;
+};
+
+export type CredentialSubject = {
+  id: UrlString;
+  inbox: UrlString;
+  hasConsent?: ConsentAttributes;
+  providedConsent?: ConsentGrantAttributes;
+};
+
+export type RequestCredentialSubject = Required<
+  Omit<CredentialSubject, "providedConsent">
+>;
+
+export type GrantCredentialSubject = Required<
+  Omit<CredentialSubject, "hasConsent">
+>;
+
+export type BaseAccessVcBody = {
   "@context": typeof CONSENT_CONTEXT;
   type: [typeof CREDENTIAL_TYPE];
-  credentialSubject: {
-    id: UrlString;
-    inbox: UrlString;
-  };
+  credentialSubject: RequestCredentialSubject | GrantCredentialSubject;
   issuanceDate?: string;
 };
 
-export type BaseRequestBody = BaseBody & {
-  credentialSubject: {
-    hasConsent: {
-      mode: ResourceAccessMode[];
-      hasStatus: ConsentStatus;
-      forPersonalData: UrlString[];
-    };
-  };
+export type BaseRequestBody = {
+  "@context": typeof CONSENT_CONTEXT;
+  type: [typeof CREDENTIAL_TYPE];
+  credentialSubject: RequestCredentialSubject;
+  issuanceDate?: string;
 };
 
-export type BaseGrantBody = BaseBody & {
-  credentialSubject: {
-    providedConsent: {
-      mode: ResourceAccessMode[];
-      hasStatus: ConsentStatus;
-      forPersonalData: UrlString[];
-    };
-  };
+export type BaseGrantBody = {
+  "@context": typeof CONSENT_CONTEXT;
+  type: [typeof CREDENTIAL_TYPE];
+  credentialSubject: GrantCredentialSubject;
+  issuanceDate?: string;
 };
 
 // TODO: Check why the access credentials would not have optional expiration dates

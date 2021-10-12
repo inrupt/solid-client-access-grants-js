@@ -18,11 +18,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { CREDENTIAL_TYPE } from "../constants";
-import { BaseBody } from "../type/AccessVerifiableCredential";
+import { BaseAccessVcBody } from "../type/AccessVerifiableCredential";
 import { isUnknownObject } from "./isUnknownObject";
 import { isConsentContext } from "./isConsentContext";
 
-export function isBaseVc(x: unknown): x is BaseBody {
+export function isBaseAccessVcBody(x: unknown): x is BaseAccessVcBody {
   return (
     isUnknownObject(x) &&
     isConsentContext(x["@context"]) &&
@@ -30,6 +30,7 @@ export function isBaseVc(x: unknown): x is BaseBody {
     x.type.includes(CREDENTIAL_TYPE) &&
     isUnknownObject(x.credentialSubject) &&
     typeof x.credentialSubject.id === "string" &&
-    typeof x.credentialSubject.inbox === "string"
+    typeof x.credentialSubject.inbox === "string" &&
+    (x.issuanceDate !== undefined ? typeof x.issuanceDate === "string" : true)
   );
 }

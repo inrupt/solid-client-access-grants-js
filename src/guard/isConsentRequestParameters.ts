@@ -17,13 +17,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import {
-  ConsentRequestParameters,
-  AccessRequestParameters,
-} from "../type/Parameter";
+import { BaseConsentParameters } from "../type/Parameter";
+import { isUnknownObject } from "./isUnknownObject";
 
-export function isConsentRequestParameters(
-  params: AccessRequestParameters | ConsentRequestParameters
-): params is ConsentRequestParameters {
-  return (params as ConsentRequestParameters).purpose !== undefined;
+export function isBaseConsentParameters(
+  x: unknown
+): x is BaseConsentParameters {
+  return isUnknownObject(x) && x.purpose !== undefined;
 }

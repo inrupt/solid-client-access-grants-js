@@ -8,7 +8,7 @@ The following changes have been implemented but not released yet:
 
 ### Bugfix
 
-- The access VC issued are type checked at compile time in the library.
+- Fix and re-enable VC type checking.
 
 The following changes have been released:
 

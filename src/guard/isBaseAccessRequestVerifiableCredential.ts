@@ -17,26 +17,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { BaseRequestBody } from "../type/AccessVerifiableCredential";
-import { isConsentStatus } from "./isConsentStatus";
-import { isBaseVc } from "./isBaseVc";
+import {
+  BaseRequestBody,
+  GrantCredentialSubject,
+  RequestCredentialSubject,
+} from "../type/AccessVerifiableCredential";
+import { isConsentAttributes } from "./isConsentAttributes";
+import { isBaseAccessVcBody } from "./isBaseVc";
 
-// TODO: Fix type checking
+export function isRequestCredentialSubject(
+  x: RequestCredentialSubject | GrantCredentialSubject
+): x is RequestCredentialSubject {
+  return (x as RequestCredentialSubject).hasConsent !== undefined;
+}
+
 export function isBaseAccessRequestVerifiableCredential(
   x: unknown
 ): x is BaseRequestBody {
   return (
-    isBaseVc(x) &&
-    (x as BaseRequestBody).credentialSubject.hasConsent !== undefined &&
-    // TODO: Add mode check
-    (x as BaseRequestBody).credentialSubject.hasConsent.mode !== undefined &&
-    isConsentStatus(
-      (x as BaseRequestBody).credentialSubject.hasConsent.hasStatus
-    ) &&
-    // TODO: Add Array of string check
-    Array.isArray(
-      (x as BaseRequestBody).credentialSubject.hasConsent.forPersonalData
-    ) &&
-    typeof x.credentialSubject.inbox === "string"
+    isBaseAccessVcBody(x) &&
+    isRequestCredentialSubject(x.credentialSubject) &&
+    isConsentAttributes(x.credentialSubject.hasConsent)
   );
 }

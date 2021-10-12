@@ -17,8 +17,13 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { BaseBody, BaseRequestBody } from "../type/AccessVerifiableCredential";
+import {
+  BaseAccessVcBody,
+  BaseRequestBody,
+} from "../type/AccessVerifiableCredential";
 
-export function isBaseRequest(vc: BaseBody): vc is BaseBody & BaseRequestBody {
+export function isBaseRequest(
+  vc: BaseAccessVcBody
+): vc is BaseAccessVcBody & BaseRequestBody {
   return (vc as BaseRequestBody).credentialSubject.hasConsent !== undefined;
 }

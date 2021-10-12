@@ -18,19 +18,19 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import {
-  BaseBody,
+  BaseAccessVcBody,
   BaseConsentGrantBody,
   BaseConsentRequestBody,
 } from "../type/AccessVerifiableCredential";
 
 export function isConsentRequest(
-  request: BaseBody | BaseConsentGrantBody
+  request: BaseAccessVcBody | BaseConsentGrantBody
 ): request is BaseConsentGrantBody;
 export function isConsentRequest(
-  request: BaseBody | BaseConsentRequestBody
+  request: BaseAccessVcBody | BaseConsentRequestBody
 ): request is BaseConsentRequestBody;
 export function isConsentRequest(
-  request: BaseBody | BaseConsentRequestBody | BaseConsentGrantBody
+  request: BaseAccessVcBody | BaseConsentRequestBody | BaseConsentGrantBody
 ): request is BaseConsentRequestBody | BaseConsentGrantBody {
   if (
     (request as BaseConsentRequestBody).credentialSubject.hasConsent !==

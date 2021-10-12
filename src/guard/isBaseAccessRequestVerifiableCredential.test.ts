@@ -61,4 +61,20 @@ describe("isBaseAccessRequestVerifiableCredential", () => {
       )
     ).toBe(true);
   });
+
+  it("Returns false on invalid Access Request VC", () => {
+    expect(
+      isBaseAccessRequestVerifiableCredential({
+        ...validAccessRequestVerifiableCredential,
+        credentialSubject: {
+          ...validAccessRequestVerifiableCredential.credentialSubject,
+          hasConsent: {
+            ...validAccessRequestVerifiableCredential.credentialSubject
+              .hasConsent,
+            mode: ["http://www.w3.org/ns/auth/acl#Read", "SOME_INVALID_MODE"],
+          },
+        },
+      })
+    ).toBe(false);
+  });
 });

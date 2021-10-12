@@ -28,11 +28,13 @@ import { getSessionFetch } from "./getSessionFetch";
 import type {
   AccessGrantBody,
   AccessRequestBody,
-  BaseBody,
+  BaseAccessVcBody,
   BaseConsentGrantBody,
   BaseConsentRequestBody,
   BaseGrantBody,
   BaseRequestBody,
+  ConsentAttributes,
+  ConsentGrantAttributes,
   ConsentGrantBody,
   ConsentRequestBody,
 } from "../type/AccessVerifiableCredential";
@@ -47,16 +49,57 @@ import type {
 } from "../type/Parameter";
 import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
 import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArray";
-import { isConsentRequestParameters } from "../guard/isConsentRequestParameters";
+import { isBaseConsentParameters } from "../guard/isConsentRequestParameters";
 import { isBaseRequest } from "../guard/isBaseRequest";
 
-function getBaseBody(params: BaseRequestParameters): BaseBody {
-  return {
+function getConsentAttributes(
+  params: BaseRequestParameters,
+  type: "BaseRequestBody" | "BaseGrantBody"
+): ConsentAttributes | ConsentGrantAttributes {
+  const modes = accessToResourceAccessModeArray(params.access);
+  const consentAttributes: ConsentAttributes = {
+    mode: modes,
+    hasStatus: params.status,
+    forPersonalData: params.resources,
+  };
+  if (type === "BaseGrantBody") {
+    return {
+      ...consentAttributes,
+      isProvidedTo: params.requestor,
+    } as ConsentGrantAttributes;
+  }
+  return consentAttributes;
+}
+
+function getBaseBody(
+  params: BaseRequestParameters,
+  type: "BaseRequestBody" | "BaseGrantBody"
+): BaseRequestBody | BaseGrantBody {
+  const body = {
     "@context": CONSENT_CONTEXT,
-    type: [CREDENTIAL_TYPE],
+    type: [CREDENTIAL_TYPE] as [typeof CREDENTIAL_TYPE],
     credentialSubject: {
       id: params.requestor,
       inbox: params.requestorInboxUrl,
+    },
+  };
+  if (type === "BaseGrantBody") {
+    return {
+      ...body,
+      credentialSubject: {
+        ...body.credentialSubject,
+        providedConsent: getConsentAttributes(
+          params,
+          type
+        ) as ConsentGrantAttributes,
+      },
+    };
+  }
+  return {
+    ...body,
+    credentialSubject: {
+      ...body.credentialSubject,
+      hasConsent: getConsentAttributes(params, type),
     },
   };
 }
@@ -107,17 +150,9 @@ export function getRequestBody(
 export function getRequestBody(
   params: AccessRequestParameters | ConsentRequestParameters
 ): AccessRequestBody | ConsentRequestBody {
-  const modes = accessToResourceAccessModeArray(params.access);
-  const requestBody = getBaseBody(params);
-  (requestBody as AccessRequestBody).credentialSubject = {
-    ...requestBody.credentialSubject,
-    hasConsent: {
-      mode: modes,
-      hasStatus: params.status,
-      forPersonalData: params.resources,
-    },
-  };
-  if (isConsentRequestParameters(params)) {
+  const requestBody = getBaseBody(params, "BaseRequestBody");
+
+  if (isBaseConsentParameters(params)) {
     // This makes request a ConsentRequestBody
     return getConsentRequestBody(
       params,
@@ -132,19 +167,9 @@ export function getGrantBody(params: AccessGrantParameters): AccessGrantBody;
 export function getGrantBody(
   params: AccessGrantParameters | ConsentGrantParameters
 ): AccessGrantBody | ConsentGrantBody {
-  const modes = accessToResourceAccessModeArray(params.access);
-  const grantBody = getBaseBody(params);
-  (grantBody as AccessGrantBody).credentialSubject = {
-    ...grantBody.credentialSubject,
-    providedConsent: {
-      mode: modes,
-      hasStatus: params.status,
-      forPersonalData: params.resources,
-      isProvidedTo: params.requestor,
-    },
-  };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (isConsentRequestParameters(params as any)) {
+  const grantBody = getBaseBody(params, "BaseGrantBody");
+
+  if (isBaseConsentParameters(params)) {
     // This makes request a ConsentGrantBody
     return getConsentGrantBody(
       params as ConsentGrantParameters,
