@@ -37,8 +37,8 @@ function isConsentStatus(x: unknown): x is ConsentStatus {
   return typeof x === "string" && (CONSENT_STATUS as Set<string>).has(x);
 }
 
-// TODO: Make strongly typed URL strings? as in check they parse as URL?
-function isUrlStringArray(x: unknown): x is Array<UrlString> {
+// TODO: Discuss a strongly typed UrlString guard (as a team).
+function isStringArray(x: unknown): x is Array<UrlString> {
   return (
     Array.isArray(x) &&
     x
@@ -52,6 +52,6 @@ export function isConsentAttributes(x: unknown): x is ConsentAttributes {
     isUnknownObject(x) &&
     isResourceAccessModeArray(x.mode) &&
     isConsentStatus(x.hasStatus) &&
-    isUrlStringArray(x.forPersonalData)
+    isStringArray(x.forPersonalData)
   );
 }

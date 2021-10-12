@@ -23,9 +23,9 @@ import {
   RequestCredentialSubject,
 } from "../type/AccessVerifiableCredential";
 import { isConsentAttributes } from "./isConsentAttributes";
-import { isBaseAccessVcBody } from "./isBaseVc";
+import { isBaseAccessVcBody } from "./isBaseAccessVcBody";
 
-export function isGrantCredentialSubject(
+function isGrantCredentialSubject(
   x: RequestCredentialSubject | GrantCredentialSubject
 ): x is GrantCredentialSubject {
   return (x as GrantCredentialSubject).providedConsent !== undefined;

@@ -48,9 +48,17 @@ import type {
 } from "../type/Parameter";
 import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
 import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArray";
-import { isBaseConsentParameters } from "../guard/isConsentRequestParameters";
+import { isBaseConsentParameters } from "../guard/isBaseConsentParameters";
 import { isBaseRequest } from "../guard/isBaseRequest";
 
+function getConsentAttributes(
+  params: BaseRequestParameters,
+  type: "BaseRequestBody"
+): ConsentAttributes;
+function getConsentAttributes(
+  params: BaseRequestParameters,
+  type: "BaseGrantBody"
+): ConsentGrantAttributes;
 function getConsentAttributes(
   params: BaseRequestParameters,
   type: "BaseRequestBody" | "BaseGrantBody"
@@ -72,6 +80,14 @@ function getConsentAttributes(
 
 function getBaseBody(
   params: BaseRequestParameters,
+  type: "BaseRequestBody"
+): BaseRequestBody;
+function getBaseBody(
+  params: BaseRequestParameters,
+  type: "BaseGrantBody"
+): BaseGrantBody;
+function getBaseBody(
+  params: BaseRequestParameters,
   type: "BaseRequestBody" | "BaseGrantBody"
 ): BaseRequestBody | BaseGrantBody {
   const body = {
@@ -87,10 +103,7 @@ function getBaseBody(
       ...body,
       credentialSubject: {
         ...body.credentialSubject,
-        providedConsent: getConsentAttributes(
-          params,
-          type
-        ) as ConsentGrantAttributes,
+        providedConsent: getConsentAttributes(params, type),
       },
     };
   }

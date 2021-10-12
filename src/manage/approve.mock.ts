@@ -53,7 +53,6 @@ export const mockAccessRequestVc = (): VerifiableCredential &
         forPersonalData: ["https://some.resource"],
         hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
         mode: ["http://www.w3.org/ns/auth/acl#Read"],
-        isProvidedTo: "https://some.requestor",
       },
       inbox: "https://some.inbox",
     },
