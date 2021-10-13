@@ -35,13 +35,9 @@ async function discoverConsentManagementUi(options: {
   const authFetch = await getSessionFetch({});
   let consentManagementUi;
   if (options.resourceOwner) {
-    consentManagementUi =
-      (await getConsentManagementUi(options.resourceOwner, {
-        fetch: authFetch,
-      })) ??
-      (await getConsentManagementUiFromWellKnown(options.resourceUrl, {
-        fetch: authFetch,
-      }));
+    consentManagementUi = await getConsentManagementUi(options.resourceOwner, {
+      fetch: authFetch,
+    });
   } else {
     consentManagementUi = await getConsentManagementUiFromWellKnown(
       options.resourceUrl,
