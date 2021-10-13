@@ -65,8 +65,7 @@ describe("denyAccessRequest", () => {
     );
   });
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip("throws if the provided VC isn't a Solid consent request", async () => {
+  it("throws if the provided VC isn't a Solid consent request", async () => {
     mockConsentEndpoint();
     await expect(
       denyAccessRequest({
@@ -128,7 +127,6 @@ describe("denyAccessRequest", () => {
     );
   });
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it("issues a proper denied access VC", async () => {
     mockConsentEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
@@ -142,6 +140,7 @@ describe("denyAccessRequest", () => {
       fetch: jest.fn(global.fetch),
     });
 
+    // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
       mockAccessRequestVc().credentialSubject.id,
@@ -162,8 +161,7 @@ describe("denyAccessRequest", () => {
     );
   });
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip("issues a proper denied access VC from a given access request VC IRI", async () => {
+  it("issues a proper denied access VC from a given access request VC IRI", async () => {
     mockConsentEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -186,12 +184,12 @@ describe("denyAccessRequest", () => {
       mockAccessRequestVc().credentialSubject.id,
       expect.objectContaining({
         id: mockAccessRequestVc().credentialSubject.id,
-        providedConsent: {
+        providedConsent: expect.objectContaining({
           mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
             mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
-        },
+        }),
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
@@ -201,8 +199,7 @@ describe("denyAccessRequest", () => {
     );
   });
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip("can take a URL as VC IRI parameter", async () => {
+  it("can take a URL as VC IRI parameter", async () => {
     mockConsentEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -220,17 +217,18 @@ describe("denyAccessRequest", () => {
       fetch: mockedFetch,
     });
 
+    // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
       mockAccessRequestVc().credentialSubject.id,
       expect.objectContaining({
         id: mockAccessRequestVc().credentialSubject.id,
-        providedConsent: {
+        providedConsent: expect.objectContaining({
           mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
             mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
-        },
+        }),
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({

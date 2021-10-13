@@ -6,6 +6,10 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### Bugfix
+
+- Fix and re-enable VC type checking.
+
 The following changes have been released:
 
 ## [0.2.1] - 2021-10-12

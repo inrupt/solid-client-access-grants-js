@@ -23,6 +23,7 @@ import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { jest, describe, it, expect } from "@jest/globals";
 import { revokeAccess } from "./revokeAccess";
 import { mockAccessGrant, MOCKED_CREDENTIAL_ID } from "../request/request.mock";
+import { mockAccessRequestVc } from "./approve.mock";
 
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
@@ -123,6 +124,12 @@ describe("revokeAccess", () => {
     await expect(
       revokeAccess("https://some.credential", { fetch: mockedFetch })
     ).rejects.toThrow(/\[https:\/\/some.credential\].*401.*Unauthorized/);
+  });
+
+  it("throws if the resource is not a base access grant VC", async () => {
+    await expect(revokeAccess(mockAccessRequestVc())).rejects.toThrow(
+      "An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential."
+    );
   });
 
   it("gets the VC identifier if provided as a full credential", async () => {

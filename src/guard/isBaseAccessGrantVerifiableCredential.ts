@@ -17,15 +17,26 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
-import { AccessGrantBody, BaseBody } from "../type/AccessVerifiableCredential";
+import {
+  BaseGrantBody,
+  GrantCredentialSubject,
+  RequestCredentialSubject,
+} from "../type/AccessVerifiableCredential";
+import { isConsentAttributes } from "./isConsentAttributes";
+import { isBaseAccessVcBody } from "./isBaseAccessVcBody";
 
-export function isAccessGrant(vc: BaseBody): vc is BaseBody & AccessGrantBody {
+function isGrantCredentialSubject(
+  x: RequestCredentialSubject | GrantCredentialSubject
+): x is GrantCredentialSubject {
+  return (x as GrantCredentialSubject).providedConsent !== undefined;
+}
+
+export function isBaseAccessGrantVerifiableCredential(
+  x: unknown
+): x is BaseGrantBody {
   return (
-    (vc as AccessGrantBody).credentialSubject.providedConsent !== undefined &&
-    (vc as AccessGrantBody).credentialSubject.providedConsent.hasStatus ===
-      GC_CONSENT_STATUS_EXPLICITLY_GIVEN &&
-    typeof (vc as AccessGrantBody).credentialSubject.providedConsent
-      .isProvidedTo === "string"
+    isBaseAccessVcBody(x) &&
+    isGrantCredentialSubject(x.credentialSubject) &&
+    isConsentAttributes(x.credentialSubject.providedConsent)
   );
 }

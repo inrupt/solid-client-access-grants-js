@@ -45,7 +45,7 @@ export const mockAccessGrant = (
     "@context": CONSENT_CONTEXT,
     credentialSubject: {
       id: subjectId,
-      hasConsent: {
+      providedConsent: {
         forPersonalData: ["https://some.resource"],
         hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
         mode: ["http://www.w3.org/ns/auth/acl#Read"],

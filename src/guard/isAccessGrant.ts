@@ -17,13 +17,20 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
 import {
-  ConsentRequestParameters,
-  AccessRequestParameters,
-} from "../type/Parameter";
+  AccessGrantBody,
+  BaseAccessVcBody,
+} from "../type/AccessVerifiableCredential";
 
-export function isConsentRequestParameters(
-  params: AccessRequestParameters | ConsentRequestParameters
-): params is ConsentRequestParameters {
-  return (params as ConsentRequestParameters).purpose !== undefined;
+export function isAccessGrant(
+  vc: BaseAccessVcBody
+): vc is BaseAccessVcBody & AccessGrantBody {
+  return (
+    (vc as AccessGrantBody).credentialSubject.providedConsent !== undefined &&
+    (vc as AccessGrantBody).credentialSubject.providedConsent.hasStatus ===
+      GC_CONSENT_STATUS_EXPLICITLY_GIVEN &&
+    typeof (vc as AccessGrantBody).credentialSubject.providedConsent
+      .isProvidedTo === "string"
+  );
 }

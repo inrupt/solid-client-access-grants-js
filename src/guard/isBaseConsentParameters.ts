@@ -17,32 +17,11 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import {
-  BaseAccessVcBody,
-  BaseConsentGrantBody,
-  BaseConsentRequestBody,
-} from "../type/AccessVerifiableCredential";
+import { BaseConsentParameters } from "../type/Parameter";
+import { isUnknownObject } from "./isUnknownObject";
 
-export function isConsentRequest(
-  request: BaseAccessVcBody | BaseConsentGrantBody
-): request is BaseConsentGrantBody;
-export function isConsentRequest(
-  request: BaseAccessVcBody | BaseConsentRequestBody
-): request is BaseConsentRequestBody;
-export function isConsentRequest(
-  request: BaseAccessVcBody | BaseConsentRequestBody | BaseConsentGrantBody
-): request is BaseConsentRequestBody | BaseConsentGrantBody {
-  if (
-    (request as BaseConsentRequestBody).credentialSubject.hasConsent !==
-    undefined
-  ) {
-    return (
-      (request as BaseConsentRequestBody).credentialSubject.hasConsent
-        .forPurpose !== undefined
-    );
-  }
-  return (
-    (request as BaseConsentGrantBody).credentialSubject.providedConsent
-      .forPurpose !== undefined
-  );
+export function isBaseConsentParameters(
+  x: unknown
+): x is BaseConsentParameters {
+  return isUnknownObject(x) && x.purpose !== undefined;
 }

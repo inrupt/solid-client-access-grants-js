@@ -18,31 +18,25 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import {
-  BaseAccessVcBody,
-  BaseConsentGrantBody,
-  BaseConsentRequestBody,
+  BaseRequestBody,
+  GrantCredentialSubject,
+  RequestCredentialSubject,
 } from "../type/AccessVerifiableCredential";
+import { isConsentAttributes } from "./isConsentAttributes";
+import { isBaseAccessVcBody } from "./isBaseAccessVcBody";
 
-export function isConsentRequest(
-  request: BaseAccessVcBody | BaseConsentGrantBody
-): request is BaseConsentGrantBody;
-export function isConsentRequest(
-  request: BaseAccessVcBody | BaseConsentRequestBody
-): request is BaseConsentRequestBody;
-export function isConsentRequest(
-  request: BaseAccessVcBody | BaseConsentRequestBody | BaseConsentGrantBody
-): request is BaseConsentRequestBody | BaseConsentGrantBody {
-  if (
-    (request as BaseConsentRequestBody).credentialSubject.hasConsent !==
-    undefined
-  ) {
-    return (
-      (request as BaseConsentRequestBody).credentialSubject.hasConsent
-        .forPurpose !== undefined
-    );
-  }
+function isRequestCredentialSubject(
+  x: RequestCredentialSubject | GrantCredentialSubject
+): x is RequestCredentialSubject {
+  return (x as RequestCredentialSubject).hasConsent !== undefined;
+}
+
+export function isBaseAccessRequestVerifiableCredential(
+  x: unknown
+): x is BaseRequestBody {
   return (
-    (request as BaseConsentGrantBody).credentialSubject.providedConsent
-      .forPurpose !== undefined
+    isBaseAccessVcBody(x) &&
+    isRequestCredentialSubject(x.credentialSubject) &&
+    isConsentAttributes(x.credentialSubject.hasConsent)
   );
 }

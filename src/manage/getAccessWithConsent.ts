@@ -20,8 +20,8 @@
 import { UrlString } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
-import { isBaseGrantVerifiableCredential } from "../guard/isBaseAccessVerifiableCredential";
-import { isAccessGrant } from "../guard/isConsentGrant";
+import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
+import { isAccessGrant } from "../guard/isAccessGrant";
 import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { getSessionFetch } from "../util/getSessionFetch";
@@ -60,7 +60,7 @@ export async function getAccessWithConsent(
   }
   if (
     !isVerifiableCredential(data) ||
-    !isBaseGrantVerifiableCredential(data) ||
+    !isBaseAccessGrantVerifiableCredential(data) ||
     !isAccessGrant(data)
   ) {
     throw new Error(

@@ -477,7 +477,7 @@ describe("isAccessRequest", () => {
           id: "https://some.id",
           inbox: "https://some.inbox",
           hasConsent: {
-            mode: ["some mode"],
+            mode: ["http://www.w3.org/ns/auth/acl#Read"],
             hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
             forPersonalData: ["https://some.resource"],
           },

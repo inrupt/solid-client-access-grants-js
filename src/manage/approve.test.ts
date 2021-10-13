@@ -71,8 +71,7 @@ describe("approveAccessRequest", () => {
     );
   });
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip("throws if the provided VC isn't a solid consent request VC", async () => {
+  it("throws if the provided VC isn't a solid consent request VC", async () => {
     mockConsentEndpoint();
     await expect(
       approveAccessRequest({
@@ -322,8 +321,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
   });
 
-  // eslint-disable-next-line jest/no-disabled-tests
-  it.skip("throws if the provided VC isn't a VC of type Solid Consent request", async () => {
+  it("throws if the provided VC isn't a VC of type Solid Consent request", async () => {
     mockConsentEndpoint();
     await expect(
       approveAccessRequestWithConsent({
