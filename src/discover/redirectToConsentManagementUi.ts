@@ -19,10 +19,12 @@
 
 import { UrlString, WebId } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { getConsentManagementUi } from ".";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { getConsentManagementUiFromWellKnown } from "./getConsentManagementUi";
+import {
+  getConsentManagementUi,
+  getConsentManagementUiFromWellKnown,
+} from "./getConsentManagementUi";
 
 const REQUEST_VC_PARAM_NAME = "requestVc";
 const REDIRECT_URL_PARAM_NAME = "redirectUrl";
@@ -59,30 +61,28 @@ async function discoverConsentManagementUi(options: {
 export async function redirectToConsentManagementUi(
   accessRequestVc: VerifiableCredential | UrlString | URL,
   redirectUrl: UrlString | URL,
-  options?: {
+  options: {
     redirectCallback?: (url: string) => unknown;
     fetch?: typeof global.fetch;
     resourceOwner?: WebId;
     fallbackConsentManagementUi?: UrlString;
-  }
+  } = {}
 ): Promise<void> {
   const requestVc = await getBaseAccessRequestVerifiableCredential(
     accessRequestVc,
-    { fetch: options?.fetch }
+    { fetch: options.fetch }
   );
   const consentManagementUi = await discoverConsentManagementUi({
     resourceUrl: requestVc.credentialSubject.hasConsent.forPersonalData[0],
-    resourceOwner: options?.resourceOwner,
-    fallbackUi: options?.fallbackConsentManagementUi,
+    resourceOwner: options.resourceOwner,
+    fallbackUi: options.fallbackConsentManagementUi,
   });
   if (consentManagementUi === undefined) {
     throw new Error(
       `Cannot discover consent management UI URL for [${
         requestVc.credentialSubject.hasConsent.forPersonalData[0]
       }]${
-        options?.resourceOwner
-          ? `, neither from [${options?.resourceOwner}]`
-          : ""
+        options.resourceOwner ? `, neither from [${options.resourceOwner}]` : ""
       }`
     );
   }
