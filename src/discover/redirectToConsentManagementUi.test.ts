@@ -92,9 +92,8 @@ describe("redirectToConsentManagementUi", () => {
         "https://some.redirect.iri"
       );
       const targetIri = new URL(window.location.href);
-      expect(targetIri.searchParams.get("requestVcUrl")).toBe(
-        mockAccessRequestVc().id
-      );
+      const encodedVc = targetIri.searchParams.get("requestVc") as string;
+      expect(JSON.parse(atob(encodedVc))).toEqual(mockAccessRequestVc());
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri"
       );
@@ -144,8 +143,8 @@ describe("redirectToConsentManagementUi", () => {
       );
       const redirectIri = new URL(redirectCallback.mock.calls[0][0] as string);
       expect(redirectIri.origin).toBe("https://some.consent.ui");
-      expect(redirectIri.searchParams.get("requestVcUrl")).toBe(
-        mockAccessRequestVc().id
+      expect(redirectIri.searchParams.get("requestVc")).toBe(
+        btoa(JSON.stringify(mockAccessRequestVc()))
       );
       expect(redirectIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri"

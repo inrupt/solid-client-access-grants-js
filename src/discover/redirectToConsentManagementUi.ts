@@ -23,7 +23,7 @@ import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessV
 import { getSessionFetch } from "../util/getSessionFetch";
 import { getConsentManagementUiFromWellKnown } from "./getConsentManagementUi";
 
-const REQUEST_VC_URL_PARAM_NAME = "requestVcUrl";
+const REQUEST_VC_PARAM_NAME = "requestVc";
 const REDIRECT_URL_PARAM_NAME = "redirectUrl";
 
 /**
@@ -58,8 +58,8 @@ export async function redirectToConsentManagementUi(
   }
   const targetIri = new URL(consentManagementUi);
   targetIri.searchParams.append(
-    REQUEST_VC_URL_PARAM_NAME,
-    encodeURI(requestVc.id)
+    REQUEST_VC_PARAM_NAME,
+    btoa(JSON.stringify(requestVc))
   );
   targetIri.searchParams.append(
     REDIRECT_URL_PARAM_NAME,
