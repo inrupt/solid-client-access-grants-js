@@ -17,14 +17,37 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { UrlString } from "@inrupt/solid-client";
+import { UrlString, WebId } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { getConsentManagementUiFromWellKnown } from "./getConsentManagementUi";
+import {
+  getConsentManagementUi,
+  getConsentManagementUiFromWellKnown,
+} from "./getConsentManagementUi";
 
-const REQUEST_VC_URL_PARAM_NAME = "requestVcUrl";
+const REQUEST_VC_PARAM_NAME = "requestVc";
 const REDIRECT_URL_PARAM_NAME = "redirectUrl";
+
+async function discoverConsentManagementUi(options: {
+  resourceUrl: UrlString;
+  resourceOwner?: WebId;
+  fallbackUi?: UrlString;
+}): Promise<string | undefined> {
+  const authFetch = await getSessionFetch({});
+  let consentManagementUi;
+  if (options.resourceOwner) {
+    consentManagementUi = await getConsentManagementUi(options.resourceOwner, {
+      fetch: authFetch,
+    });
+  } else {
+    consentManagementUi = await getConsentManagementUiFromWellKnown(
+      options.resourceUrl,
+      { fetch: authFetch }
+    );
+  }
+  return consentManagementUi ?? options.fallbackUi;
+}
 
 /**
  * Redirects the application to a resource owner's preferred consent management
@@ -38,28 +61,35 @@ const REDIRECT_URL_PARAM_NAME = "redirectUrl";
 export async function redirectToConsentManagementUi(
   accessRequestVc: VerifiableCredential | UrlString | URL,
   redirectUrl: UrlString | URL,
-  options?: {
+  options: {
     redirectCallback?: (url: string) => unknown;
     fetch?: typeof global.fetch;
-  }
+    resourceOwner?: WebId;
+    fallbackConsentManagementUi?: UrlString;
+  } = {}
 ): Promise<void> {
   const requestVc = await getBaseAccessRequestVerifiableCredential(
     accessRequestVc,
-    { fetch: options?.fetch }
+    { fetch: options.fetch }
   );
-  const consentManagementUi = await getConsentManagementUiFromWellKnown(
-    requestVc.credentialSubject.hasConsent.forPersonalData[0],
-    { fetch: await getSessionFetch({}) }
-  );
+  const consentManagementUi = await discoverConsentManagementUi({
+    resourceUrl: requestVc.credentialSubject.hasConsent.forPersonalData[0],
+    resourceOwner: options.resourceOwner,
+    fallbackUi: options.fallbackConsentManagementUi,
+  });
   if (consentManagementUi === undefined) {
     throw new Error(
-      `Cannot discover consent management UI URL for [${requestVc.credentialSubject.id}]`
+      `Cannot discover consent management UI URL for [${
+        requestVc.credentialSubject.hasConsent.forPersonalData[0]
+      }]${
+        options.resourceOwner ? `, neither from [${options.resourceOwner}]` : ""
+      }`
     );
   }
   const targetIri = new URL(consentManagementUi);
   targetIri.searchParams.append(
-    REQUEST_VC_URL_PARAM_NAME,
-    encodeURI(requestVc.id)
+    REQUEST_VC_PARAM_NAME,
+    btoa(JSON.stringify(requestVc))
   );
   targetIri.searchParams.append(
     REDIRECT_URL_PARAM_NAME,

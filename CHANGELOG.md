@@ -6,6 +6,12 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### Feature change
+
+- `redirectToConsentManagementUi` redirects to the consent management app adding
+  the base-64 encoded VC to the IRI as a query parameter named `requestVc`, instead
+  of the previous `requestVcUrl` which only contained the VC IRI.
+
 ### Bugfix
 
 - Fix and re-enable VC type checking.

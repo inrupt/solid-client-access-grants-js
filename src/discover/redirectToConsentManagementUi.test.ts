@@ -28,7 +28,10 @@ import {
 } from "@jest/globals";
 /* eslint-enable no-shadow */
 import { redirectToConsentManagementUi } from "./redirectToConsentManagementUi";
-import { getConsentManagementUiFromWellKnown } from "./getConsentManagementUi";
+import {
+  getConsentManagementUiFromWellKnown,
+  getConsentManagementUi,
+} from "./getConsentManagementUi";
 import { mockAccessRequestVc } from "../manage/approve.mock";
 
 jest.mock("./getConsentManagementUi");
@@ -40,6 +43,9 @@ const mockConsentManagementUiDiscovery = (url: string | undefined) => {
   ) as any;
   consentUiDiscoveryModule.getConsentManagementUiFromWellKnown = jest
     .fn(getConsentManagementUiFromWellKnown)
+    .mockResolvedValueOnce(url);
+  consentUiDiscoveryModule.getConsentManagementUi = jest
+    .fn(getConsentManagementUi)
     .mockResolvedValueOnce(url);
 };
 
@@ -65,15 +71,60 @@ describe("redirectToConsentManagementUi", () => {
 
     it("throws if the consent management UI may not be discovered", async () => {
       mockConsentManagementUiDiscovery(undefined);
-      const resourceOwner = mockAccessRequestVc().credentialSubject.id;
       await expect(
         redirectToConsentManagementUi(
           mockAccessRequestVc(),
           "https://some.redirect.iri"
         )
       ).rejects.toThrow(
-        `Cannot discover consent management UI URL for [${resourceOwner}]`
+        `Cannot discover consent management UI URL for [${
+          mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData[0]
+        }]`
       );
+    });
+
+    it("throws if the consent management UI may not be discovered, even if a resource owner WebID is provided", async () => {
+      mockConsentManagementUiDiscovery(undefined);
+      const resourceOwner = "https://some.webid";
+      await expect(
+        redirectToConsentManagementUi(
+          mockAccessRequestVc(),
+          "https://some.redirect.iri",
+          {
+            resourceOwner,
+          }
+        )
+      ).rejects.toThrow(
+        `Cannot discover consent management UI URL for [${
+          mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData[0]
+        }], neither from [${resourceOwner}]`
+      );
+    });
+
+    it("discovers the consent management UI from the resource owner profile if provided", async () => {
+      mockConsentManagementUiDiscovery("https://some.app");
+      const resourceOwner = "https://some.webid";
+      await redirectToConsentManagementUi(
+        mockAccessRequestVc(),
+        "https://some.redirect.iri",
+        {
+          resourceOwner,
+        }
+      );
+      const targetIri = window.location.href;
+      expect(targetIri).toContain("https://some.app");
+    });
+
+    it("falls back to the provided consent app IRI if any", async () => {
+      await redirectToConsentManagementUi(
+        mockAccessRequestVc(),
+        "https://some.redirect.iri",
+        {
+          fallbackConsentManagementUi: "https://some.app",
+        }
+      );
+      const targetIri = window.location.href;
+      expect(targetIri).toContain("https://some.app");
     });
 
     it("redirects to the discovered management UI IRI", async () => {
@@ -92,9 +143,8 @@ describe("redirectToConsentManagementUi", () => {
         "https://some.redirect.iri"
       );
       const targetIri = new URL(window.location.href);
-      expect(targetIri.searchParams.get("requestVcUrl")).toBe(
-        mockAccessRequestVc().id
-      );
+      const encodedVc = targetIri.searchParams.get("requestVc") as string;
+      expect(JSON.parse(atob(encodedVc))).toEqual(mockAccessRequestVc());
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri"
       );
@@ -144,8 +194,8 @@ describe("redirectToConsentManagementUi", () => {
       );
       const redirectIri = new URL(redirectCallback.mock.calls[0][0] as string);
       expect(redirectIri.origin).toBe("https://some.consent.ui");
-      expect(redirectIri.searchParams.get("requestVcUrl")).toBe(
-        mockAccessRequestVc().id
+      expect(redirectIri.searchParams.get("requestVc")).toBe(
+        btoa(JSON.stringify(mockAccessRequestVc()))
       );
       expect(redirectIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri"
