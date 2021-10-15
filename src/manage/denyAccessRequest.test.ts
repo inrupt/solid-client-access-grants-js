@@ -89,7 +89,7 @@ describe("denyAccessRequest", () => {
     await expect(
       denyAccessRequest("https://some.resource/owner", mockAccessRequestVc())
     ).rejects.toThrow(
-      "No access issuer listed for property [verifiable_credential_issuer] in"
+      "No access issuer listed for property [verifiable_credential_issuer]"
     );
   });
 
