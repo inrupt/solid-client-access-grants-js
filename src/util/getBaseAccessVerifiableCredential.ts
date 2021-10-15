@@ -68,11 +68,11 @@ export async function getBaseAccessRequestVerifiableCredential(
     typeof vc === "string" || vc instanceof URL
       ? await getVerifiableCredential(vc, options)
       : vc;
-  // if (!isBaseAccessRequestVerifiableCredential(fetchedVerifiableCredential)) {
-  //   throw new Error(
-  //     `An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential.`
-  //   );
-  // }
+  if (!isBaseAccessRequestVerifiableCredential(fetchedVerifiableCredential)) {
+    throw new Error(
+      `An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential.`
+    );
+  }
   return fetchedVerifiableCredential as AccessRequestBody &
     VerifiableCredential;
 }
