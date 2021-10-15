@@ -70,7 +70,7 @@ describe("denyAccessRequest", () => {
     await expect(
       denyAccessRequest({
         ...mockAccessRequestVc(),
-        type: ["NotASolidConsentRequest"],
+        type: ["NotASolidAccessRequest"],
       })
     ).rejects.toThrow(
       "An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential."
@@ -155,7 +155,7 @@ describe("denyAccessRequest", () => {
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidConsentRequest"],
+        type: ["SolidAccessRequest"],
       }),
       expect.anything()
     );
@@ -193,7 +193,7 @@ describe("denyAccessRequest", () => {
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidConsentRequest"],
+        type: ["SolidAccessRequest"],
       }),
       expect.anything()
     );
@@ -232,7 +232,7 @@ describe("denyAccessRequest", () => {
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidConsentRequest"],
+        type: ["SolidAccessRequest"],
       }),
       expect.anything()
     );

@@ -53,7 +53,7 @@ export const mockAccessGrant = (
       inbox: "https://some.inbox",
       ...subjectClaims,
     },
-    type: ["SolidCredential", "SolidConsentRequest"],
+    type: ["SolidCredential", "SolidAccessRequest"],
     id: MOCKED_CREDENTIAL_ID,
     issuanceDate: MOCKED_ISSUANCE_DATE,
     issuer,

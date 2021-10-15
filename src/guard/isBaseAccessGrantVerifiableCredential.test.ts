@@ -50,7 +50,7 @@ const validAccessGrantVerifiableCredential = {
     verificationMethod:
       "https://consent.service.example.com/key/f82e5979-xxxx-xxxx-xxxx-cd9d2105d314",
   },
-  type: ["VerifiableCredential", "SolidConsentRequest"],
+  type: ["VerifiableCredential", "SolidAccessRequest"],
 };
 
 describe("isBaseAccessGrantVerifiableCredential", () => {

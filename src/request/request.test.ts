@@ -79,7 +79,7 @@ describe("getConsentRequestBody", () => {
         id: MOCK_REQUESTOR_IRI,
         inbox: MOCK_REQUESTOR_INBOX,
       },
-      type: ["SolidConsentRequest"],
+      type: ["SolidAccessRequest"],
     });
   });
 
@@ -121,7 +121,7 @@ describe("getConsentRequestBody", () => {
       },
       expirationDate: "1990-11-12T13:37:42.042Z",
       issuanceDate: "1955-06-08T13:37:42.042Z",
-      type: ["SolidConsentRequest"],
+      type: ["SolidAccessRequest"],
     });
   });
 });
@@ -166,7 +166,7 @@ describe("requestAccess", () => {
         },
       }),
       expect.objectContaining({
-        type: ["SolidConsentRequest"],
+        type: ["SolidAccessRequest"],
       }),
       expect.anything()
     );
@@ -249,7 +249,7 @@ describe("requestAccessWithConsent", () => {
         },
       }),
       expect.objectContaining({
-        type: ["SolidConsentRequest"],
+        type: ["SolidAccessRequest"],
         issuanceDate: "1955-06-08T13:37:42.042Z",
         expirationDate: "1990-11-12T13:37:42.042Z",
       }),
@@ -293,7 +293,7 @@ describe("requestAccessWithConsent", () => {
         },
       }),
       expect.objectContaining({
-        type: ["SolidConsentRequest"],
+        type: ["SolidAccessRequest"],
       }),
       expect.anything()
     );
@@ -358,7 +358,7 @@ describe("isAccessRequest", () => {
         proof: mockCredentialProof(),
         issuer: "https://some.issuer",
         issuanceDate: "some date",
-        type: ["SolidConsentRequest"],
+        type: ["SolidAccessRequest"],
       })
     ).toBe(false);
   });
@@ -379,7 +379,7 @@ describe("isAccessRequest", () => {
         proof: mockCredentialProof(),
         issuer: "https://some.issuer",
         issuanceDate: "some date",
-        type: ["SolidConsentRequest"],
+        type: ["SolidAccessRequest"],
       })
     ).toBe(false);
   });
@@ -400,7 +400,7 @@ describe("isAccessRequest", () => {
         proof: mockCredentialProof(),
         issuer: "https://some.issuer",
         issuanceDate: "some date",
-        type: ["SolidConsentRequest"],
+        type: ["SolidAccessRequest"],
       })
     ).toBe(false);
   });
@@ -421,7 +421,7 @@ describe("isAccessRequest", () => {
         proof: mockCredentialProof(),
         issuer: "https://some.issuer",
         issuanceDate: "some date",
-        type: ["SolidConsentRequest"],
+        type: ["SolidAccessRequest"],
       })
     ).toBe(false);
   });
@@ -442,12 +442,12 @@ describe("isAccessRequest", () => {
         proof: mockCredentialProof(),
         issuer: "https://some.issuer",
         issuanceDate: "some date",
-        type: ["SolidConsentRequest"],
+        type: ["SolidAccessRequest"],
       })
     ).toBe(false);
   });
 
-  it("returns false if the credential type does not include 'SolidConsentRequest'", () => {
+  it("returns false if the credential type does not include 'SolidAccessRequest'", () => {
     expect(
       isAccessRequest({
         "@context": "https://some.context",
@@ -486,7 +486,7 @@ describe("isAccessRequest", () => {
         proof: mockCredentialProof(),
         issuer: "https://some.issuer",
         issuanceDate: "some date",
-        type: ["SolidConsentRequest"],
+        type: ["SolidAccessRequest"],
       })
     ).toBe(true);
   });
