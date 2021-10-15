@@ -68,7 +68,7 @@ export const INRUPT_CONSENT_SERVICE_LEGACY =
 
 export const SOLID_CONSENT_SERVICE = "http://www.w3.org/ns/solid/terms#consent";
 
-export const CREDENTIAL_TYPE = "SolidConsentRequest";
+export const CREDENTIAL_TYPE = "SolidAccessRequest";
 
 export const CONSENT_STATUS = new Set([
   GC_CONSENT_STATUS_DENIED,

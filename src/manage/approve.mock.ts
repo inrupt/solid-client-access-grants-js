@@ -65,7 +65,7 @@ export const mockAccessRequestVc = (): VerifiableCredential &
       type: "some proof type",
       verificationMethod: "some method",
     },
-    type: ["SolidConsentRequest"],
+    type: ["SolidAccessRequest"],
   };
 };
 
@@ -92,7 +92,7 @@ export const mockAccessGrantVc = (): VerifiableCredential & BaseGrantBody => {
       type: "some proof type",
       verificationMethod: "some method",
     },
-    type: ["SolidConsentRequest"],
+    type: ["SolidAccessRequest"],
   };
 };
 
