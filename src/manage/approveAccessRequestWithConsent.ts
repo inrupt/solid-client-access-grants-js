@@ -123,11 +123,7 @@ export async function approveAccessRequestWithConsent(
     issuanceDate: initialisedOptions.issuanceDate,
     expirationDate: initialisedOptions.expirationDate,
   });
-  return issueAccessOrConsentVc(
-    initialisedOptions.requestor,
-    requestBody,
-    options
-  );
+  return issueAccessOrConsentVc(resourceOwner, requestBody, options);
 }
 
 export default approveAccessRequestWithConsent;

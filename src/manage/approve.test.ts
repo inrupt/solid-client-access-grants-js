@@ -398,7 +398,7 @@ describe("approveAccessRequestWithConsent", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      mockConsentRequestVc().credentialSubject.id,
+      "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
           mode: mockConsentGrantVc().credentialSubject.providedConsent.mode,
@@ -447,7 +447,7 @@ describe("approveAccessRequestWithConsent", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      "https://some-custom.requestor",
+      "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
           mode: ["http://www.w3.org/ns/auth/acl#Append"],
@@ -493,7 +493,7 @@ describe("approveAccessRequestWithConsent", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      "https://some-custom.requestor",
+      "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
           mode: ["http://www.w3.org/ns/auth/acl#Append"],
@@ -533,7 +533,7 @@ describe("approveAccessRequestWithConsent", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      mockConsentRequestVc().credentialSubject.id,
+      "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
           mode: mockConsentGrantVc().credentialSubject.providedConsent.mode,
@@ -578,7 +578,7 @@ describe("approveAccessRequestWithConsent", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      mockConsentRequestVc().credentialSubject.id,
+      "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
           mode: mockConsentRequestVc().credentialSubject.hasConsent.mode,
@@ -623,7 +623,7 @@ describe("approveAccessRequestWithConsent", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      mockConsentRequestVc().credentialSubject.id,
+      "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
           mode: mockConsentRequestVc().credentialSubject.hasConsent.mode,
@@ -669,7 +669,7 @@ describe("approveAccessRequestWithConsent", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      mockConsentRequestVc().credentialSubject.id,
+      "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
           mode: mockConsentRequestVc().credentialSubject.hasConsent.mode,
