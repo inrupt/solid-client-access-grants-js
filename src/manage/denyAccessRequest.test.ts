@@ -172,7 +172,7 @@ describe("denyAccessRequest", () => {
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessDenial"],
       }),
       expect.anything()
     );
@@ -214,7 +214,7 @@ describe("denyAccessRequest", () => {
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessDenial"],
       }),
       expect.anything()
     );
@@ -257,7 +257,7 @@ describe("denyAccessRequest", () => {
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessDenial"],
       }),
       expect.anything()
     );

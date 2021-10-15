@@ -188,7 +188,7 @@ describe("approveAccessRequest", () => {
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessGrant"],
       }),
       expect.anything()
     );
@@ -230,7 +230,7 @@ describe("approveAccessRequest", () => {
         inbox: "https://some-custom.inbox",
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessGrant"],
       }),
       expect.anything()
     );
@@ -269,7 +269,7 @@ describe("approveAccessRequest", () => {
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessGrant"],
       }),
       expect.anything()
     );
@@ -312,7 +312,7 @@ describe("approveAccessRequest", () => {
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessGrant"],
       }),
       expect.anything()
     );
@@ -413,7 +413,7 @@ describe("approveAccessRequestWithConsent", () => {
         inbox: mockConsentGrantVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessGrant"],
       }),
       expect.anything()
     );
@@ -459,7 +459,7 @@ describe("approveAccessRequestWithConsent", () => {
         inbox: "https://some-custom.inbox",
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessGrant"],
       }),
       expect.anything()
     );
@@ -505,7 +505,7 @@ describe("approveAccessRequestWithConsent", () => {
         inbox: "https://some-custom.inbox",
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessGrant"],
       }),
       expect.anything()
     );
@@ -548,7 +548,7 @@ describe("approveAccessRequestWithConsent", () => {
         inbox: mockConsentRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessGrant"],
         expirationDate: mockConsentRequestVc().expirationDate,
         issuanceDate: new Date(2021, 8, 15).toISOString(),
       }),
@@ -592,7 +592,7 @@ describe("approveAccessRequestWithConsent", () => {
         inbox: mockConsentRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessGrant"],
         issuanceDate: mockConsentRequestVc().issuanceDate,
         expirationDate: new Date(2021, 8, 16).toISOString(),
       }),
@@ -637,7 +637,7 @@ describe("approveAccessRequestWithConsent", () => {
         inbox: mockConsentRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessGrant"],
         issuanceDate: mockConsentRequestVc().issuanceDate,
       }),
       expect.anything()
@@ -683,7 +683,7 @@ describe("approveAccessRequestWithConsent", () => {
         inbox: mockConsentRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessGrant"],
       }),
       expect.anything()
     );

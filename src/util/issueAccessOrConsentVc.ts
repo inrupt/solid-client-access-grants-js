@@ -191,7 +191,7 @@ export function getGrantBody(
   const grantBody = getBaseBody(params, "BaseGrantBody");
   // TODO: This should be set by getBaseBody properly.
   grantBody.credentialSubject.id = params.resourceOwner;
-  grantBody.type = [];
+  grantBody.type = [CREDENTIAL_TYPE_ACCESS_GRANT];
   if (isBaseConsentParameters(params)) {
     // This makes request a ConsentGrantBody
     return getConsentGrantBody(
@@ -233,7 +233,7 @@ export async function issueAccessOrConsentVc(
     },
     {
       "@context": vcBody["@context"],
-      type: [CREDENTIAL_TYPE_ACCESS_REQUEST],
+      type: vcBody.type,
       issuanceDate: isConsentRequest(vcBody) ? vcBody.issuanceDate : undefined,
       expirationDate: isConsentRequest(vcBody)
         ? vcBody.expirationDate

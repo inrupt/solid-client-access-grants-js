@@ -21,6 +21,8 @@ The following changes have been released:
 - Fix and re-enable VC type checking.
 - Consent endpoint discovery from `.well-known/solid` now supports both the legacy
   property, and the new `solid:consent` one.
+- The credential subject of a grant is now the resource owner, instead of the requestor.
+  The requestor is still the credential subject of requests.
 
 ## [0.2.1] - 2021-10-12
 

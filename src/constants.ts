@@ -70,11 +70,13 @@ export const SOLID_CONSENT_SERVICE = "http://www.w3.org/ns/solid/terms#consent";
 
 export const CREDENTIAL_TYPE_ACCESS_REQUEST = "SolidAccessRequest";
 export const CREDENTIAL_TYPE_ACCESS_GRANT = "SolidAccessGrant";
+export const CREDENTIAL_TYPE_ACCESS_DENIAL = "SolidAccessDenial";
 export const CREDENTIAL_TYPE_LEGACY_CONSENT_REQUEST = "SolidConsentRequest";
 
 export const ACCESS_CREDENTIAL_TYPE = new Set([
   CREDENTIAL_TYPE_ACCESS_REQUEST,
   CREDENTIAL_TYPE_ACCESS_GRANT,
+  CREDENTIAL_TYPE_ACCESS_DENIAL,
   CREDENTIAL_TYPE_LEGACY_CONSENT_REQUEST,
 ]);
 
