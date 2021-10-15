@@ -72,10 +72,13 @@ export const MOCKED_CONSENT_UI_IRI = "https://some-consent.app";
 export const MOCKED_STORAGE = "https://pod-provider.iri";
 
 export const mockWellKnownWithConsent = (
-  hasUi = true
+  hasUi = true,
+  legacy = false
 ): SolidDataset & WithServerResourceInfo => {
   const wellKnown = buildThing().addIri(
-    "http://inrupt.com/ns/ess#consentIssuer",
+    legacy
+      ? "http://inrupt.com/ns/ess#consentIssuer"
+      : "http://www.w3.org/ns/solid/terms#consent",
     MOCKED_CONSENT_ISSUER
   );
   if (hasUi) {
@@ -117,12 +120,15 @@ export const mockWebIdWithUi = (
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const mockConsentEndpoint = (withConsent = true) => {
+export const mockConsentEndpoint = (
+  withConsent = true,
+  legacyProperty = false
+) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getWellKnownSolid.mockResolvedValue(
     (withConsent
-      ? mockWellKnownWithConsent()
+      ? mockWellKnownWithConsent(false, legacyProperty)
       : mockWellKnownNoConsent()) as never
   );
 };

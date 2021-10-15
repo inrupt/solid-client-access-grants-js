@@ -63,7 +63,10 @@ export const CONSENT_CONTEXT = [
 
 export const WELL_KNOWN_SOLID = ".well-known/solid";
 
-export const INRUPT_CONSENT_SERVICE = "http://inrupt.com/ns/ess#consentIssuer";
+export const INRUPT_CONSENT_SERVICE_LEGACY =
+  "http://inrupt.com/ns/ess#consentIssuer";
+
+export const SOLID_CONSENT_SERVICE = "http://www.w3.org/ns/solid/terms#consent";
 
 export const CREDENTIAL_TYPE = "SolidConsentRequest";
 

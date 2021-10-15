@@ -15,6 +15,8 @@ The following changes have been implemented but not released yet:
 ### Bugfix
 
 - Fix and re-enable VC type checking.
+- Consent endpoint discovery from `.well-known/solid` now supports both the legacy
+  property, and the new `solid:consent` one.
 
 The following changes have been released:
 

@@ -80,7 +80,7 @@ describe("denyAccessRequest", () => {
   it("throws if there is no well known consent endpoint", async () => {
     mockConsentEndpoint(false);
     await expect(denyAccessRequest(mockAccessRequestVc())).rejects.toThrow(
-      "Cannot discover consent endpoint from [https://pod-provider.iri/resource/.well-known/solid]: the well-known document contains no value for property [http://inrupt.com/ns/ess#consentIssuer]."
+      "Cannot discover consent endpoint from [https://pod-provider.iri/resource/.well-known/solid]: the well-known document contains no value for properties [http://www.w3.org/ns/solid/terms#consent] or [http://inrupt.com/ns/ess#consentIssuer]."
     );
   });
 
