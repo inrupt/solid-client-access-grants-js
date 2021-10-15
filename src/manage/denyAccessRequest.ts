@@ -18,7 +18,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import type { UrlString } from "@inrupt/solid-client";
+import type { UrlString, WebId } from "@inrupt/solid-client";
 import {
   GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
@@ -42,6 +42,7 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
  * @since 0.0.1
  */
 async function denyAccessRequest(
+  resourceOwner: WebId,
   vc: VerifiableCredential | URL | UrlString,
   options: ConsentApiBaseOptions = {}
 ): Promise<VerifiableCredential> {
@@ -52,6 +53,7 @@ async function denyAccessRequest(
     baseAccessVerifiableCredential
   );
   const requestBody = getGrantBody({
+    resourceOwner,
     access: internalOptions.access,
     requestor: internalOptions.requestor,
     resources: internalOptions.resources,

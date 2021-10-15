@@ -41,6 +41,7 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
  * @since 0.0.1.
  */
 export async function approveAccessRequest(
+  resourceOwner: WebId,
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential | UrlString,
   requestOverride?: Partial<{
@@ -62,6 +63,7 @@ export async function approveAccessRequest(
  * @since 0.0.1.
  */
 export async function approveAccessRequest(
+  resourceOwner: WebId,
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: {
@@ -73,6 +75,7 @@ export async function approveAccessRequest(
   options?: ConsentApiBaseOptions
 ): Promise<VerifiableCredential>;
 export async function approveAccessRequest(
+  resourceOwner: WebId,
   requestVc?: VerifiableCredential | UrlString,
   requestOverride?: Partial<{
     requestor: WebId;
@@ -97,6 +100,7 @@ export async function approveAccessRequest(
     requestOverride
   );
   const requestBody = getGrantBody({
+    resourceOwner,
     access: internalOptions.access,
     requestor: internalOptions.requestor,
     resources: internalOptions.resources,

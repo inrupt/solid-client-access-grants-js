@@ -22,7 +22,11 @@ import {
   issueVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { CONSENT_CONTEXT, CREDENTIAL_TYPE } from "../constants";
+import {
+  CONSENT_CONTEXT,
+  CREDENTIAL_TYPE_ACCESS_GRANT,
+  CREDENTIAL_TYPE_ACCESS_REQUEST,
+} from "../constants";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { getSessionFetch } from "./getSessionFetch";
 import type {
@@ -50,6 +54,7 @@ import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
 import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArray";
 import { isBaseConsentParameters } from "../guard/isBaseConsentParameters";
 import { isBaseRequest } from "../guard/isBaseRequest";
+import type { AccessCredentialType } from "../type/AccessCredentialType";
 
 function getConsentAttributes(
   params: BaseRequestParameters,
@@ -92,7 +97,11 @@ function getBaseBody(
 ): BaseRequestBody | BaseGrantBody {
   const body = {
     "@context": CONSENT_CONTEXT,
-    type: [CREDENTIAL_TYPE] as [typeof CREDENTIAL_TYPE],
+    type: [
+      type === "BaseGrantBody"
+        ? CREDENTIAL_TYPE_ACCESS_GRANT
+        : CREDENTIAL_TYPE_ACCESS_REQUEST,
+    ] as AccessCredentialType[],
     credentialSubject: {
       id: params.requestor,
       inbox: params.requestorInboxUrl,
@@ -180,7 +189,9 @@ export function getGrantBody(
   params: AccessGrantParameters | ConsentGrantParameters
 ): AccessGrantBody | ConsentGrantBody {
   const grantBody = getBaseBody(params, "BaseGrantBody");
-
+  // TODO: This should be set by getBaseBody properly.
+  grantBody.credentialSubject.id = params.resourceOwner;
+  grantBody.type = [];
   if (isBaseConsentParameters(params)) {
     // This makes request a ConsentGrantBody
     return getConsentGrantBody(
@@ -222,7 +233,7 @@ export async function issueAccessOrConsentVc(
     },
     {
       "@context": vcBody["@context"],
-      type: [CREDENTIAL_TYPE],
+      type: [CREDENTIAL_TYPE_ACCESS_REQUEST],
       issuanceDate: isConsentRequest(vcBody) ? vcBody.issuanceDate : undefined,
       expirationDate: isConsentRequest(vcBody)
         ? vcBody.expirationDate

@@ -17,20 +17,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import type { BaseAccessVcBody } from "../type/AccessVerifiableCredential";
-import { isAccessCredentialType } from "./isAccessCredentialType";
-import { isConsentContext } from "./isConsentContext";
-import { isUnknownObject } from "./isUnknownObject";
+import { ACCESS_CREDENTIAL_TYPE } from "../constants";
 
-export function isBaseAccessVcBody(x: unknown): x is BaseAccessVcBody {
-  return (
-    isUnknownObject(x) &&
-    isConsentContext(x["@context"]) &&
-    Array.isArray(x.type) &&
-    isAccessCredentialType(x.type) &&
-    isUnknownObject(x.credentialSubject) &&
-    typeof x.credentialSubject.id === "string" &&
-    typeof x.credentialSubject.inbox === "string" &&
-    (x.issuanceDate !== undefined ? typeof x.issuanceDate === "string" : true)
-  );
+export function isAccessCredentialType(x: unknown): x is string[] {
+  return Array.isArray(x) && x.some((y) => ACCESS_CREDENTIAL_TYPE.has(y));
 }
