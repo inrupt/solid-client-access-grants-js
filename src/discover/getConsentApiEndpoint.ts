@@ -25,7 +25,7 @@ import {
   UrlString,
 } from "@inrupt/solid-client";
 import {
-  INRUPT_CONSENT_SERVICE,
+  SOLID_CONSENT_SERVICE,
   INRUPT_CONSENT_SERVICE_LEGACY,
 } from "../constants";
 import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
@@ -50,13 +50,13 @@ async function getConsentEndpointForResource(
   // are multiple, we arbitrarily pick the first one.
   const wellKnownSubject = wellKnownSubjects[0];
   const consentIri =
-    getIri(wellKnownSubject, INRUPT_CONSENT_SERVICE) ??
+    getIri(wellKnownSubject, SOLID_CONSENT_SERVICE) ??
     getIri(wellKnownSubject, INRUPT_CONSENT_SERVICE_LEGACY);
   if (consentIri === null) {
     throw new Error(
       `Cannot discover consent endpoint from [${getSourceIri(
         wellKnown
-      )}]: the well-known document contains no value for properties [${INRUPT_CONSENT_SERVICE}] or [${INRUPT_CONSENT_SERVICE_LEGACY}].`
+      )}]: the well-known document contains no value for properties [${SOLID_CONSENT_SERVICE}] or [${INRUPT_CONSENT_SERVICE_LEGACY}].`
     );
   }
   return consentIri;
