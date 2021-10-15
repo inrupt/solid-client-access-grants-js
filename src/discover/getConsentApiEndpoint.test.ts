@@ -42,7 +42,16 @@ jest.mock("@inrupt/solid-client-authn-browser");
 
 describe("getConsentApiEndpoint", () => {
   it("can find the consent endpoint for a given resource", async () => {
-    mockConsentEndpoint();
+    mockConsentEndpoint(true, false);
+    const consentEndpoint = await getConsentApiEndpoint(MOCK_REQUESTEE_IRI, {
+      // eslint-disable-next-line
+      fetch: jest.fn() as any,
+    });
+    expect(consentEndpoint).toBe(MOCKED_CONSENT_ISSUER);
+  });
+
+  it("supports the legacy property for consent endpoint discovery", async () => {
+    mockConsentEndpoint(true, true);
     const consentEndpoint = await getConsentApiEndpoint(MOCK_REQUESTEE_IRI, {
       // eslint-disable-next-line
       fetch: jest.fn() as any,
@@ -77,7 +86,7 @@ describe("getConsentApiEndpoint", () => {
         fetch: jest.fn() as any,
       })
     ).rejects.toThrow(
-      /Cannot discover.*no value for property \[http:\/\/inrupt.com\/ns\/ess#consentIssuer\]/
+      /Cannot discover.*no value for properties .*\[http:\/\/inrupt.com\/ns\/ess#consentIssuer\]/
     );
   });
 });

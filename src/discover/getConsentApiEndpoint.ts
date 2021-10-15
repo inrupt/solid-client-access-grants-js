@@ -24,7 +24,10 @@ import {
   getWellKnownSolid,
   UrlString,
 } from "@inrupt/solid-client";
-import { INRUPT_CONSENT_SERVICE } from "../constants";
+import {
+  INRUPT_CONSENT_SERVICE,
+  INRUPT_CONSENT_SERVICE_LEGACY,
+} from "../constants";
 import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { getSessionFetch } from "../util/getSessionFetch";
 
@@ -46,12 +49,14 @@ async function getConsentEndpointForResource(
   // There should only be 1 subject in the .well-known/solid document, and if there
   // are multiple, we arbitrarily pick the first one.
   const wellKnownSubject = wellKnownSubjects[0];
-  const consentIri = getIri(wellKnownSubject, INRUPT_CONSENT_SERVICE);
+  const consentIri =
+    getIri(wellKnownSubject, INRUPT_CONSENT_SERVICE) ??
+    getIri(wellKnownSubject, INRUPT_CONSENT_SERVICE_LEGACY);
   if (consentIri === null) {
     throw new Error(
       `Cannot discover consent endpoint from [${getSourceIri(
         wellKnown
-      )}]: the well-known document contains no value for property [${INRUPT_CONSENT_SERVICE}].`
+      )}]: the well-known document contains no value for properties [${INRUPT_CONSENT_SERVICE}] or [${INRUPT_CONSENT_SERVICE_LEGACY}].`
     );
   }
   return consentIri;
