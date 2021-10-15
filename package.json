@@ -98,8 +98,8 @@
     "typescript": "^4.3.4"
   },
   "dependencies": {
-    "@inrupt/solid-client": "1.13.4-feat2239-wellknown-root-1342438913-4339-1634224961.0",
-    "@inrupt/solid-client-vc": "^0.1.1",
+    "@inrupt/solid-client": "^1.14.0",
+    "@inrupt/solid-client-vc": "^0.1.2",
     "cross-fetch": "^3.1.4",
     "events": "^3.3.0",
     "parse-link-header": "^1.0.1",
