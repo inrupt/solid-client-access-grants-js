@@ -6,6 +6,10 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+The following changes have been released:
+
+## [0.3.0] - 2021-10-15
+
 ### Feature change
 
 - `redirectToConsentManagementUi` redirects to the consent management app adding
@@ -17,8 +21,6 @@ The following changes have been implemented but not released yet:
 - Fix and re-enable VC type checking.
 - Consent endpoint discovery from `.well-known/solid` now supports both the legacy
   property, and the new `solid:consent` one.
-
-The following changes have been released:
 
 ## [0.2.1] - 2021-10-12
 
