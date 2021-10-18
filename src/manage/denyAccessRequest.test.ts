@@ -52,7 +52,10 @@ describe("denyAccessRequest", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
 
-    await denyAccessRequest(mockAccessRequestVc());
+    await denyAccessRequest(
+      "https://some.resource/owner",
+      mockAccessRequestVc()
+    );
 
     expect(mockedIssue).toHaveBeenCalledWith(
       expect.anything(),
@@ -68,7 +71,7 @@ describe("denyAccessRequest", () => {
   it("throws if the provided VC isn't a Solid consent request", async () => {
     mockConsentEndpoint();
     await expect(
-      denyAccessRequest({
+      denyAccessRequest("https://some.resource/owner", {
         ...mockAccessRequestVc(),
         type: ["NotASolidAccessRequest"],
       })
@@ -79,7 +82,9 @@ describe("denyAccessRequest", () => {
 
   it("throws if there is no well known consent endpoint", async () => {
     mockConsentEndpoint(false);
-    await expect(denyAccessRequest(mockAccessRequestVc())).rejects.toThrow(
+    await expect(
+      denyAccessRequest("https://some.resource/owner", mockAccessRequestVc())
+    ).rejects.toThrow(
       "Cannot discover consent endpoint from [https://pod-provider.iri/resource/.well-known/solid]: the well-known document contains no value for properties [http://www.w3.org/ns/solid/terms#consent] or [http://inrupt.com/ns/ess#consentIssuer]."
     );
   });
@@ -92,10 +97,14 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await denyAccessRequest(mockAccessRequestVc(), {
-      consentEndpoint: "https://some.consent-endpoint.override/",
-      fetch: jest.fn(),
-    });
+    await denyAccessRequest(
+      "https://some.resource/owner",
+      mockAccessRequestVc(),
+      {
+        consentEndpoint: "https://some.consent-endpoint.override/",
+        fetch: jest.fn(),
+      }
+    );
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       "https://some.consent-endpoint.override/".concat("issue"),
       expect.anything(),
@@ -115,9 +124,13 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await denyAccessRequest(mockAccessRequestVc(), {
-      fetch: mockedFetch,
-    });
+    await denyAccessRequest(
+      "https://some.resource/owner",
+      mockAccessRequestVc(),
+      {
+        fetch: mockedFetch,
+      }
+    );
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
@@ -136,14 +149,18 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await denyAccessRequest(mockAccessRequestVc(), {
-      fetch: jest.fn(global.fetch),
-    });
+    await denyAccessRequest(
+      "https://some.resource/owner",
+      mockAccessRequestVc(),
+      {
+        fetch: jest.fn(global.fetch),
+      }
+    );
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      mockAccessRequestVc().credentialSubject.id,
+      "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
           mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
@@ -155,7 +172,7 @@ describe("denyAccessRequest", () => {
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessDenial"],
       }),
       expect.anything()
     );
@@ -175,15 +192,19 @@ describe("denyAccessRequest", () => {
       .mockResolvedValueOnce(
         new Response(JSON.stringify(mockAccessRequestVc()))
       );
-    await denyAccessRequest("https://some.credential", {
-      fetch: mockedFetch,
-    });
+    await denyAccessRequest(
+      "https://some.resource/owner",
+      "https://some.credential",
+      {
+        fetch: mockedFetch,
+      }
+    );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      mockAccessRequestVc().credentialSubject.id,
+      "https://some.resource/owner",
       expect.objectContaining({
-        id: mockAccessRequestVc().credentialSubject.id,
+        id: "https://some.resource/owner",
         providedConsent: expect.objectContaining({
           mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
@@ -193,7 +214,7 @@ describe("denyAccessRequest", () => {
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessDenial"],
       }),
       expect.anything()
     );
@@ -213,16 +234,20 @@ describe("denyAccessRequest", () => {
       .mockResolvedValueOnce(
         new Response(JSON.stringify(mockAccessRequestVc()))
       );
-    await denyAccessRequest(new URL("https://some.credential"), {
-      fetch: mockedFetch,
-    });
+    await denyAccessRequest(
+      "https://some.resource/owner",
+      new URL("https://some.credential"),
+      {
+        fetch: mockedFetch,
+      }
+    );
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_CONSENT_ISSUER}/issue`,
-      mockAccessRequestVc().credentialSubject.id,
+      "https://some.resource/owner",
       expect.objectContaining({
-        id: mockAccessRequestVc().credentialSubject.id,
+        id: "https://some.resource/owner",
         providedConsent: expect.objectContaining({
           mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
@@ -232,7 +257,7 @@ describe("denyAccessRequest", () => {
         inbox: mockAccessRequestVc().credentialSubject.inbox,
       }),
       expect.objectContaining({
-        type: ["SolidAccessRequest"],
+        type: ["SolidAccessDenial"],
       }),
       expect.anything()
     );

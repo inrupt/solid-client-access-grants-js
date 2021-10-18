@@ -42,6 +42,7 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
  * @since 0.0.1
  */
 export async function approveAccessRequestWithConsent(
+  resourceOwner: WebId,
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<{
@@ -66,6 +67,7 @@ export async function approveAccessRequestWithConsent(
  * @since 0.0.1
  */
 export async function approveAccessRequestWithConsent(
+  resourceOwner: WebId,
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: {
@@ -80,6 +82,7 @@ export async function approveAccessRequestWithConsent(
   options?: ConsentApiBaseOptions
 ): Promise<VerifiableCredential>;
 export async function approveAccessRequestWithConsent(
+  resourceOwner: WebId,
   requestVc?: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<{
     requestor: WebId;
@@ -110,6 +113,7 @@ export async function approveAccessRequestWithConsent(
     requestOverride
   );
   const requestBody = getGrantBody({
+    resourceOwner,
     access: initialisedOptions.access,
     requestor: initialisedOptions.requestor,
     resources: initialisedOptions.resources,
@@ -119,11 +123,7 @@ export async function approveAccessRequestWithConsent(
     issuanceDate: initialisedOptions.issuanceDate,
     expirationDate: initialisedOptions.expirationDate,
   });
-  return issueAccessOrConsentVc(
-    initialisedOptions.requestor,
-    requestBody,
-    options
-  );
+  return issueAccessOrConsentVc(resourceOwner, requestBody, options);
 }
 
 export default approveAccessRequestWithConsent;

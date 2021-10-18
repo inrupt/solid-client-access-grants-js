@@ -18,8 +18,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import type { UrlString } from "@inrupt/solid-client";
+import type { UrlString, WebId } from "@inrupt/solid-client";
 import {
+  CREDENTIAL_TYPE_ACCESS_DENIAL,
   GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
@@ -42,6 +43,7 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
  * @since 0.0.1
  */
 async function denyAccessRequest(
+  resourceOwner: WebId,
   vc: VerifiableCredential | URL | UrlString,
   options: ConsentApiBaseOptions = {}
 ): Promise<VerifiableCredential> {
@@ -51,7 +53,8 @@ async function denyAccessRequest(
   const internalOptions = initializeGrantParameters(
     baseAccessVerifiableCredential
   );
-  const requestBody = getGrantBody({
+  const denialBody = getGrantBody({
+    resourceOwner,
     access: internalOptions.access,
     requestor: internalOptions.requestor,
     resources: internalOptions.resources,
@@ -59,14 +62,11 @@ async function denyAccessRequest(
     status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   }) as any; // FIXME
-  requestBody.credentialSubject.providedConsent.hasStatus =
+  denialBody.type = [CREDENTIAL_TYPE_ACCESS_DENIAL];
+  denialBody.credentialSubject.providedConsent.hasStatus =
     GC_CONSENT_STATUS_DENIED;
 
-  return issueAccessOrConsentVc(
-    requestBody.credentialSubject.id,
-    requestBody,
-    options
-  );
+  return issueAccessOrConsentVc(resourceOwner, denialBody, options);
 }
 
 export { denyAccessRequest };

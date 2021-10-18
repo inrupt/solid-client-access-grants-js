@@ -17,7 +17,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import type { access, UrlString } from "@inrupt/solid-client";
+import type { access, UrlString, WebId } from "@inrupt/solid-client";
 import type {
   GC_CONSENT_STATUS_REQUESTED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
@@ -46,6 +46,7 @@ export type ConsentRequestParameters = AccessRequestParameters &
   BaseConsentParameters;
 
 export type AccessGrantParameters = BaseRequestParameters & {
+  resourceOwner: WebId;
   status: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
 };
 

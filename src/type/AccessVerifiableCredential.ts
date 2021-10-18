@@ -23,10 +23,10 @@ import type {
   GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   GC_CONSENT_STATUS_REQUESTED,
-  CREDENTIAL_TYPE,
 } from "../constants";
 import type { ResourceAccessMode } from "./ResourceAccessMode";
 import type { ConsentStatus } from "./ConsentStatus";
+import type { AccessCredentialType } from "./AccessCredentialType";
 
 export type ConsentAttributes = {
   mode: ResourceAccessMode[];
@@ -55,21 +55,21 @@ export type GrantCredentialSubject = Required<
 
 export type BaseAccessVcBody = {
   "@context": typeof CONSENT_CONTEXT;
-  type: [typeof CREDENTIAL_TYPE];
+  type: AccessCredentialType[];
   credentialSubject: RequestCredentialSubject | GrantCredentialSubject;
   issuanceDate?: string;
 };
 
 export type BaseRequestBody = {
   "@context": typeof CONSENT_CONTEXT;
-  type: [typeof CREDENTIAL_TYPE];
+  type: AccessCredentialType[];
   credentialSubject: RequestCredentialSubject;
   issuanceDate?: string;
 };
 
 export type BaseGrantBody = {
   "@context": typeof CONSENT_CONTEXT;
-  type: [typeof CREDENTIAL_TYPE];
+  type: AccessCredentialType[];
   credentialSubject: GrantCredentialSubject;
   issuanceDate?: string;
 };
