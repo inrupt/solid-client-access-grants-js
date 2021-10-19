@@ -78,7 +78,7 @@ export const mockWellKnownWithConsent = (
   const wellKnown = buildThing().addIri(
     legacy
       ? "http://inrupt.com/ns/ess#consentIssuer"
-      : "http://www.w3.org/ns/solid/terms#consent",
+      : "http://www.w3.org/ns/solid/terms#accessIssuer",
     MOCKED_CONSENT_ISSUER
   );
   if (hasUi) {
