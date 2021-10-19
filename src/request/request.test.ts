@@ -38,9 +38,6 @@ import {
 } from "./request.mock";
 import { CONSENT_CONTEXT } from "../constants";
 
-jest.mock("../discover/getConsentApiEndpoint", () => {
-  return jest.requireActual("../discover/getConsentApiEndpoint");
-});
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
   // skip type checking for those:
@@ -54,6 +51,7 @@ jest.mock("@inrupt/solid-client", () => {
 });
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
+jest.mock("cross-fetch");
 
 describe("getConsentRequestBody", () => {
   it("can generate a minimal consent request body", () => {

@@ -69,6 +69,7 @@
     "@inrupt/solid-client-authn-browser": "^1.8.1",
     "@skypack/package-check": "^0.2.2",
     "@testing-library/testcafe": "^4.4.0",
+    "@types/auth-header": "^1.0.2",
     "@types/dotenv-flow": "^3.1.0",
     "@types/jest": "^26.0.21",
     "@types/parse-link-header": "^1.0.0",
@@ -100,6 +101,7 @@
   "dependencies": {
     "@inrupt/solid-client": "^1.14.0",
     "@inrupt/solid-client-vc": "^0.1.2",
+    "auth-header": "^1.0.0",
     "cross-fetch": "^3.1.4",
     "events": "^3.3.0",
     "parse-link-header": "^1.0.1",

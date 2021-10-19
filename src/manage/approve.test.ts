@@ -19,12 +19,14 @@
 
 /* eslint-disable no-shadow */
 import { jest, it, describe, expect } from "@jest/globals";
-import { MOCKED_CONSENT_ISSUER } from "../request/request.mock";
+import {
+  mockConsentEndpoint,
+  MOCKED_CONSENT_ISSUER,
+} from "../request/request.mock";
 import { approveAccessRequestWithConsent } from "./approveAccessRequestWithConsent";
 import { approveAccessRequest } from "./approveAccessRequest";
 import {
   mockAccessRequestVc,
-  mockConsentEndpoint,
   mockConsentGrantVc,
   mockConsentRequestVc,
 } from "./approve.mock";
@@ -43,10 +45,14 @@ jest.mock("@inrupt/solid-client", () => {
 
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
+jest.mock("cross-fetch");
 
 describe("approveAccessRequest", () => {
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    mockConsentEndpoint();
+    const crossFetchModule = jest.requireMock("cross-fetch") as {
+      fetch: typeof global.fetch;
+    };
+    crossFetchModule.fetch = mockConsentEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: () => unknown;
@@ -320,8 +326,8 @@ describe("approveAccessRequest", () => {
 });
 
 describe("approveAccessRequestWithConsent", () => {
-  mockConsentEndpoint();
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
+    mockConsentEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: () => unknown;

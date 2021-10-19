@@ -24,10 +24,7 @@ import { jest, describe, it, expect } from "@jest/globals";
 // This ESLint plugin seems to not be able to resolve subpackage imports:
 // eslint-disable-next-line import/no-unresolved
 import { mocked } from "ts-jest/utils";
-import {
-  mockWellKnownNoConsent,
-  mockWellKnownWithConsent,
-} from "../request/request.mock";
+import { mockConsentEndpoint } from "../request/request.mock";
 import { isValidConsentGrant } from "./isValidConsentGrant";
 
 jest.mock("@inrupt/solid-client", () => {
@@ -43,16 +40,7 @@ jest.mock("@inrupt/solid-client", () => {
 });
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
-
-const mockConsentEndpoint = (withConsent = true) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
-  solidClientModule.getWellKnownSolid.mockResolvedValue(
-    (withConsent
-      ? mockWellKnownWithConsent()
-      : mockWellKnownNoConsent()) as never
-  );
-};
+jest.mock("cross-fetch");
 
 describe("isValidConsentGrant", () => {
   const MOCK_CONSENT_GRANT = {

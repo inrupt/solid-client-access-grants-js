@@ -17,49 +17,44 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import {
-  getIri,
-  getSourceIri,
-  getThingAll,
-  getWellKnownSolid,
-  UrlString,
-} from "@inrupt/solid-client";
-import {
-  SOLID_CONSENT_SERVICE,
-  INRUPT_CONSENT_SERVICE_LEGACY,
-} from "../constants";
+import { UrlString } from "@inrupt/solid-client";
+import { fetch as crossFetch } from "cross-fetch";
+import { parse } from "auth-header";
 import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import { getSessionFetch } from "../util/getSessionFetch";
 
 async function getConsentEndpointForResource(
-  resource: UrlString,
-  fetcher: typeof fetch
+  resource: UrlString
 ): Promise<UrlString> {
-  const wellKnown = await getWellKnownSolid(resource, {
-    fetch: fetcher,
-  });
-  const wellKnownSubjects = getThingAll(wellKnown, { acceptBlankNodes: true });
-  if (wellKnownSubjects.length === 0) {
+  // Explicitly makes an unauthenticated fetch to be sure to get the link to the
+  // authorization server.
+  const response = await crossFetch(resource);
+  if (!response.headers.has("WWW-Authenticate")) {
     throw new Error(
-      `Cannot discover consent endpoint from [${getSourceIri(
-        wellKnown
-      )}]: the well-known document is empty.`
+      `Expected a 401 error with a WWW-Authenticate header, got a [${response.status}: ${response.statusText}] response lacking the WWW-Authenticate header.`
     );
   }
-  // There should only be 1 subject in the .well-known/solid document, and if there
-  // are multiple, we arbitrarily pick the first one.
-  const wellKnownSubject = wellKnownSubjects[0];
-  const consentIri =
-    getIri(wellKnownSubject, SOLID_CONSENT_SERVICE) ??
-    getIri(wellKnownSubject, INRUPT_CONSENT_SERVICE_LEGACY);
-  if (consentIri === null) {
+  const authHeader = response.headers.get("WWW-Authenticate") as string;
+  const authHeaderToken = parse(authHeader);
+  if (authHeaderToken.scheme !== "UMA") {
     throw new Error(
-      `Cannot discover consent endpoint from [${getSourceIri(
-        wellKnown
-      )}]: the well-known document contains no value for properties [${SOLID_CONSENT_SERVICE}] or [${INRUPT_CONSENT_SERVICE_LEGACY}].`
+      `Unsupported authorization scheme: [${authHeaderToken.scheme}]`
     );
   }
-  return consentIri;
+  const authorizationServerIri = authHeaderToken.params.as_uri as string;
+  const wellKnownIri = new URL(
+    "/.well-known/uma2-configuration",
+    authorizationServerIri
+  );
+  const rawDiscoveryDocument = await crossFetch(wellKnownIri.href);
+  const discoveryDocument = await rawDiscoveryDocument.json();
+  if (typeof discoveryDocument.verifiable_credential_issuer !== "string") {
+    throw new Error(
+      `No access issuer listed for property [verifiable_credential_issuer] in [${JSON.stringify(
+        discoveryDocument
+      )}]`
+    );
+  }
+  return discoveryDocument.verifiable_credential_issuer as string;
 }
 
 /**
@@ -72,7 +67,7 @@ async function getConsentEndpointForResource(
  */
 async function getConsentApiEndpoint(
   resource: URL | UrlString,
-  options: ConsentApiBaseOptions
+  options: ConsentApiBaseOptions = {}
 ): Promise<UrlString> {
   // TODO: complete code coverage
   /* istanbul ignore next */
@@ -84,8 +79,7 @@ async function getConsentApiEndpoint(
   }
   return getConsentEndpointForResource(
     /* istanbul ignore next */
-    resource instanceof URL ? resource.href : resource,
-    await getSessionFetch(options)
+    resource instanceof URL ? resource.href : resource
   );
 }
 
