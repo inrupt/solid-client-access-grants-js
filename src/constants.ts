@@ -66,7 +66,8 @@ export const WELL_KNOWN_SOLID = ".well-known/solid";
 export const INRUPT_CONSENT_SERVICE_LEGACY =
   "http://inrupt.com/ns/ess#consentIssuer";
 
-export const SOLID_CONSENT_SERVICE = "http://www.w3.org/ns/solid/terms#consent";
+export const SOLID_CONSENT_SERVICE =
+  "http://www.w3.org/ns/solid/terms#accessIssuer";
 
 export const CREDENTIAL_TYPE_ACCESS_REQUEST = "SolidAccessRequest";
 export const CREDENTIAL_TYPE_ACCESS_GRANT = "SolidAccessGrant";

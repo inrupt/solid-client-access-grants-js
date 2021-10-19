@@ -6,6 +6,11 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### Bugfix
+
+- The property for access issuer discovery has been aligned with the one used on
+  the server side, i.e. `http://www.w3.org/ns/solid/terms#accessIssuer`.
+
 The following changes have been released:
 
 ## [0.3.0] - 2021-10-15
