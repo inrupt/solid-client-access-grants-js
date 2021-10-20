@@ -1,7 +1,7 @@
 :orphan:
 
 ==============================
-solid-client-consent API
+solid-client-access-grants API
 ==============================
 
 

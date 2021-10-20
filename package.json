@@ -1,6 +1,6 @@
 {
-  "name": "@inrupt/solid-client-consent",
-  "description": "A library for managing consent in Solid",
+  "name": "@inrupt/solid-client-access-grants",
+  "description": "A library for managing access grants in Solid",
   "version": "0.3.0",
   "license": "MIT",
   "scripts": {
@@ -22,8 +22,8 @@
     "linked data",
     "turtle"
   ],
-  "homepage": "https://docs.inrupt.com/client-libraries/solid-client-consent-js/",
-  "bugs": "https://github.com/inrupt/solid-client-consent-js/issues",
+  "homepage": "https://docs.inrupt.com/client-libraries/solid-client-access-grants-js/",
+  "bugs": "https://github.com/inrupt/solid-client-access-grants-js/issues",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
@@ -61,7 +61,7 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "https://github.com/inrupt/solid-client-consent-js.git"
+    "url": "https://github.com/inrupt/solid-client-access-grants-js.git"
   },
   "devDependencies": {
     "@inrupt/eslint-config-base": "^0.2.0-alpha.1",
