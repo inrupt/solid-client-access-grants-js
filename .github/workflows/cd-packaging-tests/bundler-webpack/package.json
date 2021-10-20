@@ -3,7 +3,7 @@
   "private": true,
   "dependencies": {
     "@inrupt/solid-client-authn-browser": "^1.11.2",
-    "@inrupt/solid-client-consent": "file:../../../..",
+    "@inrupt/solid-client-access-grants": "*",
     "assert": "^2.0.0",
     "browserify-zlib": "^0.2.0",
     "buffer": "^6.0.3",
