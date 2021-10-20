@@ -10,6 +10,8 @@ The following changes have been implemented but not released yet:
 
 - The property for access issuer discovery has been aligned with the one used on
   the server side, i.e. `http://www.w3.org/ns/solid/terms#accessIssuer`.
+- The discovery for the access issuer no longer relies on the Pod server, but rather
+  on the UMA server.
 
 The following changes have been released:
 
