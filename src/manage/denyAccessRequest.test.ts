@@ -20,8 +20,11 @@
 /* eslint-disable no-shadow */
 import { jest, it, describe, expect } from "@jest/globals";
 import { denyAccessRequest } from "./denyAccessRequest";
-import { mockAccessRequestVc, mockConsentEndpoint } from "./approve.mock";
-import { MOCKED_CONSENT_ISSUER } from "../request/request.mock";
+import { mockAccessRequestVc } from "./approve.mock";
+import {
+  mockConsentEndpoint,
+  MOCKED_CONSENT_ISSUER,
+} from "../request/request.mock";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -36,6 +39,7 @@ jest.mock("@inrupt/solid-client", () => {
 });
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
+jest.mock("cross-fetch");
 
 // TODO: Extract the fetch VC function and related tests
 describe("denyAccessRequest", () => {
@@ -85,7 +89,7 @@ describe("denyAccessRequest", () => {
     await expect(
       denyAccessRequest("https://some.resource/owner", mockAccessRequestVc())
     ).rejects.toThrow(
-      "Cannot discover consent endpoint from [https://pod-provider.iri/resource/.well-known/solid]: the well-known document contains no value for properties [http://www.w3.org/ns/solid/terms#accessIssuer] or [http://inrupt.com/ns/ess#consentIssuer]."
+      "No access issuer listed for property [verifiable_credential_issuer] in"
     );
   });
 

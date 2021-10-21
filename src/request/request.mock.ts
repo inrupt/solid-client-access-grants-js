@@ -72,13 +72,10 @@ export const MOCKED_CONSENT_UI_IRI = "https://some-consent.app";
 export const MOCKED_STORAGE = "https://pod-provider.iri";
 
 export const mockWellKnownWithConsent = (
-  hasUi = true,
-  legacy = false
+  hasUi = true
 ): SolidDataset & WithServerResourceInfo => {
   const wellKnown = buildThing().addIri(
-    legacy
-      ? "http://inrupt.com/ns/ess#consentIssuer"
-      : "http://www.w3.org/ns/solid/terms#accessIssuer",
+    "http://www.w3.org/ns/solid/terms#accessIssuer",
     MOCKED_CONSENT_ISSUER
   );
   if (hasUi) {
@@ -87,20 +84,6 @@ export const mockWellKnownWithConsent = (
   return setThing(
     mockSolidDatasetFrom("https://pod-provider.iri/resource/.well-known/solid"),
     wellKnown.build()
-  );
-};
-
-export const mockWellKnownNoConsent = (): SolidDataset &
-  WithServerResourceInfo => {
-  const wellKnown = buildThing()
-    .addIri(
-      "http://www.w3.org/ns/pim/space#storage",
-      "https://pod-provider.iri"
-    )
-    .build();
-  return setThing(
-    mockSolidDatasetFrom("https://pod-provider.iri/resource/.well-known/solid"),
-    wellKnown
   );
 };
 
@@ -120,15 +103,31 @@ export const mockWebIdWithUi = (
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const mockConsentEndpoint = (
-  withConsent = true,
-  legacyProperty = false
-) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
-  solidClientModule.getWellKnownSolid.mockResolvedValue(
-    (withConsent
-      ? mockWellKnownWithConsent(false, legacyProperty)
-      : mockWellKnownNoConsent()) as never
-  );
+export const mockConsentEndpoint = (withConsent = true) => {
+  const mockedFetch = jest
+    .fn(global.fetch)
+    .mockResolvedValueOnce(
+      new Response("", {
+        status: 401,
+        headers: {
+          "WWW-Authenticate": `UMA realm="Solid Pod", as_uri="https://uma.inrupt.com", ticket="some UMA ticket`,
+        },
+      })
+    )
+    .mockResolvedValueOnce(
+      new Response(
+        JSON.stringify(
+          withConsent
+            ? {
+                verifiable_credential_issuer: MOCKED_CONSENT_ISSUER,
+              }
+            : {}
+        )
+      )
+    );
+  const crossFetchModule = jest.requireMock("cross-fetch") as {
+    fetch: typeof global.fetch;
+  };
+  crossFetchModule.fetch = mockedFetch;
+  return mockedFetch;
 };

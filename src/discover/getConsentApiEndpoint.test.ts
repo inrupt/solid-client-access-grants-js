@@ -19,74 +19,81 @@
 
 // eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
-import { mockSolidDatasetFrom, getWellKnownSolid } from "@inrupt/solid-client";
 import {
-  mockConsentEndpoint,
   MOCKED_CONSENT_ISSUER,
   MOCK_REQUESTEE_IRI,
+  mockConsentEndpoint,
 } from "../request/request.mock";
 import { getConsentApiEndpoint } from "./getConsentApiEndpoint";
 
-jest.mock("@inrupt/solid-client", () => {
-  // TypeScript can't infer the type of modules imported via Jest;
-  // skip type checking for those:
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
-  solidClientModule.getSolidDataset = jest.fn(
-    solidClientModule.getSolidDataset
-  );
-  solidClientModule.getWellKnownSolid = jest.fn();
-  return solidClientModule;
-});
 jest.mock("@inrupt/solid-client-authn-browser");
+jest.mock("cross-fetch");
 
 describe("getConsentApiEndpoint", () => {
   it("can find the consent endpoint for a given resource", async () => {
-    mockConsentEndpoint(true, false);
-    const consentEndpoint = await getConsentApiEndpoint(MOCK_REQUESTEE_IRI, {
-      // eslint-disable-next-line
-      fetch: jest.fn() as any,
-    });
+    mockConsentEndpoint();
+    const consentEndpoint = await getConsentApiEndpoint(MOCK_REQUESTEE_IRI);
     expect(consentEndpoint).toBe(MOCKED_CONSENT_ISSUER);
   });
 
-  it("supports the legacy property for consent endpoint discovery", async () => {
-    mockConsentEndpoint(true, true);
-    const consentEndpoint = await getConsentApiEndpoint(MOCK_REQUESTEE_IRI, {
-      // eslint-disable-next-line
-      fetch: jest.fn() as any,
-    });
-    expect(consentEndpoint).toBe(MOCKED_CONSENT_ISSUER);
-  });
-
-  it("throws an error if the well-known document does not list any subject", async () => {
-    jest
-      .spyOn(
-        jest.requireMock("@inrupt/solid-client") as {
-          getWellKnownSolid: typeof getWellKnownSolid;
-        },
-        "getWellKnownSolid"
-      )
-      .mockResolvedValueOnce(
-        mockSolidDatasetFrom("https://some.resource/.well-known/solid")
-      );
-    await expect(
-      getConsentApiEndpoint(MOCK_REQUESTEE_IRI, {
-        // eslint-disable-next-line
-        fetch: jest.fn() as any,
+  it("throws an error if the unauthenticated fetch does not fail", async () => {
+    const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
+      new Response("", {
+        status: 200,
+        statusText: "Ok",
       })
-    ).rejects.toThrow(/Cannot discover.*well-known document is empty/);
+    );
+    const crossFetchModule = jest.requireMock("cross-fetch") as {
+      fetch: typeof global.fetch;
+    };
+    crossFetchModule.fetch = mockedFetch;
+    await expect(getConsentApiEndpoint(MOCK_REQUESTEE_IRI)).rejects.toThrow(
+      "Expected a 401 error with a WWW-Authenticate header, got a [200: Ok] response lacking the WWW-Authenticate header"
+    );
+  });
+
+  it("throws if the authentication scheme is unexpected", async () => {
+    const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
+      new Response("", {
+        status: 401,
+        headers: {
+          "WWW-Authenticate": `someScheme aParam="Some value"`,
+        },
+      })
+    );
+    const crossFetchModule = jest.requireMock("cross-fetch") as {
+      fetch: typeof global.fetch;
+    };
+    crossFetchModule.fetch = mockedFetch;
+    await expect(getConsentApiEndpoint(MOCK_REQUESTEE_IRI)).rejects.toThrow(
+      "Unsupported authorization scheme: [someScheme]"
+    );
   });
 
   it("throws an error if the well-known document does not list a consent endpoint", async () => {
-    mockConsentEndpoint(false);
-    await expect(
-      getConsentApiEndpoint(MOCK_REQUESTEE_IRI, {
-        // eslint-disable-next-line
-        fetch: jest.fn() as any,
-      })
-    ).rejects.toThrow(
-      /Cannot discover.*no value for properties .*\[http:\/\/inrupt.com\/ns\/ess#consentIssuer\]/
+    const mockedFetch = jest
+      .fn(global.fetch)
+      .mockResolvedValueOnce(
+        new Response("", {
+          status: 401,
+          headers: {
+            "WWW-Authenticate": `UMA realm="Solid Pod", as_uri="https://uma.inrupt.com", ticket="some UMA ticket`,
+          },
+        })
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            some_property: "some value",
+          })
+        )
+      );
+    const crossFetchModule = jest.requireMock("cross-fetch") as {
+      fetch: typeof global.fetch;
+    };
+    crossFetchModule.fetch = mockedFetch;
+    await expect(getConsentApiEndpoint(MOCK_REQUESTEE_IRI)).rejects.toThrow(
+      /No access issuer listed for property \[verifiable_credential_issuer\] in.*some_property.*some value/
     );
   });
 });

@@ -17,13 +17,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-/* eslint-disable no-shadow */
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { jest } from "@jest/globals";
-import {
-  mockWellKnownNoConsent,
-  mockWellKnownWithConsent,
-} from "../request/request.mock";
 import {
   BaseConsentGrantBody,
   BaseConsentRequestBody,
@@ -31,16 +25,6 @@ import {
   BaseRequestBody,
 } from "../type/AccessVerifiableCredential";
 import { CONSENT_CONTEXT } from "../constants";
-
-export const mockConsentEndpoint = (withConsent = true): void => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
-  solidClientModule.getWellKnownSolid.mockResolvedValue(
-    (withConsent
-      ? mockWellKnownWithConsent()
-      : mockWellKnownNoConsent()) as never
-  );
-};
 
 export const mockAccessRequestVc = (): VerifiableCredential &
   BaseRequestBody => {
