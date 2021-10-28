@@ -61,7 +61,7 @@ async function getAccessWithConsentAll(
       credentialSubject: {
         providedConsent: {
           hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-          forPersonalData: [resource instanceof URL ? resource.href : resource],
+          forPersonalData: [resource.toString()],
         },
       },
     };

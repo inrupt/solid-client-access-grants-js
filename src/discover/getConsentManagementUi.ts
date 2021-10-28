@@ -100,8 +100,7 @@ async function getConsentManagementUi(
   const fetcher = await getSessionFetch(options);
   // TODO: Complete code coverage for URL argument
   const { consentEndpoint, storage } = await getConsentManagementUiFromProfile(
-    /* istanbul ignore next */
-    webId instanceof URL ? webId.href : webId,
+    webId.toString(),
     { fetch: fetcher }
   );
   return (

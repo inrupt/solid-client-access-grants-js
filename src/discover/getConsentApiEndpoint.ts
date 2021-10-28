@@ -71,15 +71,12 @@ async function getConsentApiEndpoint(
 ): Promise<UrlString> {
   // TODO: complete code coverage
   /* istanbul ignore next */
-  if (options.consentEndpoint instanceof URL) {
-    return options.consentEndpoint.href;
-  }
-  if (options.consentEndpoint) {
-    return options.consentEndpoint;
+  if (options.consentEndpoint !== undefined) {
+    return options.consentEndpoint.toString();
   }
   return getConsentEndpointForResource(
     /* istanbul ignore next */
-    resource instanceof URL ? resource.href : resource
+    resource.toString()
   );
 }
 
