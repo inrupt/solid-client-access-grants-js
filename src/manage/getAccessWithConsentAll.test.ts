@@ -50,10 +50,8 @@ describe("getAccessWithConsentAll", () => {
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right default parameters", async () => {
     const expectedDefaultVcShape = {
       credentialSubject: {
-        hasConsent: {
-          mode: [],
+        providedConsent: {
           forPersonalData: [resource.href],
-          forPurpose: undefined,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
         },
       },
@@ -74,20 +72,80 @@ describe("getAccessWithConsentAll", () => {
     );
   });
 
-  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right passed in parameters", async () => {
+  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the appropriate requestor", async () => {
     const paramsInput: Partial<RequestAccessWithConsentParameters> = {
-      purpose: ["https://some.purpose"],
-      access: { read: true },
       requestor: "https://some.requestor",
     };
 
     const expectedVcShape = {
       credentialSubject: {
-        id: paramsInput.requestor,
-        hasConsent: {
-          mode: ["http://www.w3.org/ns/auth/acl#Read"],
+        providedConsent: {
+          forPersonalData: [resource.href],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          isProvidedTo: "https://some.requestor",
+        },
+      },
+    };
+
+    await getAccessWithConsentAll(resource, paramsInput, {
+      fetch: otherFetch,
+    });
+
+    expect(getConsentApiEndpoint).toHaveBeenCalledTimes(1);
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(1);
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      "https://some.api.endpoint/derive",
+      expectedVcShape,
+      {
+        fetch: otherFetch,
+      }
+    );
+  });
+
+  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape appropriate purpose", async () => {
+    const paramsInput: Partial<RequestAccessWithConsentParameters> = {
+      purpose: ["https://some.purpose"],
+    };
+
+    const expectedVcShape = {
+      credentialSubject: {
+        providedConsent: {
           forPersonalData: [resource.href],
           forPurpose: paramsInput.purpose,
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+        },
+      },
+    };
+
+    await getAccessWithConsentAll(resource, paramsInput, {
+      fetch: otherFetch,
+    });
+
+    expect(getConsentApiEndpoint).toHaveBeenCalledTimes(1);
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(1);
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      "https://some.api.endpoint/derive",
+      expectedVcShape,
+      {
+        fetch: otherFetch,
+      }
+    );
+  });
+
+  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the appropriate mode", async () => {
+    const paramsInput: Partial<RequestAccessWithConsentParameters> = {
+      access: { read: true },
+    };
+
+    const expectedVcShape = {
+      credentialSubject: {
+        providedConsent: {
+          mode: ["http://www.w3.org/ns/auth/acl#Read"],
+          forPersonalData: [resource.href],
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
         },
       },

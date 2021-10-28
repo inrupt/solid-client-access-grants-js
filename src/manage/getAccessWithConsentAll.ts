@@ -24,7 +24,7 @@ import {
 } from "@inrupt/solid-client-vc";
 import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
 import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
-import { BaseConsentRequestBody } from "../type/AccessVerifiableCredential";
+import { BaseConsentGrantBody } from "../type/AccessVerifiableCredential";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import type { RecursivePartial } from "../type/RecursivePartial";
 import type { RequestAccessWithConsentParameters } from "../type/RequestAccessWithConsentParameters";
@@ -56,19 +56,31 @@ async function getAccessWithConsentAll(
     await getConsentApiEndpoint(resource, options)
   );
 
-  const vcShape: RecursivePartial<
-    BaseConsentRequestBody & VerifiableCredential
-  > = {
-    credentialSubject: {
-      id: params.requestor,
-      hasConsent: {
-        mode: accessToResourceAccessModeArray(params.access ?? {}),
-        hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-        forPersonalData: [resource instanceof URL ? resource.href : resource],
-        forPurpose: params.purpose,
+  const vcShape: RecursivePartial<BaseConsentGrantBody & VerifiableCredential> =
+    {
+      credentialSubject: {
+        providedConsent: {
+          hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+          forPersonalData: [resource instanceof URL ? resource.href : resource],
+        },
       },
-    },
-  };
+    };
+
+  const specifiedModes = accessToResourceAccessModeArray(params.access ?? {});
+  if (specifiedModes.length > 0) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    vcShape.credentialSubject!.providedConsent!.mode = specifiedModes;
+  }
+
+  if (params.purpose !== undefined) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    vcShape.credentialSubject!.providedConsent!.forPurpose = params.purpose;
+  }
+
+  if (params.requestor) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    vcShape.credentialSubject!.providedConsent!.isProvidedTo = params.requestor;
+  }
 
   // TODO: Fix up the type of accepted arguments (this function should allow deep partial)
   return getVerifiableCredentialAllFromShape(
