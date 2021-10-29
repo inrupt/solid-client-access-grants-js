@@ -33,7 +33,7 @@ async function getVerifiableCredential(
   options: ConsentApiBaseOptions
 ): Promise<VerifiableCredential> {
   const fetcher = await getSessionFetch(options);
-  const vcAsUrlString = vc instanceof URL ? vc.toString() : vc;
+  const vcAsUrlString = vc.toString();
   const issuerResponse = await fetcher(vcAsUrlString);
   if (!issuerResponse.ok) {
     throw new Error(
