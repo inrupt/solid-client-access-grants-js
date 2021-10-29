@@ -6,11 +6,13 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+The following changes have been released:
+
+## [0.3.2] - 2021-10-29
+
 ### Bugfix
 
 - Looking up access grants for a given resource was issuing incorrect requests.
-
-The following changes have been released:
 
 ## [0.3.1] - 2021-10-21
 
