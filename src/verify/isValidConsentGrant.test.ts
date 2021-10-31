@@ -27,7 +27,6 @@ import { jest, describe, it, expect } from "@jest/globals";
 // This ESLint plugin seems to not be able to resolve subpackage imports:
 // eslint-disable-next-line import/no-unresolved
 import { mocked } from "ts-jest/utils";
-import { mockConsentEndpoint } from "../request/request.mock";
 import { isValidConsentGrant } from "./isValidConsentGrant";
 
 jest.mock("@inrupt/solid-client", () => {

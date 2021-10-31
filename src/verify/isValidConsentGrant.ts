@@ -25,8 +25,6 @@ import {
 } from "@inrupt/solid-client-vc";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
-import { ConsentGrantBody } from "../type/AccessVerifiableCredential";
 
 /**
  * Makes a request to the consent server to verify the validity of a given VC.
