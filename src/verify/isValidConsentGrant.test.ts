@@ -17,7 +17,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { isVerifiableCredential } from "@inrupt/solid-client-vc";
+import {
+  isVerifiableCredential,
+  getVerifiableCredentialApiConfiguration,
+} from "@inrupt/solid-client-vc";
 // This rule complains about the `@jest/globals` variables overriding global vars:
 // eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
@@ -75,20 +78,25 @@ describe("isValidConsentGrant", () => {
   const MOCK_VERIFY_RESPONSE = { checks: [], warning: [], errors: [] };
 
   it("uses the provided fetch if any", async () => {
-    const mockedFetch = jest.fn() as typeof fetch;
-    try {
-      await isValidConsentGrant(MOCK_CONSENT_GRANT, {
-        fetch: mockedFetch,
-        consentEndpoint: MOCK_CONSENT_ENDPOINT,
-      });
-      // eslint-disable-next-line no-empty
-    } catch (_e) {}
+    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
+      new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+        status: 200,
+      })
+    );
+    await isValidConsentGrant(MOCK_CONSENT_GRANT, {
+      fetch: mockedFetch,
+      verificationEndpoint: MOCK_CONSENT_ENDPOINT,
+    });
 
     expect(mockedFetch).toHaveBeenCalled();
   });
 
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    mockConsentEndpoint();
+    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+      verifierService: "https://some.vc.verifier",
+    });
     // TypeScript can't infer the type of mock modules imported via Jest;
     // skip type checking for those:
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -101,15 +109,18 @@ describe("isValidConsentGrant", () => {
   });
 
   it("sends the given vc to the verify endpoint", async () => {
-    const mockedFetch = jest.fn().mockReturnValue({
-      ok: true,
-      status: 200,
-      json: jest.fn().mockReturnValueOnce(MOCK_VERIFY_RESPONSE),
-    }) as typeof fetch;
+    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+      verifierService: "https://some.vc.verifier",
+    });
+    const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
+      new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+        status: 200,
+      })
+    );
 
     await isValidConsentGrant(MOCK_CONSENT_GRANT, {
       fetch: mockedFetch,
-      consentEndpoint: MOCK_CONSENT_ENDPOINT,
     });
 
     expect(mockedFetch).toHaveBeenCalledWith(
@@ -121,17 +132,22 @@ describe("isValidConsentGrant", () => {
   });
 
   it("retrieves the vc if a url was passed", async () => {
-    const mockedFetch = jest.fn().mockReturnValue({
-      ok: true,
-      status: 200,
-      json: jest.fn().mockReturnValueOnce(MOCK_VERIFY_RESPONSE),
-    });
-    mockedFetch.mockReturnValueOnce({
-      ok: true,
-      status: 200,
-      json: jest.fn().mockReturnValueOnce(MOCK_CONSENT_GRANT),
+    mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+      verifierService: "https://some.vc.verifier",
     });
     mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    const mockedFetch = jest
+      .fn(global.fetch)
+      // First, the VC is fetched
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(MOCK_CONSENT_GRANT), { status: 200 })
+      )
+      // Then, the verification endpoint is called
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+          status: 200,
+        })
+      );
 
     await isValidConsentGrant("https://example.com/someVc", {
       fetch: mockedFetch as typeof fetch,
@@ -159,29 +175,98 @@ describe("isValidConsentGrant", () => {
     );
   });
 
-  it("gets consent endpoint using credentialSubject.id if no consentEndpoint was passed", async () => {
-    mockConsentEndpoint();
-    const getConsentApiEndpoint = jest.requireActual(
-      "../discover/getConsentApiEndpoint"
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ) as any;
-    const spiedConsentEndpointLookup = jest.spyOn(
-      getConsentApiEndpoint,
-      "getConsentApiEndpoint"
+  it("uses the provided verification endpoint if any", async () => {
+    const vcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      getVerifiableCredentialApiConfiguration: typeof getVerifiableCredentialApiConfiguration;
+    };
+    const spiedConfigurationDiscovery = jest.spyOn(
+      vcModule,
+      "getVerifiableCredentialApiConfiguration"
     );
-    const mockedFetch = jest.fn().mockReturnValue({
-      ok: true,
-      status: 200,
-      json: jest.fn().mockReturnValueOnce(MOCK_VERIFY_RESPONSE),
-    });
-
+    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
+      new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+        status: 200,
+      })
+    );
     await isValidConsentGrant(MOCK_CONSENT_GRANT, {
-      fetch: mockedFetch as typeof fetch,
+      fetch: mockedFetch,
+      verificationEndpoint: "https://some.verification.api",
     });
-
-    expect(spiedConsentEndpointLookup).toHaveBeenCalledWith(
-      MOCK_CONSENT_GRANT.credentialSubject.id,
+    expect(mockedFetch).toHaveBeenCalledWith(
+      "https://some.verification.api",
       expect.anything()
     );
+    expect(spiedConfigurationDiscovery).not.toHaveBeenCalled();
+  });
+
+  it("discovers the verification endpoint if none is provided", async () => {
+    const mockedDiscovery = mocked(
+      getVerifiableCredentialApiConfiguration
+    ).mockResolvedValueOnce({
+      verifierService: "https://some.vc.verifier",
+    });
+    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    const mockedFetch = jest
+      .fn(global.fetch)
+      // First, the VC is fetched
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(MOCK_CONSENT_GRANT), { status: 200 })
+      )
+      // Then, the verification endpoint is called
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+          status: 200,
+        })
+      );
+
+    await isValidConsentGrant(MOCK_CONSENT_GRANT, {
+      fetch: mockedFetch,
+    });
+
+    expect(mockedDiscovery).toHaveBeenCalledWith(MOCK_CONSENT_GRANT.issuer);
+  });
+
+  it("throws if no verification endpoint is discovered", async () => {
+    mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({});
+    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    const mockedFetch = jest
+      .fn(global.fetch)
+      // First, the VC is fetched
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(MOCK_CONSENT_GRANT), { status: 200 })
+      )
+      // Then, the verification endpoint is called
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+          status: 200,
+        })
+      );
+
+    await expect(
+      isValidConsentGrant(MOCK_CONSENT_GRANT, {
+        fetch: mockedFetch,
+      })
+    ).rejects.toThrow(
+      `The VC service provider ${MOCK_CONSENT_GRANT.issuer} does not advertize for a verifier service in its .well-known/vc-configuration document`
+    );
+  });
+
+  it("returns the validation result from the consent endpoint", async () => {
+    mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+      verifierService: "https://some.vc.verifier",
+    });
+    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
+      new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+        status: 200,
+      })
+    );
+    await expect(
+      isValidConsentGrant(MOCK_CONSENT_GRANT, {
+        fetch: mockedFetch,
+        verificationEndpoint: "https://some.verification.api",
+      })
+    ).resolves.toEqual({ checks: [], errors: [], warning: [] });
   });
 });
