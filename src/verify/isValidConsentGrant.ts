@@ -21,10 +21,10 @@ import type { UrlString } from "@inrupt/solid-client";
 import {
   isVerifiableCredential,
   VerifiableCredential,
+  getVerifiableCredentialApiConfiguration,
 } from "@inrupt/solid-client-vc";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
 
 /**
  * Makes a request to the consent server to verify the validity of a given VC.
@@ -38,33 +38,45 @@ import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
 // TODO: Push verification further as this just checks it's a valid VC should we not type check the consent grant?
 async function isValidConsentGrant(
   vc: VerifiableCredential | URL | UrlString,
-  options: ConsentApiBaseOptions = {}
+  options: Exclude<ConsentApiBaseOptions, "consentEndpoint"> & {
+    verificationEndpoint?: UrlString;
+  } = {}
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
   const fetcher = await getSessionFetch(options);
 
-  let vcObject = vc;
-  if (typeof vc === "string") {
-    const vcResponse = await fetcher(vc);
+  let vcObject;
+  // This test passes for both URL and UrlString
+  if (vc.toString().startsWith("http")) {
+    // vc is either an IRI-shaped string or a URL object. In both
+    // cases, vc.toString() is an IRI.
+    const vcResponse = await fetcher(vc.toString());
     vcObject = await vcResponse.json();
-    if (!isVerifiableCredential(vcObject)) {
-      throw new Error(
-        `The request to [${vc}] returned an unexpected response: ${JSON.stringify(
-          vcObject,
-          null,
-          "  "
-        )}`
-      );
-    }
+  } else {
+    vcObject = vc;
   }
-  const credentialSubjectId = (vcObject as VerifiableCredential)
-    .credentialSubject.id;
+  if (!isVerifiableCredential(vcObject)) {
+    throw new Error(
+      `The request to [${vc}] returned an unexpected response: ${JSON.stringify(
+        vcObject,
+        null,
+        "  "
+      )}`
+    );
+  }
 
-  const consentEndpoint =
-    options.consentEndpoint ??
-    (await getConsentApiEndpoint(credentialSubjectId, { fetch: fetcher }));
-  const consentVerifyEndpoint = `${consentEndpoint}/verify`;
+  // Discover the consent endpoint from the resource part of the Access Grant.
+  const verifierEndpoint =
+    options.verificationEndpoint ??
+    (await getVerifiableCredentialApiConfiguration(vcObject.issuer))
+      .verifierService;
 
-  const response = await fetcher(consentVerifyEndpoint, {
+  if (verifierEndpoint === undefined) {
+    throw new Error(
+      `The VC service provider ${vcObject.issuer} does not advertize for a verifier service in its .well-known/vc-configuration document`
+    );
+  }
+
+  const response = await fetcher(verifierEndpoint, {
     headers: {
       "Content-Type": "application/json",
     },

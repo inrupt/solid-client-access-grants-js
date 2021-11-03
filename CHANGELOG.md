@@ -6,6 +6,11 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### Bugfix
+
+- Discovering the verification endpoint was relying on incorrect assumptions, and
+  failed when calling `isValidConsentGrant`.
+
 The following changes have been released:
 
 ## [0.3.2] - 2021-10-29
