@@ -62,6 +62,8 @@ async function getAccessWithConsentAll(
         providedConsent: {
           hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
           forPersonalData: [resource.toString()],
+          forPurpose: params.purpose,
+          isProvidedTo: params.requestor,
         },
       },
     };
@@ -70,16 +72,6 @@ async function getAccessWithConsentAll(
   if (specifiedModes.length > 0) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     vcShape.credentialSubject!.providedConsent!.mode = specifiedModes;
-  }
-
-  if (params.purpose !== undefined) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    vcShape.credentialSubject!.providedConsent!.forPurpose = params.purpose;
-  }
-
-  if (params.requestor) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    vcShape.credentialSubject!.providedConsent!.isProvidedTo = params.requestor;
   }
 
   // TODO: Fix up the type of accepted arguments (this function should allow deep partial)
