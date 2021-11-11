@@ -148,7 +148,6 @@ describe.each(serversUnderTest)(
             consentEndpoint: vcService,
           }
         );
-        console.debug(JSON.stringify(request, undefined, "  "));
         expect(isVerifiableCredential(request)).toBe(true);
 
         const grant = await approveAccessRequestWithConsent(
@@ -163,7 +162,10 @@ describe.each(serversUnderTest)(
         await expect(
           isValidConsentGrant(grant, {
             fetch: resourceOwnerSession.fetch,
-            consentEndpoint: vcService,
+            // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+            // It is an issue documented in the VC library e2e test, and in a ticket
+            // to be fixed.
+            verificationEndpoint: `${vcService}/verify`,
           })
         ).resolves.toMatchObject({ errors: [] });
 
@@ -187,7 +189,8 @@ describe.each(serversUnderTest)(
           (
             await isValidConsentGrant(grant, {
               fetch: resourceOwnerSession.fetch,
-              consentEndpoint: vcService,
+              // FIXME: Ditto verification endpoint discovery.
+              verificationEndpoint: `${vcService}/verify`,
             })
           ).errors
         ).toHaveLength(1);
