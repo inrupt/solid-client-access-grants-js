@@ -27,7 +27,7 @@ import type { ConsentStatus } from "./ConsentStatus";
 export type BaseRequestParameters = {
   access: Partial<access.Access>;
   requestor: UrlString;
-  requestorInboxUrl: UrlString;
+  requestorInboxUrl?: UrlString;
   resources: Array<UrlString>;
   status: ConsentStatus;
 };

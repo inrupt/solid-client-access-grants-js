@@ -70,7 +70,7 @@ export async function approveAccessRequest(
     requestor: WebId;
     access: Partial<Access>;
     resources: Array<UrlString>;
-    requestorInboxIri: UrlString;
+    requestorInboxIri?: UrlString;
   },
   options?: ConsentApiBaseOptions
 ): Promise<VerifiableCredential>;

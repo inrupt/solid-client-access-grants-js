@@ -74,7 +74,7 @@ export async function approveAccessRequestWithConsent(
     requestor: WebId;
     access: Partial<Access>;
     resources: Array<UrlString>;
-    requestorInboxIri: UrlString;
+    requestorInboxIri?: UrlString;
     purpose: Array<UrlString>;
     issuanceDate: Date;
     expirationDate: Date;

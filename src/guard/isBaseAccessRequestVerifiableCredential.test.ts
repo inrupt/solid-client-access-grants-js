@@ -62,6 +62,18 @@ describe("isBaseAccessRequestVerifiableCredential", () => {
     ).toBe(true);
   });
 
+  it("accepts undefined inboxes", () => {
+    expect(
+      isBaseAccessRequestVerifiableCredential({
+        ...validAccessRequestVerifiableCredential,
+        credentialSubject: {
+          ...validAccessRequestVerifiableCredential.credentialSubject,
+          inbox: undefined,
+        },
+      })
+    ).toBe(true);
+  });
+
   it("Returns false on invalid Access Request VC", () => {
     expect(
       isBaseAccessRequestVerifiableCredential({
