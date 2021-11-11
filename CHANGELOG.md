@@ -10,6 +10,7 @@ The following changes have been implemented but not released yet:
 
 - Discovering the verification endpoint was relying on incorrect assumptions, and
   failed when calling `isValidConsentGrant`.
+- Specifying an inbox when requesting/granting access is no longer mandatory.
 
 The following changes have been released:
 
