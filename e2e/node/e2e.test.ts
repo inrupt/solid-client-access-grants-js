@@ -90,10 +90,10 @@ describe.each(serversUnderTest)(
     resourceOwnerClientId,
     resourceOwnerClientSecret
   ) => {
-    const oidcIssuer = "https://" + oidcIssuerDisplay;
-    const vcService = "https://" + vcServiceDisplay;
-    const requestor = "https://" + requestorDisplay;
-    const resourceOwner = "https://" + resourceOwnerDisplay;
+    const oidcIssuer = new URL(`https://${oidcIssuerDisplay}`).href;
+    const vcService = new URL(`https://${vcServiceDisplay}`).href;
+    const requestor = new URL(`https://${requestorDisplay}`).href;
+    const resourceOwner = new URL(`https://${resourceOwnerDisplay}`).href;
 
     it("has the appropriate environment variables", () => {
       expect(oidcIssuer).not.toBeUndefined();
