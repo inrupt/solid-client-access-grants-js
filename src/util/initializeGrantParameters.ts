@@ -50,7 +50,9 @@ function modesToAccess(modes: ResourceAccessMode[]): Partial<Access> {
   return access;
 }
 
-function getInboxFromRequest(requestVc: AccessRequestBody): UrlString {
+function getInboxFromRequest(
+  requestVc: AccessRequestBody
+): UrlString | undefined {
   return requestVc.credentialSubject.inbox;
 }
 
@@ -91,7 +93,10 @@ export function initializeGrantParameters(
     issuanceDate: Date;
     expirationDate: Date;
   }>
-): Exclude<Required<typeof requestOverride>, undefined> {
+): Omit<
+  Exclude<Required<typeof requestOverride>, undefined>,
+  "requestorInboxIri"
+> & { requestorInboxIri?: string } {
   let internalOptions: typeof requestOverride;
   if (requestVc === undefined) {
     internalOptions = requestOverride;

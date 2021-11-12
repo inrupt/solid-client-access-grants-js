@@ -35,7 +35,7 @@ import type { access, UrlString, WebId } from "@inrupt/solid-client";
 export type RequestAccessParameters = {
   access: Partial<access.Access>;
   requestor: WebId;
-  requestorInboxUrl: UrlString;
+  requestorInboxUrl?: UrlString;
   resourceOwner: WebId;
   resources: Array<UrlString>;
 };

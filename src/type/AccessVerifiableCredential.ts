@@ -40,7 +40,7 @@ export type ConsentGrantAttributes = ConsentAttributes & {
 
 export type CredentialSubject = {
   id: UrlString;
-  inbox: UrlString;
+  inbox: UrlString | undefined;
   hasConsent?: ConsentAttributes;
   providedConsent?: ConsentGrantAttributes;
 };

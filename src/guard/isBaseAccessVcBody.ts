@@ -30,7 +30,8 @@ export function isBaseAccessVcBody(x: unknown): x is BaseAccessVcBody {
     isAccessCredentialType(x.type) &&
     isUnknownObject(x.credentialSubject) &&
     typeof x.credentialSubject.id === "string" &&
-    typeof x.credentialSubject.inbox === "string" &&
+    (typeof x.credentialSubject.inbox === "string" ||
+      typeof x.credentialSubject.inbox === "undefined") &&
     (x.issuanceDate !== undefined ? typeof x.issuanceDate === "string" : true)
   );
 }
