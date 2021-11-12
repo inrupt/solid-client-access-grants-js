@@ -177,7 +177,6 @@ describe.each(serversUnderTest)(
             consentEndpoint: vcService,
           }
         );
-        console.log(JSON.stringify(grantedAccess));
         // Test that looking up the access grants for the given resource returns
         // the access we just granted.
         expect(grantedAccess).toContainEqual(grant);
