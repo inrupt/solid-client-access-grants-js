@@ -17,6 +17,13 @@ ifeq ($(MY_OS),Darwin)
 	IS_MAC="DEFINED"
 endif
 
+SPHINXBUILD_AVAILABLE := $(shell command -v $(SPHINXBUILD) 2> /dev/null)
+
+all:
+	ifndef SPHINXBUILD_AVAILABLE
+		$(error sphinx-build is not available, please follow the instructions in ./docs/api/README.md)
+	endif
+
 # Put it first so that "make" without argument is like "make help".
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCECOPYDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
