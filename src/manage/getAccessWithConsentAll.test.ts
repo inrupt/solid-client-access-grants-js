@@ -147,6 +147,7 @@ describe("getAccessWithConsentAll", () => {
           mode: ["http://www.w3.org/ns/auth/acl#Read"],
           forPersonalData: [resource.href],
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          isProvidedTo: paramsInput.requestor,
         },
       },
     };
