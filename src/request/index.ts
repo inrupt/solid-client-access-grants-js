@@ -20,11 +20,12 @@
 /**
  * Import this module for the consent API functions available to an entity
  * requesting access over a resource:
- * - `requestAccess`: A simple access request for a non-commercial entity;
+ * - `issueAccessRequest`: Issues an access request for access to the given
+ *   resource, resulting in a Verifiable Credential.
+ * - `cancelAccessRequest`: For retracting an access request.
  * - `requestAccessWithConsent`: An access request including a purpose for
  *   legally binding consent to access a resource;
- * - `cancelAccessRequest`: For retracting an access request.
  */
 export { cancelAccessRequest } from "./cancelAccessRequest";
-export { requestAccess } from "./requestAccess";
+export { issueAccessRequest, requestAccess } from "./issueAccessRequest";
 export { requestAccessWithConsent } from "./requestAccessWithConsent";

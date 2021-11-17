@@ -32,10 +32,16 @@ import type { access, UrlString, WebId } from "@inrupt/solid-client";
 // TODO: Make requestorInboxUrl optional or align with the design document
 // This parameter if not present should be fetched from the profile according to the design document
 // TODO: Get rid of BaseRequestParameters in favour of this
-export type RequestAccessParameters = {
+export type IssueAccessRequestParameters = {
   access: Partial<access.Access>;
   requestor: WebId;
   requestorInboxUrl?: UrlString;
   resourceOwner: WebId;
   resources: Array<UrlString>;
 };
+
+/**
+ * @hidden Alias of [[IssueAccessRequestParameters]]
+ * @deprecated
+ */
+export type RequestAccessParameters = IssueAccessRequestParameters;

@@ -82,7 +82,7 @@
       "src/manage/revokeAccess.ts",
       "src/request/index.ts",
       "src/request/cancelAccessRequest.ts",
-      "src/request/requestAccess.ts",
+      "src/request/issueAccessRequest.ts",
       "src/request/requestAccessWithConsent.ts",
       "src/type/ConsentApiBaseOptions.ts",
       "src/verify/index.ts",
