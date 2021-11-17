@@ -27,6 +27,9 @@ import type { access, UrlString, WebId } from "@inrupt/solid-client";
  * - `access`: Level access to request on the given Resource.
  *             See {@link https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.access.html}.
  * - `resources`: Array of URLs of the Resources to which access is requested.
+ * - `purpose`: (Optional.) URL representing what the requested access will be used for.
+ * - `issuanceDate`: (Optional, set to the current time if left out.) Point in time from which the access should be granted.
+ * - `expirationDate`: (Optional.) Point in time until when the access is needed.
  */
 // TODO: Find out about the overlap with BaseRequestParameters (differs in status and resource owner)
 // TODO: Make requestorInboxUrl optional or align with the design document
@@ -38,6 +41,9 @@ export type IssueAccessRequestParameters = {
   requestorInboxUrl?: UrlString;
   resourceOwner: WebId;
   resources: Array<UrlString>;
+  purpose?: Array<UrlString>;
+  issuanceDate?: Date;
+  expirationDate?: Date;
 };
 
 /**
