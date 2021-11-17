@@ -24,8 +24,11 @@ import {
   issueVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { issueAccessRequest, requestAccess } from "./issueAccessRequest";
-import { requestAccessWithConsent } from "./requestAccessWithConsent";
+import {
+  issueAccessRequest,
+  requestAccess,
+  requestAccessWithConsent,
+} from "./issueAccessRequest";
 import { getRequestBody } from "../util/issueAccessOrConsentVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import {
@@ -130,6 +133,12 @@ describe("requestAccess", () => {
   });
 });
 
+describe("requestAccessWithConsent", () => {
+  it("should be an alias of issueAccessRequest", () => {
+    expect(requestAccessWithConsent).toEqual(issueAccessRequest);
+  });
+});
+
 describe("issueAccessRequest", () => {
   it("sends a proper access request", async () => {
     mockConsentEndpoint();
@@ -207,9 +216,7 @@ describe("issueAccessRequest", () => {
       }
     );
   });
-});
 
-describe("requestAccessWithConsent", () => {
   it("sends a proper access with consent request", async () => {
     mockConsentEndpoint();
     const mockedIssue = jest.spyOn(
@@ -224,7 +231,7 @@ describe("requestAccessWithConsent", () => {
       })
     );
 
-    await requestAccessWithConsent(
+    await issueAccessRequest(
       {
         access: { read: true },
         requestor: MOCK_REQUESTOR_IRI,
@@ -275,7 +282,7 @@ describe("requestAccessWithConsent", () => {
       })
     );
 
-    await requestAccessWithConsent({
+    await issueAccessRequest({
       access: { read: true },
       requestor: MOCK_REQUESTOR_IRI,
       resourceOwner: MOCK_REQUESTEE_IRI,
@@ -303,7 +310,7 @@ describe("requestAccessWithConsent", () => {
     );
   });
 
-  it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
+  it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed, when with extended options", async () => {
     mockConsentEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
@@ -316,7 +323,7 @@ describe("requestAccessWithConsent", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
 
-    await requestAccessWithConsent({
+    await issueAccessRequest({
       access: { read: true },
       requestor: MOCK_REQUESTOR_IRI,
       resourceOwner: MOCK_REQUESTEE_IRI,

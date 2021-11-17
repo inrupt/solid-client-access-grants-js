@@ -22,7 +22,7 @@ import { jest, it, describe, expect } from "@jest/globals";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
   getAccessWithConsentAll,
-  RequestAccessWithConsentParameters,
+  IssueAccessRequestParameters,
 } from "./getAccessWithConsentAll";
 import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
 
@@ -73,7 +73,7 @@ describe("getAccessWithConsentAll", () => {
   });
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the appropriate requestor", async () => {
-    const paramsInput: Partial<RequestAccessWithConsentParameters> = {
+    const paramsInput: Partial<IssueAccessRequestParameters> = {
       requestor: "https://some.requestor",
     };
 
@@ -105,7 +105,7 @@ describe("getAccessWithConsentAll", () => {
   });
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape appropriate purpose", async () => {
-    const paramsInput: Partial<RequestAccessWithConsentParameters> = {
+    const paramsInput: Partial<IssueAccessRequestParameters> = {
       purpose: ["https://some.purpose"],
     };
 
@@ -137,7 +137,7 @@ describe("getAccessWithConsentAll", () => {
   });
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the appropriate mode", async () => {
-    const paramsInput: Partial<RequestAccessWithConsentParameters> = {
+    const paramsInput: Partial<IssueAccessRequestParameters> = {
       access: { read: true },
     };
 

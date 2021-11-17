@@ -31,10 +31,11 @@ import {
   getConsentManagementUi,
   isValidConsentGrant,
   issueAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
   revokeAccess,
   redirectToConsentManagementUi,
+  // Deprecated APIs:
+  requestAccess,
+  requestAccessWithConsent,
 } from "./index";
 
 describe("Index exports", () => {
@@ -49,9 +50,11 @@ describe("Index exports", () => {
     expect(getConsentManagementUi).toBeDefined();
     expect(isValidConsentGrant).toBeDefined();
     expect(issueAccessRequest).toBeDefined();
-    expect(requestAccess).toBeDefined();
-    expect(requestAccessWithConsent).toBeDefined();
     expect(revokeAccess).toBeDefined();
     expect(redirectToConsentManagementUi).toBeDefined();
+
+    // Deprecated APIs:
+    expect(requestAccess).toBeDefined();
+    expect(requestAccessWithConsent).toBeDefined();
   });
 });

@@ -20,6 +20,7 @@
 export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
 export type {
   IssueAccessRequestParameters,
+  // Deprecated Types:
   RequestAccessParameters,
   RequestAccessWithConsentParameters,
 } from "./type/IssueAccessRequestParameters";
@@ -27,6 +28,7 @@ export type {
 export {
   issueAccessRequest,
   cancelAccessRequest,
+  // Deprecated APIs:
   requestAccess,
   requestAccessWithConsent,
 } from "./request";
