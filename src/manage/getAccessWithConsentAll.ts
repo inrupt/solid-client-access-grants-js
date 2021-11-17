@@ -27,7 +27,7 @@ import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
 import { BaseConsentGrantBody } from "../type/AccessVerifiableCredential";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import type { RecursivePartial } from "../type/RecursivePartial";
-import type { RequestAccessWithConsentParameters } from "../type/RequestAccessWithConsentParameters";
+import type { IssueAccessRequestParameters } from "../type/IssueAccessRequestParameters";
 import { accessToResourceAccessModeArray } from "../util/accessToResourceAccessModeArray";
 import { getSessionFetch } from "../util/getSessionFetch";
 
@@ -44,7 +44,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
 async function getAccessWithConsentAll(
   resource: URL | UrlString,
   params: Partial<
-    Pick<RequestAccessWithConsentParameters, "requestor" | "access" | "purpose">
+    Pick<IssueAccessRequestParameters, "requestor" | "access" | "purpose">
   > = {},
   options: ConsentApiBaseOptions = {}
 ): Promise<Array<VerifiableCredential>> {
@@ -88,7 +88,8 @@ export { getAccessWithConsentAll };
 export default getAccessWithConsentAll;
 export type {
   ConsentApiBaseOptions,
-  RequestAccessWithConsentParameters,
+  IssueAccessRequestParameters,
+  IssueAccessRequestParameters as RequestAccessWithConsentParameters,
   UrlString,
   VerifiableCredential,
 };
