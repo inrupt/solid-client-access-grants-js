@@ -23,9 +23,11 @@
  * - `issueAccessRequest`: Issues an access request for access to the given
  *   resource, resulting in a Verifiable Credential.
  * - `cancelAccessRequest`: For retracting an access request.
- * - `requestAccessWithConsent`: An access request including a purpose for
- *   legally binding consent to access a resource;
  */
 export { cancelAccessRequest } from "./cancelAccessRequest";
-export { issueAccessRequest, requestAccess } from "./issueAccessRequest";
-export { requestAccessWithConsent } from "./requestAccessWithConsent";
+export {
+  issueAccessRequest,
+  // deprecated APIs:
+  requestAccess,
+  requestAccessWithConsent,
+} from "./issueAccessRequest";

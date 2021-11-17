@@ -52,5 +52,9 @@ export type IssueAccessRequestParameters = {
  */
 export type RequestAccessParameters = IssueAccessRequestParameters;
 
+/**
+ * @hidden Deprecated as we move towards just [[IssueAccessRequestParameters]]
+ * @deprecated
+ */
 export type RequestAccessWithConsentParameters = IssueAccessRequestParameters &
   Required<Pick<IssueAccessRequestParameters, "purpose">>;

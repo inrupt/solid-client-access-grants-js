@@ -51,7 +51,6 @@ export { issueAccessRequest };
 export type {
   ConsentApiBaseOptions,
   IssueAccessRequestParameters,
-  IssueAccessRequestParameters as RequestAccessWithConsentParameters,
   VerifiableCredential,
 };
 
@@ -63,7 +62,20 @@ const requestAccess = issueAccessRequest;
 export { requestAccess };
 
 /**
- * @hidden Deprecated alias of [[IssueAccessRequestParameters]]
+ * @hidden Alias of [[issueAccessRequest]]
  * @deprecated
  */
-export type { IssueAccessRequestParameters as RequestAccessParameters };
+const requestAccessWithConsent = issueAccessRequest;
+export { requestAccessWithConsent };
+
+/**
+ * @hidden Deprecated alias of [[IssueAccessRequestParameters]], note that
+ * whilst the types file does have a specific RequestAccessWithConsentParameters
+ * type, it is not used here as it is compatible with just
+ * IssueAccessRequestParameters.
+ * @deprecated
+ */
+export type {
+  IssueAccessRequestParameters as RequestAccessParameters,
+  IssueAccessRequestParameters as RequestAccessWithConsentParameters,
+};

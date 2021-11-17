@@ -25,7 +25,7 @@ import {
   approveAccessRequestWithConsent,
   getAccessWithConsentAll,
   isValidConsentGrant,
-  requestAccessWithConsent,
+  issueAccessRequest,
   revokeAccess,
 } from "../../src/index";
 import { Session } from "@inrupt/solid-client-authn-node";
@@ -131,7 +131,7 @@ describe.each(serversUnderTest)(
       });
 
       it("can issue an access request, grant access to a resource, and revoke the granted access", async () => {
-        const request = await requestAccessWithConsent(
+        const request = await issueAccessRequest(
           {
             access: { read: true },
             requestor,
