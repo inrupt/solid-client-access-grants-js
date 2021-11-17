@@ -21,8 +21,8 @@ export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
 export type {
   IssueAccessRequestParameters,
   RequestAccessParameters,
+  RequestAccessWithConsentParameters,
 } from "./type/IssueAccessRequestParameters";
-export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
 
 export {
   issueAccessRequest,

@@ -24,7 +24,7 @@ import {
 } from "../util/issueAccessOrConsentVc";
 import { GC_CONSENT_STATUS_REQUESTED } from "../constants";
 import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import { RequestAccessWithConsentParameters } from "../type/RequestAccessWithConsentParameters";
+import { RequestAccessWithConsentParameters } from "../type/IssueAccessRequestParameters";
 
 /**
  * Request access to a given Resource and proof that consent for a given use of that access was granted.

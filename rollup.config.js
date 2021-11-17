@@ -88,7 +88,6 @@ export default [
       "./src/type/Parameter.ts",
       "./src/type/RecursivePartial.ts",
       "./src/type/IssueAccessRequestParameters.ts",
-      "./src/type/RequestAccessWithConsentParameters.ts",
       "./src/type/ResourceAccessMode.ts",
     ],
     output: {

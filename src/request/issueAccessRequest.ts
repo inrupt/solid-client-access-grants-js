@@ -51,6 +51,7 @@ export { issueAccessRequest };
 export type {
   ConsentApiBaseOptions,
   IssueAccessRequestParameters,
+  IssueAccessRequestParameters as RequestAccessWithConsentParameters,
   VerifiableCredential,
 };
 
