@@ -85,6 +85,7 @@
       "src/request/issueAccessRequest.ts",
       "src/request/requestAccessWithConsent.ts",
       "src/type/ConsentApiBaseOptions.ts",
+      "src/type/IssueAccessRequestParameters.ts",
       "src/verify/index.ts",
       "src/verify/isValidConsentGrant.ts",
     ],
