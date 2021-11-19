@@ -24,7 +24,7 @@ import {
   approveAccessRequest,
   approveAccessRequestWithConsent,
   getAccessWithConsentAll,
-  isValidConsentGrant,
+  isValidAccessGrant,
   issueAccessRequest,
   revokeAccess,
 } from "../../src/index";
@@ -160,7 +160,7 @@ describe.each(serversUnderTest)(
           }
         );
         await expect(
-          isValidConsentGrant(grant, {
+          isValidAccessGrant(grant, {
             fetch: resourceOwnerSession.fetch,
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
@@ -186,7 +186,7 @@ describe.each(serversUnderTest)(
         });
         expect(
           (
-            await isValidConsentGrant(grant, {
+            await isValidAccessGrant(grant, {
               fetch: resourceOwnerSession.fetch,
               // FIXME: Ditto verification endpoint discovery.
               verificationEndpoint: `${vcService}/verify`,

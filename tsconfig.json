@@ -86,7 +86,7 @@
       "src/type/ConsentApiBaseOptions.ts",
       "src/type/IssueAccessRequestParameters.ts",
       "src/verify/index.ts",
-      "src/verify/isValidConsentGrant.ts",
+      "src/verify/isValidAccessGrant.ts",
     ],
     "exclude": [
       "node_modules/**",

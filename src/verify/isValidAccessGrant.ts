@@ -27,16 +27,15 @@ import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
- * Makes a request to the consent server to verify the validity of a given VC.
+ * Makes a request to the access server to verify the validity of a given Verifiable Credential.
  *
  * @param vc Either a VC, or a URL to a VC, to be verified.
  * @param options Optional properties to customise the request behaviour.
  * @returns An object containing checks, warnings, and errors.
  * @since 0.0.1
  */
-// TODO: Rename to isValidAccessCredential and add isValidAccessWithConsentCredential
 // TODO: Push verification further as this just checks it's a valid VC should we not type check the consent grant?
-async function isValidConsentGrant(
+async function isValidAccessGrant(
   vc: VerifiableCredential | URL | UrlString,
   options: Exclude<ConsentApiBaseOptions, "consentEndpoint"> & {
     verificationEndpoint?: UrlString;
@@ -64,7 +63,7 @@ async function isValidConsentGrant(
     );
   }
 
-  // Discover the consent endpoint from the resource part of the Access Grant.
+  // Discover the access endpoint from the resource part of the Access Grant.
   const verifierEndpoint =
     options.verificationEndpoint ??
     (await getVerifiableCredentialApiConfiguration(vcObject.issuer))
@@ -89,6 +88,13 @@ async function isValidConsentGrant(
   return response.json();
 }
 
-export { isValidConsentGrant };
-export default isValidConsentGrant;
+export { isValidAccessGrant };
+export default isValidAccessGrant;
 export type { ConsentApiBaseOptions, UrlString, VerifiableCredential };
+
+/**
+ * @hidden Deprecated alias of [[isValidAccessGrant]]
+ * @deprecated
+ */
+const isValidConsentGrant = isValidAccessGrant;
+export { isValidConsentGrant };

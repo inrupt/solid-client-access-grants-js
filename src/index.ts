@@ -42,7 +42,11 @@ export {
   getAccessWithConsent,
 } from "./manage";
 
-export { isValidConsentGrant } from "./verify";
+export {
+  isValidAccessGrant,
+  // Deprecated API:
+  isValidConsentGrant,
+} from "./verify";
 
 export {
   getConsentApiEndpoint,

@@ -12,6 +12,7 @@ The following changes have been implemented but not released yet:
   `issueAccessRequest` and `IssueAccessRequestParameters` respectively, as we will
   be deprecating `requestAccessWithConsent` in the near future and merging it with
   `issueAccessRequest`. The previous names are still exported, but are not documented.
+- Rename `isValidConsentGrant` to `isValidAccessGrant`
 
 ### Bugfix
 
