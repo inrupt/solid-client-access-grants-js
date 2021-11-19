@@ -8,11 +8,32 @@ The following changes have been implemented but not released yet:
 
 ### Feature change
 
-- The `requestAccess` and `RequestAccessParameters` have been renamed to
-  `issueAccessRequest` and `IssueAccessRequestParameters` respectively, as we will
-  be deprecating `requestAccessWithConsent` in the near future and merging it with
-  `issueAccessRequest`. The previous names are still exported, but are not documented.
+Rename APIs to remove the connotations that "consent" could imply. All previous
+APIs still exist, but are undocumented and deprecated, and will be removed in
+the future.
+
+- Deprecate `approveAccessRequestWithConsent` in favour of `approveAccessRequest` (which now supports `purpose`)
+- Deprecate `requestAccessWithConsent` in favour of `issueAccessRequest` (which now supports `purpose`)
+- Deprecate `RequestAccessWithConsentParameters` in favour of `IssueAccessRequestParameters`
+- Rename type `RequestAccessParameters` to `IssueAccessRequestParameters`
+- Rename type `ConsentApiBaseOptions` to `AccessBaseOptions`
+- Rename `requestAccess` to `issueAccessRequest`
 - Rename `isValidConsentGrant` to `isValidAccessGrant`
+- Rename `getAccessWithConsent` to `getAccessGrant`
+- Rename `getAccessWithConsentAll` to `getAccessGrantAll`
+- Rename `revokeAccess` to `revokeAccessGrant`
+- Rename `getConsentApiEndpoint` to `getAccessApiEndpoint`
+- Rename `getConsentManagementUi` to `getAccessManagementUi`
+- Rename `getConsentManagementUiFromWellKnown` to `getAccessManagementUiFromWellKnown`
+- Rename `redirectToConsentManagementUi` to `redirectToAccessManagementUi`
+- Change `consentEndpoint` property in `ConsentApiBaseOptions`/`AccessBaseOptions` to `accessEndpoint` (backwards compatible)
+
+Other changes:
+
+- Explicitly document the `IssueAccessRequestParameters` type, such that it doesn't end up on the `manage` module documentation.
+- Ensure only the exported modules are documented by typedoc, making our documentation clearer to read.
+- Fix typo in error message thrown from `getBaseAccessVerifiableCredential`
+- Reduce iterations needed for calculating consent guards (minor performance gain)
 
 ### Bugfix
 
