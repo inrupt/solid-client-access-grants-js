@@ -18,9 +18,13 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /**
- * Import this module for the consent API functions available to an entity
+ * Import this module for the access API functions available to an entity
  * verifying issued credentials for access over a resource:
- * - `isValidConsentGrant`: Verifying an access grant.
+ * - `isValidAccessGrant`: Verifying an access grant.
  */
-// TODO: Make name more explicit and allow verification of different types of consent & access grants
-export { isValidConsentGrant } from "./isValidConsentGrant";
+// TODO: Allow verification of different types of consent & access grants
+export {
+  isValidAccessGrant,
+  // Deprecated APIs:
+  isValidConsentGrant,
+} from "./isValidAccessGrant";

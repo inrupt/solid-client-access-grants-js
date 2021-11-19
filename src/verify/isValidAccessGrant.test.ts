@@ -27,7 +27,7 @@ import { jest, describe, it, expect } from "@jest/globals";
 // This ESLint plugin seems to not be able to resolve subpackage imports:
 // eslint-disable-next-line import/no-unresolved
 import { mocked } from "ts-jest/utils";
-import { isValidConsentGrant } from "./isValidConsentGrant";
+import { isValidConsentGrant, isValidAccessGrant } from "./isValidAccessGrant";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -45,7 +45,13 @@ jest.mock("@inrupt/solid-client-vc");
 jest.mock("cross-fetch");
 
 describe("isValidConsentGrant", () => {
-  const MOCK_CONSENT_GRANT = {
+  it("should be an alias of isValidAccessGrant", () => {
+    expect(isValidConsentGrant).toBe(isValidAccessGrant);
+  });
+});
+
+describe("isValidAccessGrant", () => {
+  const MOCK_ACCESS_GRANT = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
       "https://consent.pod.inrupt.com/credentials/v1",
@@ -83,7 +89,7 @@ describe("isValidConsentGrant", () => {
         status: 200,
       })
     );
-    await isValidConsentGrant(MOCK_CONSENT_GRANT, {
+    await isValidAccessGrant(MOCK_ACCESS_GRANT, {
       fetch: mockedFetch,
       verificationEndpoint: MOCK_CONSENT_ENDPOINT,
     });
@@ -101,7 +107,7 @@ describe("isValidConsentGrant", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
     try {
-      await isValidConsentGrant(MOCK_CONSENT_GRANT);
+      await isValidAccessGrant(MOCK_ACCESS_GRANT);
       // eslint-disable-next-line no-empty
     } catch (_e) {}
     expect(scab.fetch).toHaveBeenCalled();
@@ -118,14 +124,14 @@ describe("isValidConsentGrant", () => {
       })
     );
 
-    await isValidConsentGrant(MOCK_CONSENT_GRANT, {
+    await isValidAccessGrant(MOCK_ACCESS_GRANT, {
       fetch: mockedFetch,
     });
 
     expect(mockedFetch).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
-        body: JSON.stringify({ verifiableCredential: MOCK_CONSENT_GRANT }),
+        body: JSON.stringify({ verifiableCredential: MOCK_ACCESS_GRANT }),
       })
     );
   });
@@ -139,7 +145,7 @@ describe("isValidConsentGrant", () => {
       .fn(global.fetch)
       // First, the VC is fetched
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(MOCK_CONSENT_GRANT), { status: 200 })
+        new Response(JSON.stringify(MOCK_ACCESS_GRANT), { status: 200 })
       )
       // Then, the verification endpoint is called
       .mockResolvedValueOnce(
@@ -148,7 +154,7 @@ describe("isValidConsentGrant", () => {
         })
       );
 
-    await isValidConsentGrant("https://example.com/someVc", {
+    await isValidAccessGrant("https://example.com/someVc", {
       fetch: mockedFetch as typeof fetch,
       consentEndpoint: MOCK_CONSENT_ENDPOINT,
     });
@@ -165,7 +171,7 @@ describe("isValidConsentGrant", () => {
     mocked(isVerifiableCredential).mockReturnValueOnce(false);
 
     await expect(
-      isValidConsentGrant("https://example.com/someVc", {
+      isValidAccessGrant("https://example.com/someVc", {
         fetch: mockedFetch as typeof fetch,
         consentEndpoint: MOCK_CONSENT_ENDPOINT,
       })
@@ -188,7 +194,7 @@ describe("isValidConsentGrant", () => {
         status: 200,
       })
     );
-    await isValidConsentGrant(MOCK_CONSENT_GRANT, {
+    await isValidAccessGrant(MOCK_ACCESS_GRANT, {
       fetch: mockedFetch,
       verificationEndpoint: "https://some.verification.api",
     });
@@ -210,7 +216,7 @@ describe("isValidConsentGrant", () => {
       .fn(global.fetch)
       // First, the VC is fetched
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(MOCK_CONSENT_GRANT), { status: 200 })
+        new Response(JSON.stringify(MOCK_ACCESS_GRANT), { status: 200 })
       )
       // Then, the verification endpoint is called
       .mockResolvedValueOnce(
@@ -219,11 +225,11 @@ describe("isValidConsentGrant", () => {
         })
       );
 
-    await isValidConsentGrant(MOCK_CONSENT_GRANT, {
+    await isValidAccessGrant(MOCK_ACCESS_GRANT, {
       fetch: mockedFetch,
     });
 
-    expect(mockedDiscovery).toHaveBeenCalledWith(MOCK_CONSENT_GRANT.issuer);
+    expect(mockedDiscovery).toHaveBeenCalledWith(MOCK_ACCESS_GRANT.issuer);
   });
 
   it("throws if no verification endpoint is discovered", async () => {
@@ -233,7 +239,7 @@ describe("isValidConsentGrant", () => {
       .fn(global.fetch)
       // First, the VC is fetched
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(MOCK_CONSENT_GRANT), { status: 200 })
+        new Response(JSON.stringify(MOCK_ACCESS_GRANT), { status: 200 })
       )
       // Then, the verification endpoint is called
       .mockResolvedValueOnce(
@@ -243,15 +249,15 @@ describe("isValidConsentGrant", () => {
       );
 
     await expect(
-      isValidConsentGrant(MOCK_CONSENT_GRANT, {
+      isValidAccessGrant(MOCK_ACCESS_GRANT, {
         fetch: mockedFetch,
       })
     ).rejects.toThrow(
-      `The VC service provider ${MOCK_CONSENT_GRANT.issuer} does not advertize for a verifier service in its .well-known/vc-configuration document`
+      `The VC service provider ${MOCK_ACCESS_GRANT.issuer} does not advertize for a verifier service in its .well-known/vc-configuration document`
     );
   });
 
-  it("returns the validation result from the consent endpoint", async () => {
+  it("returns the validation result from the access endpoint", async () => {
     mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
       verifierService: "https://some.vc.verifier",
     });
@@ -262,7 +268,7 @@ describe("isValidConsentGrant", () => {
       })
     );
     await expect(
-      isValidConsentGrant(MOCK_CONSENT_GRANT, {
+      isValidAccessGrant(MOCK_ACCESS_GRANT, {
         fetch: mockedFetch,
         verificationEndpoint: "https://some.verification.api",
       })
