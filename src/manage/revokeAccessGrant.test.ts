@@ -21,7 +21,7 @@
 /* eslint-disable no-shadow */
 import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { jest, describe, it, expect } from "@jest/globals";
-import { revokeAccess } from "./revokeAccess";
+import { revokeAccessGrant, revokeAccess } from "./revokeAccessGrant";
 import { mockAccessGrant, MOCKED_CREDENTIAL_ID } from "../request/request.mock";
 import { mockAccessRequestVc } from "./approve.mock";
 
@@ -29,6 +29,12 @@ jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
 
 describe("revokeAccess", () => {
+  it("should be an alias of revokeAccessGrant", () => {
+    expect(revokeAccess).toBe(revokeAccessGrant);
+  });
+});
+
+describe("revokeAccessGrant", () => {
   it("defaults to the authenticated fetch from solid-client-authn-browser", async () => {
     const sca = jest.requireMock("@inrupt/solid-client-authn-browser") as {
       fetch: typeof global.fetch;
@@ -49,7 +55,7 @@ describe("revokeAccess", () => {
       mockedVcModule,
       "revokeVerifiableCredential"
     );
-    await revokeAccess("https://some.credential");
+    await revokeAccessGrant("https://some.credential");
     expect(spiedRevoke).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
@@ -76,7 +82,7 @@ describe("revokeAccess", () => {
           )
         )
       );
-    await revokeAccess("https://some.credential", {
+    await revokeAccessGrant("https://some.credential", {
       fetch: mockedFetch,
     });
     expect(spiedRevoke).toHaveBeenCalledWith(
@@ -103,7 +109,7 @@ describe("revokeAccess", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValue(new Response(JSON.stringify(mockedVc)));
-    await revokeAccess(MOCKED_CREDENTIAL_ID, {
+    await revokeAccessGrant(MOCKED_CREDENTIAL_ID, {
       fetch: mockedFetch,
     });
     expect(mockedFetch).toHaveBeenCalledWith(MOCKED_CREDENTIAL_ID);
@@ -122,12 +128,12 @@ describe("revokeAccess", () => {
       })
     );
     await expect(
-      revokeAccess("https://some.credential", { fetch: mockedFetch })
+      revokeAccessGrant("https://some.credential", { fetch: mockedFetch })
     ).rejects.toThrow(/\[https:\/\/some.credential\].*401.*Unauthorized/);
   });
 
   it("throws if the resource is not a base access grant VC", async () => {
-    await expect(revokeAccess(mockAccessRequestVc())).rejects.toThrow(
+    await expect(revokeAccessGrant(mockAccessRequestVc())).rejects.toThrow(
       "An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential."
     );
   });
@@ -141,7 +147,7 @@ describe("revokeAccess", () => {
       "revokeVerifiableCredential"
     );
     const mockedFetch = jest.fn(global.fetch);
-    await revokeAccess(
+    await revokeAccessGrant(
       mockAccessGrant("https://some.issuer", "https://some.subject"),
       {
         fetch: mockedFetch,

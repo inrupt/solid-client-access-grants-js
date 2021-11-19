@@ -31,13 +31,14 @@ import {
   getConsentManagementUi,
   isValidAccessGrant,
   issueAccessRequest,
-  revokeAccess,
   redirectToConsentManagementUi,
+  revokeAccessGrant,
   // Deprecated APIs:
   getAccessWithConsent,
   getAccessWithConsentAll,
   requestAccess,
   requestAccessWithConsent,
+  revokeAccess,
   isValidConsentGrant,
 } from "./index";
 
@@ -53,14 +54,15 @@ describe("Index exports", () => {
     expect(getConsentManagementUi).toBeDefined();
     expect(isValidAccessGrant).toBeDefined();
     expect(issueAccessRequest).toBeDefined();
-    expect(revokeAccess).toBeDefined();
     expect(redirectToConsentManagementUi).toBeDefined();
+    expect(revokeAccessGrant).toBeDefined();
 
     // Deprecated APIs:
     expect(getAccessWithConsent).toBeDefined();
     expect(getAccessWithConsentAll).toBeDefined();
     expect(requestAccess).toBeDefined();
     expect(requestAccessWithConsent).toBeDefined();
+    expect(revokeAccess).toBeDefined();
     expect(isValidConsentGrant).toBeDefined();
   });
 });
