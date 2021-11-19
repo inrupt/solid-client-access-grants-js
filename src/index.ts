@@ -37,8 +37,10 @@ export {
   approveAccessRequest,
   approveAccessRequestWithConsent,
   denyAccessRequest,
+  getAccessGrant,
   getAccessWithConsentAll,
   revokeAccess,
+  // Deprecated APIs:
   getAccessWithConsent,
 } from "./manage";
 

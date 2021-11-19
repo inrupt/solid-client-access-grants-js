@@ -27,14 +27,14 @@ import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
- * Gets the Access Grant (with optional consent) associated to the given URL.
+ * Retrieve the Access Grant associated to the given URL.
  *
  * @param accessGrantVcUrl The URL of an access grant, with or without consent.
  * @param options Optional properties to customise the request behaviour.
  * @returns The Verifiable Credential associated to the given IRI, if it is an access grant. Throws otherwise.
  * @since 0.1.0
  */
-export async function getAccessWithConsent(
+export async function getAccessGrant(
   accessGrantVcUrl: UrlString | URL,
   options?: ConsentApiBaseOptions
 ): Promise<VerifiableCredential & AccessGrantBody> {
@@ -71,3 +71,10 @@ export async function getAccessWithConsent(
   }
   return data;
 }
+
+/**
+ * @hidden Deprecated alias of [[getAccessGrant]]
+ * @deprecated
+ */
+const getAccessWithConsent = getAccessGrant;
+export { getAccessWithConsent };
