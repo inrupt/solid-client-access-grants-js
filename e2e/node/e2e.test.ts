@@ -23,7 +23,7 @@ import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 import {
   approveAccessRequest,
   approveAccessRequestWithConsent,
-  getAccessWithConsentAll,
+  getAccessGrantAll,
   isValidAccessGrant,
   issueAccessRequest,
   revokeAccess,
@@ -169,7 +169,7 @@ describe.each(serversUnderTest)(
           })
         ).resolves.toMatchObject({ errors: [] });
 
-        const grantedAccess = await getAccessWithConsentAll(
+        const grantedAccess = await getAccessGrantAll(
           SHARED_IMAGE_IRI,
           undefined,
           {
@@ -197,7 +197,7 @@ describe.each(serversUnderTest)(
 
       it("can filter VCs held by the service based on requestor", async () => {
         await expect(
-          getAccessWithConsentAll(
+          getAccessGrantAll(
             SHARED_IMAGE_IRI,
             { requestor },
             {
@@ -207,7 +207,7 @@ describe.each(serversUnderTest)(
           )
         ).resolves.not.toHaveLength(0);
         await expect(
-          getAccessWithConsentAll(
+          getAccessGrantAll(
             SHARED_IMAGE_IRI,
             { requestor: "https://some.unknown.requestor" },
             {
@@ -220,13 +220,13 @@ describe.each(serversUnderTest)(
 
       it("can filter VCs held by the service based on target resource", async () => {
         await expect(
-          getAccessWithConsentAll(SHARED_IMAGE_IRI, undefined, {
+          getAccessGrantAll(SHARED_IMAGE_IRI, undefined, {
             fetch: resourceOwnerSession.fetch,
             consentEndpoint: vcService,
           })
         ).resolves.not.toHaveLength(0);
         await expect(
-          getAccessWithConsentAll("https://some.unkown.resource", undefined, {
+          getAccessGrantAll("https://some.unkown.resource", undefined, {
             fetch: resourceOwnerSession.fetch,
             consentEndpoint: vcService,
           })
@@ -241,11 +241,11 @@ describe.each(serversUnderTest)(
           bothPurposeFilter,
           unknownPurposeFilter,
         ] = await Promise.all([
-          getAccessWithConsentAll(SHARED_IMAGE_IRI, undefined, {
+          getAccessGrantAll(SHARED_IMAGE_IRI, undefined, {
             fetch: resourceOwnerSession.fetch,
             consentEndpoint: vcService,
           }),
-          getAccessWithConsentAll(
+          getAccessGrantAll(
             SHARED_IMAGE_IRI,
             { purpose: ["https://some.purpose/not-a-nefarious-one/i-promise"] },
             {
@@ -253,7 +253,7 @@ describe.each(serversUnderTest)(
               consentEndpoint: vcService,
             }
           ),
-          getAccessWithConsentAll(
+          getAccessGrantAll(
             SHARED_IMAGE_IRI,
             { purpose: ["https://some.other.purpose/"] },
             {
@@ -261,7 +261,7 @@ describe.each(serversUnderTest)(
               consentEndpoint: vcService,
             }
           ),
-          getAccessWithConsentAll(
+          getAccessGrantAll(
             SHARED_IMAGE_IRI,
             {
               purpose: [
@@ -274,7 +274,7 @@ describe.each(serversUnderTest)(
               consentEndpoint: vcService,
             }
           ),
-          getAccessWithConsentAll(
+          getAccessGrantAll(
             SHARED_IMAGE_IRI,
             { purpose: ["https://some.unknown.purpose/"] },
             {

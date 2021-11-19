@@ -21,9 +21,10 @@
 import { jest, it, describe, expect } from "@jest/globals";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
+  getAccessGrantAll,
   getAccessWithConsentAll,
   IssueAccessRequestParameters,
-} from "./getAccessWithConsentAll";
+} from "./getAccessGrantAll";
 import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
 
 const clientAuthnFetch = jest.fn(global.fetch);
@@ -45,6 +46,12 @@ jest.mock("../discover/getConsentApiEndpoint", () => {
 });
 
 describe("getAccessWithConsentAll", () => {
+  it("should be an alias for getAccessGrantAll", () => {
+    expect(getAccessWithConsentAll).toBe(getAccessGrantAll);
+  });
+});
+
+describe("getAccessGrantAll", () => {
   const resource = new URL("https://some.resource");
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right default parameters", async () => {
@@ -57,7 +64,7 @@ describe("getAccessWithConsentAll", () => {
       },
     };
 
-    await getAccessWithConsentAll(resource.href);
+    await getAccessGrantAll(resource.href);
 
     expect(getConsentApiEndpoint).toHaveBeenCalledTimes(1);
 
@@ -87,7 +94,7 @@ describe("getAccessWithConsentAll", () => {
       },
     };
 
-    await getAccessWithConsentAll(resource, paramsInput, {
+    await getAccessGrantAll(resource, paramsInput, {
       fetch: otherFetch,
     });
 
@@ -119,7 +126,7 @@ describe("getAccessWithConsentAll", () => {
       },
     };
 
-    await getAccessWithConsentAll(resource, paramsInput, {
+    await getAccessGrantAll(resource, paramsInput, {
       fetch: otherFetch,
     });
 
@@ -152,7 +159,7 @@ describe("getAccessWithConsentAll", () => {
       },
     };
 
-    await getAccessWithConsentAll(resource, paramsInput, {
+    await getAccessGrantAll(resource, paramsInput, {
       fetch: otherFetch,
     });
 

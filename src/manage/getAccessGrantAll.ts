@@ -32,16 +32,16 @@ import { accessToResourceAccessModeArray } from "../util/accessToResourceAccessM
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
- * Retrieve consent grants issued over a resource.
+ * Retrieve Access Grants issued over a resource.
  * Can be filtered by requestor, access and purpose.
  *
- * @param resource The URL of a resource to which consent grants might have been issued.
+ * @param resource The URL of a resource to which access grants might have been issued.
  * @param grantShape The properties of grants to filter results.
  * @param options Optional properties to customise the request behaviour.
  * @returns A void promise.
  * @since 0.1.0
  */
-async function getAccessWithConsentAll(
+async function getAccessGrantAll(
   resource: URL | UrlString,
   params: Partial<
     Pick<IssueAccessRequestParameters, "requestor" | "access" | "purpose">
@@ -50,7 +50,7 @@ async function getAccessWithConsentAll(
 ): Promise<Array<VerifiableCredential>> {
   const sessionFetch = await getSessionFetch(options);
 
-  // TODO: Fix consent API endpoint retrieval (should include all the different API endpoints)
+  // TODO: Fix access API endpoint retrieval (should include all the different API endpoints)
   const holderEndpoint = new URL(
     "derive",
     await getConsentApiEndpoint(resource, options)
@@ -84,8 +84,8 @@ async function getAccessWithConsentAll(
   );
 }
 
-export { getAccessWithConsentAll };
-export default getAccessWithConsentAll;
+export { getAccessGrantAll };
+export default getAccessGrantAll;
 export type {
   ConsentApiBaseOptions,
   IssueAccessRequestParameters,
@@ -93,3 +93,10 @@ export type {
   UrlString,
   VerifiableCredential,
 };
+
+/**
+ * @hidden Deprecated alias for [[getAccessGrantAll]]
+ * @deprecated
+ */
+const getAccessWithConsentAll = getAccessGrantAll;
+export { getAccessWithConsentAll };
