@@ -20,7 +20,7 @@
 import type { UrlString } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import { revokeAccess } from "../manage/revokeAccess";
+import { revokeAccessGrant } from "../manage/revokeAccessGrant";
 
 /**
  * Cancel a request for access to data (with explicit or implicit consent) before
@@ -36,7 +36,7 @@ async function cancelAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
   options: ConsentApiBaseOptions = {}
 ): Promise<void> {
-  return revokeAccess(vc, options);
+  return revokeAccessGrant(vc, options);
 }
 
 export { cancelAccessRequest };

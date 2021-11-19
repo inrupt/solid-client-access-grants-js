@@ -27,14 +27,14 @@ import { getBaseAccessGrantVerifiableCredential } from "../util/getBaseAccessVer
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
- * Makes a request to the consent server to revoke a given VC.
+ * Makes a request to the consent server to revoke a given Verifiable Credential (VC).
  *
  * @param vc Either a VC, or a URL to a VC, to be revoked.
  * @param options Optional properties to customise the request behaviour.
  * @returns A void promise.
  * @since 0.0.1
  */
-async function revokeAccess(
+async function revokeAccessGrant(
   vc: VerifiableCredential | URL | UrlString,
   options: Omit<ConsentApiBaseOptions, "consentEndpoint"> = {}
 ): Promise<void> {
@@ -49,6 +49,13 @@ async function revokeAccess(
   );
 }
 
-export { revokeAccess };
-export default revokeAccess;
+export { revokeAccessGrant };
+export default revokeAccessGrant;
 export type { ConsentApiBaseOptions, UrlString, VerifiableCredential };
+
+/**
+ * @hidden deprecated alias of [[revokeAccessGrant]]
+ * @deprecated
+ */
+const revokeAccess = revokeAccessGrant;
+export { revokeAccess };

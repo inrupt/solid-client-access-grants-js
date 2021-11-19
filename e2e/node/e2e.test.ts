@@ -26,7 +26,7 @@ import {
   getAccessGrantAll,
   isValidAccessGrant,
   issueAccessRequest,
-  revokeAccess,
+  revokeAccessGrant,
 } from "../../src/index";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
@@ -181,7 +181,7 @@ describe.each(serversUnderTest)(
         // the access we just granted.
         expect(grantedAccess).toContainEqual(grant);
 
-        await revokeAccess(grant, {
+        await revokeAccessGrant(grant, {
           fetch: resourceOwnerSession.fetch,
         });
         expect(

@@ -26,7 +26,7 @@
  * - `denyAccessRequest`: Deny access over a resource;
  * - `getAccessGrant`: Retrieve the Access Grant associated to the given URL.
  * - `getAccessGrantAll`: Retrieve the Access Grants issued over a resource;
- * - `revokeAccess`: Revoke previously granted access over a resource.
+ * - `revokeAccessGrant`: Revoke previously granted access over a resource.
  */
 export { approveAccessRequest } from "./approveAccessRequest";
 export { approveAccessRequestWithConsent } from "./approveAccessRequestWithConsent";
@@ -41,4 +41,8 @@ export {
   // Deprecated APIs:
   getAccessWithConsentAll,
 } from "./getAccessGrantAll";
-export { revokeAccess } from "./revokeAccess";
+export {
+  revokeAccessGrant,
+  // Deprecated APIs:
+  revokeAccess,
+} from "./revokeAccessGrant";
