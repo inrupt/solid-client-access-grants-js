@@ -24,12 +24,17 @@
  * - `approveAccessRequestWithConsent`: Approve an access request including a purpose for
  *   legally binding consent to access a resource;
  * - `denyAccessRequest`: Deny access over a resource;
+ * - `getAccessGrant`: Retrieve the Access Grant associated to the given URL.
  * - `getAccessWithConsentAll`: Retrieve consent grants issued over a resource;
  * - `revokeAccess`: Revoke previously granted access over a resource.
  */
 export { approveAccessRequest } from "./approveAccessRequest";
 export { approveAccessRequestWithConsent } from "./approveAccessRequestWithConsent";
 export { denyAccessRequest } from "./denyAccessRequest";
+export {
+  getAccessGrant,
+  // Deprecated APIs:
+  getAccessWithConsent,
+} from "./getAccessGrant";
 export { getAccessWithConsentAll } from "./getAccessWithConsentAll";
 export { revokeAccess } from "./revokeAccess";
-export { getAccessWithConsent } from "./getAccessWithConsent";

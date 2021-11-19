@@ -21,12 +21,18 @@
 import { jest, it, describe, expect } from "@jest/globals";
 import { mockConsentEndpoint } from "../request/request.mock";
 import { mockAccessGrantVc, mockConsentRequestVc } from "./approve.mock";
-import { getAccessWithConsent } from "./getAccessWithConsent";
+import { getAccessGrant, getAccessWithConsent } from "./getAccessGrant";
 
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("cross-fetch");
 
 describe("getAccessWithConsent", () => {
+  it("should be an alias of getAccessGrant", () => {
+    expect(getAccessWithConsent).toBe(getAccessGrant);
+  });
+});
+
+describe("getAccessGrant", () => {
   it("defaults to the session fetch if none is provided", async () => {
     mockConsentEndpoint();
     const mockedFetch = jest
@@ -37,7 +43,8 @@ describe("getAccessWithConsent", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) as any;
     fetchModule.fetch = mockedFetch;
-    await getAccessWithConsent("https://some.vc.url");
+
+    await getAccessGrant("https://some.vc.url");
     expect(mockedFetch).toHaveBeenCalledWith("https://some.vc.url");
   });
 
@@ -46,7 +53,8 @@ describe("getAccessWithConsent", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(new Response(JSON.stringify(mockAccessGrantVc())));
-    await getAccessWithConsent("https://some.vc.url", {
+
+    await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
     });
     expect(mockedFetch).toHaveBeenCalledWith("https://some.vc.url");
@@ -59,8 +67,9 @@ describe("getAccessWithConsent", () => {
       .mockResolvedValueOnce(
         new Response("Not Found", { status: 404, statusText: "Not Found" })
       );
+
     await expect(
-      getAccessWithConsent("https://some.vc.url", {
+      getAccessGrant("https://some.vc.url", {
         fetch: mockedFetch,
       })
     ).rejects.toThrow(
@@ -73,8 +82,9 @@ describe("getAccessWithConsent", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(new Response("{'someKey': 'someValue'}"));
+
     await expect(
-      getAccessWithConsent("https://some.vc.url", {
+      getAccessGrant("https://some.vc.url", {
         fetch: mockedFetch,
       })
     ).rejects.toThrow(
@@ -89,8 +99,9 @@ describe("getAccessWithConsent", () => {
       .mockResolvedValueOnce(
         new Response(JSON.stringify(mockConsentRequestVc()))
       );
+
     await expect(
-      getAccessWithConsent("https://some.vc.url", {
+      getAccessGrant("https://some.vc.url", {
         fetch: mockedFetch,
       })
     ).rejects.toThrow(
@@ -100,28 +111,27 @@ describe("getAccessWithConsent", () => {
 
   it("returns the consent grant with the given IRI", async () => {
     mockConsentEndpoint();
-    const mockedAccessgrant = mockAccessGrantVc();
+    const mockedAccessGrant = mockAccessGrantVc();
     const mockedFetch = jest
       .fn(global.fetch)
-      .mockResolvedValueOnce(new Response(JSON.stringify(mockedAccessgrant)));
-    const accessGrant = await getAccessWithConsent("https://some.vc.url", {
+      .mockResolvedValueOnce(new Response(JSON.stringify(mockedAccessGrant)));
+
+    const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
     });
-    expect(accessGrant).toEqual(mockedAccessgrant);
+    expect(accessGrant).toEqual(mockedAccessGrant);
   });
 
   it("returns the consent grant with the given URL object", async () => {
     mockConsentEndpoint();
-    const mockedAccessgrant = mockAccessGrantVc();
+    const mockedAccessGrant = mockAccessGrantVc();
     const mockedFetch = jest
       .fn(global.fetch)
-      .mockResolvedValueOnce(new Response(JSON.stringify(mockedAccessgrant)));
-    const accessGrant = await getAccessWithConsent(
-      new URL("https://some.vc.url"),
-      {
-        fetch: mockedFetch,
-      }
-    );
-    expect(accessGrant).toEqual(mockedAccessgrant);
+      .mockResolvedValueOnce(new Response(JSON.stringify(mockedAccessGrant)));
+
+    const accessGrant = await getAccessGrant(new URL("https://some.vc.url"), {
+      fetch: mockedFetch,
+    });
+    expect(accessGrant).toEqual(mockedAccessGrant);
   });
 });
