@@ -72,21 +72,11 @@
       // (i.e. public API's that should be documented) should be listed here:
       "src/index.ts",
       "src/discover/index.ts",
-      "src/discover/getConsentApiEndpoint.ts",
-      "src/discover/getConsentManagementUi.ts",
       "src/manage/index.ts",
-      "src/manage/approveAccessRequest.ts",
-      "src/manage/approveAccessRequestWithConsent.ts",
-      "src/manage/denyAccessRequest.ts",
-      "src/manage/getAccessWithConsentAll.ts",
-      "src/manage/revokeAccess.ts",
       "src/request/index.ts",
-      "src/request/cancelAccessRequest.ts",
-      "src/request/issueAccessRequest.ts",
-      "src/type/ConsentApiBaseOptions.ts",
-      "src/type/IssueAccessRequestParameters.ts",
       "src/verify/index.ts",
-      "src/verify/isValidAccessGrant.ts",
+      "src/type/ConsentApiBaseOptions.ts",
+      "src/type/IssueAccessRequestParameters.ts"
     ],
     "exclude": [
       "node_modules/**",
@@ -105,7 +95,7 @@
     "readme": "none",
     "entryDocument": "index.md",
   },
-  "include": [ "src/index.ts", ".eslintrc.js" ],
+  "include": ["src/index.ts", ".eslintrc.js"],
   "exclude": [
     "**/node_modules",
     // These end-to-end tests reference code in `.codesandbox`,
