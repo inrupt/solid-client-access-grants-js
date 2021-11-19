@@ -25,12 +25,7 @@ import { isUnknownObject } from "./isUnknownObject";
 import { ConsentStatus } from "../type/ConsentStatus";
 
 function isResourceAccessModeArray(x: unknown): x is Array<ResourceAccessMode> {
-  return (
-    Array.isArray(x) &&
-    x
-      .map((y) => RESOURCE_ACCESS_MODE.has(y))
-      .reduce((previous, current) => previous && current)
-  );
+  return Array.isArray(x) && x.every((y) => RESOURCE_ACCESS_MODE.has(y));
 }
 
 function isConsentStatus(x: unknown): x is ConsentStatus {
@@ -39,12 +34,7 @@ function isConsentStatus(x: unknown): x is ConsentStatus {
 
 // TODO: Discuss a strongly typed UrlString guard (as a team).
 function isStringArray(x: unknown): x is Array<UrlString> {
-  return (
-    Array.isArray(x) &&
-    x
-      .map((y) => typeof y === "string")
-      .reduce((previous, current) => previous && current)
-  );
+  return Array.isArray(x) && x.every((y) => typeof y === "string");
 }
 
 export function isConsentAttributes(x: unknown): x is ConsentAttributes {

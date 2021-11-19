@@ -21,10 +21,5 @@ import { CONSENT_CONTEXT } from "../constants";
 import { ConsentContext } from "../type/ConsentContext";
 
 export function isConsentContext(x: unknown): x is ConsentContext {
-  return (
-    Array.isArray(x) &&
-    CONSENT_CONTEXT.map((y) => x.includes(y)).reduce(
-      (previous, current) => previous && current
-    )
-  );
+  return Array.isArray(x) && CONSENT_CONTEXT.every((y) => x.includes(y));
 }
