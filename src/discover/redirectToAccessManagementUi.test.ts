@@ -27,7 +27,11 @@ import {
   afterEach,
 } from "@jest/globals";
 /* eslint-enable no-shadow */
-import { redirectToConsentManagementUi } from "./redirectToConsentManagementUi";
+import {
+  redirectToAccessManagementUi,
+  // Deprecated API:
+  redirectToConsentManagementUi,
+} from "./redirectToAccessManagementUi";
 import {
   getConsentManagementUiFromWellKnown,
   getConsentManagementUi,
@@ -36,20 +40,26 @@ import { mockAccessRequestVc } from "../manage/approve.mock";
 
 jest.mock("./getConsentManagementUi");
 
-const mockConsentManagementUiDiscovery = (url: string | undefined) => {
-  const consentUiDiscoveryModule = jest.requireMock(
+const mockAccessManagementUiDiscovery = (url: string | undefined) => {
+  const accessUiDiscoveryModule = jest.requireMock(
     "./getConsentManagementUi"
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) as any;
-  consentUiDiscoveryModule.getConsentManagementUiFromWellKnown = jest
+  accessUiDiscoveryModule.getConsentManagementUiFromWellKnown = jest
     .fn(getConsentManagementUiFromWellKnown)
     .mockResolvedValueOnce(url);
-  consentUiDiscoveryModule.getConsentManagementUi = jest
+  accessUiDiscoveryModule.getConsentManagementUi = jest
     .fn(getConsentManagementUi)
     .mockResolvedValueOnce(url);
 };
 
 describe("redirectToConsentManagementUi", () => {
+  it("should be an alias of redirectToAccessManagementUi", () => {
+    expect(redirectToConsentManagementUi).toBe(redirectToAccessManagementUi);
+  });
+});
+
+describe("redirectToAccessManagementUi", () => {
   describe("in a browser environment", () => {
     const { location: savedLocation } = window;
 
@@ -69,25 +79,25 @@ describe("redirectToConsentManagementUi", () => {
       window.location = savedLocation;
     });
 
-    it("throws if the consent management UI may not be discovered", async () => {
-      mockConsentManagementUiDiscovery(undefined);
+    it("throws if the access management UI may not be discovered", async () => {
+      mockAccessManagementUiDiscovery(undefined);
       await expect(
-        redirectToConsentManagementUi(
+        redirectToAccessManagementUi(
           mockAccessRequestVc(),
           "https://some.redirect.iri"
         )
       ).rejects.toThrow(
-        `Cannot discover consent management UI URL for [${
+        `Cannot discover access management UI URL for [${
           mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData[0]
         }]`
       );
     });
 
-    it("throws if the consent management UI may not be discovered, even if a resource owner WebID is provided", async () => {
-      mockConsentManagementUiDiscovery(undefined);
+    it("throws if the access management UI may not be discovered, even if a resource owner WebID is provided", async () => {
+      mockAccessManagementUiDiscovery(undefined);
       const resourceOwner = "https://some.webid";
       await expect(
-        redirectToConsentManagementUi(
+        redirectToAccessManagementUi(
           mockAccessRequestVc(),
           "https://some.redirect.iri",
           {
@@ -95,16 +105,16 @@ describe("redirectToConsentManagementUi", () => {
           }
         )
       ).rejects.toThrow(
-        `Cannot discover consent management UI URL for [${
+        `Cannot discover access management UI URL for [${
           mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData[0]
         }], neither from [${resourceOwner}]`
       );
     });
 
-    it("discovers the consent management UI from the resource owner profile if provided", async () => {
-      mockConsentManagementUiDiscovery("https://some.app");
+    it("discovers the access management UI from the resource owner profile if provided", async () => {
+      mockAccessManagementUiDiscovery("https://some.app");
       const resourceOwner = "https://some.webid";
-      await redirectToConsentManagementUi(
+      await redirectToAccessManagementUi(
         mockAccessRequestVc(),
         "https://some.redirect.iri",
         {
@@ -115,8 +125,20 @@ describe("redirectToConsentManagementUi", () => {
       expect(targetIri).toContain("https://some.app");
     });
 
-    it("falls back to the provided consent app IRI if any", async () => {
-      await redirectToConsentManagementUi(
+    it("falls back to the provided access app IRI if any", async () => {
+      await redirectToAccessManagementUi(
+        mockAccessRequestVc(),
+        "https://some.redirect.iri",
+        {
+          fallbackAccessManagementUi: "https://some.app",
+        }
+      );
+      const targetIri = window.location.href;
+      expect(targetIri).toContain("https://some.app");
+    });
+
+    it("falls back to the provided access app IRI if any (legacy)", async () => {
+      await redirectToAccessManagementUi(
         mockAccessRequestVc(),
         "https://some.redirect.iri",
         {
@@ -128,17 +150,17 @@ describe("redirectToConsentManagementUi", () => {
     });
 
     it("redirects to the discovered management UI IRI", async () => {
-      mockConsentManagementUiDiscovery("https://some.consent.ui");
-      await redirectToConsentManagementUi(
+      mockAccessManagementUiDiscovery("https://some.access.ui");
+      await redirectToAccessManagementUi(
         mockAccessRequestVc(),
         "https://some.redirect.iri"
       );
-      expect(window.location.href).toContain("https://some.consent.ui");
+      expect(window.location.href).toContain("https://some.access.ui");
     });
 
-    it("includes the VC IRI and redirect IRI as query parameters to the consent UI IRI", async () => {
-      mockConsentManagementUiDiscovery("https://some.consent.ui");
-      await redirectToConsentManagementUi(
+    it("includes the VC IRI and redirect IRI as query parameters to the access UI IRI", async () => {
+      mockAccessManagementUiDiscovery("https://some.access.ui");
+      await redirectToAccessManagementUi(
         mockAccessRequestVc(),
         "https://some.redirect.iri"
       );
@@ -151,13 +173,13 @@ describe("redirectToConsentManagementUi", () => {
     });
 
     it("supports the VC to be provided as an IRI", async () => {
-      mockConsentManagementUiDiscovery("https://some.consent.ui");
+      mockAccessManagementUiDiscovery("https://some.access.ui");
       const mockedFetch = jest
         .fn(global.fetch)
         .mockResolvedValueOnce(
           new Response(JSON.stringify(mockAccessRequestVc()))
         );
-      await redirectToConsentManagementUi(
+      await redirectToAccessManagementUi(
         "https://some.request-vc.url",
         new URL("https://some.redirect.iri"),
         {
@@ -171,8 +193,8 @@ describe("redirectToConsentManagementUi", () => {
     });
 
     it("supports the redirect IRI being a URL object", async () => {
-      mockConsentManagementUiDiscovery("https://some.consent.ui");
-      await redirectToConsentManagementUi(
+      mockAccessManagementUiDiscovery("https://some.access.ui");
+      await redirectToAccessManagementUi(
         mockAccessRequestVc(),
         new URL("https://some.redirect.iri")
       );
@@ -183,9 +205,9 @@ describe("redirectToConsentManagementUi", () => {
     });
 
     it("calls the redirection callback if provided", async () => {
-      mockConsentManagementUiDiscovery("https://some.consent.ui");
+      mockAccessManagementUiDiscovery("https://some.access.ui");
       const redirectCallback = jest.fn();
-      await redirectToConsentManagementUi(
+      await redirectToAccessManagementUi(
         mockAccessRequestVc(),
         "https://some.redirect.iri",
         {
@@ -193,7 +215,7 @@ describe("redirectToConsentManagementUi", () => {
         }
       );
       const redirectIri = new URL(redirectCallback.mock.calls[0][0] as string);
-      expect(redirectIri.origin).toBe("https://some.consent.ui");
+      expect(redirectIri.origin).toBe("https://some.access.ui");
       expect(redirectIri.searchParams.get("requestVc")).toBe(
         btoa(JSON.stringify(mockAccessRequestVc()))
       );
@@ -218,10 +240,10 @@ describe("redirectToConsentManagementUi", () => {
     });
 
     it("throws if the window", async () => {
-      mockConsentManagementUiDiscovery("https://some.consent.ui");
+      mockAccessManagementUiDiscovery("https://some.access.ui");
       expect(window).toBeUndefined();
       await expect(
-        redirectToConsentManagementUi(
+        redirectToAccessManagementUi(
           mockAccessRequestVc(),
           "https://some.redirect.iri"
         )

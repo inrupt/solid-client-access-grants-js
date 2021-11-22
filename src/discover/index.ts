@@ -30,4 +30,10 @@ export {
 } from "./getAccessApiEndpoint";
 
 export { getConsentManagementUi } from "./getConsentManagementUi";
-export { redirectToConsentManagementUi } from "./redirectToConsentManagementUi";
+export {
+  redirectToAccessManagementUi,
+  // Deprecated API:
+  redirectToConsentManagementUi,
+} from "./redirectToAccessManagementUi";
+
+export type { RedirectToAccessManagementUiOptions } from "./redirectToAccessManagementUi";
