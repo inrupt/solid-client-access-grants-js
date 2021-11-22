@@ -33,23 +33,23 @@ import {
   redirectToConsentManagementUi,
 } from "./redirectToAccessManagementUi";
 import {
-  getConsentManagementUiFromWellKnown,
-  getConsentManagementUi,
-} from "./getConsentManagementUi";
+  getAccessManagementUiFromWellKnown,
+  getAccessManagementUi,
+} from "./getAccessManagementUi";
 import { mockAccessRequestVc } from "../manage/approve.mock";
 
-jest.mock("./getConsentManagementUi");
+jest.mock("./getAccessManagementUi");
 
 const mockAccessManagementUiDiscovery = (url: string | undefined) => {
   const accessUiDiscoveryModule = jest.requireMock(
-    "./getConsentManagementUi"
+    "./getAccessManagementUi"
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) as any;
-  accessUiDiscoveryModule.getConsentManagementUiFromWellKnown = jest
-    .fn(getConsentManagementUiFromWellKnown)
+  accessUiDiscoveryModule.getAccessManagementUiFromWellKnown = jest
+    .fn(getAccessManagementUiFromWellKnown)
     .mockResolvedValueOnce(url);
-  accessUiDiscoveryModule.getConsentManagementUi = jest
-    .fn(getConsentManagementUi)
+  accessUiDiscoveryModule.getAccessManagementUi = jest
+    .fn(getAccessManagementUi)
     .mockResolvedValueOnce(url);
 };
 

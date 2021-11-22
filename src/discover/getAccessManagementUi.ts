@@ -29,86 +29,110 @@ import { getSessionFetch } from "../util/getSessionFetch";
 import { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { PIM_STORAGE, PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
-async function getConsentManagementUiFromProfile(
+interface AccessManagementUiFromProfile {
+  accessEndpoint?: UrlString;
+  storage?: UrlString;
+}
+
+async function getAccessManagementUiFromProfile(
   webId: UrlString,
   options: { fetch: typeof global.fetch }
-): Promise<{ consentEndpoint?: UrlString; storage?: UrlString }> {
-  const result: { consentEndpoint?: UrlString; storage?: UrlString } = {};
+): Promise<AccessManagementUiFromProfile> {
+  const result: AccessManagementUiFromProfile = {};
+
   let webIdDocument;
   try {
     webIdDocument = await getSolidDataset(webId, {
       fetch: options.fetch,
     });
   } catch (e) {
-    throw new Error(`Cannot get consent API for ${webId}: ${e}.`);
+    throw new Error(`Cannot get the Access Management UI for ${webId}: ${e}.`);
   }
+
   const profile = getThing(webIdDocument, webId);
   if (profile === null) {
     throw new Error(
-      `Cannot get consent API for ${webId}: the WebID cannot be dereferenced.`
+      `Cannot get the Access Management UI for ${webId}: the WebID cannot be dereferenced.`
     );
   }
+
+  // TODO: rename constant & variable when a definitive term is published:
   const profileConsentUi = getIri(profile, PREFERRED_CONSENT_MANAGEMENT_UI);
   if (profileConsentUi !== null) {
-    result.consentEndpoint = profileConsentUi;
+    result.accessEndpoint = profileConsentUi;
   }
-  // If the profile document does not advertize for the consent UI, look for a storage root.
+
+  // If the profile document does not advertize for the access management UI, look for a storage root.
   const storage = getIri(profile, PIM_STORAGE);
   if (storage !== null) {
     result.storage = storage;
   }
+
   return result;
 }
 
 /**
  * @hidden
  */
-export async function getConsentManagementUiFromWellKnown(
+export async function getAccessManagementUiFromWellKnown(
   storage: UrlString | undefined,
   options: { fetch: typeof global.fetch }
 ): Promise<UrlString | undefined> {
   if (storage === undefined) {
     return undefined;
   }
+
   const wellKnown = await getWellKnownSolid(storage, {
     fetch: options.fetch,
   });
+
   if (getThingAll(wellKnown, { acceptBlankNodes: true }).length === 0) {
     return undefined;
   }
+
   const wellKnownConsentUi = getIri(
     getThingAll(wellKnown, { acceptBlankNodes: true })[0],
     PREFERRED_CONSENT_MANAGEMENT_UI
   );
+
   return wellKnownConsentUi ?? undefined;
 }
 
 /**
- * Get the endpoint where the user prefers to be redirected when asked for consent.
- * If the user does not specify an endpoint, this function attemps to discover the
- * default consent UI recommended by their Pod provider.
+ * Get the endpoint where the user prefers to be redirected when asked for access.
+ * If the user does not specify an endpoint, this function attempts to discover the
+ * default access UI recommended by their Pod provider.
  *
- * @param webId The WebID of the user asked for consent.
+ * @param webId The WebID of the user asked for access.
  * @param options Optional properties to customise the access request behaviour.
  * @returns The URL where the user should be redirected, if discoverable.
  * @since 0.0.1
  */
-async function getConsentManagementUi(
+async function getAccessManagementUi(
   webId: URL | UrlString,
   options: Pick<AccessBaseOptions, "fetch"> = {}
 ): Promise<UrlString | undefined> {
   const fetcher = await getSessionFetch(options);
+
   // TODO: Complete code coverage for URL argument
-  const { consentEndpoint, storage } = await getConsentManagementUiFromProfile(
+  const { accessEndpoint, storage } = await getAccessManagementUiFromProfile(
     webId.toString(),
     { fetch: fetcher }
   );
+
   return (
-    consentEndpoint ??
-    getConsentManagementUiFromWellKnown(storage, { fetch: fetcher })
+    accessEndpoint ??
+    getAccessManagementUiFromWellKnown(storage, { fetch: fetcher })
   );
 }
 
-export { getConsentManagementUi };
-export default getConsentManagementUi;
+export { getAccessManagementUi };
+export default getAccessManagementUi;
 export type { UrlString };
+
+/**
+ * @hidden alias of [[getAccessManagementUi]]
+ * @deprecated
+ */
+const getConsentManagementUi = getAccessManagementUi;
+export { getConsentManagementUi };

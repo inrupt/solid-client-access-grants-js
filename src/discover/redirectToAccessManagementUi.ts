@@ -22,9 +22,9 @@ import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
 import {
-  getConsentManagementUi,
-  getConsentManagementUiFromWellKnown,
-} from "./getConsentManagementUi";
+  getAccessManagementUi,
+  getAccessManagementUiFromWellKnown,
+} from "./getAccessManagementUi";
 
 const REQUEST_VC_PARAM_NAME = "requestVc";
 const REDIRECT_URL_PARAM_NAME = "redirectUrl";
@@ -62,11 +62,11 @@ async function discoverAccessManagementUi(options: {
   const authFetch = await getSessionFetch({});
   let accessManagementUi;
   if (options.resourceOwner) {
-    accessManagementUi = await getConsentManagementUi(options.resourceOwner, {
+    accessManagementUi = await getAccessManagementUi(options.resourceOwner, {
       fetch: authFetch,
     });
   } else {
-    accessManagementUi = await getConsentManagementUiFromWellKnown(
+    accessManagementUi = await getAccessManagementUiFromWellKnown(
       options.resourceUrl,
       { fetch: authFetch }
     );
