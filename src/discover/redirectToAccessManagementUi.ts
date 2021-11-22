@@ -29,64 +29,92 @@ import {
 const REQUEST_VC_PARAM_NAME = "requestVc";
 const REDIRECT_URL_PARAM_NAME = "redirectUrl";
 
-async function discoverConsentManagementUi(options: {
+/**
+ * Optional parameters for the [[redirectToAccessManagementUi]] method:
+ *
+ * - `fetch?`: Pass in a function with a signature compatible with the WHATWG
+ *   Fetch API, which will be used to make HTTP requests. Primarily useful when
+ *   requests need to be authenticated. When
+ *   `@inrupt/solid-client-authn-browser` is available and this property is not
+ *   set, `fetch` will be imported from there. Otherwise, the HTTP requests will
+ *   be unauthenticated.
+ * - `redirectCallback?`: For use in a non-browser environment, this must be
+ *   provided by the user in order to handle the redirect URL, since setting
+ *   `window.location.href` is not an option.
+ */
+export type RedirectToAccessManagementUiOptions = {
+  redirectCallback?: (url: string) => void;
+  fetch?: typeof global.fetch;
+  resourceOwner?: WebId;
+  fallbackAccessManagementUi?: UrlString;
+  /**
+   * @hidden Replaced by [[fallbackAccessManagementUi]]
+   * @deprecated
+   */
+  fallbackConsentManagementUi?: UrlString;
+};
+
+async function discoverAccessManagementUi(options: {
   resourceUrl: UrlString;
   resourceOwner?: WebId;
   fallbackUi?: UrlString;
 }): Promise<string | undefined> {
   const authFetch = await getSessionFetch({});
-  let consentManagementUi;
+  let accessManagementUi;
   if (options.resourceOwner) {
-    consentManagementUi = await getConsentManagementUi(options.resourceOwner, {
+    accessManagementUi = await getConsentManagementUi(options.resourceOwner, {
       fetch: authFetch,
     });
   } else {
-    consentManagementUi = await getConsentManagementUiFromWellKnown(
+    accessManagementUi = await getConsentManagementUiFromWellKnown(
       options.resourceUrl,
       { fetch: authFetch }
     );
   }
-  return consentManagementUi ?? options.fallbackUi;
+  return accessManagementUi ?? options.fallbackUi;
 }
 
 /**
- * Redirects the application to a resource owner's preferred consent management
+ * Redirects the application to a resource owner's preferred access management
  * UI.
  *
  * @param accessRequestVc The VC containing the Access Request to a resource.
- * @param redirectUrl The URL where the user should be redirected back after having granted access.
- * @param options If you are in a NodeJS environment, you must specify a callback to handle the redirection.
+ * @param redirectUrl The URL where the user should be redirected back after
+ * having granted access.
+ * @param options If you are in a NodeJS environment, you must specify a
+ * callback to handle the redirection.
  * @since 0.1.0
  */
-export async function redirectToConsentManagementUi(
+export async function redirectToAccessManagementUi(
   accessRequestVc: VerifiableCredential | UrlString | URL,
   redirectUrl: UrlString | URL,
-  options: {
-    redirectCallback?: (url: string) => unknown;
-    fetch?: typeof global.fetch;
-    resourceOwner?: WebId;
-    fallbackConsentManagementUi?: UrlString;
-  } = {}
+  options: RedirectToAccessManagementUiOptions = {}
 ): Promise<void> {
+  // The former fallbackConsentManagementUi option is deprecated:
+  const fallbackUi =
+    options.fallbackAccessManagementUi ?? options.fallbackConsentManagementUi;
+
   const requestVc = await getBaseAccessRequestVerifiableCredential(
     accessRequestVc,
     { fetch: options.fetch }
   );
-  const consentManagementUi = await discoverConsentManagementUi({
+  const accessManagementUi = await discoverAccessManagementUi({
     resourceUrl: requestVc.credentialSubject.hasConsent.forPersonalData[0],
     resourceOwner: options.resourceOwner,
-    fallbackUi: options.fallbackConsentManagementUi,
+    fallbackUi,
   });
-  if (consentManagementUi === undefined) {
+
+  if (accessManagementUi === undefined) {
     throw new Error(
-      `Cannot discover consent management UI URL for [${
+      `Cannot discover access management UI URL for [${
         requestVc.credentialSubject.hasConsent.forPersonalData[0]
       }]${
         options.resourceOwner ? `, neither from [${options.resourceOwner}]` : ""
       }`
     );
   }
-  const targetIri = new URL(consentManagementUi);
+
+  const targetIri = new URL(accessManagementUi);
   targetIri.searchParams.append(
     REQUEST_VC_PARAM_NAME,
     btoa(JSON.stringify(requestVc))
@@ -95,6 +123,7 @@ export async function redirectToConsentManagementUi(
     REDIRECT_URL_PARAM_NAME,
     encodeURI(typeof redirectUrl === "string" ? redirectUrl : redirectUrl.href)
   );
+
   if (options !== undefined && options.redirectCallback !== undefined) {
     options.redirectCallback(targetIri.href);
   } else {
@@ -106,3 +135,10 @@ export async function redirectToConsentManagementUi(
     window.location.href = targetIri.href;
   }
 }
+
+/**
+ * @hidden alias of [[redirectToAccessManagementUi]]
+ * @deprecated
+ */
+const redirectToConsentManagementUi = redirectToAccessManagementUi;
+export { redirectToConsentManagementUi };

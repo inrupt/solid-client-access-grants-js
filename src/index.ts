@@ -28,10 +28,13 @@ export type {
 export {
   getAccessApiEndpoint,
   getConsentManagementUi,
-  redirectToConsentManagementUi,
+  redirectToAccessManagementUi,
   // Deprecated APIs:
+  redirectToConsentManagementUi,
   getConsentApiEndpoint,
 } from "./discover";
+
+export type { RedirectToAccessManagementUiOptions } from "./discover";
 
 export {
   issueAccessRequest,
