@@ -203,7 +203,7 @@ export function getGrantBody(
 }
 
 export async function issueAccessOrConsentVc(
-  requestor: WebId,
+  vcSubject: WebId,
   vcBody:
     | BaseRequestBody
     | BaseGrantBody
@@ -228,7 +228,7 @@ export async function issueAccessOrConsentVc(
 
   return issueVerifiableCredential(
     accessIssuerEndpoint.href,
-    requestor,
+    vcSubject,
     {
       "@context": vcBody["@context"],
       ...vcBody.credentialSubject,
