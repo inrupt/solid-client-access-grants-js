@@ -20,7 +20,10 @@
 // eslint-disable-next-line no-shadow
 import { jest, it, describe, expect } from "@jest/globals";
 import { mockAccessApiEndpoint } from "../request/request.mock";
-import { mockAccessGrantVc, mockConsentRequestVc } from "./approve.mock";
+import {
+  mockAccessGrantVc,
+  mockConsentRequestVc,
+} from "./approveAccessRequest.mock";
 import { getAccessGrant, getAccessWithConsent } from "./getAccessGrant";
 
 jest.mock("@inrupt/solid-client-authn-browser");

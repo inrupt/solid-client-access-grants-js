@@ -29,6 +29,16 @@ import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessV
 import { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 
+export type ApproveAccessRequestOverrides = {
+  requestor: WebId;
+  access: Partial<Access>;
+  resources: Array<UrlString>;
+  requestorInboxIri?: UrlString;
+  purpose?: Array<UrlString>;
+  issuanceDate?: Date;
+  expirationDate?: Date;
+};
+
 /**
  * Approve an access request. The content of the approved access request is provided
  * as a Verifiable Credential which properties may be overriden if necessary.
@@ -43,13 +53,8 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
 export async function approveAccessRequest(
   resourceOwner: WebId,
   // If the VC is specified, all the overrides become optional
-  requestVc: VerifiableCredential | UrlString,
-  requestOverride?: Partial<{
-    requestor: WebId;
-    access: Partial<Access>;
-    resources: Array<UrlString>;
-    requestorInboxIri: UrlString;
-  }>,
+  requestVc: VerifiableCredential | URL | UrlString,
+  requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions
 ): Promise<VerifiableCredential>;
 /**
@@ -66,23 +71,13 @@ export async function approveAccessRequest(
   resourceOwner: WebId,
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
-  requestOverride: {
-    requestor: WebId;
-    access: Partial<Access>;
-    resources: Array<UrlString>;
-    requestorInboxIri?: UrlString;
-  },
+  requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions
 ): Promise<VerifiableCredential>;
 export async function approveAccessRequest(
   resourceOwner: WebId,
-  requestVc?: VerifiableCredential | UrlString,
-  requestOverride?: Partial<{
-    requestor: WebId;
-    access: Partial<Access>;
-    resources: Array<UrlString>;
-    requestorInboxIri: UrlString;
-  }>,
+  requestVc?: VerifiableCredential | URL | UrlString,
+  requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options: AccessBaseOptions = {}
 ): Promise<VerifiableCredential> {
   const requestCredential =
@@ -95,24 +90,32 @@ export async function approveAccessRequest(
       `Unexpected VC provided for approval: ${JSON.stringify(requestVc)}`
     );
   }
+
   const internalOptions = initializeGrantParameters(
     requestCredential,
     requestOverride
   );
+
   const requestBody = getGrantBody({
     resourceOwner,
     access: internalOptions.access,
     requestor: internalOptions.requestor,
     resources: internalOptions.resources,
     requestorInboxUrl: internalOptions.requestorInboxIri,
+    purpose: internalOptions.purpose,
+    issuanceDate: internalOptions.issuanceDate,
+    expirationDate: internalOptions.expirationDate,
     status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   });
-  return issueAccessOrConsentVc(
-    internalOptions.requestor,
-    requestBody,
-    options
-  );
+  return issueAccessOrConsentVc(resourceOwner, requestBody, options);
 }
 
 export default approveAccessRequest;
 export type { UrlString, VerifiableCredential };
+
+/**
+ * @hidden alias for [[approveAccessRequest]]
+ * @deprecated
+ */
+const approveAccessRequestWithConsent = approveAccessRequest;
+export { approveAccessRequestWithConsent };

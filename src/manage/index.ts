@@ -18,29 +18,36 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /**
- * Import this module for the consent API functions available to an entity
+ * Import this module for the access API functions available to an entity
  * managing access requests over resources:
- * - `approveAccessRequest`: Approve an access request for a non-commercial entity;
- * - `approveAccessRequestWithConsent`: Approve an access request including a purpose for
- *   legally binding consent to access a resource;
+ * - `approveAccessRequest`: Approve an access request;
  * - `denyAccessRequest`: Deny access over a resource;
  * - `getAccessGrant`: Retrieve the Access Grant associated to the given URL.
  * - `getAccessGrantAll`: Retrieve the Access Grants issued over a resource;
  * - `revokeAccessGrant`: Revoke previously granted access over a resource.
  */
-export { approveAccessRequest } from "./approveAccessRequest";
-export { approveAccessRequestWithConsent } from "./approveAccessRequestWithConsent";
+export {
+  approveAccessRequest,
+  // Deprecated API:
+  approveAccessRequestWithConsent,
+} from "./approveAccessRequest";
+
+export type { ApproveAccessRequestOverrides } from "./approveAccessRequest";
+
 export { denyAccessRequest } from "./denyAccessRequest";
+
 export {
   getAccessGrant,
   // Deprecated APIs:
   getAccessWithConsent,
 } from "./getAccessGrant";
+
 export {
   getAccessGrantAll,
   // Deprecated APIs:
   getAccessWithConsentAll,
 } from "./getAccessGrantAll";
+
 export {
   revokeAccessGrant,
   // Deprecated APIs:
