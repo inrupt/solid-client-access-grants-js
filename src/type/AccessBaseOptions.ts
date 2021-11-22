@@ -22,7 +22,7 @@ import type { UrlString } from "@inrupt/solid-client";
 // TODO: Verify whether we need to support the podHost parameter and implement
 // podHost?: URL | UrlString;
 /**
- * Optional parameters to customise the behaviour of consent requests.
+ * Optional parameters to customise the behaviour of access requests.
  *
  * - `fetch`: Pass in a function with a signature compatible with the WHATWG
  *   Fetch API, which will be used to make HTTP requests. Primarily useful when
@@ -36,7 +36,13 @@ import type { UrlString } from "@inrupt/solid-client";
  * - `podHost`: The URL of the pod host, from which the `.well-known/solid` file
  *   can be derived.
  */
-export type ConsentApiBaseOptions = {
+export type AccessBaseOptions = {
   fetch?: typeof fetch;
   consentEndpoint?: URL | UrlString;
 };
+
+/**
+ * @hidden alias of AccessBaseOptions
+ * @deprecated
+ */
+export { AccessBaseOptions as ConsentApiBaseOptions };

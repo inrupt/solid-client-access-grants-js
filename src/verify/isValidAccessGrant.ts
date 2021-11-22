@@ -23,7 +23,7 @@ import {
   VerifiableCredential,
   getVerifiableCredentialApiConfiguration,
 } from "@inrupt/solid-client-vc";
-import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
@@ -37,7 +37,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
 // TODO: Push verification further as this just checks it's a valid VC should we not type check the consent grant?
 async function isValidAccessGrant(
   vc: VerifiableCredential | URL | UrlString,
-  options: Exclude<ConsentApiBaseOptions, "consentEndpoint"> & {
+  options: Exclude<AccessBaseOptions, "consentEndpoint"> & {
     verificationEndpoint?: UrlString;
   } = {}
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
@@ -90,7 +90,7 @@ async function isValidAccessGrant(
 
 export { isValidAccessGrant };
 export default isValidAccessGrant;
-export type { ConsentApiBaseOptions, UrlString, VerifiableCredential };
+export type { UrlString, VerifiableCredential };
 
 /**
  * @hidden Deprecated alias of [[isValidAccessGrant]]

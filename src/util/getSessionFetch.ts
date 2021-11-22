@@ -18,7 +18,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { fetch as crossFetch } from "cross-fetch";
-import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import { AccessBaseOptions } from "../type/AccessBaseOptions";
 
 /**
  * Dynamically import solid-client-authn-browser so that
@@ -27,7 +27,7 @@ import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
  * @returns fetch function
  */
 export async function getSessionFetch(
-  options: ConsentApiBaseOptions
+  options: AccessBaseOptions
 ): Promise<typeof fetch> {
   if (options.fetch) {
     return options.fetch;

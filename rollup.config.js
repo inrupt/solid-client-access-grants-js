@@ -80,9 +80,9 @@ export default [
   },
   {
     input: [
+      "./src/type/AccessBaseOptions.ts",
       "./src/type/AccessCredentialType.ts",
       "./src/type/AccessVerifiableCredential.ts",
-      "./src/type/ConsentApiBaseOptions.ts",
       "./src/type/ConsentContext.ts",
       "./src/type/ConsentStatus.ts",
       "./src/type/Parameter.ts",

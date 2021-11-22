@@ -26,7 +26,7 @@ import {
   UrlString,
 } from "@inrupt/solid-client";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { PIM_STORAGE, PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
 async function getConsentManagementUiFromProfile(
@@ -95,7 +95,7 @@ export async function getConsentManagementUiFromWellKnown(
  */
 async function getConsentManagementUi(
   webId: URL | UrlString,
-  options: Pick<ConsentApiBaseOptions, "fetch"> = {}
+  options: Pick<AccessBaseOptions, "fetch"> = {}
 ): Promise<UrlString | undefined> {
   const fetcher = await getSessionFetch(options);
   // TODO: Complete code coverage for URL argument
@@ -111,4 +111,4 @@ async function getConsentManagementUi(
 
 export { getConsentManagementUi };
 export default getConsentManagementUi;
-export type { ConsentApiBaseOptions, UrlString };
+export type { UrlString };

@@ -17,7 +17,12 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
+export type {
+  AccessBaseOptions,
+  // Deprecated Type:
+  ConsentApiBaseOptions,
+} from "./type/AccessBaseOptions";
+
 export type {
   IssueAccessRequestParameters,
   // Deprecated Types:
