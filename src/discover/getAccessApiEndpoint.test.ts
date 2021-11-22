@@ -97,7 +97,7 @@ describe("getAccessApiEndpoint", () => {
     );
   });
 
-  it("throws an error if the well-known document does not list a consent endpoint", async () => {
+  it("throws an error if the well-known document does not list a access endpoint", async () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(

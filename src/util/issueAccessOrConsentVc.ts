@@ -216,16 +216,18 @@ export async function issueAccessOrConsentVc(
     ? vcBody.credentialSubject.hasConsent.forPersonalData[0]
     : (vcBody as ConsentGrantBody).credentialSubject.providedConsent
         .forPersonalData[0];
+
   // TODO: find out if concatenating "issue" here is correct
   // It seems like the issuer endpoint should be discovered from the well-known direcly
-  // And the consent endpoint should be an object with one URI per service
+  // And the access endpoint should be an object with one URI per service
   // (issuer service, verifier service... supposedly status and query and vc???)
-  const consentIssuerEndpoint = new URL(
+  const accessIssuerEndpoint = new URL(
     "issue",
     await getAccessApiEndpoint(targetResourceIri, options)
   );
+
   return issueVerifiableCredential(
-    consentIssuerEndpoint.href,
+    accessIssuerEndpoint.href,
     requestor,
     {
       "@context": vcBody["@context"],

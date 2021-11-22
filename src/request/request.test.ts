@@ -56,9 +56,9 @@ jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
 jest.mock("cross-fetch");
 
-describe("getConsentRequestBody", () => {
-  it("can generate a minimal consent request body", () => {
-    const consentRequestBody = getRequestBody({
+describe("getRequestBody", () => {
+  it("can generate a minimal request body", () => {
+    const requestBody = getRequestBody({
       access: { append: true },
       requestor: MOCK_REQUESTOR_IRI,
       resources: ["https://some.pod/resource"],
@@ -66,7 +66,7 @@ describe("getConsentRequestBody", () => {
       requestorInboxUrl: MOCK_REQUESTOR_INBOX,
     });
 
-    expect(consentRequestBody).toStrictEqual({
+    expect(requestBody).toStrictEqual({
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
         "https://consent.pod.inrupt.com/credentials/v1",
@@ -84,8 +84,8 @@ describe("getConsentRequestBody", () => {
     });
   });
 
-  it("can generate a full consent request body", () => {
-    const consentRequestBody = getRequestBody({
+  it("can generate a full request body", () => {
+    const requestBody = getRequestBody({
       access: {
         read: true,
         write: true,
@@ -101,7 +101,7 @@ describe("getConsentRequestBody", () => {
       status: "https://w3id.org/GConsent#ConsentStatusRequested",
     });
 
-    expect(consentRequestBody).toStrictEqual({
+    expect(requestBody).toStrictEqual({
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
         "https://consent.pod.inrupt.com/credentials/v1",

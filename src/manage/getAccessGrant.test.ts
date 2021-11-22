@@ -92,7 +92,7 @@ describe("getAccessGrant", () => {
     );
   });
 
-  it("throws if the given IRI does not resolve to a consent grant Verifiable Credential", async () => {
+  it("throws if the given IRI does not resolve to a access grant Verifiable Credential", async () => {
     mockAccessApiEndpoint();
     const mockedFetch = jest
       .fn(global.fetch)
@@ -109,7 +109,7 @@ describe("getAccessGrant", () => {
     );
   });
 
-  it("returns the consent grant with the given IRI", async () => {
+  it("returns the access grant with the given IRI", async () => {
     mockAccessApiEndpoint();
     const mockedAccessGrant = mockAccessGrantVc();
     const mockedFetch = jest
@@ -122,7 +122,7 @@ describe("getAccessGrant", () => {
     expect(accessGrant).toEqual(mockedAccessGrant);
   });
 
-  it("returns the consent grant with the given URL object", async () => {
+  it("returns the access grant with the given URL object", async () => {
     mockAccessApiEndpoint();
     const mockedAccessGrant = mockAccessGrantVc();
     const mockedFetch = jest

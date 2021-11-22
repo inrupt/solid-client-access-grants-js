@@ -90,12 +90,12 @@ export async function getAccessManagementUiFromWellKnown(
     return undefined;
   }
 
-  const wellKnownConsentUi = getIri(
+  const wellKnownAccesstUi = getIri(
     getThingAll(wellKnown, { acceptBlankNodes: true })[0],
     PREFERRED_CONSENT_MANAGEMENT_UI
   );
 
-  return wellKnownConsentUi ?? undefined;
+  return wellKnownAccesstUi ?? undefined;
 }
 
 /**
