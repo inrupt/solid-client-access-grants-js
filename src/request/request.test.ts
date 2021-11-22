@@ -33,8 +33,8 @@ import { getRequestBody } from "../util/issueAccessOrConsentVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import {
   mockAccessGrant,
-  MOCKED_CONSENT_ISSUER,
-  mockConsentEndpoint,
+  mockAccessApiEndpoint,
+  MOCKED_ACCESS_ISSUER,
   MOCK_REQUESTOR_IRI,
   MOCK_REQUESTOR_INBOX,
   MOCK_REQUESTEE_IRI,
@@ -141,7 +141,7 @@ describe("requestAccessWithConsent", () => {
 
 describe("issueAccessRequest", () => {
   it("sends a proper access request", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
@@ -149,7 +149,7 @@ describe("issueAccessRequest", () => {
       "issueVerifiableCredential"
     );
     mockedIssue.mockResolvedValueOnce(
-      mockAccessGrant(MOCKED_CONSENT_ISSUER, MOCK_REQUESTOR_IRI, {
+      mockAccessGrant(MOCKED_ACCESS_ISSUER, MOCK_REQUESTOR_IRI, {
         someClaim: "some value",
       })
     );
@@ -168,7 +168,7 @@ describe("issueAccessRequest", () => {
     );
 
     expect(mockedIssue).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       MOCK_REQUESTOR_IRI,
       expect.objectContaining({
         id: MOCK_REQUESTOR_IRI,
@@ -186,7 +186,7 @@ describe("issueAccessRequest", () => {
   });
 
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
@@ -218,7 +218,7 @@ describe("issueAccessRequest", () => {
   });
 
   it("sends a proper access with consent request", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
@@ -226,7 +226,7 @@ describe("issueAccessRequest", () => {
       "issueVerifiableCredential"
     );
     mockedIssue.mockResolvedValueOnce(
-      mockAccessGrant(MOCKED_CONSENT_ISSUER, MOCK_REQUESTOR_IRI, {
+      mockAccessGrant(MOCKED_ACCESS_ISSUER, MOCK_REQUESTOR_IRI, {
         someClaim: "some value",
       })
     );
@@ -248,7 +248,7 @@ describe("issueAccessRequest", () => {
     );
 
     expect(mockedIssue).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       MOCK_REQUESTOR_IRI,
       expect.objectContaining({
         id: MOCK_REQUESTOR_IRI,
@@ -269,7 +269,7 @@ describe("issueAccessRequest", () => {
   });
 
   it("supports access with consent request with no issuance or expiration set", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
@@ -277,7 +277,7 @@ describe("issueAccessRequest", () => {
       "issueVerifiableCredential"
     );
     mockedIssue.mockResolvedValueOnce(
-      mockAccessGrant(MOCKED_CONSENT_ISSUER, MOCK_REQUESTOR_IRI, {
+      mockAccessGrant(MOCKED_ACCESS_ISSUER, MOCK_REQUESTOR_IRI, {
         someClaim: "some value",
       })
     );
@@ -292,7 +292,7 @@ describe("issueAccessRequest", () => {
     });
 
     expect(mockedIssue).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       MOCK_REQUESTOR_IRI,
       expect.objectContaining({
         id: MOCK_REQUESTOR_IRI,
@@ -311,7 +311,7 @@ describe("issueAccessRequest", () => {
   });
 
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed, when with extended options", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;

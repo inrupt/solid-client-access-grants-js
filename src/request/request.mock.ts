@@ -71,9 +71,6 @@ export const MOCKED_ACCESS_ISSUER = "https://access-issuer.iri";
 export const MOCKED_CONSENT_UI_IRI = "https://some-consent.app";
 export const MOCKED_STORAGE = "https://pod-provider.iri";
 
-// Deprecated
-export const MOCKED_CONSENT_ISSUER = MOCKED_ACCESS_ISSUER;
-
 export const mockWellKnownWithConsent = (
   hasUi = true
 ): SolidDataset & WithServerResourceInfo => {
@@ -134,6 +131,3 @@ export const mockAccessApiEndpoint = (withConsent = true) => {
   crossFetchModule.fetch = mockedFetch;
   return mockedFetch;
 };
-
-// Deprecated:
-export const mockConsentEndpint = mockAccessApiEndpoint;
