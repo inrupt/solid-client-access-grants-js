@@ -36,7 +36,7 @@ import {
   getAccessManagementUiFromWellKnown,
   getAccessManagementUi,
 } from "./getAccessManagementUi";
-import { mockAccessRequestVc } from "../manage/approve.mock";
+import { mockAccessRequestVc } from "../manage/approveAccessRequest.mock";
 
 jest.mock("./getAccessManagementUi");
 

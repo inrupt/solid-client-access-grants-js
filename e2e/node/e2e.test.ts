@@ -22,7 +22,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 import {
   approveAccessRequest,
-  approveAccessRequestWithConsent,
   getAccessGrantAll,
   isValidAccessGrant,
   issueAccessRequest,
@@ -150,7 +149,7 @@ describe.each(serversUnderTest)(
         );
         expect(isVerifiableCredential(request)).toBe(true);
 
-        const grant = await approveAccessRequestWithConsent(
+        const grant = await approveAccessRequest(
           resourceOwner,
           request,
           {},
