@@ -18,7 +18,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /**
- * Import this module for the consent API functions available to an entity
+ * Import this module for the access API functions available to an entity
  * requesting access over a resource:
  * - `issueAccessRequest`: Issues an access request for access to the given
  *   resource, resulting in a Verifiable Credential.

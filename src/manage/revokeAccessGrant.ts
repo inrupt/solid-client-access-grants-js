@@ -27,7 +27,7 @@ import { getBaseAccessGrantVerifiableCredential } from "../util/getBaseAccessVer
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
- * Makes a request to the consent server to revoke a given Verifiable Credential (VC).
+ * Makes a request to the access server to revoke a given Verifiable Credential (VC).
  *
  * @param vc Either a VC, or a URL to a VC, to be revoked.
  * @param options Optional properties to customise the request behaviour.

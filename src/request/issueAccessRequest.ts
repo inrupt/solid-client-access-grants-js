@@ -38,12 +38,12 @@ async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options: AccessBaseOptions = {}
 ): Promise<VerifiableCredential> {
-  const consentRequest = getRequestBody({
+  const accessRequest = getRequestBody({
     ...params,
     status: GC_CONSENT_STATUS_REQUESTED,
   });
 
-  return issueAccessOrConsentVc(params.requestor, consentRequest, options);
+  return issueAccessOrConsentVc(params.requestor, accessRequest, options);
 }
 
 export default issueAccessRequest;

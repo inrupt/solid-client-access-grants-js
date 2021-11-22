@@ -24,8 +24,8 @@ import { revokeAccessGrant } from "../manage/revokeAccessGrant";
 
 /**
  * Cancel a request for access to data (with explicit or implicit consent) before
- * the person being asked for consent has replied.
- * This is equivalent to revoking a consent grant.
+ * the person being asked for access has replied.
+ * This is equivalent to revoking a access grant.
  *
  * @param vc The access request, either in the form of a VC URL or a full-fledged VC.
  * @param options Optional properties to customise the access request behaviour.

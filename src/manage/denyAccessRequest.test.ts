@@ -72,7 +72,7 @@ describe("denyAccessRequest", () => {
     );
   });
 
-  it("throws if the provided VC isn't a Solid consent request", async () => {
+  it("throws if the provided VC isn't a Solid access request", async () => {
     mockAccessApiEndpoint();
     await expect(
       denyAccessRequest("https://some.resource/owner", {
@@ -84,7 +84,7 @@ describe("denyAccessRequest", () => {
     );
   });
 
-  it("throws if there is no well known consent endpoint", async () => {
+  it("throws if there is no well known access endpoint", async () => {
     mockAccessApiEndpoint(false);
     await expect(
       denyAccessRequest("https://some.resource/owner", mockAccessRequestVc())
@@ -93,7 +93,7 @@ describe("denyAccessRequest", () => {
     );
   });
 
-  it("uses the provided consent endpoint, if any", async () => {
+  it("uses the provided access endpoint, if any", async () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -105,12 +105,12 @@ describe("denyAccessRequest", () => {
       "https://some.resource/owner",
       mockAccessRequestVc(),
       {
-        accessEndpoint: "https://some.consent-endpoint.override/",
+        accessEndpoint: "https://some.access-endpoint.override/",
         fetch: jest.fn(),
       }
     );
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      "https://some.consent-endpoint.override/".concat("issue"),
+      "https://some.access-endpoint.override/".concat("issue"),
       expect.anything(),
       expect.anything(),
       expect.anything(),

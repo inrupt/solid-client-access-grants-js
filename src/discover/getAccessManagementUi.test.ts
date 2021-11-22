@@ -32,9 +32,9 @@ import {
 } from "./getAccessManagementUi";
 
 import {
-  MOCKED_CONSENT_UI_IRI,
+  MOCKED_ACCESS_UI_IRI,
   mockWebIdWithUi,
-  mockWellKnownWithConsent,
+  mockWellKnownWithAccess,
 } from "../request/request.mock";
 
 jest.mock("@inrupt/solid-client", () => {
@@ -133,7 +133,7 @@ describe("getAccessManagementUi", () => {
     const spiedGetWellKnown = jest.spyOn(solidClient, "getWellKnownSolid");
 
     await expect(getAccessManagementUi("https://some.webid")).resolves.toBe(
-      MOCKED_CONSENT_UI_IRI
+      MOCKED_ACCESS_UI_IRI
     );
     // If the profile contains a preferred UI, the .well-known document should not be looked up.
     expect(spiedGetWellKnown).not.toHaveBeenCalled();
@@ -149,10 +149,10 @@ describe("getAccessManagementUi", () => {
       .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid", false));
     const spiedGetWellKnown = jest
       .spyOn(solidClient, "getWellKnownSolid")
-      .mockResolvedValueOnce(mockWellKnownWithConsent());
+      .mockResolvedValueOnce(mockWellKnownWithAccess());
 
     await expect(getAccessManagementUi("https://some.webid")).resolves.toBe(
-      MOCKED_CONSENT_UI_IRI
+      MOCKED_ACCESS_UI_IRI
     );
 
     expect(spiedGetWellKnown).toHaveBeenCalled();
@@ -174,7 +174,7 @@ describe("getAccessManagementUi", () => {
     ).resolves.toBeUndefined();
   });
 
-  it("returns undefined if the host's well-known does not link to a recommanded consent UI", async () => {
+  it("returns undefined if the host's well-known does not link to a recommended access management UI", async () => {
     const solidClient = jest.requireMock("@inrupt/solid-client") as {
       getSolidDataset: typeof getSolidDataset;
       getWellKnownSolid: typeof getWellKnownSolid;
@@ -184,7 +184,7 @@ describe("getAccessManagementUi", () => {
       .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid", false));
     const spiedGetWellKnown = jest
       .spyOn(solidClient, "getWellKnownSolid")
-      .mockResolvedValueOnce(mockWellKnownWithConsent(false));
+      .mockResolvedValueOnce(mockWellKnownWithAccess(false));
 
     await expect(
       getAccessManagementUi("https://some.webid")

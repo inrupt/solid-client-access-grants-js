@@ -68,10 +68,10 @@ export const mockAccessGrant = (
 };
 
 export const MOCKED_ACCESS_ISSUER = "https://access-issuer.iri";
-export const MOCKED_CONSENT_UI_IRI = "https://some-consent.app";
+export const MOCKED_ACCESS_UI_IRI = "https://some-consent.app";
 export const MOCKED_STORAGE = "https://pod-provider.iri";
 
-export const mockWellKnownWithConsent = (
+export const mockWellKnownWithAccess = (
   hasUi = true
 ): SolidDataset & WithServerResourceInfo => {
   const wellKnown = buildThing().addIri(
@@ -79,7 +79,7 @@ export const mockWellKnownWithConsent = (
     MOCKED_ACCESS_ISSUER
   );
   if (hasUi) {
-    wellKnown.addIri(PREFERRED_CONSENT_MANAGEMENT_UI, MOCKED_CONSENT_UI_IRI);
+    wellKnown.addIri(PREFERRED_CONSENT_MANAGEMENT_UI, MOCKED_ACCESS_UI_IRI);
   }
   return setThing(
     mockSolidDatasetFrom("https://pod-provider.iri/resource/.well-known/solid"),
@@ -97,13 +97,13 @@ export const mockWebIdWithUi = (
     profile.addIri("http://www.w3.org/ns/pim/space#storage", MOCKED_STORAGE);
   }
   if (hasUi) {
-    profile.addIri(PREFERRED_CONSENT_MANAGEMENT_UI, MOCKED_CONSENT_UI_IRI);
+    profile.addIri(PREFERRED_CONSENT_MANAGEMENT_UI, MOCKED_ACCESS_UI_IRI);
   }
   return setThing(mockSolidDatasetFrom(webId), profile.build());
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const mockAccessApiEndpoint = (withConsent = true) => {
+export const mockAccessApiEndpoint = (withCredentialIssuer = true) => {
   const mockedFetch = jest
     .fn(global.fetch)
     .mockResolvedValueOnce(
@@ -117,7 +117,7 @@ export const mockAccessApiEndpoint = (withConsent = true) => {
     .mockResolvedValueOnce(
       new Response(
         JSON.stringify(
-          withConsent
+          withCredentialIssuer
             ? {
                 verifiable_credential_issuer: MOCKED_ACCESS_ISSUER,
               }

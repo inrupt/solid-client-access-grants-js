@@ -425,7 +425,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
   });
 
-  it("issues a proper consent grant from a totally overriden request VC", async () => {
+  it("issues a proper access grant from a totally overriden request VC", async () => {
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -471,7 +471,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
   });
 
-  it("issues a proper consent grant from a request override alone", async () => {
+  it("issues a proper access grant from a request override alone", async () => {
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -517,7 +517,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
   });
 
-  it("issues a consent grant overriding only the issuance of the provided VC", async () => {
+  it("issues a access grant overriding only the issuance of the provided VC", async () => {
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -562,7 +562,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
   });
 
-  it("issues a consent grant overriding only the expiration of the provided VC", async () => {
+  it("issues a access grant overriding only the expiration of the provided VC", async () => {
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -606,7 +606,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
   });
 
-  it("issues a consent grant with undefined expiration date", async () => {
+  it("issues a access grant with undefined expiration date", async () => {
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -650,7 +650,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
   });
 
-  it("issues a proper consent grant from a given request VC IRI", async () => {
+  it("issues a proper access grant from a given request VC IRI", async () => {
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
