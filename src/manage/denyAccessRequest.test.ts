@@ -80,7 +80,7 @@ describe("denyAccessRequest", () => {
         type: ["NotASolidAccessRequest"],
       })
     ).rejects.toThrow(
-      "An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential."
+      "An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential."
     );
   });
 

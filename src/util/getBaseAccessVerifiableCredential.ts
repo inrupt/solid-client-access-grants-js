@@ -37,7 +37,7 @@ async function getVerifiableCredential(
   const issuerResponse = await fetcher(vcAsUrlString);
   if (!issuerResponse.ok) {
     throw new Error(
-      `An error occured when looking up [${vcAsUrlString}]: ${issuerResponse.status} ${issuerResponse.statusText}`
+      `An error occurred when looking up [${vcAsUrlString}]: ${issuerResponse.status} ${issuerResponse.statusText}`
     );
   }
   // TODO: Type checking VerifiableCredential (probably via solid-client-vc?)
@@ -54,7 +54,7 @@ export async function getBaseAccessGrantVerifiableCredential(
       : vc;
   if (!isBaseAccessGrantVerifiableCredential(fetchedVerifiableCredential)) {
     throw new Error(
-      `An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential.`
+      `An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.`
     );
   }
   return fetchedVerifiableCredential as AccessGrantBody & VerifiableCredential;
@@ -70,7 +70,7 @@ export async function getBaseAccessRequestVerifiableCredential(
       : vc;
   if (!isBaseAccessRequestVerifiableCredential(fetchedVerifiableCredential)) {
     throw new Error(
-      `An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential.`
+      `An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.`
     );
   }
   return fetchedVerifiableCredential as AccessRequestBody &
