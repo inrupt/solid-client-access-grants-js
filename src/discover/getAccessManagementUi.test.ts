@@ -24,7 +24,13 @@ import {
   getWellKnownSolid,
   getSolidDataset,
 } from "@inrupt/solid-client";
-import { getConsentManagementUi } from "./getConsentManagementUi";
+
+import {
+  getAccessManagementUi,
+  // Deprecated API:
+  getConsentManagementUi,
+} from "./getAccessManagementUi";
+
 import {
   MOCKED_CONSENT_UI_IRI,
   mockWebIdWithUi,
@@ -45,6 +51,12 @@ jest.mock("@inrupt/solid-client", () => {
 jest.mock("@inrupt/solid-client-authn-browser");
 
 describe("getConsentManagementUi", () => {
+  it("should be an alias of getAccessManagementUi", () => {
+    expect(getConsentManagementUi).toBe(getAccessManagementUi);
+  });
+});
+
+describe("getAccessManagementUi", () => {
   it("defaults to the default session fetch if no fetch is provided", async () => {
     // TypeScript can't infer the type of mock modules imported via Jest;
     // skip type checking for those:
@@ -58,7 +70,8 @@ describe("getConsentManagementUi", () => {
         "getSolidDataset"
       )
       .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid"));
-    await getConsentManagementUi("https://some.webid");
+
+    await getAccessManagementUi("https://some.webid");
 
     expect(spiedGetDataset).toHaveBeenCalledWith("https://some.webid", {
       fetch: scab.fetch,
@@ -75,7 +88,9 @@ describe("getConsentManagementUi", () => {
       )
       .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid"));
     const mockedFetch = jest.fn(global.fetch);
-    await getConsentManagementUi("https://some.webid", { fetch: mockedFetch });
+
+    await getAccessManagementUi("https://some.webid", { fetch: mockedFetch });
+
     expect(spiedGetDataset).toHaveBeenCalledWith("https://some.webid", {
       fetch: mockedFetch,
     });
@@ -87,7 +102,8 @@ describe("getConsentManagementUi", () => {
       getWellKnownSolid: typeof getWellKnownSolid;
     };
     jest.spyOn(solidClient, "getSolidDataset").mockRejectedValue("Some error");
-    await expect(getConsentManagementUi("https://some.webid")).rejects.toThrow(
+
+    await expect(getAccessManagementUi("https://some.webid")).rejects.toThrow(
       /some.webid.*Some error/
     );
   });
@@ -100,7 +116,8 @@ describe("getConsentManagementUi", () => {
     jest
       .spyOn(solidClient, "getSolidDataset")
       .mockResolvedValue(mockSolidDatasetFrom("https://some.webid"));
-    await expect(getConsentManagementUi("https://some.webid")).rejects.toThrow(
+
+    await expect(getAccessManagementUi("https://some.webid")).rejects.toThrow(
       /some.webid.*WebID cannot be dereferenced/
     );
   });
@@ -114,7 +131,8 @@ describe("getConsentManagementUi", () => {
       .spyOn(solidClient, "getSolidDataset")
       .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid"));
     const spiedGetWellKnown = jest.spyOn(solidClient, "getWellKnownSolid");
-    await expect(getConsentManagementUi("https://some.webid")).resolves.toBe(
+
+    await expect(getAccessManagementUi("https://some.webid")).resolves.toBe(
       MOCKED_CONSENT_UI_IRI
     );
     // If the profile contains a preferred UI, the .well-known document should not be looked up.
@@ -132,9 +150,11 @@ describe("getConsentManagementUi", () => {
     const spiedGetWellKnown = jest
       .spyOn(solidClient, "getWellKnownSolid")
       .mockResolvedValueOnce(mockWellKnownWithConsent());
-    await expect(getConsentManagementUi("https://some.webid")).resolves.toBe(
+
+    await expect(getAccessManagementUi("https://some.webid")).resolves.toBe(
       MOCKED_CONSENT_UI_IRI
     );
+
     expect(spiedGetWellKnown).toHaveBeenCalled();
   });
 
@@ -148,8 +168,9 @@ describe("getConsentManagementUi", () => {
       .mockResolvedValueOnce(
         mockWebIdWithUi("https://some.webid", false, false)
       );
+
     await expect(
-      getConsentManagementUi("https://some.webid")
+      getAccessManagementUi("https://some.webid")
     ).resolves.toBeUndefined();
   });
 
@@ -164,9 +185,11 @@ describe("getConsentManagementUi", () => {
     const spiedGetWellKnown = jest
       .spyOn(solidClient, "getWellKnownSolid")
       .mockResolvedValueOnce(mockWellKnownWithConsent(false));
+
     await expect(
-      getConsentManagementUi("https://some.webid")
+      getAccessManagementUi("https://some.webid")
     ).resolves.toBeUndefined();
+
     expect(spiedGetWellKnown).toHaveBeenCalled();
   });
 
@@ -183,9 +206,11 @@ describe("getConsentManagementUi", () => {
       .mockResolvedValueOnce(
         mockSolidDatasetFrom("https://some.server/.well-known/solid")
       );
+
     await expect(
-      getConsentManagementUi("https://some.webid")
+      getAccessManagementUi("https://some.webid")
     ).resolves.toBeUndefined();
+
     expect(spiedGetWellKnown).toHaveBeenCalled();
   });
 });

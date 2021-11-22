@@ -32,11 +32,12 @@ export type {
 
 export {
   getAccessApiEndpoint,
-  getConsentManagementUi,
+  getAccessManagementUi,
   redirectToAccessManagementUi,
   // Deprecated APIs:
   redirectToConsentManagementUi,
   getConsentApiEndpoint,
+  getConsentManagementUi,
 } from "./discover";
 
 export type { RedirectToAccessManagementUiOptions } from "./discover";
