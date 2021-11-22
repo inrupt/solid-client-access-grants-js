@@ -19,7 +19,7 @@
 
 // eslint-disable-next-line no-shadow
 import { jest, it, describe, expect } from "@jest/globals";
-import { mockConsentEndpoint } from "../request/request.mock";
+import { mockAccessApiEndpoint } from "../request/request.mock";
 import { mockAccessGrantVc, mockConsentRequestVc } from "./approve.mock";
 import { getAccessGrant, getAccessWithConsent } from "./getAccessGrant";
 
@@ -34,7 +34,7 @@ describe("getAccessWithConsent", () => {
 
 describe("getAccessGrant", () => {
   it("defaults to the session fetch if none is provided", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(new Response(JSON.stringify(mockAccessGrantVc())));
@@ -49,7 +49,7 @@ describe("getAccessGrant", () => {
   });
 
   it("uses the provided fetch if any", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(new Response(JSON.stringify(mockAccessGrantVc())));
@@ -61,7 +61,7 @@ describe("getAccessGrant", () => {
   });
 
   it("throws if resolving the IRI results in an HTTP error", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
@@ -78,7 +78,7 @@ describe("getAccessGrant", () => {
   });
 
   it("throws if the given IRI does not resolve to a Verifiable Credential", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(new Response("{'someKey': 'someValue'}"));
@@ -93,7 +93,7 @@ describe("getAccessGrant", () => {
   });
 
   it("throws if the given IRI does not resolve to a consent grant Verifiable Credential", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
@@ -110,7 +110,7 @@ describe("getAccessGrant", () => {
   });
 
   it("returns the consent grant with the given IRI", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedAccessGrant = mockAccessGrantVc();
     const mockedFetch = jest
       .fn(global.fetch)
@@ -123,7 +123,7 @@ describe("getAccessGrant", () => {
   });
 
   it("returns the consent grant with the given URL object", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedAccessGrant = mockAccessGrantVc();
     const mockedFetch = jest
       .fn(global.fetch)

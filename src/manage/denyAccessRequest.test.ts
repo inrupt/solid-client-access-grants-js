@@ -22,8 +22,8 @@ import { jest, it, describe, expect } from "@jest/globals";
 import { denyAccessRequest } from "./denyAccessRequest";
 import { mockAccessRequestVc } from "./approve.mock";
 import {
-  mockConsentEndpoint,
-  MOCKED_CONSENT_ISSUER,
+  mockAccessApiEndpoint,
+  MOCKED_ACCESS_ISSUER,
 } from "../request/request.mock";
 
 jest.mock("@inrupt/solid-client", () => {
@@ -44,7 +44,7 @@ jest.mock("cross-fetch");
 // TODO: Extract the fetch VC function and related tests
 describe("denyAccessRequest", () => {
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: () => unknown;
@@ -73,7 +73,7 @@ describe("denyAccessRequest", () => {
   });
 
   it("throws if the provided VC isn't a Solid consent request", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     await expect(
       denyAccessRequest("https://some.resource/owner", {
         ...mockAccessRequestVc(),
@@ -85,7 +85,7 @@ describe("denyAccessRequest", () => {
   });
 
   it("throws if there is no well known consent endpoint", async () => {
-    mockConsentEndpoint(false);
+    mockAccessApiEndpoint(false);
     await expect(
       denyAccessRequest("https://some.resource/owner", mockAccessRequestVc())
     ).rejects.toThrow(
@@ -119,7 +119,7 @@ describe("denyAccessRequest", () => {
   });
 
   it("uses the provided fetch, if any", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedFetch = jest.fn(global.fetch);
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -145,7 +145,7 @@ describe("denyAccessRequest", () => {
   });
 
   it("issues a proper denied access VC", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -163,7 +163,7 @@ describe("denyAccessRequest", () => {
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
@@ -183,7 +183,7 @@ describe("denyAccessRequest", () => {
   });
 
   it("issues a proper denied access VC from a given access request VC IRI", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -205,7 +205,7 @@ describe("denyAccessRequest", () => {
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       "https://some.resource/owner",
       expect.objectContaining({
         id: "https://some.resource/owner",
@@ -225,7 +225,7 @@ describe("denyAccessRequest", () => {
   });
 
   it("can take a URL as VC IRI parameter", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -248,7 +248,7 @@ describe("denyAccessRequest", () => {
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       "https://some.resource/owner",
       expect.objectContaining({
         id: "https://some.resource/owner",

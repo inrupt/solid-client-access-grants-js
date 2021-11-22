@@ -20,8 +20,8 @@
 /* eslint-disable no-shadow */
 import { jest, it, describe, expect } from "@jest/globals";
 import {
-  mockConsentEndpoint,
-  MOCKED_CONSENT_ISSUER,
+  mockAccessApiEndpoint,
+  MOCKED_ACCESS_ISSUER,
 } from "../request/request.mock";
 import { approveAccessRequestWithConsent } from "./approveAccessRequestWithConsent";
 import { approveAccessRequest } from "./approveAccessRequest";
@@ -52,7 +52,7 @@ describe("approveAccessRequest", () => {
     const crossFetchModule = jest.requireMock("cross-fetch") as {
       fetch: typeof global.fetch;
     };
-    crossFetchModule.fetch = mockConsentEndpoint();
+    crossFetchModule.fetch = mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: () => unknown;
@@ -81,7 +81,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("throws if the provided VC isn't a solid consent request VC", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     await expect(
       approveAccessRequest("https://some.resource/owner", {
         ...mockAccessRequestVc(),
@@ -93,7 +93,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("throws if the provided VC isn't an access request", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const accessRequest = mockAccessRequestVc();
     await expect(
       approveAccessRequest("https://some.resource/owner", {
@@ -136,7 +136,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("uses the provided fetch, if any", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedFetch = jest.fn(global.fetch);
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -163,7 +163,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant from a request VC", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -181,7 +181,7 @@ describe("approveAccessRequest", () => {
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       mockAccessRequestVc().credentialSubject.id,
       expect.objectContaining({
         providedConsent: {
@@ -201,7 +201,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant from a fully custom input", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -224,7 +224,7 @@ describe("approveAccessRequest", () => {
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       "https://some-custom.requestor",
       expect.objectContaining({
         providedConsent: {
@@ -243,7 +243,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant from a partially overriden request VC", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -263,7 +263,7 @@ describe("approveAccessRequest", () => {
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       mockConsentRequestVc().credentialSubject.id,
       expect.objectContaining({
         providedConsent: {
@@ -282,7 +282,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant from a given request VC IRI", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -305,7 +305,7 @@ describe("approveAccessRequest", () => {
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       mockAccessRequestVc().credentialSubject.id,
       expect.objectContaining({
         providedConsent: {
@@ -327,7 +327,7 @@ describe("approveAccessRequest", () => {
 
 describe("approveAccessRequestWithConsent", () => {
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: () => unknown;
@@ -356,7 +356,7 @@ describe("approveAccessRequestWithConsent", () => {
   });
 
   it("throws if the provided VC isn't a VC of type Solid Consent request", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     await expect(
       approveAccessRequestWithConsent("https://some.resource/owner", {
         ...mockConsentRequestVc(),
@@ -368,7 +368,7 @@ describe("approveAccessRequestWithConsent", () => {
   });
 
   it("throws if the provided VC isn't an access request", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const accessRequestWithConsent = mockConsentRequestVc();
     await expect(
       approveAccessRequestWithConsent("https://some.resource/owner", {
@@ -385,7 +385,7 @@ describe("approveAccessRequestWithConsent", () => {
   });
 
   it("issues a proper consent grant from a given request VC", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -403,7 +403,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
@@ -426,7 +426,7 @@ describe("approveAccessRequestWithConsent", () => {
   });
 
   it("issues a proper consent grant from a totally overriden request VC", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -452,7 +452,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
@@ -472,7 +472,7 @@ describe("approveAccessRequestWithConsent", () => {
   });
 
   it("issues a proper consent grant from a request override alone", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -498,7 +498,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
@@ -518,7 +518,7 @@ describe("approveAccessRequestWithConsent", () => {
   });
 
   it("issues a consent grant overriding only the issuance of the provided VC", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -538,7 +538,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
@@ -563,7 +563,7 @@ describe("approveAccessRequestWithConsent", () => {
   });
 
   it("issues a consent grant overriding only the expiration of the provided VC", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -583,7 +583,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
@@ -607,7 +607,7 @@ describe("approveAccessRequestWithConsent", () => {
   });
 
   it("issues a consent grant with undefined expiration date", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -628,7 +628,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
@@ -651,7 +651,7 @@ describe("approveAccessRequestWithConsent", () => {
   });
 
   it("issues a proper consent grant from a given request VC IRI", async () => {
-    mockConsentEndpoint();
+    mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -674,7 +674,7 @@ describe("approveAccessRequestWithConsent", () => {
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_CONSENT_ISSUER}/issue`,
+      `${MOCKED_ACCESS_ISSUER}/issue`,
       "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
