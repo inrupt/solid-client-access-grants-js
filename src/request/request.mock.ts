@@ -67,16 +67,19 @@ export const mockAccessGrant = (
   };
 };
 
-export const MOCKED_CONSENT_ISSUER = "https://consent-issuer.iri";
+export const MOCKED_ACCESS_ISSUER = "https://access-issuer.iri";
 export const MOCKED_CONSENT_UI_IRI = "https://some-consent.app";
 export const MOCKED_STORAGE = "https://pod-provider.iri";
+
+// Deprecated
+export const MOCKED_CONSENT_ISSUER = MOCKED_ACCESS_ISSUER;
 
 export const mockWellKnownWithConsent = (
   hasUi = true
 ): SolidDataset & WithServerResourceInfo => {
   const wellKnown = buildThing().addIri(
     "http://www.w3.org/ns/solid/terms#accessIssuer",
-    MOCKED_CONSENT_ISSUER
+    MOCKED_ACCESS_ISSUER
   );
   if (hasUi) {
     wellKnown.addIri(PREFERRED_CONSENT_MANAGEMENT_UI, MOCKED_CONSENT_UI_IRI);
@@ -103,7 +106,7 @@ export const mockWebIdWithUi = (
 };
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export const mockConsentEndpoint = (withConsent = true) => {
+export const mockAccessApiEndpoint = (withConsent = true) => {
   const mockedFetch = jest
     .fn(global.fetch)
     .mockResolvedValueOnce(
@@ -119,7 +122,7 @@ export const mockConsentEndpoint = (withConsent = true) => {
         JSON.stringify(
           withConsent
             ? {
-                verifiable_credential_issuer: MOCKED_CONSENT_ISSUER,
+                verifiable_credential_issuer: MOCKED_ACCESS_ISSUER,
               }
             : {}
         )
@@ -131,3 +134,6 @@ export const mockConsentEndpoint = (withConsent = true) => {
   crossFetchModule.fetch = mockedFetch;
   return mockedFetch;
 };
+
+// Deprecated:
+export const mockConsentEndpint = mockAccessApiEndpoint;

@@ -23,7 +23,7 @@ import {
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
-import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
+import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import { BaseConsentGrantBody } from "../type/AccessVerifiableCredential";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 import type { RecursivePartial } from "../type/RecursivePartial";
@@ -53,7 +53,7 @@ async function getAccessGrantAll(
   // TODO: Fix access API endpoint retrieval (should include all the different API endpoints)
   const holderEndpoint = new URL(
     "derive",
-    await getConsentApiEndpoint(resource, options)
+    await getAccessApiEndpoint(resource, options)
   );
 
   const vcShape: RecursivePartial<BaseConsentGrantBody & VerifiableCredential> =

@@ -50,7 +50,7 @@ import type {
   ConsentGrantParameters,
   AccessGrantParameters,
 } from "../type/Parameter";
-import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
+import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArray";
 import { isBaseConsentParameters } from "../guard/isBaseConsentParameters";
 import { isBaseRequest } from "../guard/isBaseRequest";
@@ -222,7 +222,7 @@ export async function issueAccessOrConsentVc(
   // (issuer service, verifier service... supposedly status and query and vc???)
   const consentIssuerEndpoint = new URL(
     "issue",
-    await getConsentApiEndpoint(targetResourceIri, options)
+    await getAccessApiEndpoint(targetResourceIri, options)
   );
   return issueVerifiableCredential(
     consentIssuerEndpoint.href,

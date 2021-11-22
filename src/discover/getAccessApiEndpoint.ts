@@ -22,7 +22,7 @@ import { fetch as crossFetch } from "cross-fetch";
 import { parse } from "auth-header";
 import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
 
-async function getConsentEndpointForResource(
+async function getAccessEndpointForResource(
   resource: UrlString
 ): Promise<UrlString> {
   // Explicitly makes an unauthenticated fetch to be sure to get the link to the
@@ -65,21 +65,23 @@ async function getConsentEndpointForResource(
  * @returns The URL of the access request server.
  * @since 0.0.1
  */
-async function getConsentApiEndpoint(
+async function getAccessApiEndpoint(
   resource: URL | UrlString,
   options: ConsentApiBaseOptions = {}
 ): Promise<UrlString> {
-  // TODO: complete code coverage
-  /* istanbul ignore next */
   if (options.consentEndpoint !== undefined) {
     return options.consentEndpoint.toString();
   }
-  return getConsentEndpointForResource(
-    /* istanbul ignore next */
-    resource.toString()
-  );
+  return getAccessEndpointForResource(resource.toString());
 }
 
-export { getConsentApiEndpoint };
-export default getConsentApiEndpoint;
+export { getAccessApiEndpoint };
+export default getAccessApiEndpoint;
 export type { ConsentApiBaseOptions, UrlString };
+
+/**
+ * @hidden deprecated alias of [[getAccessApiEndpoint]]
+ * @deprecated
+ */
+const getConsentApiEndpoint = getAccessApiEndpoint;
+export { getConsentApiEndpoint };

@@ -25,7 +25,7 @@ import {
   getAccessWithConsentAll,
   IssueAccessRequestParameters,
 } from "./getAccessGrantAll";
-import { getConsentApiEndpoint } from "../discover/getConsentApiEndpoint";
+import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 
 const clientAuthnFetch = jest.fn(global.fetch);
 const otherFetch = jest.fn(global.fetch);
@@ -39,9 +39,9 @@ jest.mock("@inrupt/solid-client-vc", () => {
   };
 });
 
-jest.mock("../discover/getConsentApiEndpoint", () => {
+jest.mock("../discover/getAccessApiEndpoint", () => {
   return {
-    getConsentApiEndpoint: jest.fn(() => "https://some.api.endpoint"),
+    getAccessApiEndpoint: jest.fn(() => "https://some.api.endpoint"),
   };
 });
 
@@ -66,7 +66,7 @@ describe("getAccessGrantAll", () => {
 
     await getAccessGrantAll(resource.href);
 
-    expect(getConsentApiEndpoint).toHaveBeenCalledTimes(1);
+    expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(1);
 
@@ -98,7 +98,7 @@ describe("getAccessGrantAll", () => {
       fetch: otherFetch,
     });
 
-    expect(getConsentApiEndpoint).toHaveBeenCalledTimes(1);
+    expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(1);
 
@@ -130,7 +130,7 @@ describe("getAccessGrantAll", () => {
       fetch: otherFetch,
     });
 
-    expect(getConsentApiEndpoint).toHaveBeenCalledTimes(1);
+    expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(1);
 
@@ -163,7 +163,7 @@ describe("getAccessGrantAll", () => {
       fetch: otherFetch,
     });
 
-    expect(getConsentApiEndpoint).toHaveBeenCalledTimes(1);
+    expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(1);
 
