@@ -40,13 +40,22 @@ describe("getConsentApiEndpoint", () => {
 });
 
 describe("getAccessApiEndpoint", () => {
-  it("can find the consent endpoint for a given resource", async () => {
+  it("can find the access endpoint for a given resource", async () => {
     mockAccessApiEndpoint();
     const accessEndpoint = await getAccessApiEndpoint(MOCK_REQUESTEE_IRI);
     expect(accessEndpoint).toBe(MOCKED_ACCESS_ISSUER);
   });
 
-  it("can find the consent endpoint via options", async () => {
+  it("can find the access endpoint via the accessEndpoint option", async () => {
+    mockAccessApiEndpoint();
+    const accessEndpoint = await getAccessApiEndpoint(MOCK_REQUESTEE_IRI, {
+      accessEndpoint: "https://access.inrupt.com",
+    });
+    expect(accessEndpoint).toBe("https://access.inrupt.com");
+  });
+
+  // Deprecated API:
+  it("can find the access endpoint via the consentEndpoint option", async () => {
     mockAccessApiEndpoint();
     const accessEndpoint = await getAccessApiEndpoint(MOCK_REQUESTEE_IRI, {
       consentEndpoint: "https://access.inrupt.com",

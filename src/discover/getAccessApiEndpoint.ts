@@ -69,9 +69,14 @@ async function getAccessApiEndpoint(
   resource: URL | UrlString,
   options: AccessBaseOptions = {}
 ): Promise<UrlString> {
+  if (options.accessEndpoint !== undefined) {
+    return options.accessEndpoint.toString();
+  }
+
   if (options.consentEndpoint !== undefined) {
     return options.consentEndpoint.toString();
   }
+
   return getAccessEndpointForResource(resource.toString());
 }
 

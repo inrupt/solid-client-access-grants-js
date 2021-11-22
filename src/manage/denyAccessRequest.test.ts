@@ -105,7 +105,7 @@ describe("denyAccessRequest", () => {
       "https://some.resource/owner",
       mockAccessRequestVc(),
       {
-        consentEndpoint: "https://some.consent-endpoint.override/",
+        accessEndpoint: "https://some.consent-endpoint.override/",
         fetch: jest.fn(),
       }
     );
