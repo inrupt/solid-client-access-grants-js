@@ -26,6 +26,14 @@ export type {
 } from "./type/IssueAccessRequestParameters";
 
 export {
+  getAccessApiEndpoint,
+  getConsentManagementUi,
+  redirectToConsentManagementUi,
+  // Deprecated APIs:
+  getConsentApiEndpoint,
+} from "./discover";
+
+export {
   issueAccessRequest,
   cancelAccessRequest,
   // Deprecated APIs:
@@ -51,9 +59,3 @@ export {
   // Deprecated API:
   isValidConsentGrant,
 } from "./verify";
-
-export {
-  getConsentApiEndpoint,
-  getConsentManagementUi,
-  redirectToConsentManagementUi,
-} from "./discover";

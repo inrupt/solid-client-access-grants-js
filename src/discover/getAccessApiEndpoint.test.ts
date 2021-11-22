@@ -20,20 +20,38 @@
 // eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
 import {
-  MOCKED_CONSENT_ISSUER,
+  MOCKED_ACCESS_ISSUER,
   MOCK_REQUESTEE_IRI,
-  mockConsentEndpoint,
+  mockAccessApiEndpoint,
 } from "../request/request.mock";
-import { getConsentApiEndpoint } from "./getConsentApiEndpoint";
+
+import {
+  getAccessApiEndpoint,
+  getConsentApiEndpoint,
+} from "./getAccessApiEndpoint";
 
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("cross-fetch");
 
 describe("getConsentApiEndpoint", () => {
+  it("should be an alias of getAccessApiEndpoint", () => {
+    expect(getConsentApiEndpoint).toBe(getAccessApiEndpoint);
+  });
+});
+
+describe("getAccessApiEndpoint", () => {
   it("can find the consent endpoint for a given resource", async () => {
-    mockConsentEndpoint();
-    const consentEndpoint = await getConsentApiEndpoint(MOCK_REQUESTEE_IRI);
-    expect(consentEndpoint).toBe(MOCKED_CONSENT_ISSUER);
+    mockAccessApiEndpoint();
+    const accessEndpoint = await getAccessApiEndpoint(MOCK_REQUESTEE_IRI);
+    expect(accessEndpoint).toBe(MOCKED_ACCESS_ISSUER);
+  });
+
+  it("can find the consent endpoint via options", async () => {
+    mockAccessApiEndpoint();
+    const accessEndpoint = await getAccessApiEndpoint(MOCK_REQUESTEE_IRI, {
+      consentEndpoint: "https://access.inrupt.com",
+    });
+    expect(accessEndpoint).toBe("https://access.inrupt.com");
   });
 
   it("throws an error if the unauthenticated fetch does not fail", async () => {
@@ -47,7 +65,7 @@ describe("getConsentApiEndpoint", () => {
       fetch: typeof global.fetch;
     };
     crossFetchModule.fetch = mockedFetch;
-    await expect(getConsentApiEndpoint(MOCK_REQUESTEE_IRI)).rejects.toThrow(
+    await expect(getAccessApiEndpoint(MOCK_REQUESTEE_IRI)).rejects.toThrow(
       "Expected a 401 error with a WWW-Authenticate header, got a [200: Ok] response lacking the WWW-Authenticate header"
     );
   });
@@ -65,7 +83,7 @@ describe("getConsentApiEndpoint", () => {
       fetch: typeof global.fetch;
     };
     crossFetchModule.fetch = mockedFetch;
-    await expect(getConsentApiEndpoint(MOCK_REQUESTEE_IRI)).rejects.toThrow(
+    await expect(getAccessApiEndpoint(MOCK_REQUESTEE_IRI)).rejects.toThrow(
       "Unsupported authorization scheme: [someScheme]"
     );
   });
@@ -92,7 +110,7 @@ describe("getConsentApiEndpoint", () => {
       fetch: typeof global.fetch;
     };
     crossFetchModule.fetch = mockedFetch;
-    await expect(getConsentApiEndpoint(MOCK_REQUESTEE_IRI)).rejects.toThrow(
+    await expect(getAccessApiEndpoint(MOCK_REQUESTEE_IRI)).rejects.toThrow(
       /No access issuer listed for property \[verifiable_credential_issuer\] in.*some_property.*some value/
     );
   });

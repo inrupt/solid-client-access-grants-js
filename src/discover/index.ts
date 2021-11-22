@@ -18,11 +18,16 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /**
- * Import this module for the consent API functions available to an entity
- * discovering properties of the consent API:
- * - `getConsentApiEndpoint`: Discover the preferred consent endpoint for a resource;
+ * Import this module for the access API functions available to an entity
+ * discovering properties of the access API:
+ * - `getAccessApiEndpoint`: Discover the preferred access API endpoint for a resource;
  * - `getConsentManagementUi`: Discover the preferred consent management UI for an entity.
  */
-export { getConsentApiEndpoint } from "./getConsentApiEndpoint";
+export {
+  getAccessApiEndpoint,
+  // Deprecated API:
+  getConsentApiEndpoint,
+} from "./getAccessApiEndpoint";
+
 export { getConsentManagementUi } from "./getConsentManagementUi";
 export { redirectToConsentManagementUi } from "./redirectToConsentManagementUi";
