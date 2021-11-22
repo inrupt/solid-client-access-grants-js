@@ -134,7 +134,7 @@ describe("revokeAccessGrant", () => {
 
   it("throws if the resource is not a base access grant VC", async () => {
     await expect(revokeAccessGrant(mockAccessRequestVc())).rejects.toThrow(
-      "An error occured when type checking the VC, it is not a BaseAccessVerifiableCredential."
+      "An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential."
     );
   });
 
