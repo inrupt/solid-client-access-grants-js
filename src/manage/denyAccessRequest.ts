@@ -24,7 +24,7 @@ import {
   GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
-import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import {
   getGrantBody,
   issueAccessOrConsentVc,
@@ -45,7 +45,7 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
 async function denyAccessRequest(
   resourceOwner: WebId,
   vc: VerifiableCredential | URL | UrlString,
-  options: ConsentApiBaseOptions = {}
+  options: AccessBaseOptions = {}
 ): Promise<VerifiableCredential> {
   const baseAccessVerifiableCredential =
     await getBaseAccessRequestVerifiableCredential(vc, options);
@@ -71,4 +71,4 @@ async function denyAccessRequest(
 
 export { denyAccessRequest };
 export default denyAccessRequest;
-export type { ConsentApiBaseOptions, VerifiableCredential, UrlString };
+export type { VerifiableCredential, UrlString };

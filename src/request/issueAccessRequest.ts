@@ -23,7 +23,7 @@ import {
   issueAccessOrConsentVc,
 } from "../util/issueAccessOrConsentVc";
 import { GC_CONSENT_STATUS_REQUESTED } from "../constants";
-import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { IssueAccessRequestParameters } from "../type/IssueAccessRequestParameters";
 
 /**
@@ -36,7 +36,7 @@ import type { IssueAccessRequestParameters } from "../type/IssueAccessRequestPar
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options: ConsentApiBaseOptions = {}
+  options: AccessBaseOptions = {}
 ): Promise<VerifiableCredential> {
   const consentRequest = getRequestBody({
     ...params,
@@ -48,11 +48,7 @@ async function issueAccessRequest(
 
 export default issueAccessRequest;
 export { issueAccessRequest };
-export type {
-  ConsentApiBaseOptions,
-  IssueAccessRequestParameters,
-  VerifiableCredential,
-};
+export type { IssueAccessRequestParameters, VerifiableCredential };
 
 /**
  * @hidden Deprecated alias of [[issueAccessRequest]]

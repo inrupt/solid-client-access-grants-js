@@ -27,7 +27,7 @@ import { isAccessRequest } from "../guard/isAccessRequest";
 import { isConsentRequest } from "../guard/isConsentRequest";
 import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
-import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 
 /**
@@ -54,7 +54,7 @@ export async function approveAccessRequestWithConsent(
     issuanceDate: Date;
     expirationDate: Date;
   }>,
-  options?: ConsentApiBaseOptions
+  options?: AccessBaseOptions
 ): Promise<VerifiableCredential>;
 /**
  * Approve a consent request. The content of the approved consent request is provided
@@ -79,7 +79,7 @@ export async function approveAccessRequestWithConsent(
     issuanceDate: Date;
     expirationDate: Date;
   },
-  options?: ConsentApiBaseOptions
+  options?: AccessBaseOptions
 ): Promise<VerifiableCredential>;
 export async function approveAccessRequestWithConsent(
   resourceOwner: WebId,
@@ -93,7 +93,7 @@ export async function approveAccessRequestWithConsent(
     issuanceDate: Date;
     expirationDate: Date;
   }>,
-  options: ConsentApiBaseOptions = {}
+  options: AccessBaseOptions = {}
 ): Promise<VerifiableCredential> {
   const requestCredential =
     typeof requestVc !== "undefined"
@@ -127,4 +127,4 @@ export async function approveAccessRequestWithConsent(
 }
 
 export default approveAccessRequestWithConsent;
-export type { ConsentApiBaseOptions, UrlString, VerifiableCredential };
+export type { UrlString, VerifiableCredential };

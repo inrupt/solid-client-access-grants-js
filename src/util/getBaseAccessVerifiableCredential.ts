@@ -19,7 +19,7 @@
 
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
-import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type {
   AccessGrantBody,
   AccessRequestBody,
@@ -30,7 +30,7 @@ import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGran
 
 async function getVerifiableCredential(
   vc: URL | UrlString,
-  options: ConsentApiBaseOptions
+  options: AccessBaseOptions
 ): Promise<VerifiableCredential> {
   const fetcher = await getSessionFetch(options);
   const vcAsUrlString = vc.toString();
@@ -46,7 +46,7 @@ async function getVerifiableCredential(
 
 export async function getBaseAccessGrantVerifiableCredential(
   vc: VerifiableCredential | URL | UrlString,
-  options: ConsentApiBaseOptions
+  options: AccessBaseOptions
 ): Promise<AccessGrantBody & VerifiableCredential> {
   const fetchedVerifiableCredential =
     typeof vc === "string" || vc instanceof URL
@@ -62,7 +62,7 @@ export async function getBaseAccessGrantVerifiableCredential(
 
 export async function getBaseAccessRequestVerifiableCredential(
   vc: VerifiableCredential | URL | UrlString,
-  options: ConsentApiBaseOptions
+  options: AccessBaseOptions
 ): Promise<AccessRequestBody & VerifiableCredential> {
   const fetchedVerifiableCredential =
     typeof vc === "string" || vc instanceof URL

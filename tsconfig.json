@@ -75,7 +75,7 @@
       "src/manage/index.ts",
       "src/request/index.ts",
       "src/verify/index.ts",
-      "src/type/ConsentApiBaseOptions.ts",
+      "src/type/AccessBaseOptions.ts",
       "src/type/IssueAccessRequestParameters.ts"
     ],
     "exclude": [

@@ -20,7 +20,7 @@
 import { UrlString } from "@inrupt/solid-client";
 import { fetch as crossFetch } from "cross-fetch";
 import { parse } from "auth-header";
-import { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import { AccessBaseOptions } from "../type/AccessBaseOptions";
 
 async function getAccessEndpointForResource(
   resource: UrlString
@@ -67,7 +67,7 @@ async function getAccessEndpointForResource(
  */
 async function getAccessApiEndpoint(
   resource: URL | UrlString,
-  options: ConsentApiBaseOptions = {}
+  options: AccessBaseOptions = {}
 ): Promise<UrlString> {
   if (options.consentEndpoint !== undefined) {
     return options.consentEndpoint.toString();
@@ -77,7 +77,7 @@ async function getAccessApiEndpoint(
 
 export { getAccessApiEndpoint };
 export default getAccessApiEndpoint;
-export type { ConsentApiBaseOptions, UrlString };
+export type { UrlString };
 
 /**
  * @hidden deprecated alias of [[getAccessApiEndpoint]]

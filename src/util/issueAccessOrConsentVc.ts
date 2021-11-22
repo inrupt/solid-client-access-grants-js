@@ -27,7 +27,7 @@ import {
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_REQUEST,
 } from "../constants";
-import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getSessionFetch } from "./getSessionFetch";
 import type {
   AccessGrantBody,
@@ -209,7 +209,7 @@ export async function issueAccessOrConsentVc(
     | BaseGrantBody
     | BaseConsentRequestBody
     | BaseConsentGrantBody,
-  options: ConsentApiBaseOptions
+  options: AccessBaseOptions
 ): Promise<VerifiableCredential> {
   const fetcher = await getSessionFetch(options);
   const targetResourceIri = isBaseRequest(vcBody)

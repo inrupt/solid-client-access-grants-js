@@ -19,7 +19,7 @@
 
 import type { UrlString } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
+import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { revokeAccessGrant } from "../manage/revokeAccessGrant";
 
 /**
@@ -34,11 +34,11 @@ import { revokeAccessGrant } from "../manage/revokeAccessGrant";
  */
 async function cancelAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
-  options: ConsentApiBaseOptions = {}
+  options: AccessBaseOptions = {}
 ): Promise<void> {
   return revokeAccessGrant(vc, options);
 }
 
 export { cancelAccessRequest };
 export default cancelAccessRequest;
-export type { ConsentApiBaseOptions, VerifiableCredential, UrlString };
+export type { VerifiableCredential, UrlString };
