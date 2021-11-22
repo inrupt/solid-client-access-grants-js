@@ -20,7 +20,12 @@
 import type { UrlString } from "@inrupt/solid-client";
 
 // TODO: Verify whether we need to support the podHost parameter and implement
+/**
+ * - `podHost`: The URL of the pod host, from which the `.well-known/solid` file
+ *   can be derived.
+ */
 // podHost?: URL | UrlString;
+
 /**
  * Optional parameters to customise the behaviour of access requests.
  *
@@ -29,15 +34,18 @@ import type { UrlString } from "@inrupt/solid-client";
  *   requests need to be authenticated. When `@inrupt/solid-client-authn-browser`
  *   is available and this property is not set, `fetch` will be imported from
  *   there. Otherwise, the HTTP requests will be unauthenticated.
- * - `consentEndpoint`: A base URL used when determining the location of consent
+ * - `accessEndpoint`: A base URL used when determining the location of access
  *   API calls. If not given, it is attempted to be found by determining the
  *   server URL from the resource involved in the request and reading its
- *   `.well-known/solid` file for a ConsentAPI entry.
- * - `podHost`: The URL of the pod host, from which the `.well-known/solid` file
- *   can be derived.
+ *   `.well-known/solid` file for an Access API entry.
  */
 export type AccessBaseOptions = {
   fetch?: typeof fetch;
+  accessEndpoint?: URL | UrlString;
+  /**
+   * @hidden alias of accessEndpoint
+   * @deprecated
+   */
   consentEndpoint?: URL | UrlString;
 };
 

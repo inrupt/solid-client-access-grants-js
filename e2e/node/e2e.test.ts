@@ -145,7 +145,7 @@ describe.each(serversUnderTest)(
           },
           {
             fetch: requestorSession.fetch,
-            consentEndpoint: vcService,
+            accessEndpoint: vcService,
           }
         );
         expect(isVerifiableCredential(request)).toBe(true);
@@ -156,7 +156,7 @@ describe.each(serversUnderTest)(
           {},
           {
             fetch: resourceOwnerSession.fetch,
-            consentEndpoint: vcService,
+            accessEndpoint: vcService,
           }
         );
         await expect(
@@ -174,7 +174,7 @@ describe.each(serversUnderTest)(
           undefined,
           {
             fetch: resourceOwnerSession.fetch,
-            consentEndpoint: vcService,
+            accessEndpoint: vcService,
           }
         );
         // Test that looking up the access grants for the given resource returns
@@ -202,7 +202,7 @@ describe.each(serversUnderTest)(
             { requestor },
             {
               fetch: resourceOwnerSession.fetch,
-              consentEndpoint: vcService,
+              accessEndpoint: vcService,
             }
           )
         ).resolves.not.toHaveLength(0);
@@ -212,7 +212,7 @@ describe.each(serversUnderTest)(
             { requestor: "https://some.unknown.requestor" },
             {
               fetch: resourceOwnerSession.fetch,
-              consentEndpoint: vcService,
+              accessEndpoint: vcService,
             }
           )
         ).resolves.toHaveLength(0);
@@ -222,13 +222,13 @@ describe.each(serversUnderTest)(
         await expect(
           getAccessGrantAll(SHARED_IMAGE_IRI, undefined, {
             fetch: resourceOwnerSession.fetch,
-            consentEndpoint: vcService,
+            accessEndpoint: vcService,
           })
         ).resolves.not.toHaveLength(0);
         await expect(
           getAccessGrantAll("https://some.unkown.resource", undefined, {
             fetch: resourceOwnerSession.fetch,
-            consentEndpoint: vcService,
+            accessEndpoint: vcService,
           })
         ).resolves.toHaveLength(0);
       });
@@ -243,14 +243,14 @@ describe.each(serversUnderTest)(
         ] = await Promise.all([
           getAccessGrantAll(SHARED_IMAGE_IRI, undefined, {
             fetch: resourceOwnerSession.fetch,
-            consentEndpoint: vcService,
+            accessEndpoint: vcService,
           }),
           getAccessGrantAll(
             SHARED_IMAGE_IRI,
             { purpose: ["https://some.purpose/not-a-nefarious-one/i-promise"] },
             {
               fetch: resourceOwnerSession.fetch,
-              consentEndpoint: vcService,
+              accessEndpoint: vcService,
             }
           ),
           getAccessGrantAll(
@@ -258,7 +258,7 @@ describe.each(serversUnderTest)(
             { purpose: ["https://some.other.purpose/"] },
             {
               fetch: resourceOwnerSession.fetch,
-              consentEndpoint: vcService,
+              accessEndpoint: vcService,
             }
           ),
           getAccessGrantAll(
@@ -271,7 +271,7 @@ describe.each(serversUnderTest)(
             },
             {
               fetch: resourceOwnerSession.fetch,
-              consentEndpoint: vcService,
+              accessEndpoint: vcService,
             }
           ),
           getAccessGrantAll(
@@ -279,7 +279,7 @@ describe.each(serversUnderTest)(
             { purpose: ["https://some.unknown.purpose/"] },
             {
               fetch: resourceOwnerSession.fetch,
-              consentEndpoint: vcService,
+              accessEndpoint: vcService,
             }
           ),
         ]);

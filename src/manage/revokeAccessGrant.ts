@@ -36,7 +36,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
  */
 async function revokeAccessGrant(
   vc: VerifiableCredential | URL | UrlString,
-  options: Omit<AccessBaseOptions, "consentEndpoint"> = {}
+  options: Omit<AccessBaseOptions, "accessEndpoint" | "consentEndpoint"> = {}
 ): Promise<void> {
   const credential = await getBaseAccessGrantVerifiableCredential(vc, options);
 

@@ -37,7 +37,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
 // TODO: Push verification further as this just checks it's a valid VC should we not type check the consent grant?
 async function isValidAccessGrant(
   vc: VerifiableCredential | URL | UrlString,
-  options: Exclude<AccessBaseOptions, "consentEndpoint"> & {
+  options: Exclude<AccessBaseOptions, "accessEndpoint" | "consentEndpoint"> & {
     verificationEndpoint?: UrlString;
   } = {}
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {

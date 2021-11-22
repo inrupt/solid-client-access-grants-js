@@ -79,7 +79,7 @@ describe("isValidAccessGrant", () => {
       verificationMethod: "https://consent.pod.inrupt.com/key/396f686b",
     },
   };
-  const MOCK_CONSENT_ENDPOINT = "https://consent.example.com";
+  const MOCK_ACCESS_ENDPOINT = "https://consent.example.com";
   const MOCK_VERIFY_RESPONSE = { checks: [], warning: [], errors: [] };
 
   it("uses the provided fetch if any", async () => {
@@ -91,7 +91,7 @@ describe("isValidAccessGrant", () => {
     );
     await isValidAccessGrant(MOCK_ACCESS_GRANT, {
       fetch: mockedFetch,
-      verificationEndpoint: MOCK_CONSENT_ENDPOINT,
+      verificationEndpoint: MOCK_ACCESS_ENDPOINT,
     });
 
     expect(mockedFetch).toHaveBeenCalled();
@@ -156,7 +156,7 @@ describe("isValidAccessGrant", () => {
 
     await isValidAccessGrant("https://example.com/someVc", {
       fetch: mockedFetch as typeof fetch,
-      consentEndpoint: MOCK_CONSENT_ENDPOINT,
+      accessEndpoint: MOCK_ACCESS_ENDPOINT,
     });
 
     expect(mockedFetch).toHaveBeenCalledWith("https://example.com/someVc");
@@ -173,7 +173,7 @@ describe("isValidAccessGrant", () => {
     await expect(
       isValidAccessGrant("https://example.com/someVc", {
         fetch: mockedFetch as typeof fetch,
-        consentEndpoint: MOCK_CONSENT_ENDPOINT,
+        accessEndpoint: MOCK_ACCESS_ENDPOINT,
       })
     ).rejects.toThrow(
       "The request to [https://example.com/someVc] returned an unexpected response:"
