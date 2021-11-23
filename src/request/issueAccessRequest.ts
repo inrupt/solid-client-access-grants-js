@@ -18,10 +18,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import {
-  getRequestBody,
-  issueAccessOrConsentVc,
-} from "../util/issueAccessOrConsentVc";
+import { getRequestBody, issueAccessVc } from "../util/issueAccessVc";
 import { GC_CONSENT_STATUS_REQUESTED } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { IssueAccessRequestParameters } from "../type/IssueAccessRequestParameters";
@@ -43,7 +40,7 @@ async function issueAccessRequest(
     status: GC_CONSENT_STATUS_REQUESTED,
   });
 
-  return issueAccessOrConsentVc(params.requestor, accessRequest, options);
+  return issueAccessVc(params.requestor, accessRequest, options);
 }
 
 export default issueAccessRequest;

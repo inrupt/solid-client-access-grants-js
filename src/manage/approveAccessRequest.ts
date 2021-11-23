@@ -19,10 +19,7 @@
 
 import { Access, UrlString, WebId } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import {
-  getGrantBody,
-  issueAccessOrConsentVc,
-} from "../util/issueAccessOrConsentVc";
+import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
@@ -107,7 +104,7 @@ export async function approveAccessRequest(
     expirationDate: internalOptions.expirationDate,
     status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   });
-  return issueAccessOrConsentVc(resourceOwner, requestBody, options);
+  return issueAccessVc(resourceOwner, requestBody, options);
 }
 
 export default approveAccessRequest;
