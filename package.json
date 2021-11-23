@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "rollup --config rollup.config.js",
-    "build-api-docs": "typedoc",
+    "build-api-docs": "rm -rf docs/api/source/api/ && typedoc",
     "build-docs-preview-site": "npm run build-api-docs; cd docs/api; rm source/api/index.md; make html; cd ../; rm -r dist || true; mkdir -p dist/api; cp -r api/build/html/. dist/;",
     "lint": "eslint --max-warnings 0 src",
     "test": "jest src",
