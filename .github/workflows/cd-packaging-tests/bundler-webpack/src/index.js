@@ -1,7 +1,7 @@
 // Verify that imports from the main export work:
-import { requestAccess as mainModuleFn } from "@inrupt/solid-client-access-grants";
+import { issueAccessRequest as mainModuleFn } from "@inrupt/solid-client-access-grants";
 // Verify that submodule imports work:
-import { requestAccess } from "@inrupt/solid-client-access-grants/request";
+import { issueAccessRequest } from "@inrupt/solid-client-access-grants/request";
 
 console.log(typeof mainModuleFn);
-console.log(typeof requestAccess);
+console.log(typeof issueAccessRequest);

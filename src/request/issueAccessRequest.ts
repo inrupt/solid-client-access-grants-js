@@ -24,7 +24,7 @@ import {
 } from "../util/issueAccessOrConsentVc";
 import { GC_CONSENT_STATUS_REQUESTED } from "../constants";
 import type { ConsentApiBaseOptions } from "../type/ConsentApiBaseOptions";
-import type { RequestAccessParameters } from "../type/RequestAccessParameters";
+import type { IssueAccessRequestParameters } from "../type/IssueAccessRequestParameters";
 
 /**
  * Request access to a given Resource.
@@ -34,8 +34,8 @@ import type { RequestAccessParameters } from "../type/RequestAccessParameters";
  * @returns A signed Verifiable Credential representing the access request.
  * @since 0.0.1
  */
-async function requestAccess(
-  params: RequestAccessParameters,
+async function issueAccessRequest(
+  params: IssueAccessRequestParameters,
   options: ConsentApiBaseOptions = {}
 ): Promise<VerifiableCredential> {
   const consentRequest = getRequestBody({
@@ -46,10 +46,23 @@ async function requestAccess(
   return issueAccessOrConsentVc(params.requestor, consentRequest, options);
 }
 
-export { requestAccess };
-export default requestAccess;
+export default issueAccessRequest;
+export { issueAccessRequest };
 export type {
   ConsentApiBaseOptions,
-  RequestAccessParameters,
+  IssueAccessRequestParameters,
   VerifiableCredential,
 };
+
+/**
+ * @hidden Deprecated alias of [[issueAccessRequest]]
+ * @deprecated
+ */
+const requestAccess = issueAccessRequest;
+export { requestAccess };
+
+/**
+ * @hidden Deprecated alias of [[IssueAccessRequestParameters]]
+ * @deprecated
+ */
+export type { IssueAccessRequestParameters as RequestAccessParameters };

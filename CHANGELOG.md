@@ -6,6 +6,13 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### Feature change
+
+- The `requestAccess` and `RequestAccessParameters` have been renamed to
+  `issueAccessRequest` and `IssueAccessRequestParameters` respectively, as we will
+  be deprecating `requestAccessWithConsent` in the near future and merging it with
+  `issueAccessRequest`. The previous names are still exported, but are not documented.
+
 ### Bugfix
 
 - Discovering the verification endpoint was relying on incorrect assumptions, and

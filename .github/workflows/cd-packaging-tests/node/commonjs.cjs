@@ -1,5 +1,3 @@
-const {
-  requestAccess,
-} = require("@inrupt/solid-client-access-grants");
+const { issueAccessRequest } = require("@inrupt/solid-client-access-grants");
 
-console.log(typeof requestAccess);
+console.log(typeof issueAccessRequest);

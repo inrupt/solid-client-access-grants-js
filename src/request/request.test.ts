@@ -24,7 +24,7 @@ import {
   issueVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { requestAccess } from "./requestAccess";
+import { issueAccessRequest, requestAccess } from "./issueAccessRequest";
 import { requestAccessWithConsent } from "./requestAccessWithConsent";
 import { getRequestBody } from "../util/issueAccessOrConsentVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
@@ -125,6 +125,12 @@ describe("getConsentRequestBody", () => {
 });
 
 describe("requestAccess", () => {
+  it("should be an alias of issueAccessRequest", () => {
+    expect(requestAccess).toEqual(issueAccessRequest);
+  });
+});
+
+describe("issueAccessRequest", () => {
   it("sends a proper access request", async () => {
     mockConsentEndpoint();
     const mockedIssue = jest.spyOn(
@@ -139,7 +145,7 @@ describe("requestAccess", () => {
       })
     );
 
-    await requestAccess(
+    await issueAccessRequest(
       {
         access: { read: true },
         requestor: MOCK_REQUESTOR_IRI,
@@ -183,7 +189,7 @@ describe("requestAccess", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
 
-    await requestAccess({
+    await issueAccessRequest({
       access: { read: true },
       requestor: MOCK_REQUESTOR_IRI,
       resourceOwner: MOCK_REQUESTEE_IRI,

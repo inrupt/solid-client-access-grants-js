@@ -23,19 +23,32 @@ import type { access, UrlString, WebId } from "@inrupt/solid-client";
  * Required parameters to request access to one or more Resources.
  *
  * - `requestor`: WebID of the Agent requesting access to the given Resources.
+ * - `requestorInboxUrl`: (Optional.) URL that a consent receipt may be posted to.
  * - `resourceOwner`: WebID of an Agent controlling access to the given Resources.
  * - `access`: Level access to request on the given Resource.
  *             See {@link https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.access.html}.
  * - `resources`: Array of URLs of the Resources to which access is requested.
+ * - `purpose`: (Optional.) URL representing what the requested access will be used for.
+ * - `issuanceDate`: (Optional, set to the current time if left out.) Point in time from which the access should be granted.
+ * - `expirationDate`: (Optional.) Point in time until when the access is needed.
  */
 // TODO: Find out about the overlap with BaseRequestParameters (differs in status and resource owner)
 // TODO: Make requestorInboxUrl optional or align with the design document
 // This parameter if not present should be fetched from the profile according to the design document
 // TODO: Get rid of BaseRequestParameters in favour of this
-export type RequestAccessParameters = {
+export type IssueAccessRequestParameters = {
   access: Partial<access.Access>;
   requestor: WebId;
   requestorInboxUrl?: UrlString;
   resourceOwner: WebId;
   resources: Array<UrlString>;
+  purpose?: Array<UrlString>;
+  issuanceDate?: Date;
+  expirationDate?: Date;
 };
+
+/**
+ * @hidden Alias of [[IssueAccessRequestParameters]]
+ * @deprecated
+ */
+export type RequestAccessParameters = IssueAccessRequestParameters;

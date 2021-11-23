@@ -17,8 +17,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import type { UrlString } from "@inrupt/solid-client";
-import type { RequestAccessParameters } from "./RequestAccessParameters";
+import type { IssueAccessRequestParameters } from "./IssueAccessRequestParameters";
 
 /**
  * Required parameters to request access to one or more Resources.
@@ -34,8 +33,5 @@ import type { RequestAccessParameters } from "./RequestAccessParameters";
  * - `expirationDate`: (Optional.) Point in time until when the access is needed.
  */
 // TODO: Find out about the overlap with BaseConsentParameters
-export type RequestAccessWithConsentParameters = RequestAccessParameters & {
-  purpose: Array<UrlString>;
-  issuanceDate?: Date;
-  expirationDate?: Date;
-};
+export type RequestAccessWithConsentParameters = IssueAccessRequestParameters &
+  Required<Pick<IssueAccessRequestParameters, "purpose">>;

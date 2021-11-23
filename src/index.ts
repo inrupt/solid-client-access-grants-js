@@ -18,10 +18,14 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 export type { ConsentApiBaseOptions } from "./type/ConsentApiBaseOptions";
-export type { RequestAccessParameters } from "./type/RequestAccessParameters";
+export type {
+  IssueAccessRequestParameters,
+  RequestAccessParameters,
+} from "./type/IssueAccessRequestParameters";
 export type { RequestAccessWithConsentParameters } from "./type/RequestAccessWithConsentParameters";
 
 export {
+  issueAccessRequest,
   cancelAccessRequest,
   requestAccess,
   requestAccessWithConsent,

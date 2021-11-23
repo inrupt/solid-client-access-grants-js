@@ -30,6 +30,7 @@ import {
   getConsentApiEndpoint,
   getConsentManagementUi,
   isValidConsentGrant,
+  issueAccessRequest,
   requestAccess,
   requestAccessWithConsent,
   revokeAccess,
@@ -47,6 +48,7 @@ describe("Index exports", () => {
     expect(getConsentApiEndpoint).toBeDefined();
     expect(getConsentManagementUi).toBeDefined();
     expect(isValidConsentGrant).toBeDefined();
+    expect(issueAccessRequest).toBeDefined();
     expect(requestAccess).toBeDefined();
     expect(requestAccessWithConsent).toBeDefined();
     expect(revokeAccess).toBeDefined();

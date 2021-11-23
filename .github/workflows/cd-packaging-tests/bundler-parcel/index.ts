@@ -1,3 +1,3 @@
-import { requestAccess } from "@inrupt/solid-client-access-grants";
+import { issueAccessRequest } from "@inrupt/solid-client-access-grants";
 
-console.log(typeof requestAccess);
+console.log(typeof issueAccessRequest);
