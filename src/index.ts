@@ -68,3 +68,5 @@ export {
   // Deprecated API:
   isValidConsentGrant,
 } from "./verify";
+
+export { fetchWithVC } from "./fetch";

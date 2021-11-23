@@ -72,8 +72,11 @@
       // (i.e. public API's that should be documented) should be listed here:
       "src/index.ts",
       "src/discover/index.ts",
+      "src/fetch/index.ts",
       "src/manage/index.ts",
       "src/request/index.ts",
+      "src/type/FetchOptions.ts",
+      "src/type/UmaConfiguration.ts",
       "src/verify/index.ts",
       "src/type/AccessBaseOptions.ts",
       "src/type/IssueAccessRequestParameters.ts"
