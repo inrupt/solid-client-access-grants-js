@@ -29,7 +29,7 @@ import {
   requestAccess,
   requestAccessWithConsent,
 } from "./issueAccessRequest";
-import { getRequestBody } from "../util/issueAccessOrConsentVc";
+import { getRequestBody } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import {
   mockAccessGrant,

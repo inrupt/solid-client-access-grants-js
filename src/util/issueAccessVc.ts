@@ -202,7 +202,7 @@ export function getGrantBody(
   return grantBody as AccessGrantBody;
 }
 
-export async function issueAccessOrConsentVc(
+export async function issueAccessVc(
   vcSubject: WebId,
   vcBody:
     | BaseRequestBody

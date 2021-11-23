@@ -25,10 +25,7 @@ import {
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
-import {
-  getGrantBody,
-  issueAccessOrConsentVc,
-} from "../util/issueAccessOrConsentVc";
+import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 
@@ -66,7 +63,7 @@ async function denyAccessRequest(
   denialBody.credentialSubject.providedConsent.hasStatus =
     GC_CONSENT_STATUS_DENIED;
 
-  return issueAccessOrConsentVc(resourceOwner, denialBody, options);
+  return issueAccessVc(resourceOwner, denialBody, options);
 }
 
 export { denyAccessRequest };
