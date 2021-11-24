@@ -65,7 +65,7 @@ export function parseUMAAuthIri(header: string): UrlString | null {
 export async function getUmaConfiguration(
   authIri: string
 ): Promise<UmaConfiguration> {
-  const configurationUrl = `${authIri}${UMA_CONFIG_PATH}`;
+  const configurationUrl = new URL(UMA_CONFIG_PATH, authIri).href;
   const response = await crossFetch(configurationUrl);
   return response.json().catch((e) => {
     throw new Error(
