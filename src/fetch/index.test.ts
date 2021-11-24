@@ -29,6 +29,7 @@
 import { jest, describe, it, expect } from "@jest/globals";
 // eslint-disable-next-line no-shadow
 import { fetch as crossFetch, Response } from "cross-fetch";
+import formUrlEncoded from "form-urlencoded";
 
 import {
   parseUMAAuthTicket,
@@ -163,10 +164,10 @@ describe("exchangeTicketForAccessToken", () => {
     expect(mockedFetch).toHaveBeenCalledWith(tokenEndpoint, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: JSON.stringify({
-        claim_token: JSON.stringify(MOCK_VC),
+      body: formUrlEncoded({
+        claim_token: btoa(JSON.stringify({ verifiableCredential: [MOCK_VC] })),
         claim_token_type: "https://www.w3.org/TR/vc-data-model/#json-ld",
         grant_type: "urn:ietf:params:oauth:grant-type:uma-ticket",
         ticket: authTicket,

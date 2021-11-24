@@ -20,6 +20,7 @@
 import { fetch as crossFetch } from "cross-fetch";
 import type { UrlString } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import formurlencoded from "form-urlencoded";
 
 import type { FetchOptions } from "../type/FetchOptions";
 import type { UmaConfiguration } from "../type/UmaConfiguration";
@@ -82,13 +83,16 @@ export async function exchangeTicketForAccessToken(
   accessGrant: VerifiableCredential,
   authTicket: string
 ): Promise<string | null> {
+  const credentialPresentation = {
+    verifiableCredential: [accessGrant],
+  };
   const response = await crossFetch(tokenEndpoint, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: JSON.stringify({
-      claim_token: JSON.stringify(accessGrant),
+    body: formurlencoded({
+      claim_token: btoa(JSON.stringify(credentialPresentation)),
       claim_token_type: VC_CLAIM_TOKEN_TYPE,
       grant_type: UMA_GRANT_TYPE,
       ticket: authTicket,
