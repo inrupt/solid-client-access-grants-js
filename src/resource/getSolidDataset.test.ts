@@ -20,9 +20,6 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 // eslint-disable-next-line no-shadow
 import { it, jest, describe, expect } from "@jest/globals";
-// This function isn't exported by the module yet.
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import { mockAccessRequestVc } from "../manage/approve.mock";
 import { getSolidDataset } from "./getSolidDataset";
