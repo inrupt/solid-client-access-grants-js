@@ -27,6 +27,7 @@
 // This rule complains about the `@jest/globals` variables overriding global vars:
 // eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
+// eslint-disable-next-line no-shadow
 import { fetch as crossFetch, Response } from "cross-fetch";
 
 import {
