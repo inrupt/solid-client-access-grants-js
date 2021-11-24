@@ -76,7 +76,6 @@
     "@inrupt/eslint-config-lib": "^0.2.0-alpha.1",
     "@inrupt/solid-client-authn-browser": "^1.8.1",
     "@inrupt/solid-client-authn-node": "^1.11.2",
-    "@rdfjs/data-model": "^1.3.3",
     "@skypack/package-check": "^0.2.2",
     "@testing-library/testcafe": "^4.4.0",
     "@types/auth-header": "^1.0.2",
