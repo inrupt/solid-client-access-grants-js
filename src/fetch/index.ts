@@ -129,7 +129,7 @@ export async function fetchWithVc(
   accessGrant: VerifiableCredential,
   options: FetchOptions
 ): Promise<typeof fetch> {
-  // Use an authenticated session to fetch the resoruce so that we can parse
+  // Use an authenticated session to fetch the resource so that we can parse
   // its headers to find the UMA endpoint information and ticket
   const response = await options.fetch(resourceIri);
   const { headers } = response;
