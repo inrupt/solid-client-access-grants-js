@@ -19,7 +19,7 @@
 
 import {
   UrlString,
-  getSolidDataset as _getSolidDataset,
+  getSolidDataset as coreGetSolidDataset,
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
@@ -39,13 +39,13 @@ export async function getSolidDataset(
   datasetUrl: UrlString,
   accessGrant: VerifiableCredential,
   options?: { fetch: typeof global.fetch }
-): ReturnType<typeof _getSolidDataset> {
+): ReturnType<typeof coreGetSolidDataset> {
   const sessionFetch = await getSessionFetch(options ?? {});
   const authenticatedFetch = await fetchWithVc(datasetUrl, accessGrant, {
     fetch: sessionFetch,
   });
 
-  return wrapSolidClientFunction(_getSolidDataset, [datasetUrl], {
+  return wrapSolidClientFunction(coreGetSolidDataset, [datasetUrl], {
     ...options,
     fetch: authenticatedFetch,
   });

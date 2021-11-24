@@ -17,7 +17,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { UrlString, getFile as _getFile } from "@inrupt/solid-client";
+import { UrlString, getFile as coreGetFile } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
 import { getSessionFetch } from "../util/getSessionFetch";
@@ -36,13 +36,13 @@ export async function getFile(
   resourceUrl: UrlString,
   accessGrant: VerifiableCredential,
   options?: { fetch: typeof global.fetch }
-): ReturnType<typeof _getFile> {
+): ReturnType<typeof coreGetFile> {
   const sessionFetch = await getSessionFetch(options ?? {});
   const authenticatedFetch = await fetchWithVc(resourceUrl, accessGrant, {
     fetch: sessionFetch,
   });
 
-  return wrapSolidClientFunction(_getFile, [resourceUrl], {
+  return wrapSolidClientFunction(coreGetFile, [resourceUrl], {
     ...options,
     fetch: authenticatedFetch,
   });
