@@ -140,6 +140,18 @@ describe("exchangeTicketForAccessToken", () => {
     );
 
     expect(token).toEqual("some_access_token");
+    expect(crossFetch).toHaveBeenCalledWith(tokenEndpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        claim_token: JSON.stringify(MOCK_VC),
+        claim_token_type: "https://www.w3.org/TR/vc-data-model/#json-ld",
+        grant_type: "urn:ietf:params:oauth:grant-type:uma-ticket",
+        ticket: authTicket,
+      }),
+    });
   });
 
   it("returns null if no body is returned", async () => {
