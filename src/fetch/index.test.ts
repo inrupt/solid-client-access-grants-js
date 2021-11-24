@@ -166,7 +166,7 @@ describe("exchangeTicketForAccessToken", () => {
     const tokenEndpoint = "https://fake.url/token";
     const authTicket = "auth-ticket";
 
-    mockFetch(new Response(JSON.stringify({})));
+    mockFetch(new Response());
 
     const token = await exchangeTicketForAccessToken(
       tokenEndpoint,
