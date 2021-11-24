@@ -35,44 +35,6 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 describe("getFile", () => {
-  it("uses the provided fetch if any", async () => {
-    const mockedFetch = jest.fn() as typeof global.fetch;
-    // TODO: change to mockAccessGrantVc when rebasing
-    await getFile("https://some.resource.url", mockAccessRequestVc(), {
-      fetch: mockedFetch,
-    });
-    expect(fetchWithVc).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      {
-        fetch: mockedFetch,
-      }
-    );
-  });
-
-  it("defaults to the session fetch", async () => {
-    const mockedFetch = jest.fn() as typeof global.fetch;
-    const authnBrowserModule = jest.requireMock(
-      "@inrupt/solid-client-authn-browser"
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ) as any;
-    authnBrowserModule.fetch = mockedFetch;
-    const authnCoreModule = jest.requireMock(
-      "@inrupt/solid-client-authn-core"
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ) as any;
-    authnCoreModule.fetchWithVc = jest.fn();
-    // TODO: change to mockAccessGrantVc when rebasing
-    await getFile("https://some.resource.url", mockAccessRequestVc());
-    expect(fetchWithVc).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      {
-        fetch: mockedFetch,
-      }
-    );
-  });
-
   it("authenticates using the provided VC", async () => {
     const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
     const mockedFile = new Blob();
@@ -80,16 +42,12 @@ describe("getFile", () => {
     // TODO: change to mockAccessGrantVc when rebasing
     const resultFile = await getFile(
       "https://some.resource.url",
-      mockAccessRequestVc(),
-      {
-        fetch: jest.fn(),
-      }
+      mockAccessRequestVc()
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
-      mockAccessRequestVc(),
-      expect.anything()
+      mockAccessRequestVc()
     );
 
     expect(solidClientModule.getFile).toHaveBeenCalledWith(

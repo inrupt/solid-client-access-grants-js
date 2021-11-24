@@ -38,48 +38,6 @@ jest.mock("@inrupt/solid-client", () => {
 const MOCKED_DATASET = mockSolidDatasetFrom("https://some.url");
 
 describe("saveSolidDatasetAt", () => {
-  it("uses the provided fetch if any", async () => {
-    const mockedFetch = jest.fn() as typeof global.fetch;
-    // TODO: change to mockAccessGrantVc when rebasing
-    await saveSolidDatasetAt(
-      "https://some.dataset.url",
-      MOCKED_DATASET,
-      mockAccessRequestVc(),
-      {
-        fetch: mockedFetch,
-      }
-    );
-    expect(fetchWithVc).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      {
-        fetch: mockedFetch,
-      }
-    );
-  });
-
-  it("defaults to the session fetch", async () => {
-    const mockedFetch = jest.fn() as typeof global.fetch;
-    const authnBrowserModule = jest.requireMock(
-      "@inrupt/solid-client-authn-browser"
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ) as any;
-    authnBrowserModule.fetch = mockedFetch;
-    // TODO: change to mockAccessGrantVc when rebasing
-    await saveSolidDatasetAt(
-      "https://some.dataset.url",
-      MOCKED_DATASET,
-      mockAccessRequestVc()
-    );
-    expect(fetchWithVc).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      {
-        fetch: mockedFetch,
-      }
-    );
-  });
-
   it("authenticates using the provided VC", async () => {
     const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
     const mockedDataset = mockSolidDatasetFrom("https://some.url");
@@ -88,15 +46,11 @@ describe("saveSolidDatasetAt", () => {
     const resultDataset = await saveSolidDatasetAt(
       "https://some.dataset.url",
       MOCKED_DATASET,
-      mockAccessRequestVc(),
-      {
-        fetch: jest.fn(),
-      }
+      mockAccessRequestVc()
     );
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
-      mockAccessRequestVc(),
-      expect.anything()
+      mockAccessRequestVc()
     );
     expect(solidClientModule.saveSolidDatasetAt).toHaveBeenCalledWith(
       "https://some.dataset.url",

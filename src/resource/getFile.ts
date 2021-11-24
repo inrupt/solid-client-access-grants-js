@@ -20,7 +20,6 @@
 import { UrlString, getFile as coreGetFile } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
-import { getSessionFetch } from "../util/getSessionFetch";
 import { wrapSolidClientFunction } from "./wrapSolidClientFunction";
 
 /**
@@ -37,10 +36,7 @@ export async function getFile(
   accessGrant: VerifiableCredential,
   options?: { fetch: typeof global.fetch }
 ): ReturnType<typeof coreGetFile> {
-  const sessionFetch = await getSessionFetch(options ?? {});
-  const authenticatedFetch = await fetchWithVc(resourceUrl, accessGrant, {
-    fetch: sessionFetch,
-  });
+  const authenticatedFetch = await fetchWithVc(resourceUrl, accessGrant);
 
   return wrapSolidClientFunction(coreGetFile, [resourceUrl], {
     ...options,

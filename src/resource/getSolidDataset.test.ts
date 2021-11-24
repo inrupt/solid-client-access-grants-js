@@ -36,39 +36,6 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 describe("getSolidDataset", () => {
-  it("uses the provided fetch if any", async () => {
-    const mockedFetch = jest.fn() as typeof global.fetch;
-    // TODO: change to mockAccessGrantVc when rebasing
-    await getSolidDataset("https://some.dataset.url", mockAccessRequestVc(), {
-      fetch: mockedFetch,
-    });
-    expect(fetchWithVc).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      {
-        fetch: mockedFetch,
-      }
-    );
-  });
-
-  it("defaults to the session fetch", async () => {
-    const mockedFetch = jest.fn() as typeof global.fetch;
-    const authnBrowserModule = jest.requireMock(
-      "@inrupt/solid-client-authn-browser"
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ) as any;
-    authnBrowserModule.fetch = mockedFetch;
-    // TODO: change to mockAccessGrantVc when rebasing
-    await getSolidDataset("https://some.dataset.url", mockAccessRequestVc());
-    expect(fetchWithVc).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      {
-        fetch: mockedFetch,
-      }
-    );
-  });
-
   it("authenticates using the provided VC", async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
@@ -77,15 +44,11 @@ describe("getSolidDataset", () => {
     // TODO: change to mockAccessGrantVc when rebasing
     const resultDataset = await getSolidDataset(
       "https://some.dataset.url",
-      mockAccessRequestVc(),
-      {
-        fetch: jest.fn(),
-      }
+      mockAccessRequestVc()
     );
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
-      mockAccessRequestVc(),
-      expect.anything()
+      mockAccessRequestVc()
     );
     expect(solidClientModule.getSolidDataset).toHaveBeenCalledWith(
       "https://some.dataset.url",

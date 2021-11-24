@@ -252,11 +252,9 @@ describe("fetchWithVc", () => {
 
     mockFetch(new Response());
 
-    await expect(
-      fetchWithVc(resourceIri, MOCK_VC, {
-        fetch: crossFetch,
-      })
-    ).rejects.toThrow("No www-authentication header found");
+    await expect(fetchWithVc(resourceIri, MOCK_VC)).rejects.toThrow(
+      "No www-authentication header found"
+    );
   });
 
   it("throws an error if www-authentication header does not contain a ticket", async () => {
@@ -270,11 +268,9 @@ describe("fetchWithVc", () => {
       })
     );
 
-    await expect(
-      fetchWithVc(resourceIri, MOCK_VC, {
-        fetch: crossFetch,
-      })
-    ).rejects.toThrow('did not include "ticket"');
+    await expect(fetchWithVc(resourceIri, MOCK_VC)).rejects.toThrow(
+      'did not include "ticket"'
+    );
   });
 
   it("throws an error if www-authentication header does not contain an uma endpoint iri", async () => {
@@ -288,11 +284,9 @@ describe("fetchWithVc", () => {
       })
     );
 
-    await expect(
-      fetchWithVc(resourceIri, MOCK_VC, {
-        fetch: crossFetch,
-      })
-    ).rejects.toThrow('did not include "as_uri"');
+    await expect(fetchWithVc(resourceIri, MOCK_VC)).rejects.toThrow(
+      'did not include "as_uri"'
+    );
   });
 
   it("gets uma configuration from the iri in the auth header", async () => {
@@ -326,9 +320,7 @@ describe("fetchWithVc", () => {
         )
       );
 
-    await fetchWithVc(resourceIri, MOCK_VC, {
-      fetch: crossFetch,
-    });
+    await fetchWithVc(resourceIri, MOCK_VC);
 
     expect(crossFetch).toHaveBeenCalledWith(
       "https://fake.url/.well-known/uma2-configuration"
@@ -360,10 +352,8 @@ describe("fetchWithVc", () => {
       // third request is for the token. Note that the token is missing here.
       .mockResolvedValueOnce(new Response(JSON.stringify({})));
 
-    await expect(
-      fetchWithVc(resourceIri, MOCK_VC, {
-        fetch: crossFetch,
-      })
-    ).rejects.toThrow("No access token was returned");
+    await expect(fetchWithVc(resourceIri, MOCK_VC)).rejects.toThrow(
+      "No access token was returned"
+    );
   });
 });

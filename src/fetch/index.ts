@@ -22,7 +22,6 @@ import type { UrlString } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import formurlencoded from "form-urlencoded";
 
-import type { FetchOptions } from "../type/FetchOptions";
 import type { UmaConfiguration } from "../type/UmaConfiguration";
 
 const WWW_AUTH_HEADER = "www-authenticate";
@@ -130,11 +129,7 @@ export async function fetchWithVc(
   // Why UrlString instead of UrlString | Url? Because Urls aren't compatible
   // with the fetch return type.
   resourceIri: UrlString,
-  accessGrant: VerifiableCredential,
-  // Currently, the authenticated fetch isn't used, but it could be required
-  // to provide an ID token along the VC in the future.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _options: FetchOptions
+  accessGrant: VerifiableCredential
 ): Promise<typeof fetch> {
   // Use an authenticated session to fetch the resource so that we can parse
   // its headers to find the UMA endpoint information and ticket

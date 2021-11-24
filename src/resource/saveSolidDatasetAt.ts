@@ -24,7 +24,6 @@ import {
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
-import { getSessionFetch } from "../util/getSessionFetch";
 import { wrapSolidClientFunction } from "./wrapSolidClientFunction";
 
 /**
@@ -42,10 +41,7 @@ export async function saveSolidDatasetAt(
   accessGrant: VerifiableCredential,
   options?: { fetch: typeof global.fetch }
 ): ReturnType<typeof coreSaveSolidDatasetAt> {
-  const sessionFetch = await getSessionFetch(options ?? {});
-  const authenticatedFetch = await fetchWithVc(datasetUrl, accessGrant, {
-    fetch: sessionFetch,
-  });
+  const authenticatedFetch = await fetchWithVc(datasetUrl, accessGrant);
 
   return wrapSolidClientFunction(
     coreSaveSolidDatasetAt,
