@@ -67,7 +67,11 @@ export async function getUmaConfiguration(
 ): Promise<UmaConfiguration> {
   const configurationUrl = `${authIri}${UMA_CONFIG_PATH}`;
   const response = await crossFetch(configurationUrl);
-  return response.json();
+  return response.json().catch((e) => {
+    throw new Error(
+      `Parsing the UMA configuration found at ${configurationUrl} failed with the following error: ${e.toString()}`
+    );
+  });
 }
 
 /**

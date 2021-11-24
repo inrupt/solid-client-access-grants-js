@@ -126,6 +126,17 @@ describe("getUmaConfiguration", () => {
     await getUmaConfiguration(iri);
     expect(mockedFetch).toHaveBeenCalledWith(expectedIri);
   });
+
+  it("throws if parsing the response as JSON fails", async () => {
+    const iri = "https://fake.url";
+    const expectedIri = "https://fake.url/.well-known/uma2-configuration";
+
+    mockFetch(new Response("Not a JSON document."));
+
+    await expect(getUmaConfiguration(iri)).rejects.toThrow(
+      `Parsing the UMA configuration found at ${expectedIri} failed`
+    );
+  });
 });
 
 describe("exchangeTicketForAccessToken", () => {
