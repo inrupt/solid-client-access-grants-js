@@ -27,7 +27,7 @@
 // This rule complains about the `@jest/globals` variables overriding global vars:
 // eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
-import { fetch as crossFetch } from "cross-fetch";
+import { fetch as crossFetch, Response } from "cross-fetch";
 
 import {
   parseUMAAuthTicket,
@@ -38,7 +38,13 @@ import {
   fetchWithVc,
 } from "./index";
 
-jest.mock("cross-fetch");
+jest.mock("cross-fetch", () => {
+  const crossFetchModule = jest.requireActual("cross-fetch") as any;
+  return {
+    ...crossFetchModule,
+    fetch: jest.fn(),
+  };
+});
 
 const MOCK_VC = {
   "@context": [
@@ -67,6 +73,12 @@ const MOCK_VC = {
     type: "Ed25519Signature2020",
     verificationMethod: "https://consent.pod.inrupt.com/key/396f686b",
   },
+};
+
+const mockFetch = (response: Response) => {
+  return (
+    crossFetch as jest.MockedFunction<typeof crossFetch>
+  ).mockResolvedValueOnce(response);
 };
 
 describe("parseUMAAuthTicket", () => {
@@ -109,14 +121,10 @@ describe("getUmaConfiguration", () => {
     const iri = "https://fake.url";
     const expectedIri = "https://fake.url/.well-known/uma2-configuration";
 
-    (
-      crossFetch as jest.MockedFunction<typeof crossFetch>
-    ).mockResolvedValueOnce({
-      json: jest.fn(),
-    } as any);
+    const mockedFetch = mockFetch(new Response(JSON.stringify({})));
 
     await getUmaConfiguration(iri);
-    expect(crossFetch).toHaveBeenCalledWith(expectedIri);
+    expect(mockedFetch).toHaveBeenCalledWith(expectedIri);
   });
 });
 
@@ -125,13 +133,13 @@ describe("exchangeTicketForAccessToken", () => {
     const tokenEndpoint = "https://fake.url/token";
     const authTicket = "auth-ticket";
 
-    (
-      crossFetch as jest.MockedFunction<typeof crossFetch>
-    ).mockResolvedValueOnce({
-      json: jest.fn().mockReturnValueOnce({
-        access_token: "some_access_token",
-      }),
-    } as any);
+    const mockedFetch = mockFetch(
+      new Response(
+        JSON.stringify({
+          access_token: "some_access_token",
+        })
+      )
+    );
 
     const token = await exchangeTicketForAccessToken(
       tokenEndpoint,
@@ -140,7 +148,7 @@ describe("exchangeTicketForAccessToken", () => {
     );
 
     expect(token).toEqual("some_access_token");
-    expect(crossFetch).toHaveBeenCalledWith(tokenEndpoint, {
+    expect(mockedFetch).toHaveBeenCalledWith(tokenEndpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -158,11 +166,7 @@ describe("exchangeTicketForAccessToken", () => {
     const tokenEndpoint = "https://fake.url/token";
     const authTicket = "auth-ticket";
 
-    (
-      crossFetch as jest.MockedFunction<typeof crossFetch>
-    ).mockResolvedValueOnce({
-      json: jest.fn().mockReturnValueOnce(null),
-    } as any);
+    mockFetch(new Response(JSON.stringify({})));
 
     const token = await exchangeTicketForAccessToken(
       tokenEndpoint,
@@ -177,11 +181,7 @@ describe("exchangeTicketForAccessToken", () => {
     const tokenEndpoint = "https://fake.url/token";
     const authTicket = "auth-ticket";
 
-    (
-      crossFetch as jest.MockedFunction<typeof crossFetch>
-    ).mockResolvedValueOnce({
-      json: jest.fn().mockReturnValueOnce({}),
-    } as any);
+    mockFetch(new Response(JSON.stringify({})));
 
     const token = await exchangeTicketForAccessToken(
       tokenEndpoint,
@@ -198,15 +198,11 @@ describe("boundFetch", () => {
     const accessToken = "access-token";
     const fetchFn = boundFetch(accessToken);
 
-    (
-      crossFetch as jest.MockedFunction<typeof crossFetch>
-    ).mockResolvedValueOnce({
-      json: jest.fn().mockReturnValueOnce({}),
-    } as any);
+    const mockedFetch = mockFetch(new Response(JSON.stringify({})));
 
     await fetchFn("https://fake.url");
 
-    expect(crossFetch).toHaveBeenCalledWith("https://fake.url", {
+    expect(mockedFetch).toHaveBeenCalledWith("https://fake.url", {
       headers: {
         authorization: `Bearer ${accessToken}`,
       },
@@ -217,11 +213,7 @@ describe("boundFetch", () => {
     const accessToken = "access-token";
     const fetchFn = boundFetch(accessToken);
 
-    (
-      crossFetch as jest.MockedFunction<typeof crossFetch>
-    ).mockResolvedValueOnce({
-      json: jest.fn().mockReturnValueOnce({}),
-    } as any);
+    const mockedFetch = mockFetch(new Response(JSON.stringify({})));
 
     await fetchFn("https://fake.url", {
       method: "POST",
@@ -230,7 +222,7 @@ describe("boundFetch", () => {
       },
     });
 
-    expect(crossFetch).toHaveBeenCalledWith("https://fake.url", {
+    expect(mockedFetch).toHaveBeenCalledWith("https://fake.url", {
       method: "POST",
       headers: {
         authorization: `Bearer ${accessToken}`,
@@ -245,13 +237,7 @@ describe("fetchWithVc", () => {
   it("throws an error if no www-authentication header is found", async () => {
     const resourceIri = "https://fake.url/some-resource";
 
-    (
-      crossFetch as jest.MockedFunction<typeof crossFetch>
-    ).mockResolvedValueOnce({
-      headers: {
-        get: jest.fn().mockReturnValueOnce(null),
-      },
-    } as any);
+    mockFetch(new Response());
 
     await expect(
       fetchWithVc(resourceIri, MOCK_VC, {
@@ -262,15 +248,14 @@ describe("fetchWithVc", () => {
 
   it("throws an error if www-authentication header does not contain a ticket", async () => {
     const resourceIri = "https://fake.url/some-resource";
-    const mockHeader = 'UMA realm="test" as_uri="https://fake.url"';
 
-    (
-      crossFetch as jest.MockedFunction<typeof crossFetch>
-    ).mockResolvedValueOnce({
-      headers: {
-        get: jest.fn().mockReturnValueOnce(mockHeader),
-      },
-    } as any);
+    mockFetch(
+      new Response(undefined, {
+        headers: {
+          "WWW-Authenticate": 'UMA realm="test" as_uri="https://fake.url"',
+        },
+      })
+    );
 
     await expect(
       fetchWithVc(resourceIri, MOCK_VC, {
@@ -281,15 +266,14 @@ describe("fetchWithVc", () => {
 
   it("throws an error if www-authentication header does not contain an uma endpoint iri", async () => {
     const resourceIri = "https://fake.url/some-resource";
-    const mockHeader = 'UMA realm="test" ticket="some_value"';
 
-    (
-      crossFetch as jest.MockedFunction<typeof crossFetch>
-    ).mockResolvedValueOnce({
-      headers: {
-        get: jest.fn().mockReturnValueOnce(mockHeader),
-      },
-    } as any);
+    mockFetch(
+      new Response(undefined, {
+        headers: {
+          "WWW-Authenticate": 'UMA realm="test" ticket="some_value"',
+        },
+      })
+    );
 
     await expect(
       fetchWithVc(resourceIri, MOCK_VC, {
@@ -304,24 +288,30 @@ describe("fetchWithVc", () => {
       'UMA realm="test" as_uri="https://fake.url" ticket="some_value"';
 
     (crossFetch as jest.MockedFunction<typeof crossFetch>)
-      .mockResolvedValueOnce({
-        // first request is for headers
-        headers: {
-          get: jest.fn().mockReturnValueOnce(mockHeader),
-        },
-      } as any)
-      .mockResolvedValueOnce({
-        // second request is for config
-        json: jest.fn().mockReturnValueOnce({
-          token_endpoint: "https://fake.url/token-endpoint",
-        }),
-      } as any)
-      .mockResolvedValueOnce({
-        // third request is for the token
-        json: jest.fn().mockReturnValueOnce({
-          access_token: "access-token",
-        }),
-      } as any);
+      // first request is for headers
+      .mockResolvedValueOnce(
+        new Response(undefined, {
+          headers: {
+            "WWW-Authenticate": mockHeader,
+          },
+        })
+      )
+      // second request is for config
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            token_endpoint: "https://fake.url/token-endpoint",
+          })
+        )
+      )
+      // third request is for the token
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            access_token: "access-token",
+          })
+        )
+      );
 
     await fetchWithVc(resourceIri, MOCK_VC, {
       fetch: crossFetch,
@@ -338,22 +328,24 @@ describe("fetchWithVc", () => {
       'UMA realm="test" as_uri="https://fake.url" ticket="some_value"';
 
     (crossFetch as jest.MockedFunction<typeof crossFetch>)
-      .mockResolvedValueOnce({
-        // first request is for headers
-        headers: {
-          get: jest.fn().mockReturnValueOnce(mockHeader),
-        },
-      } as any)
-      .mockResolvedValueOnce({
-        // second request is for config
-        json: jest.fn().mockReturnValueOnce({
-          token_endpoint: "https://fake.url/token-endpoint",
-        }),
-      } as any)
-      .mockResolvedValueOnce({
-        // third request is for the token
-        json: jest.fn().mockReturnValueOnce({}),
-      } as any);
+      // first request is for headers
+      .mockResolvedValueOnce(
+        new Response(undefined, {
+          headers: {
+            "WWW-Authenticate": mockHeader,
+          },
+        })
+      )
+      // second request is for config
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            token_endpoint: "https://fake.url/token-endpoint",
+          })
+        )
+      )
+      // third request is for the token. Note that the token is missing here.
+      .mockResolvedValueOnce(new Response(JSON.stringify({})));
 
     await expect(
       fetchWithVc(resourceIri, MOCK_VC, {
