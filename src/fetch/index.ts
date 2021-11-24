@@ -127,11 +127,14 @@ export async function fetchWithVc(
   // with the fetch return type.
   resourceIri: UrlString,
   accessGrant: VerifiableCredential,
-  options: FetchOptions
+  // Currently, the authenticated fetch isn't used, but it could be required
+  // to provide an ID token along the VC in the future.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _options: FetchOptions
 ): Promise<typeof fetch> {
   // Use an authenticated session to fetch the resource so that we can parse
   // its headers to find the UMA endpoint information and ticket
-  const response = await options.fetch(resourceIri);
+  const response = await crossFetch(resourceIri);
   const { headers } = response;
 
   const wwwAuthentication = headers.get(WWW_AUTH_HEADER);
