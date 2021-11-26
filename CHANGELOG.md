@@ -35,6 +35,14 @@ Other changes:
 - Fix typo in error message thrown from `getBaseAccessVerifiableCredential`
 - Reduce iterations needed for calculating consent guards (minor performance gain)
 
+### New Feature
+
+- `getSolidDataset`, `getFile`, and `saveSolidDatasetAt` have been implemented as
+  wrappers around their solid-client function calls. These take an access grant
+  and use it to authenticate against a resource. `fetchWithVc` is a generic
+  function that uses an access grant and returns a pre-authenticated `fetch`
+  method.
+
 ### Bugfix
 
 - Discovering the verification endpoint was relying on incorrect assumptions, and
@@ -100,6 +108,8 @@ The following changes have been released:
 
 - `getAccessWithConsent` looks up an access grant from its IRI, and performs some
   validation on it.
+- `getSolidDataset` fetches a dataset from a Solid Pod, using an Acces Grant to
+  prove the caller is entitled to access to the target resource.
 - `getAccessWithConsentAll` enables retrieving all consent grants issued over a
   specific resource.
 - `redirectToConsentManagementUi` enables discovering a user's preferred consent

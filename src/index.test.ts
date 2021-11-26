@@ -33,6 +33,10 @@ import {
   issueAccessRequest,
   redirectToAccessManagementUi,
   revokeAccessGrant,
+  fetchWithVc,
+  getFile,
+  getSolidDataset,
+  saveSolidDatasetAt,
   // Deprecated APIs:
   getConsentApiEndpoint,
   getConsentManagementUi,
@@ -59,7 +63,10 @@ describe("Index exports", () => {
     expect(issueAccessRequest).toBeDefined();
     expect(redirectToAccessManagementUi).toBeDefined();
     expect(revokeAccessGrant).toBeDefined();
-
+    expect(fetchWithVc).toBeDefined();
+    expect(getFile).toBeDefined();
+    expect(getSolidDataset).toBeDefined();
+    expect(saveSolidDatasetAt).toBeDefined();
     // Deprecated APIs:
     expect(getConsentApiEndpoint).toBeDefined();
     expect(getConsentManagementUi).toBeDefined();

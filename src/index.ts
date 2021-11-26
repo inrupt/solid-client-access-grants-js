@@ -68,3 +68,7 @@ export {
   // Deprecated API:
   isValidConsentGrant,
 } from "./verify";
+
+export { fetchWithVc } from "./fetch";
+
+export { getSolidDataset, getFile, saveSolidDatasetAt } from "./resource";

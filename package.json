@@ -35,7 +35,9 @@
     "./discover": "./dist/discover/index.mjs",
     "./manage": "./dist/manage/index.mjs",
     "./request": "./dist/request/index.mjs",
-    "./verify": "./dist/verify/index.mjs"
+    "./verify": "./dist/verify/index.mjs",
+    "./resource": "./dist/resource/index.mjs",
+    "./fetch": "./dist/resource/index.mjs"
   },
   "typesVersions": {
     "*": {
@@ -50,6 +52,12 @@
       ],
       "verify": [
         "dist/verify/index.d.ts"
+      ],
+      "resource": [
+        "dist/resource/index.d.ts"
+      ],
+      "fetch": [
+        "dist/fetch/index.d.ts"
       ]
     }
   },
@@ -101,7 +109,8 @@
   },
   "dependencies": {
     "@inrupt/solid-client": "^1.14.0",
-    "@inrupt/solid-client-vc": "^0.2.1",
+    "@inrupt/solid-client-authn-core": "^1.11.2",
+    "@inrupt/solid-client-vc": "^0.2.2",
     "auth-header": "^1.0.0",
     "cross-fetch": "^3.1.4",
     "events": "^3.3.0",
