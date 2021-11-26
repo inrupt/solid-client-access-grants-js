@@ -6,6 +6,10 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+The following changes have been released:
+
+## [0.4.0] - 2021-11-26
+
 ### Feature change
 
 Rename APIs to remove the connotations that "consent" could imply. All previous
@@ -48,8 +52,6 @@ Other changes:
 - Discovering the verification endpoint was relying on incorrect assumptions, and
   failed when calling `isValidConsentGrant`.
 - Specifying an inbox when requesting/granting access is no longer mandatory.
-
-The following changes have been released:
 
 ## [0.3.2] - 2021-10-29
 
