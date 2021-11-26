@@ -29,7 +29,6 @@
 import { jest, describe, it, expect } from "@jest/globals";
 // eslint-disable-next-line no-shadow
 import { fetch as crossFetch, Response } from "cross-fetch";
-import formUrlEncoded from "form-urlencoded";
 
 import {
   parseUMAAuthTicket,
@@ -167,12 +166,12 @@ describe("exchangeTicketForAccessToken", () => {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: formUrlEncoded({
-        claim_token: btoa(JSON.stringify({ verifiableCredential: [MOCK_VC] })),
-        claim_token_type: "https://www.w3.org/TR/vc-data-model/#json-ld",
-        grant_type: "urn:ietf:params:oauth:grant-type:uma-ticket",
-        ticket: authTicket,
-      }),
+      // The body should be the following data as a form_urlencoded:
+      // claim_token: btoa(JSON.stringify({ verifiableCredential: [MOCK_VC] })),
+      // claim_token_type: "https://www.w3.org/TR/vc-data-model/#json-ld",
+      // grant_type: "urn:ietf:params:oauth:grant-type:uma-ticket",
+      // ticket: authTicket,
+      body: "claim_token=eyJ2ZXJpZmlhYmxlQ3JlZGVudGlhbCI6W3siQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL2NvbnNlbnQucG9kLmlucnVwdC5jb20vY3JlZGVudGlhbHMvdjEiXSwiaWQiOiJodHRwczovL2V4YW1wbGUuY29tL2lkIiwiaXNzdWVyIjoiaHR0cHM6Ly9leGFtcGxlLmNvbS9pc3N1ZXIiLCJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiU29saWRDcmVkZW50aWFsIiwiU29saWRBY2Nlc3NHcmFudCJdLCJpc3N1YW5jZURhdGUiOiIyMDIxLTA1LTI2VDE2OjQwOjAzIiwiZXhwaXJhdGlvbkRhdGUiOiIyMDIxLTA2LTA5VDE2OjQwOjAzIiwiY3JlZGVudGlhbFN1YmplY3QiOnsiaWQiOiJodHRwczovL3BvZC5pbnJ1cHQuY29tL2FsaWNlL3Byb2ZpbGUvY2FyZCNtZSIsInByb3ZpZGVkQ29uc2VudCI6eyJtb2RlIjpbImh0dHA6Ly93d3cudzMub3JnL25zL2F1dGgvYWNsI1JlYWQiXSwiaGFzU3RhdHVzIjoiQ29uc2VudFN0YXR1c0V4cGxpY2l0bHlHaXZlbiIsImZvclBlcnNvbmFsRGF0YSI6Imh0dHBzOi8vcG9kLmlucnVwdC5jb20vYWxpY2UvcHJpdmF0ZS9kYXRhIiwiZm9yUHVycG9zZSI6Imh0dHBzOi8vZXhhbXBsZS5jb20vU29tZVNwZWNpZmljUHVycG9zZSIsImlzUHJvdmlkZWRUb1BlcnNvbiI6Imh0dHBzOi8vcG9kLmlucnVwdC5jb20vYm9iL3Byb2ZpbGUvY2FyZCNtZSJ9fSwicHJvb2YiOnsiY3JlYXRlZCI6IjIwMjEtMDUtMjZUMTY6NDA6MDMuMDA5WiIsInByb29mUHVycG9zZSI6ImFzc2VydGlvbk1ldGhvZCIsInByb29mVmFsdWUiOiJlcXA4aF9rTDFEd0pDcG42NXotZDFBcm55c3g2YjExLi4uamI4ajBNeFVDYzF1RFEiLCJ0eXBlIjoiRWQyNTUxOVNpZ25hdHVyZTIwMjAiLCJ2ZXJpZmljYXRpb25NZXRob2QiOiJodHRwczovL2NvbnNlbnQucG9kLmlucnVwdC5jb20va2V5LzM5NmY2ODZiIn19XX0%3D&claim_token_type=https%3A%2F%2Fwww.w3.org%2FTR%2Fvc-data-model%2F%23json-ld&grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Auma-ticket&ticket=auth-ticket",
     });
   });
 
