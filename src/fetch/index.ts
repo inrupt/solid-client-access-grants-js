@@ -20,7 +20,6 @@
 import { fetch as crossFetch } from "cross-fetch";
 import type { UrlString } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import formurlencoded from "form-urlencoded";
 
 import type { UmaConfiguration } from "../type/UmaConfiguration";
 import type { FetchOptions } from "../type/FetchOptions";
@@ -76,6 +75,18 @@ export async function getUmaConfiguration(
 }
 
 /**
+ * @hidden
+ */
+function simpleFormUrlEncoded(form: Record<string, string>): string {
+  return Object.keys(form)
+    .reduce((encoded, key) => {
+      encoded.push(`${key}=${encodeURIComponent(form[key])}`);
+      return encoded;
+    }, new Array<string>())
+    .join("&");
+}
+
+/**
  * @hidden This is just an internal utility function to exchange a VC and ticket for an auth token.
  */
 export async function exchangeTicketForAccessToken(
@@ -92,7 +103,7 @@ export async function exchangeTicketForAccessToken(
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: formurlencoded({
+    body: simpleFormUrlEncoded({
       claim_token: btoa(JSON.stringify(credentialPresentation)),
       claim_token_type: VC_CLAIM_TOKEN_TYPE,
       grant_type: UMA_GRANT_TYPE,

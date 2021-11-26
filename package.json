@@ -94,6 +94,7 @@
     "eslint-plugin-license-header": "^0.2.0",
     "eslint-plugin-prettier": "^3.4.0",
     "fast-check": "^2.17.0",
+    "form-urlencoded": "^6.0.5",
     "husky": "^6.0.0",
     "jest": "^27.0.6",
     "license-checker": "^25.0.1",
@@ -114,7 +115,6 @@
     "auth-header": "^1.0.0",
     "cross-fetch": "^3.1.4",
     "events": "^3.3.0",
-    "form-urlencoded": "^6.0.5",
     "parse-link-header": "^1.0.1",
     "rdf-namespaces": "^1.9.2"
   },
