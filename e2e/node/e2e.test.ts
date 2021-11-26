@@ -26,7 +26,7 @@ import {
   isValidAccessGrant,
   issueAccessRequest,
   revokeAccessGrant,
-  fetchWithVC,
+  getFile,
 } from "../../src/index";
 import { Session } from "@inrupt/solid-client-authn-node";
 import {
@@ -82,7 +82,7 @@ const SHARED_FILE_IRI =
   "https://storage.dev-next.inrupt.com/eb2f327b-7bb4-4ba2-9b4b-678a4d7e3551/somefile.txt";
 
 // This is the content of the file uploaded manually at SHARED_FILE_IRI.
-const SHARED_FILE_CONTENT = "Some content.";
+const SHARED_FILE_CONTENT = "Some content.\n";
 
 describe.each(serversUnderTest)(
   "Access grant client end-to-end tests authenticated to [%s], issuing from [%s] for [%s]",
@@ -121,6 +121,9 @@ describe.each(serversUnderTest)(
           oidcIssuer,
           clientId: requestorClientId,
           clientSecret: requestorClientSecret,
+          // Note that currently, using a Bearer token (as opposed to a DPoP one)
+          // is required for the UMA access token to be usable.
+          tokenType: "Bearer",
         });
         await resourceOwnerSession.login({
           oidcIssuer,
@@ -193,11 +196,10 @@ describe.each(serversUnderTest)(
         // environment-agnostic.
         global.btoa = (str: string) => Buffer.from(str).toString("base64");
 
-        const authenticatedFetch = await fetchWithVC(SHARED_FILE_IRI, grant);
-        const sharedFile = await (
-          await authenticatedFetch(SHARED_FILE_IRI)
-        ).text();
-        expect(sharedFile).toBe(SHARED_FILE_CONTENT);
+        const sharedFile = await getFile(SHARED_FILE_IRI, grant, {
+          fetch: requestorSession.fetch,
+        });
+        await expect(sharedFile.text()).resolves.toBe(SHARED_FILE_CONTENT);
 
         await revokeAccessGrant(grant, {
           fetch: resourceOwnerSession.fetch,
