@@ -69,6 +69,6 @@ export {
   isValidConsentGrant,
 } from "./verify";
 
-export { fetchWithVC } from "./fetch";
+export { fetchWithVc } from "./fetch";
 
 export { getSolidDataset, getFile, saveSolidDatasetAt } from "./resource";
