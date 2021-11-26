@@ -157,7 +157,8 @@ describe("exchangeTicketForAccessToken", () => {
     const token = await exchangeTicketForAccessToken(
       tokenEndpoint,
       MOCK_VC,
-      authTicket
+      authTicket,
+      mockedFetch
     );
 
     expect(token).toEqual("some_access_token");
@@ -179,12 +180,13 @@ describe("exchangeTicketForAccessToken", () => {
     const tokenEndpoint = "https://fake.url/token";
     const authTicket = "auth-ticket";
 
-    mockFetch(new Response());
+    const mockedFetch = mockFetch(new Response());
 
     const token = await exchangeTicketForAccessToken(
       tokenEndpoint,
       MOCK_VC,
-      authTicket
+      authTicket,
+      mockedFetch
     );
 
     expect(token).toBeNull();
@@ -194,12 +196,13 @@ describe("exchangeTicketForAccessToken", () => {
     const tokenEndpoint = "https://fake.url/token";
     const authTicket = "auth-ticket";
 
-    mockFetch(new Response(JSON.stringify({})));
+    const mockedFetch = mockFetch(new Response(JSON.stringify({})));
 
     const token = await exchangeTicketForAccessToken(
       tokenEndpoint,
       MOCK_VC,
-      authTicket
+      authTicket,
+      mockedFetch
     );
 
     expect(token).toBeNull();
@@ -355,5 +358,43 @@ describe("fetchWithVc", () => {
     await expect(fetchWithVc(resourceIri, MOCK_VC)).rejects.toThrow(
       "No access token was returned"
     );
+  });
+
+  it("uses the provided fetch (if any) for the token request", async () => {
+    const resourceIri = "https://fake.url/some-resource";
+    const mockHeader =
+      'UMA realm="test" as_uri="https://fake.url" ticket="some_value"';
+    // Cross-fetch is necessarily called for unauthenticated calls.
+    (crossFetch as jest.MockedFunction<typeof crossFetch>)
+      // first request is for headers
+      .mockResolvedValueOnce(
+        new Response(undefined, {
+          headers: {
+            "WWW-Authenticate": mockHeader,
+          },
+        })
+      )
+      // second request is for config
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            token_endpoint: "https://fake.url/token-endpoint",
+          })
+        )
+      );
+    const mockedFetch = jest
+      .fn(global.fetch)
+      // third request is for the token
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            access_token: "access-token",
+          })
+        )
+      );
+
+    await fetchWithVc(resourceIri, MOCK_VC, { fetch: mockedFetch });
+
+    expect(mockedFetch).toHaveBeenCalled();
   });
 });

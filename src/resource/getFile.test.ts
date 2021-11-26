@@ -39,15 +39,18 @@ describe("getFile", () => {
     const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
     const mockedFile = new Blob();
     solidClientModule.getFile.mockResolvedValueOnce(mockedFile);
+    const mockedFetch = jest.fn() as typeof fetch;
     // TODO: change to mockAccessGrantVc when rebasing
     const resultFile = await getFile(
       "https://some.resource.url",
-      mockAccessRequestVc()
+      mockAccessRequestVc(),
+      { fetch: mockedFetch }
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
-      mockAccessRequestVc()
+      mockAccessRequestVc(),
+      { fetch: mockedFetch }
     );
 
     expect(solidClientModule.getFile).toHaveBeenCalledWith(

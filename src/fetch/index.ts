@@ -23,6 +23,7 @@ import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import formurlencoded from "form-urlencoded";
 
 import type { UmaConfiguration } from "../type/UmaConfiguration";
+import type { FetchOptions } from "../type/FetchOptions";
 
 const WWW_AUTH_HEADER = "www-authenticate";
 const VC_CLAIM_TOKEN_TYPE = "https://www.w3.org/TR/vc-data-model/#json-ld";
@@ -80,12 +81,13 @@ export async function getUmaConfiguration(
 export async function exchangeTicketForAccessToken(
   tokenEndpoint: UrlString,
   accessGrant: VerifiableCredential,
-  authTicket: string
+  authTicket: string,
+  authFetch: typeof fetch
 ): Promise<string | null> {
   const credentialPresentation = {
     verifiableCredential: [accessGrant],
   };
-  const response = await crossFetch(tokenEndpoint, {
+  const response = await authFetch(tokenEndpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
@@ -129,7 +131,8 @@ export async function fetchWithVc(
   // Why UrlString instead of UrlString | Url? Because Urls aren't compatible
   // with the fetch return type.
   resourceIri: UrlString,
-  accessGrant: VerifiableCredential
+  accessGrant: VerifiableCredential,
+  options?: FetchOptions
 ): Promise<typeof fetch> {
   // Use an authenticated session to fetch the resource so that we can parse
   // its headers to find the UMA endpoint information and ticket
@@ -159,7 +162,8 @@ export async function fetchWithVc(
   const accessToken = await exchangeTicketForAccessToken(
     tokenEndpoint,
     accessGrant,
-    authTicket
+    authTicket,
+    options?.fetch ?? crossFetch
   );
 
   if (!accessToken) {

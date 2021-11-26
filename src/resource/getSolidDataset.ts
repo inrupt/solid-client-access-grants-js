@@ -23,6 +23,7 @@ import {
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
+import { FetchOptions } from "../type/FetchOptions";
 import { wrapSolidClientFunction } from "./wrapSolidClientFunction";
 
 /**
@@ -37,9 +38,13 @@ import { wrapSolidClientFunction } from "./wrapSolidClientFunction";
 export async function getSolidDataset(
   datasetUrl: UrlString,
   accessGrant: VerifiableCredential,
-  options?: { fetch: typeof global.fetch }
+  options?: FetchOptions
 ): ReturnType<typeof coreGetSolidDataset> {
-  const authenticatedFetch = await fetchWithVc(datasetUrl, accessGrant);
+  const authenticatedFetch = await fetchWithVc(
+    datasetUrl,
+    accessGrant,
+    options
+  );
 
   return wrapSolidClientFunction(coreGetSolidDataset, [datasetUrl], {
     ...options,
