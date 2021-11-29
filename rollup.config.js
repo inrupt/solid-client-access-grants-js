@@ -86,10 +86,12 @@ export default [
       "./src/type/AccessVerifiableCredential.ts",
       "./src/type/ConsentContext.ts",
       "./src/type/ConsentStatus.ts",
+      "./src/type/FetchOptions.ts",
       "./src/type/Parameter.ts",
       "./src/type/RecursivePartial.ts",
       "./src/type/IssueAccessRequestParameters.ts",
       "./src/type/ResourceAccessMode.ts",
+      "./src/type/UmaConfiguration.ts",
     ],
     output: {
       dir: "dist",
