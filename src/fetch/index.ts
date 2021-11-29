@@ -138,6 +138,19 @@ export function boundFetch(accessToken: string): typeof fetch {
   };
 }
 
+/**
+ * Fetches the given Resource IRI with an verifiable credential access grant
+ *
+ * @param resourceIri The Resource to fetch over the network
+ * @param accessGrant The verifiable credential to use when fetching the
+ * Resource
+ * @param options Additional fetch options, allowing you to override the
+ * `fetch()` implementation
+ * @returns A promise resolving to a standard
+ * [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response)
+ * instance, rejects if Access Grant failed to exchanged for an Access Token, or
+ * if the underlying fetch call fails.
+ */
 export async function fetchWithVc(
   // Why UrlString instead of UrlString | Url? Because Urls aren't compatible
   // with the fetch return type.
