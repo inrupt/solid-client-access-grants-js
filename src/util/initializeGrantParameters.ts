@@ -17,7 +17,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { Access, UrlString, WebId } from "@inrupt/solid-client";
+import { access, UrlString, WebId } from "@inrupt/solid-client";
 import { isConsentRequest } from "../guard/isConsentRequest";
 import {
   ACL_RESOURCE_ACCESS_MODE_APPEND,
@@ -41,13 +41,14 @@ function getModesFromRequest(
   return requestVc.credentialSubject.hasConsent.mode;
 }
 
-function modesToAccess(modes: ResourceAccessMode[]): Partial<Access> {
-  const access: Partial<Access> = {};
-  access.append = modes.includes(ACL_RESOURCE_ACCESS_MODE_APPEND);
-  access.control = modes.includes(ACL_RESOURCE_ACCESS_MODE_CONTROL);
-  access.read = modes.includes(ACL_RESOURCE_ACCESS_MODE_READ);
-  access.write = modes.includes(ACL_RESOURCE_ACCESS_MODE_WRITE);
-  return access;
+function modesToAccess(modes: ResourceAccessMode[]): Partial<access.Access> {
+  const accessMode: Partial<access.Access> = {};
+  accessMode.append = modes.includes(ACL_RESOURCE_ACCESS_MODE_APPEND);
+  accessMode.controlRead = modes.includes(ACL_RESOURCE_ACCESS_MODE_CONTROL);
+  accessMode.controlWrite = modes.includes(ACL_RESOURCE_ACCESS_MODE_CONTROL);
+  accessMode.read = modes.includes(ACL_RESOURCE_ACCESS_MODE_READ);
+  accessMode.write = modes.includes(ACL_RESOURCE_ACCESS_MODE_WRITE);
+  return accessMode;
 }
 
 function getInboxFromRequest(
@@ -86,7 +87,7 @@ export function initializeGrantParameters(
     | (ConsentRequestBody & { issuanceDate: string }),
   requestOverride?: Partial<{
     requestor: WebId;
-    access: Partial<Access>;
+    access: Partial<access.Access>;
     resources: Array<UrlString>;
     requestorInboxIri: UrlString;
     purpose: Array<UrlString>;
