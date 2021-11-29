@@ -10,6 +10,10 @@ The following changes have been implemented but not released yet:
 
 ## [0.4.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.4.0) - 2021-11-30
 
+### Demo
+
+- Runnable examples are available in `examples/requestor` and `examples/grant-access`.
+
 ### Feature change
 
 Rename APIs to remove the connotations that "consent" could imply. All previous
