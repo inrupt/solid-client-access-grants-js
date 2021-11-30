@@ -18,6 +18,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { UrlString } from "@inrupt/solid-client";
 import {
   BaseConsentGrantBody,
   BaseConsentRequestBody,
@@ -25,18 +26,23 @@ import {
   BaseRequestBody,
 } from "../type/AccessVerifiableCredential";
 import { CONSENT_CONTEXT } from "../constants";
+import { ResourceAccessMode } from "../type/ResourceAccessMode";
 
-export const mockAccessRequestVc = (): VerifiableCredential &
-  BaseRequestBody => {
+export const mockAccessRequestVc = (
+  options?: Partial<{
+    resources: UrlString[];
+    modes: ResourceAccessMode[];
+  }>
+): VerifiableCredential & BaseRequestBody => {
   return {
     "@context": CONSENT_CONTEXT,
     id: "https://some.credential",
     credentialSubject: {
       id: "https://some.requestor",
       hasConsent: {
-        forPersonalData: ["https://some.resource"],
+        forPersonalData: options?.resources ?? ["https://some.resource"],
         hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-        mode: ["http://www.w3.org/ns/auth/acl#Read"],
+        mode: options?.modes ?? ["http://www.w3.org/ns/auth/acl#Read"],
       },
       inbox: "https://some.inbox",
     },

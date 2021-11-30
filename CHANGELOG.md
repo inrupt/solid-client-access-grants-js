@@ -6,6 +6,11 @@ The following changes have been implemented but not released yet:
 
 ## [Unreleased]
 
+### Bugfix
+
+- Approving an Access Request did not update the target resources' ACR, resulting
+  in a useless Access Grant.
+
 ### Feature change
 
 Rename APIs to remove the connotations that "consent" could imply. All previous

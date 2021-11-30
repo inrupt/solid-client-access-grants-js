@@ -17,14 +17,22 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import { Access, UrlString, WebId } from "@inrupt/solid-client";
+// eslint-disable-next-line camelcase
+import { Access, UrlString, WebId, acp_v4, access } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
-import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
+import {
+  ACL_RESOURCE_ACCESS_MODE_APPEND,
+  ACL_RESOURCE_ACCESS_MODE_CONTROL,
+  ACL_RESOURCE_ACCESS_MODE_READ,
+  ACL_RESOURCE_ACCESS_MODE_WRITE,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+} from "../constants";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
+import { AccessGrantBody } from "../type/AccessVerifiableCredential";
 
 export type ApproveAccessRequestOverrides = {
   requestor: WebId;
@@ -35,6 +43,45 @@ export type ApproveAccessRequestOverrides = {
   issuanceDate?: Date;
   expirationDate?: Date;
 };
+
+function getAccessModesFromAccessGrant(
+  request: AccessGrantBody
+): Partial<access.Access> {
+  const accessMode: Partial<access.Access> = {};
+  const requestModes = request.credentialSubject.providedConsent.mode;
+  accessMode.append = requestModes.includes(ACL_RESOURCE_ACCESS_MODE_APPEND);
+  accessMode.read = requestModes.includes(ACL_RESOURCE_ACCESS_MODE_READ);
+  accessMode.write = requestModes.includes(ACL_RESOURCE_ACCESS_MODE_WRITE);
+  accessMode.controlRead = requestModes.includes(
+    ACL_RESOURCE_ACCESS_MODE_CONTROL
+  );
+  accessMode.controlWrite = requestModes.includes(
+    ACL_RESOURCE_ACCESS_MODE_CONTROL
+  );
+  return accessMode;
+}
+
+async function addVcMatcher(
+  targetResources: Array<UrlString>,
+  accessMode: Partial<access.Access>,
+  options?: { fetch?: typeof global.fetch }
+) {
+  return Promise.all(
+    targetResources.map(async (targetResource) => {
+      const resourceInfo = await acp_v4.getResourceInfoWithAcr(
+        targetResource,
+        options
+      );
+      if (!acp_v4.hasAccessibleAcr(resourceInfo)) {
+        throw new Error(
+          "The current user does not have access to the resource's Access Control Resource. Either they have insufficiant credentials, or the resource is not controlled using ACP. In either case, an Access Grant cannot be issued."
+        );
+      }
+      const updatedResource = acp_v4.setVcAccess(resourceInfo, accessMode);
+      return acp_v4.saveAcrFor(updatedResource, options);
+    })
+  );
+}
 
 /**
  * Approve an access request. The content of the approved access request is provided
@@ -93,7 +140,7 @@ export async function approveAccessRequest(
     requestOverride
   );
 
-  const requestBody = getGrantBody({
+  const grantBody = getGrantBody({
     resourceOwner,
     access: internalOptions.access,
     requestor: internalOptions.requestor,
@@ -104,7 +151,15 @@ export async function approveAccessRequest(
     expirationDate: internalOptions.expirationDate,
     status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   });
-  return issueAccessVc(resourceOwner, requestBody, options);
+
+  const grantedAccess = getAccessModesFromAccessGrant(grantBody);
+  await addVcMatcher(
+    grantBody.credentialSubject.providedConsent.forPersonalData,
+    grantedAccess,
+    options
+  );
+
+  return issueAccessVc(resourceOwner, grantBody, options);
 }
 
 export default approveAccessRequest;

@@ -18,6 +18,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /* eslint-disable no-shadow */
+import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import { jest, it, describe, expect } from "@jest/globals";
 import {
   mockAccessApiEndpoint,
@@ -44,6 +45,12 @@ jest.mock("@inrupt/solid-client", () => {
     solidClientModule.getSolidDataset
   );
   solidClientModule.getWellKnownSolid = jest.fn();
+  solidClientModule.acp_v4 = {
+    getResourceInfoWithAcr: jest.fn(),
+    hasAccessibleAcr: jest.fn(),
+    saveAcrFor: jest.fn(),
+    setVcAccess: jest.fn(),
+  };
   return solidClientModule;
 });
 
@@ -57,8 +64,30 @@ describe("approveAccessRequestWithConsent", () => {
   });
 });
 
+const mockAcpClient = (
+  options?: Partial<{
+    hasAccessibleAcr: boolean;
+    initialResource: unknown;
+    updatedResource: unknown;
+  }>
+) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
+  solidClientModule.acp_v4.hasAccessibleAcr.mockReturnValueOnce(
+    options?.hasAccessibleAcr ?? true
+  );
+
+  solidClientModule.acp_v4.setVcAccess.mockReturnValueOnce(
+    options?.updatedResource ?? {}
+  );
+  solidClientModule.acp_v4.getResourceInfoWithAcr.mockResolvedValueOnce(
+    (options?.initialResource ?? {}) as never
+  );
+};
+
 describe("approveAccessRequest", () => {
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
+    mockAcpClient();
     const crossFetchModule = jest.requireMock("cross-fetch") as {
       fetch: typeof global.fetch;
     };
@@ -84,6 +113,69 @@ describe("approveAccessRequest", () => {
       {
         fetch: scab.fetch,
       }
+    );
+  });
+
+  // FIXME: This test must run before the other tests mocking the ACP client.
+  // This means that some mocked isn't cleared properly between tests.
+  it("updates the target resources' ACR appropriately", async () => {
+    const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
+    const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
+    mockAcpClient({
+      initialResource: mockedInitialResource,
+      updatedResource: mockedUpdatedResource,
+    });
+    mockAccessApiEndpoint();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const mockedClientModule = jest.requireMock("@inrupt/solid-client") as any;
+    const spiedAcrLookup = jest.spyOn(
+      mockedClientModule.acp_v4,
+      "getResourceInfoWithAcr"
+    );
+    const spiedAcrUpdate = jest.spyOn(mockedClientModule.acp_v4, "setVcAccess");
+    const spiedAcrSave = jest.spyOn(mockedClientModule.acp_v4, "saveAcrFor");
+
+    await approveAccessRequest(
+      MOCK_RESOURCE_OWNER,
+      mockAccessRequestVc({
+        modes: [
+          "http://www.w3.org/ns/auth/acl#Write",
+          "http://www.w3.org/ns/auth/acl#Control",
+        ],
+        resources: ["https://some.custom.resource"],
+      }),
+      undefined,
+      {
+        fetch: jest.fn(global.fetch),
+      }
+    );
+    // Thehe resource's IRI is picked up from the access grant.
+    expect(spiedAcrLookup).toHaveBeenCalledWith(
+      "https://some.custom.resource",
+      expect.anything()
+    );
+    // The resources' ACR is updated with the modes from the grant.
+    expect(spiedAcrUpdate).toHaveBeenCalledWith(mockedInitialResource, {
+      read: false,
+      write: true,
+      append: false,
+      controlRead: true,
+      controlWrite: true,
+    });
+    // The resources' ACR is written back.
+    expect(spiedAcrSave).toHaveBeenCalledWith(
+      mockedUpdatedResource,
+      expect.anything()
+    );
+  });
+
+  it("throws if the resource's ACR cannot be accessed by the current user", async () => {
+    mockAcpClient({ hasAccessibleAcr: false });
+    mockAccessApiEndpoint();
+    await expect(
+      approveAccessRequest(MOCK_RESOURCE_OWNER, mockAccessRequestVc())
+    ).rejects.toThrow(
+      "The current user does not have access to the resource's Access Control Resource"
     );
   });
 
@@ -117,6 +209,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("uses the provided access endpoint, if any", async () => {
+    mockAcpClient();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
     };
@@ -143,6 +236,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("uses the provided fetch, if any", async () => {
+    mockAcpClient();
     mockAccessApiEndpoint();
     const mockedFetch = jest.fn(global.fetch);
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
@@ -170,6 +264,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant from a request VC", async () => {
+    mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -208,6 +303,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant from a given request VC IRI", async () => {
+    mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -253,6 +349,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant from a given request VC with purpose", async () => {
+    mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -294,6 +391,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant from a partially overridden request VC", async () => {
+    mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -335,6 +433,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant from a totally overridden request VC", async () => {
+    mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -381,6 +480,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant from a request override alone", async () => {
+    mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -427,6 +527,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant overriding only the issuance of the provided VC", async () => {
+    mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -472,6 +573,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant overriding only the expiration of the provided VC", async () => {
+    mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
@@ -516,6 +618,7 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant with undefined expiration date", async () => {
+    mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => unknown;
