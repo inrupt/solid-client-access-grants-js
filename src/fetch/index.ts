@@ -139,9 +139,9 @@ export function boundFetch(accessToken: string): typeof fetch {
 }
 
 /**
- * Builds a WHATWG Fetch compatible function issuing authenticated requests based
- * on an Access Grant VC. The obtained fetch function authentication will only be
- * valid for the resources included in the Access Grant.
+ * Builds a WHATWG Fetch compatible function issuing authenticated requests
+ * based on an Access Grant VC. The obtained fetch function authentication will
+ * only be valid for the resources included in the Access Grant.
  *
  * Note that providing an authenticated `fetch` as an option is mandatory for
  * the resulting fetch to be valid. The input fetch should be authenticated to
@@ -152,9 +152,10 @@ export function boundFetch(accessToken: string): typeof fetch {
  * been granted access to the target resource.
  * @param options Additional fetch options, allowing you to override the
  * `fetch()` implementation
- * @returns A WHATWG Fetch compatible function matching the standard signature.
- * The obtained fetch function will override any provided `Authentication` header
- * with authentication information obtained thanks to the provided VC.
+ * @returns A Promise resolving to a WHATWG Fetch compatible function matching
+ * the standard signature. The obtained fetch function will override any
+ * provided `Authentication` header with authentication information obtained
+ * thanks to the provided VC.
  */
 export async function fetchWithVc(
   // Why UrlString instead of UrlString | Url? Because Urls aren't compatible
