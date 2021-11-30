@@ -80,8 +80,6 @@
       "src/type/UmaConfiguration.ts",
       "src/type/AccessBaseOptions.ts",
       "src/type/IssueAccessRequestParameters.ts",
-      "src/type/FetchOptions.ts",
-      "src/type/UmaConfiguration.ts",
       "src/verify/index.ts",
     ],
     "exclude": [

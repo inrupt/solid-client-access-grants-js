@@ -17,6 +17,10 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+/**
+ * Additional options for FetchWithVc and dependent methods
+ * - `fetch`: A WHATWG Fetch compatible function
+ */
 export type FetchOptions = {
   fetch: typeof fetch;
 };
