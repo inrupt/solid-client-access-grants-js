@@ -32,7 +32,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
  * @param vc Either a VC, or a URL to a VC, to be verified.
  * @param options Optional properties to customise the request behaviour.
  * @returns An object containing checks, warnings, and errors.
- * @since 0.0.1
+ * @since 0.4.0
  */
 // TODO: Push verification further as this just checks it's a valid VC should we not type check the consent grant?
 async function isValidAccessGrant(
@@ -94,6 +94,7 @@ export type { UrlString, VerifiableCredential };
 
 /**
  * @hidden Deprecated alias of [[isValidAccessGrant]]
+ * @since 0.0.1
  * @deprecated
  */
 const isValidConsentGrant = isValidAccessGrant;

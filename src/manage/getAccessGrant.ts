@@ -32,7 +32,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
  * @param accessGrantVcUrl The URL of an access grant, with or without consent.
  * @param options Optional properties to customise the request behaviour.
  * @returns The Verifiable Credential associated to the given IRI, if it is an access grant. Throws otherwise.
- * @since 0.1.0
+ * @since 0.4.0
  */
 export async function getAccessGrant(
   accessGrantVcUrl: UrlString | URL,
@@ -74,6 +74,7 @@ export async function getAccessGrant(
 
 /**
  * @hidden Deprecated alias of [[getAccessGrant]]
+ * @since 0.1.0
  * @deprecated
  */
 const getAccessWithConsent = getAccessGrant;

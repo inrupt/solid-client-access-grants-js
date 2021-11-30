@@ -31,6 +31,7 @@ import { wrapSolidClientFunction } from "./wrapSolidClientFunction";
  * @param accessGrant The Access Grant VC proving the caller is authorized.
  * @param options Optional properties to customise the request behaviour.
  * @returns A promise that resolves to a File if successful, and that rejects otherwise.
+ * @since 0.4.0
  */
 export async function getFile(
   resourceUrl: UrlString,

@@ -167,6 +167,7 @@ export type { UrlString, VerifiableCredential };
 
 /**
  * @hidden alias for [[approveAccessRequest]]
+ * @since 0.4.0
  * @deprecated
  */
 const approveAccessRequestWithConsent = approveAccessRequest;

@@ -156,6 +156,7 @@ export function boundFetch(accessToken: string): typeof fetch {
  * the standard signature. The obtained fetch function will override any
  * provided `Authentication` header with authentication information obtained
  * thanks to the provided VC.
+ * @since 0.4.0
  */
 export async function fetchWithVc(
   // Why UrlString instead of UrlString | Url? Because Urls aren't compatible

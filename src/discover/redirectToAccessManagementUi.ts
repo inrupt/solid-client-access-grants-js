@@ -41,11 +41,16 @@ const REDIRECT_URL_PARAM_NAME = "redirectUrl";
  * - `redirectCallback?`: For use in a non-browser environment, this must be
  *   provided by the user in order to handle the redirect URL, since setting
  *   `window.location.href` is not an option.
+ *
+ * @since 0.4.0
  */
 export type RedirectToAccessManagementUiOptions = {
   redirectCallback?: (url: string) => void;
   fetch?: typeof global.fetch;
   resourceOwner?: WebId;
+  /**
+   * @since 0.4.0
+   */
   fallbackAccessManagementUi?: UrlString;
   /**
    * @hidden Replaced by [[fallbackAccessManagementUi]]
@@ -83,7 +88,7 @@ async function discoverAccessManagementUi(options: {
  * having granted access.
  * @param options If you are in a NodeJS environment, you must specify a
  * callback to handle the redirection.
- * @since 0.1.0
+ * @since 0.4.0
  */
 export async function redirectToAccessManagementUi(
   accessRequestVc: VerifiableCredential | UrlString | URL,
@@ -138,6 +143,7 @@ export async function redirectToAccessManagementUi(
 
 /**
  * @hidden alias of [[redirectToAccessManagementUi]]
+ * @since 0.1.0
  * @deprecated
  */
 const redirectToConsentManagementUi = redirectToAccessManagementUi;
