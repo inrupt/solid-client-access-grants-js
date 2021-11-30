@@ -4,12 +4,7 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 The following changes have been implemented but not released yet:
 
-## [Unreleased]
-
-### Bugfix
-
-- Approving an Access Request did not update the target resources' ACR, resulting
-  in a useless Access Grant.
+## Unreleased
 
 ### Feature change
 
@@ -50,19 +45,19 @@ Other changes:
 
 ### Bugfix
 
+- Approving an Access Request did not update the target resources' ACR, resulting
+  in a useless Access Grant.
 - Discovering the verification endpoint was relying on incorrect assumptions, and
   failed when calling `isValidConsentGrant`.
 - Specifying an inbox when requesting/granting access is no longer mandatory.
 
-The following changes have been released:
-
-## [0.3.2] - 2021-10-29
+## [0.3.2](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.3.2) - 2021-10-29
 
 ### Bugfix
 
 - Looking up access grants for a given resource was issuing incorrect requests.
 
-## [0.3.1] - 2021-10-21
+## [0.3.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.3.1) - 2021-10-21
 
 ### Bugfix
 
@@ -71,7 +66,7 @@ The following changes have been released:
 - The discovery for the access issuer no longer relies on the Pod server, but rather
   on the UMA server.
 
-## [0.3.0] - 2021-10-15
+## [0.3.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.3.0) - 2021-10-15
 
 ### Feature change
 
@@ -87,19 +82,19 @@ The following changes have been released:
 - The credential subject of a grant is now the resource owner, instead of the requestor.
   The requestor is still the credential subject of requests.
 
-## [0.2.1] - 2021-10-12
+## [0.2.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.2.1) - 2021-10-12
 
 - An [NPM incident](https://status.npmjs.org/incidents/wy4002vc8ryc) made version
   0.2.0 uninstallable, and publishing a new version was necessary to resolve the issue.
 
-## [0.2.0] - 2021-10-11
+## [0.2.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.2.0) - 2021-10-11
 
 ### Bugfix
 
 - The 0.1.0 version had been accidentally released some time ago, creating a conflict.
   This just bumpts the version number to clean this up.
 
-## [0.1.0] - 2021-10-11
+## [0.1.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.1.0) - 2021-10-11
 
 ### Bugfix
 
@@ -120,7 +115,7 @@ The following changes have been released:
 - `redirectToConsentManagementUi` enables discovering a user's preferred consent
   management app, and redirecting them to it.
 
-## [0.0.3] - 2021-10-01
+## [0.0.3](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.0.3) - 2021-10-01
 
 ### Bugfix
 
@@ -128,13 +123,13 @@ The following changes have been released:
   expanded, and therefore fail shape validation of the consent service.
 - Fixes node imports as well as webpack, rollup and parcel builds
 
-## [0.0.2] - 2021-09-30
+## [0.0.2](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.0.2) - 2021-09-30
 
 ### Bugfix
 
 - Fixed missing dependencies which failed the build using bundlers such as Webpack or Parcel.
 
-## [0.0.1] - 2021-09-29
+## [0.0.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.0.1) - 2021-09-29
 
 ### New features
 
