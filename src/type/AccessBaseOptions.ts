@@ -38,9 +38,14 @@ import type { UrlString } from "@inrupt/solid-client";
  *   API calls. If not given, it is attempted to be found by determining the
  *   server URL from the resource involved in the request and reading its
  *   `.well-known/solid` file for an Access API entry.
+ *
+ * @since 0.4.0
  */
 export type AccessBaseOptions = {
   fetch?: typeof fetch;
+  /**
+   * @since 0.4.0
+   */
   accessEndpoint?: URL | UrlString;
   /**
    * @hidden alias of accessEndpoint

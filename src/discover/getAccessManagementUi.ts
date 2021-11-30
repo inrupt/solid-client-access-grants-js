@@ -72,6 +72,7 @@ async function getAccessManagementUiFromProfile(
 }
 
 /**
+ * @since 0.4.0
  * @hidden
  */
 export async function getAccessManagementUiFromWellKnown(
@@ -106,7 +107,7 @@ export async function getAccessManagementUiFromWellKnown(
  * @param webId The WebID of the user asked for access.
  * @param options Optional properties to customise the access request behaviour.
  * @returns The URL where the user should be redirected, if discoverable.
- * @since 0.0.1
+ * @since 0.4.0
  */
 async function getAccessManagementUi(
   webId: URL | UrlString,
@@ -132,6 +133,7 @@ export type { UrlString };
 
 /**
  * @hidden alias of [[getAccessManagementUi]]
+ * @since 0.0.1
  * @deprecated
  */
 const getConsentManagementUi = getAccessManagementUi;

@@ -63,7 +63,7 @@ async function getAccessEndpointForResource(
  * @param resource The resource for which access may be requested.
  * @param options Optional properties to customise the access request behaviour.
  * @returns The URL of the access request server.
- * @since 0.0.1
+ * @since 0.4.0
  */
 async function getAccessApiEndpoint(
   resource: URL | UrlString,
@@ -86,6 +86,7 @@ export type { UrlString };
 
 /**
  * @hidden deprecated alias of [[getAccessApiEndpoint]]
+ * @since 0.0.1
  * @deprecated
  */
 const getConsentApiEndpoint = getAccessApiEndpoint;

@@ -29,7 +29,7 @@ import type { IssueAccessRequestParameters } from "../type/IssueAccessRequestPar
  * @param params Access to request.
  * @param options Optional properties to customise the access request behaviour.
  * @returns A signed Verifiable Credential representing the access request.
- * @since 0.0.1
+ * @since 0.4.0
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
@@ -49,6 +49,7 @@ export type { IssueAccessRequestParameters, VerifiableCredential };
 
 /**
  * @hidden Deprecated alias of [[issueAccessRequest]]
+ * @since 0.0.1
  * @deprecated
  */
 const requestAccess = issueAccessRequest;

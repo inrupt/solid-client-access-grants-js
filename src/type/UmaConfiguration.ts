@@ -24,6 +24,8 @@ import type { UrlString } from "@inrupt/solid-client";
 
 /**
  * Configuration object for User Managed Access
+ *
+ * @since 0.4.0
  */
 export type UmaConfiguration = {
   dpop_signing_alg_values_supported: string[];

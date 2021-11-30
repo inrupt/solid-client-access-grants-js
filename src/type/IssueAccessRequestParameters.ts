@@ -31,6 +31,8 @@ import type { access, UrlString, WebId } from "@inrupt/solid-client";
  * - `purpose`: (Optional.) URL representing what the requested access will be used for.
  * - `issuanceDate`: (Optional, set to the current time if left out.) Point in time from which the access should be granted.
  * - `expirationDate`: (Optional.) Point in time until when the access is needed.
+ *
+ * @since 0.4.0
  */
 // TODO: Find out about the overlap with BaseRequestParameters (differs in status and resource owner)
 // This parameter if not present should be fetched from the profile according to the design document
