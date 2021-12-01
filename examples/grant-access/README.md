@@ -8,7 +8,8 @@
 ## Run
 
 - Create a `.env.local` file based on `.env.local.example`. You'll need a client ID/secret pair
-  statically registered at your Solid-OIDC provider of choice.
+  statically registered at your Solid-OIDC provider of choice. For instance, you can
+  register a client at [Inrupt's app registration page](https://broker.pod.inrupt.com/registration.html)
 - Run `node dist/serverSideApp.js`
 
 ## Use

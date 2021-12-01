@@ -1,20 +1,24 @@
-# Demo: a server-side NodeJS issuing consent requests
+# Access request manager demo
 
-## Installing the app
+## Install and build
 
-To install this demo app, first run `npm ci` at the root of the repository, which
-will trigger the build of the libraries our app depends on. Then, run `npm ci`
-again, this time in `packages/node/example/multiSession/`, and then `npm run build`.
-You should be all set. If you change the code, make sure to re-run `npm run build`
-before you re-run it.
+- Run `npm ci` and `npm run build` in the root repository to make sure the library is built.
+- Run `npm ci` and `npm run build` in the current directory to build the demo app
 
-## Running the app
+## Run
 
-Running `node dist/serverSideApp.js` starts the server. Four endpoints are then available:
+- Create a `.env.local` file based on `.env.local.example`. You'll need a client ID/secret pair
+  statically registered at your Solid-OIDC provider of choice. For instance, you can
+  register a client at [Inrupt's app registration page](https://broker.pod.inrupt.com/registration.html)
+- Run `node dist/serverSideApp.js`
 
-- `/login`, to initiate the login process against a Solid Identity Provider
-  (by default, `https://broker.pod.inrupt.com`)
-- `/redirect`, where the Solid Identity Provider will redirect users after login
-- `/fetch`, where you have to pass a `resource=<some resource>` query param in
-  order to fetch a resource (protected resources will require you be logged in and to have been granted READ access to that resource, whereas public resources can be fetched whether you're logged in or not)
-- `/logout`, to log out of the session
+## Use
+
+- Make sure the `grant-access` demo app runs before using this. Alternatively, you can
+  edit the source code in `src/serverSideApp.ts` to use Podbrowser as your access management app.
+- Go to `http://localhost:3001`. You'll be prompted for a target resource and its owner's WebID.
+  Note that currently, a non-RDF resource IRI is expected (a plain text document for instance).
+- Submitting the requested information will redirect you to the access management app. Make
+  sure to log in there as the resource owner.
+- Once the access request has been approved by the resource owner, the Access Grant is
+  sent back to this application. It uses it to fetch the requested resource.
