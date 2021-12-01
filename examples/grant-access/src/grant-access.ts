@@ -54,10 +54,14 @@ app.get("/manage", async (req, res) => {
     <form action="/redirect", method="post">
       <div>
         <p>Do you want to:</p>
-        <label for="grant">grant</label>
-        <input type="radio" name="grant" id="grant" value="grant" required/>
-        <label for="grant">deny</label>
-        <input type="radio" name="grant" id="deny" value="deny" required/>
+        <label for="grant">
+          grant
+          <input type="radio" name="grant" id="grant" value="grant" required/>
+        </label>
+        <label for="grant">
+          deny
+          <input type="radio" name="grant" id="deny" value="deny" required/>
+          </label>
         <p>the requested access ?</p>
       </div>
       <div>

@@ -51,12 +51,16 @@ app.get("/", async (req, res, next) => {
   res.send(
     `<form action="/request", method="post">
       <div>
-        <label for="name">Target resource:</label>
-        <input type="url" name="resource" id="resource" required>
+        <label for="resource">
+          Target resource:
+          <input type="url" name="resource" id="resource" required>
+        </label>
       </div>
       <div>
-        <label for="owner">Owner WebID</label>
-        <input type="url" name="owner" id="owner" required>
+        <label for="owner">
+          Owner WebID
+          <input type="url" name="owner" id="owner" required>
+        </label>
       </div>
       <div>
         <input type="submit" value="Request consent">
