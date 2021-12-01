@@ -25,8 +25,14 @@ import { config } from "dotenv-flow";
 import express from "express";
 import { approveAccessRequest } from "../../../dist/index";
 
+const GRANT_ACCESS_DEFAULT_PORT = 3002;
+
+// Load env variables
+config();
+export const GRANT_ACCESS_PORT =
+  process.env.GRANT_ACCESS_PORT ?? GRANT_ACCESS_DEFAULT_PORT;
+
 const app = express();
-const PORT = 3002;
 // Support parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
@@ -72,12 +78,11 @@ app.get("/manage", async (req, res) => {
 // Return the consent grant to the requestor
 // TODO: if the user denied access, deny consent grant instead of approving.
 app.post("/redirect", async (req, res) => {
-  config();
   const session = new Session();
   await session.login({
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    oidcIssuer: process.env.OIDC_ISSUER,
+    clientId: process.env.OWNER_CLIENT_ID,
+    clientSecret: process.env.OWNER_CLIENT_SECRET,
+    oidcIssuer: process.env.OWNER_OIDC_ISSUER,
   });
 
   const accessGrant = await approveAccessRequest(
@@ -96,6 +101,6 @@ app.post("/redirect", async (req, res) => {
   res.redirect(redirectUrl.href);
 });
 
-app.listen(PORT, async () => {
-  console.log(`Listening on [${PORT}]...`);
+app.listen(GRANT_ACCESS_PORT, async () => {
+  console.log(`Listening on [${GRANT_ACCESS_PORT}]...`);
 });

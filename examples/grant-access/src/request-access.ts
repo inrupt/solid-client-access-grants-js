@@ -30,13 +30,22 @@ import {
   getFile,
 } from "../../../dist/index";
 
+const REQUEST_ACCESS_DEFAULT_PORT = 3001;
+const GRANT_ACCESS_PORT = 3002;
+
+// Load env variables
+config();
+const REQUEST_ACCESS_PORT =
+  process.env.REQUEST_ACCESS_PORT ?? REQUEST_ACCESS_DEFAULT_PORT;
+
 const app = express();
-const PORT = 3001;
 // Support parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
 // This is the endpoint our NodeJS demo app listens on to receive incoming login
-const REDIRECT_URL = "http://localhost:3001/redirect";
+const redirectUrl = new URL("/redirect", "http://localhost");
+redirectUrl.port = `${REQUEST_ACCESS_PORT}`;
+const REDIRECT_URL = redirectUrl.href;
 
 app.get("/", async (req, res, next) => {
   res.send(
@@ -57,12 +66,11 @@ app.get("/", async (req, res, next) => {
 });
 
 app.post("/request", async (req, res) => {
-  config();
   const session = new Session();
   await session.login({
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    oidcIssuer: process.env.OIDC_ISSUER,
+    clientId: process.env.REQUESTOR_CLIENT_ID,
+    clientSecret: process.env.REQUESTOR_CLIENT_SECRET,
+    oidcIssuer: process.env.REQUESTOR_OIDC_ISSUER,
   });
 
   const consentRequest = await issueAccessRequest(
@@ -85,7 +93,7 @@ app.post("/request", async (req, res) => {
     // The following IRI redirects the user to PodBrowser so that they can approve/reny the request.
     // fallbackConsentManagementUi: `https://podborowser.inrupt.com/privacy/consent/requests/`,
     // The following IRI redirects to the IRI used by the examples/grant-access demo.
-    fallbackConsentManagementUi: `http://localhost:3002/manage/`,
+    fallbackConsentManagementUi: `http://localhost:${GRANT_ACCESS_PORT}/manage/`,
     // Note: the following is only necessary because this projects depends for testing puspose
     // on solid-client-authn-browser, which is picked up automatically for convenience in
     // browser-side apps. A typical node app would not have this dependence.
@@ -94,12 +102,11 @@ app.post("/request", async (req, res) => {
 });
 
 app.get("/redirect", async (req, res) => {
-  config();
   const session = new Session();
   await session.login({
-    clientId: process.env.CLIENT_ID,
-    clientSecret: process.env.CLIENT_SECRET,
-    oidcIssuer: process.env.OIDC_ISSUER,
+    clientId: process.env.REQUESTOR_CLIENT_ID,
+    clientSecret: process.env.REQUESTOR_CLIENT_SECRET,
+    oidcIssuer: process.env.REQUESTOR_OIDC_ISSUER,
     // Note that using a Bearer token is mandatory for the UMA access token to be valid.
     tokenType: "Bearer",
   });
@@ -126,6 +133,6 @@ app.get("/redirect", async (req, res) => {
   <div>`);
 });
 
-app.listen(PORT, async () => {
-  console.log(`Listening on [${PORT}]...`);
+app.listen(REQUEST_ACCESS_PORT, async () => {
+  console.log(`Listening on [${REQUEST_ACCESS_PORT}]...`);
 });
