@@ -63,8 +63,9 @@ async function discoverAccessManagementUi(options: {
   resourceUrl: UrlString;
   resourceOwner?: WebId;
   fallbackUi?: UrlString;
+  fetch?: typeof global.fetch;
 }): Promise<string | undefined> {
-  const authFetch = await getSessionFetch({});
+  const authFetch = await getSessionFetch({ fetch: options.fetch });
   let accessManagementUi;
   if (options.resourceOwner) {
     accessManagementUi = await getAccessManagementUi(options.resourceOwner, {
@@ -107,6 +108,7 @@ export async function redirectToAccessManagementUi(
     resourceUrl: requestVc.credentialSubject.hasConsent.forPersonalData[0],
     resourceOwner: options.resourceOwner,
     fallbackUi,
+    fetch: options.fetch,
   });
 
   if (accessManagementUi === undefined) {
