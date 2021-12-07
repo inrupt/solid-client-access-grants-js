@@ -29,7 +29,7 @@ help:
 	@$(SPHINXBUILD) -M help "$(SOURCECOPYDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 
-.PHONY: help clean Makefile migrate html
+.PHONY: help clean Makefile migrate html dist
 
 clean:
 	if [ -d $(BUILDDIR) ]; then rm -rf $(BUILDDIR) ; fi;
@@ -48,19 +48,22 @@ migrate: clean
 
 	cp -R $(SOURCEDIR)/index.rst $(SOURCECOPYDIR)
 	cp -R $(SOURCEDIR)/api/modules/ $(SOURCECOPYDIR)/modules/
-	
-html: Makefile migrate
 
+html: Makefile migrate
 # To clean up cross-reference links in markdown (foo.md#somesection) 
 # If making html (e.g. foo.html), use sed to change .md# to .html#
 # Also, on macOS, need -i '' but not for Linux
-
 ifdef IS_MAC
 	find . $(SOURCECOPYDIR) -type f -name "*.md" -exec sed -i '' -e 's?\.md#?\.html#?g' {} \;
 else
 	find . $(SOURCECOPYDIR) -type f -name "*.md" -exec sed -i  -e 's?\.md#?\.html#?g' {} \;
 endif
 	@$(SPHINXBUILD) -M $@ "$(SOURCECOPYDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O) -c .
+
+dist: html
+	rm -r ../dist || true
+	mkdir -p ../dist
+	cp -R $(BUILDDIR)/html/. ../dist/
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).
