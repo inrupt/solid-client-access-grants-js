@@ -1,4 +1,4 @@
-// Copyright 2021 Inrupt Inc.
+// Copyright 2022 Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -16,10 +16,6 @@
 // HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// We just want the generic type to be callable, the types of its
-// arguments and return value are inferred using TS utility types,
-// so it's fine to have any in the generic.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 export async function wrapSolidClientFunction<T extends (...args: any) => any>(
