@@ -136,7 +136,7 @@ jobs:
         npm install @inrupt/solid-client-access-grants
         npx parcel build index.ts
     - name: Archive Parcel build artifacts
-      uses: actions/upload-artifact@v2.2.3
+      uses: actions/upload-artifact@v2.3.1
       with:
         name: parcel-dist
         path: .github/workflows/cd-packaging-tests/bundler-parcel/dist
@@ -157,7 +157,7 @@ jobs:
         npm install webpack@5 webpack-cli buffer
         npx webpack --devtool source-map
     - name: Archive Webpack build artifacts
-      uses: actions/upload-artifact@v2.2.3
+      uses: actions/upload-artifact@v2.3.1
       with:
         name: webpack-dist
         path: .github/workflows/cd-packaging-tests/bundler-webpack/dist
