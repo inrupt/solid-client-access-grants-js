@@ -44,6 +44,7 @@ jobs:
   publish-npm:
     runs-on: ubuntu-20.04
     needs: [prepare-deployment]
+    if: github.actor != 'dependabot[bot]'
     outputs:
       version-nr: ${{ steps.determine-npm-version.outputs.version-nr }}
     steps:
@@ -51,7 +52,6 @@ jobs:
     - name: Mark GitHub Deployment as in progress
       id: start-deployment
       uses: octokit/request-action@v2.x
-      if: github.actor != 'dependabot[bot]'
       with:
         route: POST /repos/:repository/deployments/:deployment/statuses
         repository: ${{ github.repository }}
@@ -69,7 +69,6 @@ jobs:
         registry-url: 'https://registry.npmjs.org'
     - name: Prepare prerelease version
       id: determine-npm-version
-      if: github.actor != 'dependabot[bot]'
       run: |
         git config user.name $GITHUB_ACTOR
         git config user.email gh-actions-${GITHUB_ACTOR}@github.com
@@ -84,7 +83,6 @@ jobs:
         TAG_SLUG: ${{ needs.prepare-deployment.outputs.tag-slug }}
     - run: npm ci
     - name: Publish an npm tag for this branch
-      if: github.actor != 'dependabot[bot]'
       run: |
         # Unfortunately GitHub Actions does not currently let us do something like
         #     if: secrets.NPM_TOKEN != ''
@@ -98,7 +96,6 @@ jobs:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         TAG_SLUG: ${{ needs.prepare-deployment.outputs.tag-slug }}
     - name: Mark GitHub Deployment as successful
-      if: github.actor != 'dependabot[bot]'
       uses: octokit/request-action@v2.x
       with:
         route: POST /repos/:repository/deployments/:deployment/statuses
@@ -106,7 +103,7 @@ jobs:
         deployment: ${{ needs.prepare-deployment.outputs.deployment-id }}
         environment: review
         environment_url: 'https://www.npmjs.com/package/@inrupt/solid-client-access-grants/v/${{ needs.prepare-deployment.outputs.tag-slug }}'
-        description: "Published to npm. To install, run: npm install @inrupt/solid-client-access-grants@${{ needs.prepare-deployment.outputs.tag-slug }}"
+        description: "To install, run: npm install @inrupt/solid-client-access-grants@${{ needs.prepare-deployment.outputs.tag-slug }}"
         log_url: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         mediaType: '{"previews": ["flash", "ant-man"]}'
         state: success
@@ -127,7 +124,6 @@ jobs:
       env:
         GITHUB_TOKEN: "${{ secrets.GH_TOKEN }}"
     - name: Waiting for npm CDNs to update...
-      if: github.actor != 'dependabot[bot]'
       run: |
         echo "Giving npm some time to make the newly-published package available…"
         sleep 5m
