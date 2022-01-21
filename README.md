@@ -53,6 +53,7 @@ forum is a good place to meet the rest of the community.
 - [Inrupt Solid Javascript Client Libraries](https://docs.inrupt.com/developer-tools/javascript/client-libraries/)
 - [Homepage](https://docs.inrupt.com/)
 - [Examples](./examples)
+- [Security policy and vulnerability reporting](./SECURITY.md)
 
 # Changelog
 
