@@ -1,7 +1,7 @@
 # Security policy
 
 This library intends supporting the development of Solid applications requesting
-and granted access to data stored on Solid servers. Granting access to data on a
+and granting access to data stored on Solid servers. Granting access to data on a
 Solid server will result in the recipient of the grant getting some level of access
 to potentially private resources, and should be done with care.
 
