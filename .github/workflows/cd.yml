@@ -14,13 +14,13 @@ env:
 jobs:
   prepare-deployment:
     runs-on: ubuntu-20.04
+    if: github.actor != 'dependabot[bot]'
     outputs:
       tag-slug: ${{ steps.determine-npm-tag.outputs.tag-slug }}
       deployment-id: ${{ fromJson(steps.create-deployment.outputs.data).id }}
     steps:
     - name: Create GitHub Deployment
       id: create-deployment
-      if: github.actor != 'dependabot[bot]'
       uses: octokit/request-action@v2.x
       with:
         route: POST /repos/:repository/deployments
@@ -129,6 +129,9 @@ jobs:
         sleep 5m
         echo "Done waiting — hopefully that was enough time for the follow-up jobs to install the just-published package, to verify that everything looks OK."
 
+  # All of the following jobs depend on the previous ones. Since these are skipped
+  # for dependabot updates, none of the following will run as a consequence.
+
   verify-imports-node:
     runs-on: ubuntu-20.04
     strategy:
@@ -142,19 +145,16 @@ jobs:
         node-version: ${{ matrix.node-version }}
         registry-url: 'https://registry.npmjs.org'
     - name: Install the preview release of solid-client-access-grants in the packaging test project
-      if: github.actor != 'dependabot[bot]'
       run: |
         cd .github/workflows/cd-packaging-tests/node
         npm install @inrupt/solid-client @inrupt/solid-client-access-grants@$VERSION_NR
       env:
         VERSION_NR: ${{ needs.publish-npm.outputs.version-nr }}
     - name: Verify that the package can be imported in Node from a CommonJS module
-      if: github.actor != 'dependabot[bot]'
       run: |
         cd .github/workflows/cd-packaging-tests/node
         node --unhandled-rejections=strict commonjs.cjs
     - name: Verify that the package can be imported in Node from an ES module
-      if: github.actor != 'dependabot[bot]'
       run: |
         cd .github/workflows/cd-packaging-tests/node
         node --unhandled-rejections=strict esmodule.mjs
@@ -169,7 +169,6 @@ jobs:
         node-version: '16.x'
         registry-url: 'https://registry.npmjs.org'
     - name: Verify that the package can be imported in a Parcel project
-      if: github.actor != 'dependabot[bot]'
       run: |
         cd .github/workflows/cd-packaging-tests/bundler-parcel
         npm install
@@ -179,7 +178,6 @@ jobs:
       env:
         VERSION_NR: ${{ needs.publish-npm.outputs.version-nr }}
     - name: Archive Parcel build artifacts
-      if: github.actor != 'dependabot[bot]'
       uses: actions/upload-artifact@v2.3.1
       continue-on-error: true
       with:
@@ -196,7 +194,6 @@ jobs:
         node-version: '16.x'
         registry-url: 'https://registry.npmjs.org'
     - name: Verify that the package can be imported in a Webpack project
-      if: github.actor != 'dependabot[bot]'
       run: |
         cd .github/workflows/cd-packaging-tests/bundler-webpack
         npm install @inrupt/solid-client @inrupt/solid-client-access-grants@$VERSION_NR
@@ -207,7 +204,6 @@ jobs:
     - name: Archive Webpack build artifacts
       uses: actions/upload-artifact@v2.3.1
       continue-on-error: true
-      if: github.actor != 'dependabot[bot]'
       with:
         name: webpack-dist
         path: .github/workflows/cd-packaging-tests/bundler-webpack/dist
