@@ -27,17 +27,6 @@ jobs:
         key: ${{ runner.os }}-node${{ runner.node-version }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
     - run: npm ci
     - run: npm run build
-    - run: npm run lint
-    - run: npm run check-licenses
-    # Some issues identified by npm audit cannot be fixed by us
-    # (i.e. they require an upstream dependency update),
-    # but using `npm-force-resolutions` we can at least override the upstream
-    # dependency when running an audit.
-    # If this task fails, first attempt to run `npm audit fix` or upgrade the
-    # relevant dependency; when that does not work, you can add the transitive
-    # dependency to the `resolutions` field in package.json according to the
-    # instructions in `npm-force-resolutions`'s README.
-    - run: npx npm-force-resolutions@0.0.10 && npm audit --audit-level=moderate
     - run: npm test
     - run: npx package-check
     - name: Archive code coverage results
