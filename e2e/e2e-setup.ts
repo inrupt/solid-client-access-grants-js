@@ -19,9 +19,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 import { config } from "dotenv-flow";
+import { join } from "path";
 
 config({
-  path: __dirname.concat("./env/"),
+  path: join(__dirname, "env"),
   // Disable warning messages in CI
   silent: process.env.CI === "true",
 });
