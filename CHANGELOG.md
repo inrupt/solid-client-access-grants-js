@@ -8,6 +8,12 @@ The following changes have been implemented but not released yet:
 
 -
 
+## [0.4.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.4.1) - 2022-01-28
+
+### Bugfixes
+
+- Some dependencies have been updated to mitigate vulnerabilities.
+
 ## [0.4.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.4.0) - 2021-11-30
 
 ### Demo
