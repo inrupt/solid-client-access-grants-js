@@ -12,4 +12,6 @@ jobs:
           node-version: "16.x"
           registry-url: "https://registry.npmjs.org"
       - run: npm ci
+      # The example files import the built code. The latter missing fails linting.
+      - run: npm run build
       - run: npm run lint:check
