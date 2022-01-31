@@ -78,7 +78,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       }
     );
     sharedFileIri = getSourceUrl(savedFile);
-    console.log(`Shared file IRI: ${sharedFileIri}`);
   });
 
   // Cleanup the shared file
