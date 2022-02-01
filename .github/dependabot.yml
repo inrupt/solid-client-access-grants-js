@@ -22,3 +22,10 @@ updates:
     # Check the npm registry for updates every day (weekdays).
     schedule:
       interval: "daily"
+  # Enable version updates for embedded demo app
+  - package-ecosystem: "npm"
+    # Look for `package.json` and `lock` files in the `e2e/browser/webapp` directory.
+    directory: "/e2e/browser/webapp"
+    # Check the npm registry for updates every day (weekdays).
+    schedule:
+      interval: "daily"
