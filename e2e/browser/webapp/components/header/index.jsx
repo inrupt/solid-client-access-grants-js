@@ -56,9 +56,6 @@ export default function Header() {
           </a>
         </Link>
       </div>
-      <div className={classes.logoContainer}>
-        <a href="/docs/index.html">Documentation preview</a>
-      </div>
 
       <div className={bem("header-banner__main-nav")} />
 
