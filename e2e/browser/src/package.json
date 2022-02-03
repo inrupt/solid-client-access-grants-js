@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@inrupt/prism-react-components": "^0.13.1-alpha.2",
+    "@inrupt/solid-client": "^1.18.0",
+    "@inrupt/solid-client-access-grants": "*",
     "@inrupt/solid-ui-react": "^2.7.0",
     "@material-ui/core": "^4.12.3",
     "@solid/lit-prism-patterns": "^0.13.1-alpha.2",
