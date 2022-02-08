@@ -1,12 +1,26 @@
-import {
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  beforeAll,
-  afterAll,
-} from "@jest/globals";
+/**
+ * Copyright 2022 Inrupt Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal in
+ * the Software without restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the
+ * Software, and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+// Globals are actually not injected, so this does not shadow anything.
+// eslint-disable-next-line no-shadow
+import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
 import {
   saveFileInContainer,
   getPodUrlAll,
@@ -83,7 +97,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
   // Cleanup the shared file
   afterAll(async () => {
     // Remove the shared file from the resource owner's Pod.
-    deleteFile(sharedFileIri, {
+    await deleteFile(sharedFileIri, {
       fetch: resourceOwnerSession.fetch,
     });
     // Making sure the session is logged out prevents tests from hanging due
@@ -267,7 +281,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       expect(
         bothPurposeFilter.every((vc) =>
           noPurposeFilter
-            .map((vc) => JSON.stringify(vc))
+            .map((vcNoPurpose) => JSON.stringify(vcNoPurpose))
             .includes(JSON.stringify(vc))
         )
       ).toBe(true);
@@ -275,14 +289,14 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       expect(
         partialPurposeFilter.every((vc) =>
           bothPurposeFilter
-            .map((vc) => JSON.stringify(vc))
+            .map((vcWithPurpose) => JSON.stringify(vcWithPurpose))
             .includes(JSON.stringify(vc))
         )
       ).toBe(true);
       expect(
         otherPartialPurposeFilter.every((vc) =>
           bothPurposeFilter
-            .map((vc) => JSON.stringify(vc))
+            .map((vcWithPurpose) => JSON.stringify(vcWithPurpose))
             .includes(JSON.stringify(vc))
         )
       ).toBe(true);

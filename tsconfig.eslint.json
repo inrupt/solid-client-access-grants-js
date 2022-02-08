@@ -6,6 +6,7 @@
     "examples/**/*.ts",
     "*.md",
     "./*.js",
+    "./**/*.jsx"
   ],
   "exclude": ["**/node_modules", "**/dist/**"]
 }
