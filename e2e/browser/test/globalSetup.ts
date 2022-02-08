@@ -29,6 +29,8 @@ async function globalSetup() {
   });
   const devServerOutput = childProcess.stdout;
 
+  console.debug("Spawned process ", childProcess.pid);
+
   await new Promise((resolve) => {
     const chunks = [];
     devServerOutput.on("data", (data) => {
@@ -43,7 +45,8 @@ async function globalSetup() {
 
   // Return the teardown function.
   return () => {
-    childProcess.kill();
+    console.debug("Killing child process");
+    childProcess.kill("SIGINT");
   };
 }
 export default globalSetup;

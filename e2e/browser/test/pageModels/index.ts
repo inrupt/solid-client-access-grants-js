@@ -19,10 +19,10 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { Page } from "@playwright/test";
+import { Page, request } from "@playwright/test";
 
 export class IndexPage {
-  page;
+  page: Page;
 
   constructor(page: Page) {
     this.page = page;
@@ -33,6 +33,11 @@ export class IndexPage {
   }
 
   async handleRedirect() {
-    await this.page.waitForSelector("[role=alert]");
+    // Wait for the backchannel exchange
+    await this.page.waitForRequest(
+      (request) =>
+        request.method() === "POST" && request.url().includes("/token")
+    );
+    await this.page.waitForResponse((response) => response.status() === 200);
   }
 }
