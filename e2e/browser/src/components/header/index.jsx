@@ -77,7 +77,7 @@ export default function Header() {
         {!sessionRequestInProgress && !session.info.isLoggedIn && (
           <LoginButton
             authOptions={{ clientName: CONFIG.demoTitle }}
-            oidcIssuer="https://broker.pod.inrupt.com"
+            oidcIssuer={CONFIG.defaultOidcProvider}
             redirectUrl={window.location.href}
             onError={console.error}
           >

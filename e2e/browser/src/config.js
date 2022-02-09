@@ -26,4 +26,5 @@ export default () => ({
   copyright: "Copyright 2022 Inrupt, Inc.",
   demoTitle: "Web App Template Demo",
   demoDescription: "A template for building in-browser demos",
+  defaultOidcProvider: "https://openid.dev-next.inrupt.com",
 });
