@@ -22,22 +22,16 @@
 /* eslint-disable jest/no-done-callback */
 
 import { test, expect } from "@playwright/test";
-import { config } from "dotenv-flow";
 import { essUserLogin } from "./roles";
 
-// Load environment variables from .env.test.local if available:
-config({
-  default_node_env: "test",
-  path: __dirname,
-  // In CI, actual environment variables will overwrite values from .env files.
-  // We don't need warning messages in the logs for that:
-  silent: process.env.CI === "true",
-});
+import { getTestingEnvironmentBrowser } from "../../e2e-setup";
+
+const { login, password } = getTestingEnvironmentBrowser();
 
 test("Granting access to a resource, then revoking it", async ({ page }) => {
   // Navigate to the test page and log in.
   await page.goto("/");
-  await essUserLogin(page);
+  await essUserLogin(page, login, password);
 
   // Create the resource. Note that the Promis.all prevents a race condition where
   // the request would be sent before we wait on it.
@@ -58,17 +52,17 @@ test("Granting access to a resource, then revoking it", async ({ page }) => {
   ]);
   await expect(
     page.innerText("pre[data-testid=access-grant]")
-  ).resolves.not.toStrictEqual("");
+  ).resolves.not.toBe("");
 
-  //Revoke the access grant.
+  // Revoke the access grant.
   await Promise.all([
     page.click("button[data-testid=revoke-access]"),
     page.waitForRequest((request) => request.method() === "POST"),
     page.waitForResponse((response) => response.status() === 204),
   ]);
-  await expect(
-    page.innerText("pre[data-testid=access-grant]")
-  ).resolves.toStrictEqual("");
+  await expect(page.innerText("pre[data-testid=access-grant]")).resolves.toBe(
+    ""
+  );
 
   // Cleanup the resource
   await Promise.all([

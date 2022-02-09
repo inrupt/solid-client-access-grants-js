@@ -24,17 +24,18 @@ import { IndexPage } from "./pageModels";
 import { BrokerPage } from "./pageModels/broker";
 import { CognitoPage } from "./pageModels/cognito";
 
-export const essUserLogin = async (page: Page) => {
+export const essUserLogin = async (
+  page: Page,
+  login: string,
+  password: string
+): Promise<void> => {
   const indexPage = new IndexPage(page);
   const cognitoPage = new CognitoPage(page);
   const authorisePage = new BrokerPage(page);
 
   await Promise.all([
-    indexPage.startLogin(process.env.E2E_TEST_ESS_IDP_URL),
-    cognitoPage.login(
-      process.env.E2E_TEST_ESS_COGNITO_USER!,
-      process.env.E2E_TEST_ESS_COGNITO_PASSWORD!
-    ),
+    indexPage.startLogin(),
+    cognitoPage.login(login, password),
     authorisePage.authoriseOnce(),
     indexPage.handleRedirect(),
   ]);

@@ -37,7 +37,7 @@ import {
   revokeAccessGrant,
   getFile,
 } from "../../src/index";
-import { getTestingEnvironment } from "../e2e-setup";
+import { getTestingEnvironmentNode } from "../e2e-setup";
 
 const {
   idp: oidcIssuer,
@@ -45,7 +45,7 @@ const {
   requestor,
   resourceOwner,
   vcProvider,
-} = getTestingEnvironment();
+} = getTestingEnvironmentNode();
 
 // This is the content of the file uploaded manually at SHARED_FILE_IRI.
 const SHARED_FILE_CONTENT = "Some content.\n";

@@ -28,7 +28,7 @@ export class IndexPage {
     this.page = page;
   }
 
-  async startLogin(idp: string) {
+  async startLogin() {
     await this.page.click("[data-testid=login-button]");
   }
 
