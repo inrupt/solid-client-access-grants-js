@@ -91,7 +91,7 @@ describe("parseUMAAuthTicket", () => {
 
     const ticket = parseUMAAuthTicket(header);
 
-    expect(ticket).toEqual("some_value");
+    expect(ticket).toBe("some_value");
   });
 
   it("returns null if no value is found", () => {
@@ -108,7 +108,7 @@ describe("parseUMAAuthIri", () => {
       'UMA realm="test" as_uri="https://fake.url" ticket="some_value"';
 
     const ticket = parseUMAAuthIri(header);
-    expect(ticket).toEqual("https://fake.url");
+    expect(ticket).toBe("https://fake.url");
   });
 
   it("returns null if no value is found", () => {
@@ -162,7 +162,7 @@ describe("exchangeTicketForAccessToken", () => {
       mockedFetch
     );
 
-    expect(token).toEqual("some_access_token");
+    expect(token).toBe("some_access_token");
     expect(mockedFetch).toHaveBeenCalledWith(tokenEndpoint, {
       method: "POST",
       headers: {
