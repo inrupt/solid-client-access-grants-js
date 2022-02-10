@@ -35,6 +35,8 @@ jobs:
           key: ${{ runner.os }}-node${{ runner.node-version }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
       - run: npm ci
       - run: npm run build
+      # This is required to install some dependencies on the host system, in particular for WebKit
+      - run: npx playwright install-deps
       - run: npx playwright install
       - run: npm run test:e2e:browser:build
       - run: npm run test:e2e:browser
