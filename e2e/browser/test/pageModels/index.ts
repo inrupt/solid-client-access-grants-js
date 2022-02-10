@@ -38,7 +38,9 @@ export class IndexPage {
       (request) =>
         request.method() === "POST" && request.url().includes("/token")
     );
-    await this.page.waitForResponse((response) => response.status() === 200);
-    await this.page.waitForTimeout(2000);
+    await Promise.all([
+      this.page.waitForResponse((response) => response.status() === 200),
+      this.page.waitForSelector("p[data-testid=logged-in-message]"),
+    ]);
   }
 }

@@ -123,7 +123,11 @@ export default function Home() {
       <h1>
         <code>@inrupt/solid-client-access-grants</code> test browser app
       </h1>
-      {session.info.isLoggedIn && <p>Logged in as: {session.info.webId}</p>}
+      {session.info.isLoggedIn && (
+        <p data-testid="logged-in-message">
+          Logged in as: {session.info.webId}
+        </p>
+      )}
       <div>
         <button onClick={(e) => handleCreate(e)} data-testid="create-resource">
           Create resource
