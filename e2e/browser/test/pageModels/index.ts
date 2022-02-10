@@ -39,5 +39,6 @@ export class IndexPage {
         request.method() === "POST" && request.url().includes("/token")
     );
     await this.page.waitForResponse((response) => response.status() === 200);
+    await this.page.waitForTimeout(2000);
   }
 }
