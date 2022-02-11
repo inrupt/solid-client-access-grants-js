@@ -11,21 +11,19 @@ jobs:
     # Since all the other jobs of this workflow depend on this one, skipping it should
     # skip the entire workflow.
     if: ${{ github.actor != 'dependabot[bot]' }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     environment:
       name: ${{ matrix.environment-name }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        node-version: [16.x]
         # NSS does not support static client registration, which we rely on for testing.
         environment-name: ["ESS Dev-Next"]
     steps:
       - uses: actions/checkout@v2.4.0
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 16.x
         uses: actions/setup-node@v2.5.1
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 16.x
       - name: Cache node modules
         uses: actions/cache@v2.1.7
         env:
