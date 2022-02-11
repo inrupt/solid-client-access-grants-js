@@ -43,12 +43,17 @@ interface Client {
   secret: string;
 }
 
-export interface TestingEnvironment {
+export interface TestingEnvironmentNode {
   requestor: Client;
   resourceOwner: Client;
   environment: AvailableEnvironment;
   idp: string;
   vcProvider: string;
+}
+
+export interface TestingEnvironmentBrowser {
+  login: string;
+  password: string;
 }
 
 export interface EnvVariables {
@@ -59,6 +64,8 @@ export interface EnvVariables {
   E2E_TEST_REQUESTOR_CLIENT_SECRET: string;
   E2E_TEST_RESOURCE_OWNER_CLIENT_ID: string;
   E2E_TEST_RESOURCE_OWNER_CLIENT_SECRET: string;
+  E2E_TEST_UI_LOGIN: string | undefined;
+  E2E_TEST_UI_PASSWORD: string | undefined;
 }
 
 function isTestingEnvironment(
@@ -123,7 +130,7 @@ function isTestingEnvironment(
   }
 }
 
-export function getTestingEnvironment(): TestingEnvironment {
+export function getTestingEnvironmentNode(): TestingEnvironmentNode {
   isTestingEnvironment(process.env);
 
   return {
@@ -138,5 +145,19 @@ export function getTestingEnvironment(): TestingEnvironment {
       id: process.env.E2E_TEST_RESOURCE_OWNER_CLIENT_ID,
       secret: process.env.E2E_TEST_RESOURCE_OWNER_CLIENT_SECRET,
     },
+  };
+}
+
+export function getTestingEnvironmentBrowser(): TestingEnvironmentBrowser {
+  if (process.env.E2E_TEST_UI_LOGIN === undefined) {
+    throw new Error("The environment variable E2E_TEST_UI_LOGIN is undefined.");
+  }
+  if (process.env.E2E_TEST_UI_PASSWORD === undefined) {
+    throw new Error("The environment variable E2E_TEST_UI_LOGIN is undefined.");
+  }
+
+  return {
+    login: process.env.E2E_TEST_UI_LOGIN,
+    password: process.env.E2E_TEST_UI_PASSWORD,
   };
 }

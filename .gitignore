@@ -13,3 +13,5 @@ docs/.DS_Store
 .env*.local
 .cache
 .github/**/package-lock.json
+# playwright output
+test-results/

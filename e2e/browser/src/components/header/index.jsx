@@ -84,6 +84,7 @@ export default function Header() {
             <LinkButton
               variant="small"
               className={bem("user-menu__list-item-trigger")}
+              data-testid="login-button"
             >
               Log In
             </LinkButton>
