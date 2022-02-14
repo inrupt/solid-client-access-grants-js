@@ -26,9 +26,7 @@ import {
 // This rule complains about the `@jest/globals` variables overriding global vars:
 // eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
-// This ESLint plugin seems to not be able to resolve subpackage imports:
-// eslint-disable-next-line import/no-unresolved
-import { mocked } from "ts-jest/utils";
+import { mocked } from "jest-mock";
 import { isValidConsentGrant, isValidAccessGrant } from "./isValidAccessGrant";
 
 jest.mock("@inrupt/solid-client", () => {
