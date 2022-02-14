@@ -59,15 +59,15 @@ import { isBaseRequest } from "../guard/isBaseRequest";
 import type { AccessCredentialType } from "../type/AccessCredentialType";
 
 function getConsentAttributes(
-  params: BaseRequestParameters,
+  params: ConsentRequestParameters,
   type: "BaseRequestBody"
 ): ConsentAttributes;
 function getConsentAttributes(
-  params: BaseRequestParameters,
+  params: ConsentGrantParameters,
   type: "BaseGrantBody"
 ): ConsentGrantAttributes;
 function getConsentAttributes(
-  params: BaseRequestParameters,
+  params: ConsentRequestParameters | ConsentGrantParameters,
   type: "BaseRequestBody" | "BaseGrantBody"
 ): ConsentAttributes | ConsentGrantAttributes {
   const modes = accessToResourceAccessModeArray(params.access);
@@ -79,22 +79,22 @@ function getConsentAttributes(
   if (type === "BaseGrantBody") {
     return {
       ...consentAttributes,
-      isProvidedTo: params.requestor,
+      isProvidedTo: (params as AccessGrantParameters).requestor,
     } as ConsentGrantAttributes;
   }
   return consentAttributes;
 }
 
 function getBaseBody(
-  params: BaseRequestParameters,
+  params: AccessRequestParameters,
   type: "BaseRequestBody"
 ): BaseRequestBody;
 function getBaseBody(
-  params: BaseRequestParameters,
+  params: AccessGrantParameters,
   type: "BaseGrantBody"
 ): BaseGrantBody;
 function getBaseBody(
-  params: BaseRequestParameters,
+  params: AccessRequestParameters | AccessGrantParameters,
   type: "BaseRequestBody" | "BaseGrantBody"
 ): BaseRequestBody | BaseGrantBody {
   const body = {
@@ -105,7 +105,6 @@ function getBaseBody(
         : CREDENTIAL_TYPE_ACCESS_REQUEST,
     ] as AccessCredentialType[],
     credentialSubject: {
-      id: params.requestor,
       inbox: params.requestorInboxUrl,
     },
   };
@@ -114,7 +113,10 @@ function getBaseBody(
       ...body,
       credentialSubject: {
         ...body.credentialSubject,
-        providedConsent: getConsentAttributes(params, type),
+        providedConsent: getConsentAttributes(
+          params as ConsentGrantParameters,
+          type
+        ),
       },
     };
   }
@@ -122,7 +124,10 @@ function getBaseBody(
     ...body,
     credentialSubject: {
       ...body.credentialSubject,
-      hasConsent: getConsentAttributes(params, type),
+      hasConsent: getConsentAttributes(
+        params as ConsentRequestParameters,
+        type
+      ),
     },
   };
 }
@@ -173,16 +178,17 @@ export function getRequestBody(
 export function getRequestBody(
   params: AccessRequestParameters | ConsentRequestParameters
 ): AccessRequestBody | ConsentRequestBody {
-  const requestBody = getBaseBody(params, "BaseRequestBody");
-
   if (isBaseConsentParameters(params)) {
     // This makes request a ConsentRequestBody
     return getConsentRequestBody(
       params,
-      requestBody as BaseRequestBody
+      getBaseBody(params, "BaseRequestBody")
     ) as ConsentRequestBody;
   }
-  return requestBody as AccessRequestBody;
+  return getBaseBody(
+    params as AccessRequestParameters,
+    "BaseRequestBody"
+  ) as AccessRequestBody;
 }
 
 export function getGrantBody(params: ConsentGrantParameters): ConsentGrantBody;
@@ -191,8 +197,6 @@ export function getGrantBody(
   params: AccessGrantParameters | ConsentGrantParameters
 ): AccessGrantBody | ConsentGrantBody {
   const grantBody = getBaseBody(params, "BaseGrantBody");
-  // TODO: This should be set by getBaseBody properly.
-  grantBody.credentialSubject.id = params.resourceOwner;
   grantBody.type = [CREDENTIAL_TYPE_ACCESS_GRANT];
   if (isBaseConsentParameters(params)) {
     // This makes request a ConsentGrantBody
@@ -205,7 +209,6 @@ export function getGrantBody(
 }
 
 export async function issueAccessVc(
-  vcSubject: WebId,
   vcBody:
     | BaseRequestBody
     | BaseGrantBody
@@ -230,7 +233,6 @@ export async function issueAccessVc(
 
   return issueVerifiableCredential(
     accessIssuerEndpoint.href,
-    vcSubject,
     {
       "@context": vcBody["@context"],
       ...vcBody.credentialSubject,

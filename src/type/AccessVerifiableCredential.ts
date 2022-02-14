@@ -47,12 +47,16 @@ export type CredentialSubject = {
   providedConsent?: ConsentGrantAttributes;
 };
 
+export type RequestOrGrantCredentialSubject = Required<
+  Omit<CredentialSubject, "id">
+>;
+
 export type RequestCredentialSubject = Required<
-  Omit<CredentialSubject, "providedConsent">
+  Omit<RequestOrGrantCredentialSubject, "providedConsent">
 >;
 
 export type GrantCredentialSubject = Required<
-  Omit<CredentialSubject, "hasConsent">
+  Omit<RequestOrGrantCredentialSubject, "hasConsent">
 >;
 
 export type BaseAccessVcBody = {

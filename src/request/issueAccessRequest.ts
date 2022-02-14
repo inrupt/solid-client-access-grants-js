@@ -23,7 +23,10 @@ import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { getRequestBody, issueAccessVc } from "../util/issueAccessVc";
 import { GC_CONSENT_STATUS_REQUESTED } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
-import type { IssueAccessRequestParameters } from "../type/IssueAccessRequestParameters";
+import type {
+  DeprecatedAccessRequestParameters,
+  IssueAccessRequestParameters,
+} from "../type/IssueAccessRequestParameters";
 
 /**
  * Request access to a given Resource.
@@ -35,6 +38,17 @@ import type { IssueAccessRequestParameters } from "../type/IssueAccessRequestPar
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
+  options?: AccessBaseOptions
+): Promise<VerifiableCredential>;
+/**
+ * @deprecated Please remove the `requestor` parameter.
+ */
+async function issueAccessRequest(
+  params: DeprecatedAccessRequestParameters,
+  options?: AccessBaseOptions
+): Promise<VerifiableCredential>;
+async function issueAccessRequest(
+  params: IssueAccessRequestParameters,
   options: AccessBaseOptions = {}
 ): Promise<VerifiableCredential> {
   const accessRequest = getRequestBody({
@@ -42,7 +56,7 @@ async function issueAccessRequest(
     status: GC_CONSENT_STATUS_REQUESTED,
   });
 
-  return issueAccessVc(params.requestor, accessRequest, options);
+  return issueAccessVc(accessRequest, options);
 }
 
 export default issueAccessRequest;

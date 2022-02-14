@@ -28,7 +28,6 @@ import type { ConsentStatus } from "./ConsentStatus";
 
 export type BaseRequestParameters = {
   access: Partial<access.Access>;
-  requestor: UrlString;
   requestorInboxUrl?: UrlString;
   resources: Array<UrlString>;
   status: ConsentStatus;
@@ -48,8 +47,8 @@ export type ConsentRequestParameters = AccessRequestParameters &
   BaseConsentParameters;
 
 export type AccessGrantParameters = BaseRequestParameters & {
-  resourceOwner: WebId;
   status: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
+  requestor: UrlString;
 };
 
 export type ConsentGrantParameters = AccessGrantParameters &
