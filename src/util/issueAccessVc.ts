@@ -37,7 +37,9 @@ import type {
   BaseConsentGrantBody,
   BaseConsentRequestBody,
   BaseGrantBody,
+  BaseGrantPayload,
   BaseRequestBody,
+  BaseRequestPayload,
   ConsentAttributes,
   ConsentGrantAttributes,
   ConsentGrantBody,
@@ -46,7 +48,6 @@ import type {
 import { isConsentRequest } from "../guard/isConsentRequest";
 import type {
   BaseConsentParameters,
-  BaseRequestParameters,
   ConsentRequestParameters,
   AccessRequestParameters,
   ConsentGrantParameters,
@@ -88,15 +89,15 @@ function getConsentAttributes(
 function getBaseBody(
   params: AccessRequestParameters,
   type: "BaseRequestBody"
-): BaseRequestBody;
+): BaseRequestPayload;
 function getBaseBody(
   params: AccessGrantParameters,
   type: "BaseGrantBody"
-): BaseGrantBody;
+): BaseGrantPayload;
 function getBaseBody(
   params: AccessRequestParameters | AccessGrantParameters,
   type: "BaseRequestBody" | "BaseGrantBody"
-): BaseRequestBody | BaseGrantBody {
+): BaseRequestPayload | BaseGrantPayload {
   const body = {
     "@context": CONSENT_CONTEXT,
     type: [
@@ -134,7 +135,7 @@ function getBaseBody(
 
 function getConsentBaseBody(
   params: BaseConsentParameters,
-  baseBody: BaseGrantBody | BaseRequestBody
+  baseBody: BaseGrantPayload | BaseRequestPayload
 ) {
   const request = { ...baseBody };
   // This makes request a ConsentGrantBody
@@ -161,7 +162,7 @@ function getConsentGrantBody(
 
 function getConsentRequestBody(
   params: BaseConsentParameters,
-  baseBody: BaseRequestBody
+  baseBody: BaseRequestPayload
 ): ConsentRequestBody {
   const request = getConsentBaseBody(params, baseBody);
   (request as ConsentRequestBody).credentialSubject.hasConsent.forPurpose =

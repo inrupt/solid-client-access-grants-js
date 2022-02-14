@@ -36,8 +36,6 @@ import {
   mockConsentRequestVc,
 } from "./approveAccessRequest.mock";
 
-const MOCK_RESOURCE_OWNER = "https://some.resource/owner";
-
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
   // skip type checking for those:
@@ -105,10 +103,9 @@ describe("approveAccessRequest", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
 
-    await approveAccessRequest(MOCK_RESOURCE_OWNER, mockAccessRequestVc());
+    await approveAccessRequest(mockAccessRequestVc());
 
     expect(mockedIssue).toHaveBeenCalledWith(
-      expect.anything(),
       expect.anything(),
       expect.anything(),
       expect.anything(),
@@ -138,7 +135,6 @@ describe("approveAccessRequest", () => {
     const spiedAcrSave = jest.spyOn(mockedClientModule.acp_v4, "saveAcrFor");
 
     await approveAccessRequest(
-      MOCK_RESOURCE_OWNER,
       mockAccessRequestVc({
         modes: [
           "http://www.w3.org/ns/auth/acl#Write",
@@ -174,9 +170,7 @@ describe("approveAccessRequest", () => {
   it("throws if the resource's ACR cannot be accessed by the current user", async () => {
     mockAcpClient({ hasAccessibleAcr: false });
     mockAccessApiEndpoint();
-    await expect(
-      approveAccessRequest(MOCK_RESOURCE_OWNER, mockAccessRequestVc())
-    ).rejects.toThrow(
+    await expect(approveAccessRequest(mockAccessRequestVc())).rejects.toThrow(
       "The current user does not have access to the resource's Access Control Resource"
     );
   });
@@ -184,7 +178,7 @@ describe("approveAccessRequest", () => {
   it("throws if the provided VC isn't a solid access request VC", async () => {
     mockAccessApiEndpoint();
     await expect(
-      approveAccessRequest(MOCK_RESOURCE_OWNER, {
+      approveAccessRequest({
         ...mockAccessRequestVc(),
         type: ["NotASolidAccessRequest"],
       })
@@ -197,7 +191,7 @@ describe("approveAccessRequest", () => {
     mockAccessApiEndpoint();
     const accessRequest = mockAccessRequestVc();
     await expect(
-      approveAccessRequest(MOCK_RESOURCE_OWNER, {
+      approveAccessRequest({
         ...accessRequest,
         credentialSubject: {
           ...accessRequest.credentialSubject,
@@ -219,18 +213,12 @@ describe("approveAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await approveAccessRequest(
-      MOCK_RESOURCE_OWNER,
-      mockAccessRequestVc(),
-      undefined,
-      {
-        accessEndpoint: "https://some.consent-endpoint.override/",
-        fetch: jest.fn(),
-      }
-    );
+    await approveAccessRequest(mockAccessRequestVc(), undefined, {
+      accessEndpoint: "https://some.consent-endpoint.override/",
+      fetch: jest.fn(),
+    });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       "https://some.consent-endpoint.override/issue",
-      expect.anything(),
       expect.anything(),
       expect.anything(),
       expect.anything()
@@ -248,16 +236,10 @@ describe("approveAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await approveAccessRequest(
-      MOCK_RESOURCE_OWNER,
-      mockAccessRequestVc(),
-      undefined,
-      {
-        fetch: mockedFetch,
-      }
-    );
+    await approveAccessRequest(mockAccessRequestVc(), undefined, {
+      fetch: mockedFetch,
+    });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
-      expect.anything(),
       expect.anything(),
       expect.anything(),
       expect.anything(),
@@ -275,18 +257,12 @@ describe("approveAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await approveAccessRequest(
-      MOCK_RESOURCE_OWNER,
-      mockAccessRequestVc(),
-      undefined,
-      {
-        fetch: jest.fn(global.fetch),
-      }
-    );
+    await approveAccessRequest(mockAccessRequestVc(), undefined, {
+      fetch: jest.fn(global.fetch),
+    });
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      MOCK_RESOURCE_OWNER,
       expect.objectContaining({
         providedConsent: {
           mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
@@ -319,18 +295,12 @@ describe("approveAccessRequest", () => {
       .mockResolvedValueOnce(
         new Response(JSON.stringify(mockConsentRequestVc()))
       );
-    await approveAccessRequest(
-      MOCK_RESOURCE_OWNER,
-      "https://some.credential",
-      undefined,
-      {
-        fetch: mockedFetch,
-      }
-    );
+    await approveAccessRequest("https://some.credential", undefined, {
+      fetch: mockedFetch,
+    });
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      MOCK_RESOURCE_OWNER,
       expect.objectContaining({
         providedConsent: {
           mode: mockConsentRequestVc().credentialSubject.hasConsent.mode,
@@ -360,18 +330,12 @@ describe("approveAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await approveAccessRequest(
-      MOCK_RESOURCE_OWNER,
-      mockConsentRequestVc(),
-      undefined,
-      {
-        fetch: jest.fn(global.fetch),
-      }
-    );
+    await approveAccessRequest(mockConsentRequestVc(), undefined, {
+      fetch: jest.fn(global.fetch),
+    });
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      MOCK_RESOURCE_OWNER,
       expect.objectContaining({
         providedConsent: {
           mode: mockConsentGrantVc().credentialSubject.providedConsent.mode,
@@ -403,7 +367,6 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential"
     );
     await approveAccessRequest(
-      MOCK_RESOURCE_OWNER,
       mockConsentRequestVc(),
       {
         resources: ["https://some-custom.resource"],
@@ -416,7 +379,6 @@ describe("approveAccessRequest", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      MOCK_RESOURCE_OWNER,
       expect.objectContaining({
         providedConsent: {
           mode: mockConsentRequestVc().credentialSubject.hasConsent.mode,
@@ -445,7 +407,6 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential"
     );
     await approveAccessRequest(
-      MOCK_RESOURCE_OWNER,
       mockConsentRequestVc(),
       {
         access: { append: true },
@@ -463,7 +424,6 @@ describe("approveAccessRequest", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      MOCK_RESOURCE_OWNER,
       expect.objectContaining({
         providedConsent: {
           mode: ["http://www.w3.org/ns/auth/acl#Append"],
@@ -492,7 +452,6 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential"
     );
     await approveAccessRequest(
-      MOCK_RESOURCE_OWNER,
       undefined,
       {
         access: { append: true },
@@ -510,7 +469,6 @@ describe("approveAccessRequest", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      MOCK_RESOURCE_OWNER,
       expect.objectContaining({
         providedConsent: {
           mode: ["http://www.w3.org/ns/auth/acl#Append"],
@@ -539,7 +497,6 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential"
     );
     await approveAccessRequest(
-      MOCK_RESOURCE_OWNER,
       mockConsentRequestVc(),
       {
         issuanceDate: new Date(2021, 8, 15),
@@ -551,7 +508,6 @@ describe("approveAccessRequest", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      MOCK_RESOURCE_OWNER,
       expect.objectContaining({
         providedConsent: {
           mode: mockConsentGrantVc().credentialSubject.providedConsent.mode,
@@ -585,7 +541,6 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential"
     );
     await approveAccessRequest(
-      MOCK_RESOURCE_OWNER,
       mockConsentRequestVc(),
       {
         expirationDate: new Date(2021, 8, 16),
@@ -597,7 +552,6 @@ describe("approveAccessRequest", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      MOCK_RESOURCE_OWNER,
       expect.objectContaining({
         providedConsent: {
           mode: mockConsentRequestVc().credentialSubject.hasConsent.mode,
@@ -630,7 +584,6 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential"
     );
     await approveAccessRequest(
-      MOCK_RESOURCE_OWNER,
       {
         ...mockConsentRequestVc(),
         expirationDate: undefined,
@@ -643,7 +596,6 @@ describe("approveAccessRequest", () => {
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      MOCK_RESOURCE_OWNER,
       expect.objectContaining({
         providedConsent: {
           mode: mockConsentRequestVc().credentialSubject.hasConsent.mode,
