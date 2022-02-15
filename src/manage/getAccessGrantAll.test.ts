@@ -82,7 +82,9 @@ describe("getAccessGrantAll", () => {
   });
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the appropriate requestor", async () => {
-    const paramsInput: Partial<IssueAccessRequestParameters> = {
+    const paramsInput: Partial<
+      IssueAccessRequestParameters & { requestor: string }
+    > = {
       requestor: "https://some.requestor",
     };
 
@@ -156,7 +158,6 @@ describe("getAccessGrantAll", () => {
           mode: ["http://www.w3.org/ns/auth/acl#Read"],
           forPersonalData: [resource.href],
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          isProvidedTo: paramsInput.requestor,
         },
       },
     };
