@@ -79,7 +79,7 @@ export async function getUmaConfiguration(
 /**
  * @hidden
  */
-function simpleFormUrlEncoded(form: Record<string, string>): string {
+export function simpleFormUrlEncoded(form: Record<string, string>): string {
   return Object.keys(form)
     .reduce((encoded, key) => {
       encoded.push(`${key}=${encodeURIComponent(form[key])}`);

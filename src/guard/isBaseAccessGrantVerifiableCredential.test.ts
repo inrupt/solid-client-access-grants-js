@@ -27,7 +27,7 @@ const validAccessGrantVerifiableCredential = {
   "@context": [
     "https://www.w3.org/2018/credentials/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1",
-    "https://consent.pod.inrupt.com/credentials/v1",
+    "https://vc.inrupt.com/credentials/v1",
   ],
   credentialSubject: {
     providedConsent: {
