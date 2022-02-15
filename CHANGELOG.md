@@ -6,7 +6,9 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 The following changes have been implemented but not released yet:
 
--
+### Bugfixes
+
+- The JSON-LD context URL has changed from https://vc.inrupt.com/credentials/v1 to https://vc.inrupt.com/credentials/v1.
 
 ## [0.4.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.4.1) - 2022-01-28
 
