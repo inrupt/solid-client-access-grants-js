@@ -71,7 +71,7 @@ describe("getRequestBody", () => {
     expect(requestBody).toStrictEqual({
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
-        "https://consent.pod.inrupt.com/credentials/v1",
+        "https://vc.inrupt.com/credentials/v1",
       ],
       credentialSubject: {
         hasConsent: {
@@ -106,7 +106,7 @@ describe("getRequestBody", () => {
     expect(requestBody).toStrictEqual({
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
-        "https://consent.pod.inrupt.com/credentials/v1",
+        "https://vc.inrupt.com/credentials/v1",
       ],
       credentialSubject: {
         hasConsent: {

@@ -56,7 +56,7 @@ describe("isValidAccessGrant", () => {
   const MOCK_ACCESS_GRANT = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
-      "https://consent.pod.inrupt.com/credentials/v1",
+      "https://vc.inrupt.com/credentials/v1",
     ],
     id: "https://example.com/id",
     issuer: "https://example.com/issuer",
