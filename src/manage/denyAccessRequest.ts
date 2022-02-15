@@ -79,7 +79,7 @@ async function denyAccessRequest(
 async function denyAccessRequest(
   resourceOwner: WebId,
   vc: VerifiableCredential | URL | UrlString,
-  options: AccessBaseOptions
+  options?: AccessBaseOptions
 ): Promise<VerifiableCredential>;
 async function denyAccessRequest(
   resourceOwnerOrVc: WebId | VerifiableCredential | URL | UrlString,
