@@ -615,4 +615,42 @@ describe("approveAccessRequest", () => {
       expect.anything()
     );
   });
+
+  it("issues a proper access grant from a request VC using the deprecated signature", async () => {
+    mockAcpClient();
+    mockAccessApiEndpoint();
+    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      issueVerifiableCredential: () => unknown;
+    };
+    const spiedIssueRequest = jest.spyOn(
+      mockedVcModule,
+      "issueVerifiableCredential"
+    );
+    await approveAccessRequest(
+      "https://some.resource.owner",
+      mockAccessRequestVc(),
+      undefined,
+      {
+        fetch: jest.fn(global.fetch),
+      }
+    );
+
+    expect(spiedIssueRequest).toHaveBeenCalledWith(
+      `${MOCKED_ACCESS_ISSUER}/issue`,
+      expect.objectContaining({
+        providedConsent: {
+          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          forPersonalData:
+            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
+          isProvidedTo: mockAccessRequestVc().credentialSubject.id,
+        },
+        inbox: mockAccessRequestVc().credentialSubject.inbox,
+      }),
+      expect.objectContaining({
+        type: ["SolidAccessGrant"],
+      }),
+      expect.anything()
+    );
+  });
 });
