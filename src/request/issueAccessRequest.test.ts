@@ -324,7 +324,6 @@ describe("issueAccessRequest", () => {
       expect.anything(),
       expect.anything(),
       expect.anything(),
-      expect.anything(),
       {
         fetch: scab.fetch,
       }
