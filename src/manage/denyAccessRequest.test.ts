@@ -67,7 +67,6 @@ describe("denyAccessRequest", () => {
       expect.anything(),
       expect.anything(),
       expect.anything(),
-      expect.anything(),
       {
         fetch: scab.fetch,
       }
@@ -115,7 +114,6 @@ describe("denyAccessRequest", () => {
       "https://some.access-endpoint.override/".concat("issue"),
       expect.anything(),
       expect.anything(),
-      expect.anything(),
       expect.anything()
     );
   });
@@ -141,7 +139,6 @@ describe("denyAccessRequest", () => {
       expect.anything(),
       expect.anything(),
       expect.anything(),
-      expect.anything(),
       { fetch: mockedFetch }
     );
   });
@@ -155,18 +152,13 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await denyAccessRequest(
-      "https://some.resource/owner",
-      mockAccessRequestVc(),
-      {
-        fetch: jest.fn(global.fetch),
-      }
-    );
+    await denyAccessRequest(mockAccessRequestVc(), {
+      fetch: jest.fn(global.fetch),
+    });
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      "https://some.resource/owner",
       expect.objectContaining({
         providedConsent: {
           mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
@@ -198,17 +190,12 @@ describe("denyAccessRequest", () => {
       .mockResolvedValueOnce(
         new Response(JSON.stringify(mockAccessRequestVc()))
       );
-    await denyAccessRequest(
-      "https://some.resource/owner",
-      "https://some.credential",
-      {
-        fetch: mockedFetch,
-      }
-    );
+    await denyAccessRequest("https://some.credential", {
+      fetch: mockedFetch,
+    });
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      "https://some.resource/owner",
       expect.objectContaining({
         id: "https://some.resource/owner",
         providedConsent: expect.objectContaining({
@@ -240,18 +227,13 @@ describe("denyAccessRequest", () => {
       .mockResolvedValueOnce(
         new Response(JSON.stringify(mockAccessRequestVc()))
       );
-    await denyAccessRequest(
-      "https://some.resource/owner",
-      new URL("https://some.credential"),
-      {
-        fetch: mockedFetch,
-      }
-    );
+    await denyAccessRequest(new URL("https://some.credential"), {
+      fetch: mockedFetch,
+    });
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      "https://some.resource/owner",
       expect.objectContaining({
         id: "https://some.resource/owner",
         providedConsent: expect.objectContaining({
