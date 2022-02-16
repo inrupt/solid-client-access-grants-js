@@ -19,7 +19,6 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { WebId } from "@inrupt/solid-client";
 import {
   issueVerifiableCredential,
   VerifiableCredential,

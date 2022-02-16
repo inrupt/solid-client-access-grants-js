@@ -35,6 +35,7 @@ import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessV
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 
 // Merge back in denyAccessRequest after the deprecated signature has been removed.
+// eslint-disable-next-line camelcase
 async function internal_denyAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
   options: AccessBaseOptions
