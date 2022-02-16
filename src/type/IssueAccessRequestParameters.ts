@@ -41,13 +41,16 @@ import type { access, UrlString, WebId } from "@inrupt/solid-client";
 // TODO: Get rid of BaseRequestParameters in favour of this
 export type IssueAccessRequestParameters = {
   access: Partial<access.Access>;
-  requestor: WebId;
   requestorInboxUrl?: UrlString;
   resourceOwner: WebId;
   resources: Array<UrlString>;
   purpose?: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;
+};
+
+export type DeprecatedAccessRequestParameters = IssueAccessRequestParameters & {
+  requestor: WebId;
 };
 
 /**

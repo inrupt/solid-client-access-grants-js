@@ -22,13 +22,19 @@
 import {
   BaseGrantBody,
   GrantCredentialSubject,
+  GrantCredentialSubjectPayload,
   RequestCredentialSubject,
+  RequestCredentialSubjectPayload,
 } from "../type/AccessVerifiableCredential";
 import { isConsentAttributes } from "./isConsentAttributes";
 import { isBaseAccessVcBody } from "./isBaseAccessVcBody";
 
 function isGrantCredentialSubject(
-  x: RequestCredentialSubject | GrantCredentialSubject
+  x:
+    | RequestCredentialSubject
+    | GrantCredentialSubject
+    | GrantCredentialSubjectPayload
+    | RequestCredentialSubjectPayload
 ): x is GrantCredentialSubject {
   return (x as GrantCredentialSubject).providedConsent !== undefined;
 }

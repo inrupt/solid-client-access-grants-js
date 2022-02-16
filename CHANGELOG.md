@@ -10,6 +10,11 @@ The following changes have been implemented but not released yet:
 
 - The JSON-LD context URL has changed from https://vc.inrupt.com/credentials/v1 to https://vc.inrupt.com/credentials/v1.
 
+### Deprecation
+
+- `approveAccessRequest` and `denyAccessRequest` no longer requires the `resourceOwner` parameter.
+- `issueAccessRequest` options no longer include the `requestor` field.
+
 ## [0.4.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.4.1) - 2022-01-28
 
 ### Bugfixes

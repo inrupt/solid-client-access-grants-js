@@ -19,7 +19,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import type { access, UrlString, WebId } from "@inrupt/solid-client";
+import type { access, UrlString } from "@inrupt/solid-client";
 import type {
   GC_CONSENT_STATUS_REQUESTED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
@@ -28,7 +28,6 @@ import type { ConsentStatus } from "./ConsentStatus";
 
 export type BaseRequestParameters = {
   access: Partial<access.Access>;
-  requestor: UrlString;
   requestorInboxUrl?: UrlString;
   resources: Array<UrlString>;
   status: ConsentStatus;
@@ -48,8 +47,8 @@ export type ConsentRequestParameters = AccessRequestParameters &
   BaseConsentParameters;
 
 export type AccessGrantParameters = BaseRequestParameters & {
-  resourceOwner: WebId;
   status: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
+  requestor: UrlString;
 };
 
 export type ConsentGrantParameters = AccessGrantParameters &

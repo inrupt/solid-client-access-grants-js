@@ -51,29 +51,44 @@ export type RequestCredentialSubject = Required<
   Omit<CredentialSubject, "providedConsent">
 >;
 
+export type RequestCredentialSubjectPayload = Omit<
+  RequestCredentialSubject,
+  "id"
+>;
+
 export type GrantCredentialSubject = Required<
   Omit<CredentialSubject, "hasConsent">
 >;
 
+export type GrantCredentialSubjectPayload = Omit<GrantCredentialSubject, "id">;
+
 export type BaseAccessVcBody = {
   "@context": typeof CONSENT_CONTEXT;
   type: AccessCredentialType[];
-  credentialSubject: RequestCredentialSubject | GrantCredentialSubject;
+  credentialSubject:
+    | RequestCredentialSubject
+    | GrantCredentialSubject
+    | Omit<RequestCredentialSubject, "id">
+    | Omit<GrantCredentialSubject, "id">;
   issuanceDate?: string;
 };
 
-export type BaseRequestBody = {
-  "@context": typeof CONSENT_CONTEXT;
-  type: AccessCredentialType[];
+export type BaseRequestBody = BaseAccessVcBody & {
   credentialSubject: RequestCredentialSubject;
-  issuanceDate?: string;
 };
 
-export type BaseGrantBody = {
-  "@context": typeof CONSENT_CONTEXT;
-  type: AccessCredentialType[];
+export type BaseGrantBody = BaseAccessVcBody & {
   credentialSubject: GrantCredentialSubject;
-  issuanceDate?: string;
+};
+
+// When sending a VC payload to be issued, the subject id is omitted.
+export type BaseRequestPayload = BaseAccessVcBody & {
+  credentialSubject: Omit<RequestCredentialSubject, "id">;
+};
+
+// When sending a VC payload to be issued, the subject id is omitted.
+export type BaseGrantPayload = BaseAccessVcBody & {
+  credentialSubject: Omit<GrantCredentialSubject, "id">;
 };
 
 // TODO: Check why the access credentials would not have optional expiration dates

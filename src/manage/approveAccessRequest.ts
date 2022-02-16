@@ -85,43 +85,24 @@ async function addVcMatcher(
   );
 }
 
-/**
- * Approve an access request. The content of the approved access request is provided
- * as a Verifiable Credential which properties may be overriden if necessary.
- *
- * @param requestVc The Verifiable Credential representing the Access Request. If
- * not conform to an Access Request, the function will throw.
- * @param requestOverride Elements overriding information from the provided Verifiable Credential.
- * @param options Optional properties to customise the access grant behaviour.
- * @returns A Verifiable Credential representing the granted access.
- * @since 0.0.1.
- */
-export async function approveAccessRequest(
-  resourceOwner: WebId,
+// The following may be removed and merged back in `approveAccessRequest` once
+// the deprecated signature is removed.
+// eslint-disable-next-line camelcase
+async function internal_approveAccessRequest(
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions
 ): Promise<VerifiableCredential>;
-/**
- * Approve an access request. The content of the approved access request is provided
- * as a set of claims, and no input Verifiable Credential is expected.
- *
- * @param requestVc A Verifiable Credential that would represent the Access Request if provided.
- * @param requestOverride Claims constructing the Access Grant.
- * @param options Optional properties to customise the access grant behaviour.
- * @returns A Verifiable Credential representing the granted access.
- * @since 0.0.1.
- */
-export async function approveAccessRequest(
-  resourceOwner: WebId,
+// eslint-disable-next-line camelcase
+async function internal_approveAccessRequest(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions
 ): Promise<VerifiableCredential>;
-export async function approveAccessRequest(
-  resourceOwner: WebId,
+// eslint-disable-next-line camelcase
+async function internal_approveAccessRequest(
   requestVc?: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options: AccessBaseOptions = {}
@@ -143,7 +124,6 @@ export async function approveAccessRequest(
   );
 
   const grantBody = getGrantBody({
-    resourceOwner,
     access: internalOptions.access,
     requestor: internalOptions.requestor,
     resources: internalOptions.resources,
@@ -161,7 +141,97 @@ export async function approveAccessRequest(
     options
   );
 
-  return issueAccessVc(resourceOwner, grantBody, options);
+  return issueAccessVc(grantBody, options);
+}
+
+/**
+ * Approve an access request. The content of the approved access request is provided
+ * as a Verifiable Credential which properties may be overriden if necessary.
+ *
+ * @param requestVc The Verifiable Credential representing the Access Request. If
+ * not conform to an Access Request, the function will throw.
+ * @param requestOverride Elements overriding information from the provided Verifiable Credential.
+ * @param options Optional properties to customise the access grant behaviour.
+ * @returns A Verifiable Credential representing the granted access.
+ * @since 0.0.1.
+ */
+export async function approveAccessRequest(
+  // If the VC is specified, all the overrides become optional
+  requestVc: VerifiableCredential | URL | UrlString,
+  requestOverride?: Partial<ApproveAccessRequestOverrides>,
+  options?: AccessBaseOptions
+): Promise<VerifiableCredential>;
+
+/**
+ * Approve an access request. The content of the approved access request is provided
+ * as a set of claims, and no input Verifiable Credential is expected.
+ *
+ * @param requestVc A Verifiable Credential that would represent the Access Request if provided.
+ * @param requestOverride Claims constructing the Access Grant.
+ * @param options Optional properties to customise the access grant behaviour.
+ * @returns A Verifiable Credential representing the granted access.
+ * @since 0.0.1.
+ */
+export async function approveAccessRequest(
+  requestVc: undefined,
+  // If the VC is undefined, then some of the overrides become mandatory
+  requestOverride: ApproveAccessRequestOverrides,
+  options?: AccessBaseOptions
+): Promise<VerifiableCredential>;
+
+/**
+ * @deprecated Please remove the `resourceOwner` parameter.
+ * @hidden
+ */
+export async function approveAccessRequest(
+  resourceOwner: WebId,
+  // If the VC is specified, all the overrides become optional
+  requestVc: VerifiableCredential | URL | UrlString,
+  requestOverride?: Partial<ApproveAccessRequestOverrides>,
+  options?: AccessBaseOptions
+): Promise<VerifiableCredential>;
+
+/**
+ * @deprecated Please remove the `resourceOwner` parameter.
+ * @hidden
+ */
+export async function approveAccessRequest(
+  resourceOwner: WebId,
+  requestVc: undefined,
+  // If the VC is undefined, then some of the overrides become mandatory
+  requestOverride: ApproveAccessRequestOverrides,
+  options?: AccessBaseOptions
+): Promise<VerifiableCredential>;
+export async function approveAccessRequest(
+  resourceOwnerOrRequestVc:
+    | WebId
+    | VerifiableCredential
+    | URL
+    | UrlString
+    | undefined,
+  requestVcOrOverride?:
+    | VerifiableCredential
+    | URL
+    | UrlString
+    | Partial<ApproveAccessRequestOverrides>,
+  requestOverrideOrOptions?:
+    | Partial<ApproveAccessRequestOverrides>
+    | AccessBaseOptions,
+  options?: AccessBaseOptions
+): Promise<VerifiableCredential> {
+  if (typeof options === "object") {
+    // The deprecated signature is being used, so ignore the first parameter.
+    return internal_approveAccessRequest(
+      requestVcOrOverride as VerifiableCredential | URL | UrlString,
+      requestOverrideOrOptions as Partial<ApproveAccessRequestOverrides>,
+      options
+    );
+  }
+  return internal_approveAccessRequest(
+    resourceOwnerOrRequestVc as VerifiableCredential | URL | UrlString,
+    requestVcOrOverride as Partial<ApproveAccessRequestOverrides>,
+    requestOverrideOrOptions as AccessBaseOptions
+  );
 }
 
 export default approveAccessRequest;

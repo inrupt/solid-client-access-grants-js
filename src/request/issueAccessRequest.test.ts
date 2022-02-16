@@ -62,7 +62,6 @@ describe("getRequestBody", () => {
   it("can generate a minimal request body", () => {
     const requestBody = getRequestBody({
       access: { append: true },
-      requestor: MOCK_REQUESTOR_IRI,
       resources: ["https://some.pod/resource"],
       status: "https://w3id.org/GConsent#ConsentStatusRequested",
       requestorInboxUrl: MOCK_REQUESTOR_INBOX,
@@ -79,7 +78,6 @@ describe("getRequestBody", () => {
           hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
           mode: ["http://www.w3.org/ns/auth/acl#Append"],
         },
-        id: MOCK_REQUESTOR_IRI,
         inbox: MOCK_REQUESTOR_INBOX,
       },
       type: ["SolidAccessRequest"],
@@ -94,7 +92,6 @@ describe("getRequestBody", () => {
         controlRead: true,
         controlWrite: true,
       },
-      requestor: MOCK_REQUESTOR_IRI,
       resources: ["https://some.pod/resource"],
       issuanceDate: new Date(Date.UTC(1955, 5, 8, 13, 37, 42, 42)),
       expirationDate: new Date(Date.UTC(1990, 10, 12, 13, 37, 42, 42)),
@@ -119,7 +116,6 @@ describe("getRequestBody", () => {
             "http://www.w3.org/ns/auth/acl#Control",
           ],
         },
-        id: MOCK_REQUESTOR_IRI,
         inbox: "https://some.pod/inbox/",
       },
       expirationDate: "1990-11-12T13:37:42.042Z",
@@ -159,7 +155,6 @@ describe("issueAccessRequest", () => {
     await issueAccessRequest(
       {
         access: { read: true },
-        requestor: MOCK_REQUESTOR_IRI,
         resourceOwner: MOCK_REQUESTEE_IRI,
         resources: ["https://some.pod/resource"],
         requestorInboxUrl: MOCK_REQUESTOR_INBOX,
@@ -171,9 +166,7 @@ describe("issueAccessRequest", () => {
 
     expect(mockedIssue).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      MOCK_REQUESTOR_IRI,
       expect.objectContaining({
-        id: MOCK_REQUESTOR_IRI,
         hasConsent: {
           mode: ["http://www.w3.org/ns/auth/acl#Read"],
           hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
@@ -202,14 +195,12 @@ describe("issueAccessRequest", () => {
 
     await issueAccessRequest({
       access: { read: true },
-      requestor: MOCK_REQUESTOR_IRI,
       resourceOwner: MOCK_REQUESTEE_IRI,
       resources: ["https://some.pod/resource"],
       requestorInboxUrl: MOCK_REQUESTOR_INBOX,
     });
 
     expect(mockedIssue).toHaveBeenCalledWith(
-      expect.anything(),
       expect.anything(),
       expect.anything(),
       expect.anything(),
@@ -236,7 +227,6 @@ describe("issueAccessRequest", () => {
     await issueAccessRequest(
       {
         access: { read: true },
-        requestor: MOCK_REQUESTOR_IRI,
         resourceOwner: MOCK_REQUESTEE_IRI,
         resources: ["https://some.pod/resource"],
         purpose: ["https://some.vocab/purpose#save-the-world"],
@@ -251,9 +241,7 @@ describe("issueAccessRequest", () => {
 
     expect(mockedIssue).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      MOCK_REQUESTOR_IRI,
       expect.objectContaining({
-        id: MOCK_REQUESTOR_IRI,
         hasConsent: {
           mode: ["http://www.w3.org/ns/auth/acl#Read"],
           hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
@@ -286,7 +274,6 @@ describe("issueAccessRequest", () => {
 
     await issueAccessRequest({
       access: { read: true },
-      requestor: MOCK_REQUESTOR_IRI,
       resourceOwner: MOCK_REQUESTEE_IRI,
       resources: ["https://some.pod/resource"],
       purpose: ["https://some.vocab/purpose#save-the-world"],
@@ -295,9 +282,7 @@ describe("issueAccessRequest", () => {
 
     expect(mockedIssue).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
-      MOCK_REQUESTOR_IRI,
       expect.objectContaining({
-        id: MOCK_REQUESTOR_IRI,
         hasConsent: {
           mode: ["http://www.w3.org/ns/auth/acl#Read"],
           hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
@@ -327,7 +312,6 @@ describe("issueAccessRequest", () => {
 
     await issueAccessRequest({
       access: { read: true },
-      requestor: MOCK_REQUESTOR_IRI,
       resourceOwner: MOCK_REQUESTEE_IRI,
       resources: ["https://some.pod/resource"],
       purpose: ["https://some.vocab/purpose#save-the-world"],
@@ -337,7 +321,6 @@ describe("issueAccessRequest", () => {
     });
 
     expect(mockedIssue).toHaveBeenCalledWith(
-      expect.anything(),
       expect.anything(),
       expect.anything(),
       expect.anything(),

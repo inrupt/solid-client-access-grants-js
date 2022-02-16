@@ -46,7 +46,9 @@ import { getSessionFetch } from "../util/getSessionFetch";
 async function getAccessGrantAll(
   resource: URL | UrlString,
   params: Partial<
-    Pick<IssueAccessRequestParameters, "requestor" | "access" | "purpose">
+    Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
+      requestor: string;
+    }
   > = {},
   options: AccessBaseOptions = {}
 ): Promise<Array<VerifiableCredential>> {
