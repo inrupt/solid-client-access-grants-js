@@ -26,7 +26,6 @@ import {
 // This rule complains about the `@jest/globals` variables overriding global vars:
 // eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
-import { mocked } from "jest-mock";
 import { isValidConsentGrant, isValidAccessGrant } from "./isValidAccessGrant";
 
 jest.mock("@inrupt/solid-client", () => {
@@ -83,7 +82,7 @@ describe("isValidAccessGrant", () => {
   const MOCK_VERIFY_RESPONSE = { checks: [], warning: [], errors: [] };
 
   it("uses the provided fetch if any", async () => {
-    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
       new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
         status: 200,
@@ -98,8 +97,8 @@ describe("isValidAccessGrant", () => {
   });
 
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    mocked(isVerifiableCredential).mockReturnValueOnce(true);
-    mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
       verifierService: "https://some.vc.verifier",
     });
     // TypeScript can't infer the type of mock modules imported via Jest;
@@ -114,8 +113,8 @@ describe("isValidAccessGrant", () => {
   });
 
   it("sends the given vc to the verify endpoint", async () => {
-    mocked(isVerifiableCredential).mockReturnValueOnce(true);
-    mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
       verifierService: "https://some.vc.verifier",
     });
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
@@ -137,10 +136,10 @@ describe("isValidAccessGrant", () => {
   });
 
   it("retrieves the vc if a url was passed", async () => {
-    mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+    jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
       verifierService: "https://some.vc.verifier",
     });
-    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
     const mockedFetch = jest
       .fn(global.fetch)
       // First, the VC is fetched
@@ -168,7 +167,7 @@ describe("isValidAccessGrant", () => {
       status: 200,
       json: jest.fn().mockReturnValueOnce({ someField: "Not a credential" }),
     });
-    mocked(isVerifiableCredential).mockReturnValueOnce(false);
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(false);
 
     await expect(
       isValidAccessGrant("https://example.com/someVc", {
@@ -188,7 +187,7 @@ describe("isValidAccessGrant", () => {
       vcModule,
       "getVerifiableCredentialApiConfiguration"
     );
-    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
       new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
         status: 200,
@@ -206,12 +205,12 @@ describe("isValidAccessGrant", () => {
   });
 
   it("discovers the verification endpoint if none is provided", async () => {
-    const mockedDiscovery = mocked(
-      getVerifiableCredentialApiConfiguration
-    ).mockResolvedValueOnce({
-      verifierService: "https://some.vc.verifier",
-    });
-    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    const mockedDiscovery = jest
+      .mocked(getVerifiableCredentialApiConfiguration)
+      .mockResolvedValueOnce({
+        verifierService: "https://some.vc.verifier",
+      });
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
     const mockedFetch = jest
       .fn(global.fetch)
       // First, the VC is fetched
@@ -233,8 +232,10 @@ describe("isValidAccessGrant", () => {
   });
 
   it("throws if no verification endpoint is discovered", async () => {
-    mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({});
-    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    jest
+      .mocked(getVerifiableCredentialApiConfiguration)
+      .mockResolvedValueOnce({});
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
     const mockedFetch = jest
       .fn(global.fetch)
       // First, the VC is fetched
@@ -258,10 +259,10 @@ describe("isValidAccessGrant", () => {
   });
 
   it("returns the validation result from the access endpoint", async () => {
-    mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+    jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
       verifierService: "https://some.vc.verifier",
     });
-    mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
       new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
         status: 200,
