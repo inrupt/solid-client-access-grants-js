@@ -161,16 +161,7 @@ export async function approveAccessRequest(
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions
 ): Promise<VerifiableCredential>;
-/**
- * @deprecated Please remove the `resourceOwner` parameter.
- */
-export async function approveAccessRequest(
-  resourceOwner: WebId,
-  // If the VC is specified, all the overrides become optional
-  requestVc: VerifiableCredential | URL | UrlString,
-  requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions
-): Promise<VerifiableCredential>;
+
 /**
  * Approve an access request. The content of the approved access request is provided
  * as a set of claims, and no input Verifiable Credential is expected.
@@ -187,8 +178,22 @@ export async function approveAccessRequest(
   requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions
 ): Promise<VerifiableCredential>;
+
 /**
  * @deprecated Please remove the `resourceOwner` parameter.
+ * @hidden
+ */
+export async function approveAccessRequest(
+  resourceOwner: WebId,
+  // If the VC is specified, all the overrides become optional
+  requestVc: VerifiableCredential | URL | UrlString,
+  requestOverride?: Partial<ApproveAccessRequestOverrides>,
+  options?: AccessBaseOptions
+): Promise<VerifiableCredential>;
+
+/**
+ * @deprecated Please remove the `resourceOwner` parameter.
+ * @hidden
  */
 export async function approveAccessRequest(
   resourceOwner: WebId,
