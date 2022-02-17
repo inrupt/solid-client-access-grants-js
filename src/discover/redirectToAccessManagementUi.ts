@@ -27,6 +27,7 @@ import {
   getAccessManagementUi,
   getAccessManagementUiFromWellKnown,
 } from "./getAccessManagementUi";
+import { RedirectOptions, redirectWithParameters } from "../util/redirect";
 
 const REQUEST_VC_PARAM_NAME = "requestVc";
 const REDIRECT_URL_PARAM_NAME = "redirectUrl";
@@ -46,8 +47,7 @@ const REDIRECT_URL_PARAM_NAME = "redirectUrl";
  *
  * @since 0.4.0
  */
-export type RedirectToAccessManagementUiOptions = {
-  redirectCallback?: (url: string) => void;
+export type RedirectToAccessManagementUiOptions = RedirectOptions & {
   fetch?: typeof global.fetch;
   resourceOwner?: WebId;
   /**
@@ -123,26 +123,16 @@ export async function redirectToAccessManagementUi(
     );
   }
 
-  const targetIri = new URL(accessManagementUi);
-  targetIri.searchParams.append(
-    REQUEST_VC_PARAM_NAME,
-    btoa(JSON.stringify(requestVc))
+  return redirectWithParameters(
+    accessManagementUi,
+    {
+      [`${REQUEST_VC_PARAM_NAME}`]: btoa(JSON.stringify(requestVc)),
+      [`${REDIRECT_URL_PARAM_NAME}`]: encodeURI(
+        typeof redirectUrl === "string" ? redirectUrl : redirectUrl.href
+      ),
+    },
+    options
   );
-  targetIri.searchParams.append(
-    REDIRECT_URL_PARAM_NAME,
-    encodeURI(typeof redirectUrl === "string" ? redirectUrl : redirectUrl.href)
-  );
-
-  if (options !== undefined && options.redirectCallback !== undefined) {
-    options.redirectCallback(targetIri.href);
-  } else {
-    if (typeof window === "undefined") {
-      throw new Error(
-        "In a non-browser environment, a redirectCallback must be provided by the user."
-      );
-    }
-    window.location.href = targetIri.href;
-  }
 }
 
 /**
