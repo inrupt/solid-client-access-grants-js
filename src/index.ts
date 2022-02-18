@@ -58,6 +58,7 @@ export {
   denyAccessRequest,
   getAccessGrant,
   getAccessGrantAll,
+  redirectToRequestor,
   revokeAccessGrant,
   // Deprecated APIs:
   getAccessWithConsent,

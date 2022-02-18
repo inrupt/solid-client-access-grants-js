@@ -50,6 +50,8 @@ export {
   getAccessWithConsentAll,
 } from "./getAccessGrantAll";
 
+export { redirectToRequestor } from "./redirectToRequestor";
+
 export {
   revokeAccessGrant,
   // Deprecated APIs:

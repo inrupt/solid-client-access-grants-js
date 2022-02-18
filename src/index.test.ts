@@ -34,6 +34,7 @@ import {
   isValidAccessGrant,
   issueAccessRequest,
   redirectToAccessManagementUi,
+  redirectToRequestor,
   revokeAccessGrant,
   fetchWithVc,
   getFile,
@@ -64,6 +65,7 @@ describe("Index exports", () => {
     expect(isValidAccessGrant).toBeDefined();
     expect(issueAccessRequest).toBeDefined();
     expect(redirectToAccessManagementUi).toBeDefined();
+    expect(redirectToRequestor).toBeDefined();
     expect(revokeAccessGrant).toBeDefined();
     expect(fetchWithVc).toBeDefined();
     expect(getFile).toBeDefined();
