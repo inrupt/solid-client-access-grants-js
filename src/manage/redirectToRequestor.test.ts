@@ -77,7 +77,9 @@ describe("redirectToRequestor", () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
       const targetIri = new URL(window.location.href);
       expect(
-        decodeURIComponent(targetIri.searchParams.get("accessGrant") as string)
+        decodeURIComponent(
+          targetIri.searchParams.get("accessGrantUrl") as string
+        )
       ).toBe("https://some.grant-vc.iri");
     });
 
@@ -94,7 +96,9 @@ describe("redirectToRequestor", () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
       const targetIri = new URL(window.location.href);
       expect(
-        decodeURIComponent(targetIri.searchParams.get("accessGrant") as string)
+        decodeURIComponent(
+          targetIri.searchParams.get("accessGrantUrl") as string
+        )
       ).toBe("https://some.grant-vc.iri/");
       expect(targetIri.href).toContain("https://some.redirect.iri");
     });
@@ -117,7 +121,7 @@ describe("redirectToRequestor", () => {
       expect(redirectIri.origin).toBe("https://some.redirect.iri");
       expect(
         decodeURIComponent(
-          redirectIri.searchParams.get("accessGrant") as string
+          redirectIri.searchParams.get("accessGrantUrl") as string
         )
       ).toBe("https://some.grant-vc.iri");
       expect(window.location.href).toBe("https://some.site");

@@ -30,6 +30,7 @@ import {
   getAccessGrant,
   getAccessGrantAll,
   getAccessApiEndpoint,
+  getGrantFromRedirectUrl,
   getAccessManagementUi,
   isValidAccessGrant,
   issueAccessRequest,
@@ -61,6 +62,7 @@ describe("Index exports", () => {
     expect(getAccessGrant).toBeDefined();
     expect(getAccessGrantAll).toBeDefined();
     expect(getAccessApiEndpoint).toBeDefined();
+    expect(getGrantFromRedirectUrl).toBeDefined();
     expect(getAccessManagementUi).toBeDefined();
     expect(isValidAccessGrant).toBeDefined();
     expect(issueAccessRequest).toBeDefined();

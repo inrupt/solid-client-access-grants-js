@@ -22,6 +22,8 @@
 import { UrlString } from "@inrupt/solid-client";
 import { RedirectOptions, redirectWithParameters } from "../util/redirect";
 
+export const GRANT_VC_URL_PARAM_NAME = "accessGrantUrl";
+// The following is deprecated: passing VCs should only be done by IRI.
 export const GRANT_VC_PARAM_NAME = "accessGrant";
 
 /**
@@ -45,7 +47,7 @@ export async function redirectToRequestor(
   return redirectWithParameters(
     redirectUrl.toString(),
     {
-      [`${GRANT_VC_PARAM_NAME}`]: encodeURI(accessGrantVcId.toString()),
+      [`${GRANT_VC_URL_PARAM_NAME}`]: encodeURI(accessGrantVcId.toString()),
     },
     options
   );
