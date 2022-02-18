@@ -24,6 +24,19 @@ import { RedirectOptions, redirectWithParameters } from "../util/redirect";
 
 export const GRANT_VC_PARAM_NAME = "accessGrant";
 
+/**
+ * Redirect the user to the client which requested Access to a Resource. The Access
+ * Grant is sent as part of the redirect.
+ *
+ * @param accessGrantVcId The ID of the Access Grant VC, which should be a URL
+ * @param redirectUrl The URL where the client requesting access expects the
+ * user to be redirected
+ * @param options If you are in a NodeJS environment, you must specify a
+ * callback to handle the redirection.
+ * @returns A never resolving promise: the user is expected to be redirected away
+ * from the page by this call, so no code should be expected to run in that context
+ * after the redirect.
+ */
 export async function redirectToRequestor(
   accessGrantVcId: UrlString | URL,
   redirectUrl: UrlString | URL,
