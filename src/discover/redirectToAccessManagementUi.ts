@@ -104,6 +104,8 @@ export async function redirectToAccessManagementUi(
   const fallbackUi =
     options.fallbackAccessManagementUi ?? options.fallbackConsentManagementUi;
 
+  // DEPRECATED: This should be removed on the next major upgrade: the VC should
+  // be passed as an IRI, and doesn't need to be dereferenced.
   const requestVc = await getBaseAccessRequestVerifiableCredential(
     accessRequestVc,
     { fetch: options.fetch }
@@ -128,7 +130,10 @@ export async function redirectToAccessManagementUi(
   return redirectWithParameters(
     accessManagementUi,
     {
+      // DEPRECATED: This should be removed on the next major upgrade. The VC should
+      // be passed as an IRI, using the REQUEST_VC_URL_PARAM_NAME query param only.
       [`${REQUEST_VC_PARAM_NAME}`]: btoa(JSON.stringify(requestVc)),
+      [`${REQUEST_VC_URL_PARAM_NAME}`]: encodeURI(requestVc.id),
       [`${REDIRECT_URL_PARAM_NAME}`]: encodeURI(
         typeof redirectUrl === "string" ? redirectUrl : redirectUrl.href
       ),
