@@ -60,7 +60,7 @@ export async function getRequestFromRedirectUrl(
     );
   }
 
-  // Legacy: Get the Access Request. The IRI should be used instead, which is why
+  // DEPRECATED: Get the Access Request. The IRI should be used instead, which is why
   // this parameter missing doesn't result in an exception.
   const accessRequestValue = redirectUrlObj.searchParams.get(
     REQUEST_VC_PARAM_NAME
