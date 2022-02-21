@@ -146,10 +146,10 @@ describe("getAccessRequestFromRedirectUrl", () => {
       encodeURI("https://requestor.redirect.url")
     );
 
-    const { accessRequest, redirectUrl } =
+    const { accessRequest, requestorRedirectUrl } =
       await getAccessRequestFromRedirectUrl(redirectedToUrl.href);
     expect(accessRequest).toStrictEqual(mockAccessGrantVc());
-    expect(redirectUrl).toBe("https://requestor.redirect.url");
+    expect(requestorRedirectUrl).toBe("https://requestor.redirect.url");
   });
 
   it("supports the legacy approach of providing the VC as a value", async () => {

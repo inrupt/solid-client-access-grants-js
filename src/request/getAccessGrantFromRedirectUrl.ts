@@ -36,17 +36,17 @@ import { getSessionFetch } from "../util/getSessionFetch";
  *
  * @param redirectUrl The URL the user has been redirected to from the access
  * management app.
- * @param option Optional properties to customise the behaviour:
+ * @param options Optional properties to customise the behaviour:
  * - fetch: an authenticated fetch function. If not provided, the default session
  * from @inrupt/solid-client-authn-browser will be used if available.
  * @returns An Access Grant
  */
 export async function getAccessGrantFromRedirectUrl(
   redirectUrl: UrlString,
-  option: { fetch?: typeof fetch } = {}
+  options: { fetch?: typeof fetch } = {}
 ): Promise<VerifiableCredential> {
   const redirectUrlObj = new URL(redirectUrl);
-  const authFetch = option.fetch ?? (await getSessionFetch(option));
+  const authFetch = options.fetch ?? (await getSessionFetch(options));
 
   const accessGrantValue = redirectUrlObj.searchParams.get(GRANT_VC_PARAM_NAME);
 
