@@ -116,56 +116,81 @@ describe("redirectToAccessManagementUi", () => {
     it("discovers the access management UI from the resource owner profile if provided", async () => {
       mockAccessManagementUiDiscovery("https://some.app");
       const resourceOwner = "https://some.webid";
-      await redirectToAccessManagementUi(
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
         mockAccessRequestVc(),
         "https://some.redirect.iri",
         {
           resourceOwner,
         }
       );
+      // Yield the event loop to make sure the blocking promises completes.
+      await new Promise((resolve) => setImmediate(resolve));
       const targetIri = window.location.href;
       expect(targetIri).toContain("https://some.app");
     });
 
     it("falls back to the provided access app IRI if any", async () => {
-      await redirectToAccessManagementUi(
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
         mockAccessRequestVc(),
         "https://some.redirect.iri",
         {
           fallbackAccessManagementUi: "https://some.app",
         }
       );
+      // Yield the event loop to make sure the blocking promises completes.
+      await new Promise((resolve) => setImmediate(resolve));
       const targetIri = window.location.href;
       expect(targetIri).toContain("https://some.app");
     });
 
     it("falls back to the provided access app IRI if any (legacy)", async () => {
-      await redirectToAccessManagementUi(
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
         mockAccessRequestVc(),
         "https://some.redirect.iri",
         {
           fallbackConsentManagementUi: "https://some.app",
         }
       );
+      // Yield the event loop to make sure the blocking promises completes.
+      await new Promise((resolve) => setImmediate(resolve));
       const targetIri = window.location.href;
       expect(targetIri).toContain("https://some.app");
     });
 
     it("redirects to the discovered management UI IRI", async () => {
       mockAccessManagementUiDiscovery("https://some.access.ui");
-      await redirectToAccessManagementUi(
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
         mockAccessRequestVc(),
         "https://some.redirect.iri"
       );
+      // Yield the event loop to make sure the blocking promises completes.
+      await new Promise((resolve) => setImmediate(resolve));
       expect(window.location.href).toContain("https://some.access.ui");
     });
 
     it("includes the VC IRI and redirect IRI as query parameters to the access UI IRI", async () => {
       mockAccessManagementUiDiscovery("https://some.access.ui");
-      await redirectToAccessManagementUi(
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
         mockAccessRequestVc(),
         "https://some.redirect.iri"
       );
+      // Yield the event loop to make sure the blocking promises completes.
+      await new Promise((resolve) => setImmediate(resolve));
       const targetIri = new URL(window.location.href);
       const encodedVc = targetIri.searchParams.get("requestVc") as string;
       expect(JSON.parse(atob(encodedVc))).toEqual(mockAccessRequestVc());
@@ -181,13 +206,18 @@ describe("redirectToAccessManagementUi", () => {
         .mockResolvedValueOnce(
           new Response(JSON.stringify(mockAccessRequestVc()))
         );
-      await redirectToAccessManagementUi(
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
         "https://some.request-vc.url",
         new URL("https://some.redirect.iri"),
         {
           fetch: mockedFetch,
         }
       );
+      // Yield the event loop to make sure the blocking promises completes.
+      await new Promise((resolve) => setImmediate(resolve));
       const targetIri = new URL(window.location.href);
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri/"
@@ -196,10 +226,15 @@ describe("redirectToAccessManagementUi", () => {
 
     it("supports the redirect IRI being a URL object", async () => {
       mockAccessManagementUiDiscovery("https://some.access.ui");
-      await redirectToAccessManagementUi(
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
         mockAccessRequestVc(),
         new URL("https://some.redirect.iri")
       );
+      // Yield the event loop to make sure the blocking promises completes.
+      await new Promise((resolve) => setImmediate(resolve));
       const targetIri = new URL(window.location.href);
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri/"
@@ -209,13 +244,18 @@ describe("redirectToAccessManagementUi", () => {
     it("calls the redirection callback if provided", async () => {
       mockAccessManagementUiDiscovery("https://some.access.ui");
       const redirectCallback = jest.fn();
-      await redirectToAccessManagementUi(
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
         mockAccessRequestVc(),
         "https://some.redirect.iri",
         {
           redirectCallback,
         }
       );
+      // Yield the event loop to make sure the blocking promises completes.
+      await new Promise((resolve) => setImmediate(resolve));
       const redirectIri = new URL(redirectCallback.mock.calls[0][0] as string);
       expect(redirectIri.origin).toBe("https://some.access.ui");
       expect(redirectIri.searchParams.get("requestVc")).toBe(

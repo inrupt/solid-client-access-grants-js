@@ -19,41 +19,40 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import { UrlString } from "@inrupt/solid-client";
+
+export type RedirectOptions = {
+  redirectCallback?: (url: string) => void;
+};
+
 /**
- * Import this module for the access API functions available to an entity
- * managing access requests over resources:
- * - `approveAccessRequest`: Approve an access request;
- * - `denyAccessRequest`: Deny access over a resource;
- * - `getAccessGrant`: Retrieve the Access Grant associated to the given URL.
- * - `getAccessGrantAll`: Retrieve the Access Grants issued over a resource;
- * - `revokeAccessGrant`: Revoke previously granted access over a resource.
+ * Internal function implementing redirection with some query parameters.
+ *
+ * @hidden
  */
-export {
-  approveAccessRequest,
-  // Deprecated API:
-  approveAccessRequestWithConsent,
-} from "./approveAccessRequest";
+export async function redirectWithParameters(
+  target: UrlString,
+  queryParams: Record<string, string>,
+  options: RedirectOptions
+): Promise<void> {
+  const targetUrl = new URL(target);
 
-export type { ApproveAccessRequestOverrides } from "./approveAccessRequest";
+  Object.entries(queryParams).forEach(([key, value]) => {
+    targetUrl.searchParams.append(key, value);
+  });
 
-export { denyAccessRequest } from "./denyAccessRequest";
-
-export {
-  getAccessGrant,
-  // Deprecated APIs:
-  getAccessWithConsent,
-} from "./getAccessGrant";
-
-export {
-  getAccessGrantAll,
-  // Deprecated APIs:
-  getAccessWithConsentAll,
-} from "./getAccessGrantAll";
-
-export { redirectToRequestor } from "./redirectToRequestor";
-
-export {
-  revokeAccessGrant,
-  // Deprecated APIs:
-  revokeAccess,
-} from "./revokeAccessGrant";
+  if (options.redirectCallback !== undefined) {
+    options.redirectCallback(targetUrl.href);
+  } else {
+    if (typeof window === "undefined") {
+      throw new Error(
+        "In a non-browser environment, a redirectCallback must be provided by the user."
+      );
+    }
+    window.location.href = targetUrl.href;
+  }
+  // This redirects the user away from the app, so unless it throws an error,
+  // there is no code that should run afterwards (since there is no "after" in
+  // script's lifetime). Hence, this Promise never resolves:
+  return new Promise(() => undefined);
+}
