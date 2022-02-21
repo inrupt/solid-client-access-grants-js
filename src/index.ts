@@ -59,6 +59,7 @@ export {
   denyAccessRequest,
   getAccessGrant,
   getAccessGrantAll,
+  getRequestFromRedirectUrl,
   redirectToRequestor,
   revokeAccessGrant,
   // Deprecated APIs:

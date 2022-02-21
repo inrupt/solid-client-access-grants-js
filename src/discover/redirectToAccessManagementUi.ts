@@ -29,8 +29,10 @@ import {
 } from "./getAccessManagementUi";
 import { RedirectOptions, redirectWithParameters } from "../util/redirect";
 
-const REQUEST_VC_PARAM_NAME = "requestVc";
-const REDIRECT_URL_PARAM_NAME = "redirectUrl";
+// Legacy: the VC should be sent by IRI, and not by value.
+export const REQUEST_VC_PARAM_NAME = "requestVc";
+export const REQUEST_VC_URL_PARAM_NAME = "requestVcUrl";
+export const REDIRECT_URL_PARAM_NAME = "redirectUrl";
 
 /**
  * Optional parameters for the [[redirectToAccessManagementUi]] method:
