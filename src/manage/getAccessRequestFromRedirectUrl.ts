@@ -33,7 +33,7 @@ import {
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
- * Get the Access Grant out of the incoming redirect from the Access Management app.
+ * Get the Access Request out of the incoming redirect from the Access Management app.
  *
  * @param redirectUrl The URL the user has been redirected to from the access
  * management app.
