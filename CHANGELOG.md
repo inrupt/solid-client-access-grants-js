@@ -15,7 +15,7 @@ The following changes have been implemented but not released yet:
 
 - The JSON-LD context URL has changed from https://vc.inrupt.com/credentials/v1 to https://vc.inrupt.com/credentials/v1.
 - `redirectToAccessManagementUi` now returns a promise that never resolves. This
-  prevents from `await`ing on it, have it resolve, and start running code in the underterministic
+  prevents from `await`ing on it, have it resolve, and start running code in the undeterministic
   time between the moment when `window.location.href` is set (or the redirect callback
   is called) and the moment the redirection actually happens.
 
