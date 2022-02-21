@@ -41,7 +41,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
  * from @inrupt/solid-client-authn-browser will be used if available.
  * @returns An Access Grant
  */
-export async function getGrantFromRedirectUrl(
+export async function getAccessGrantFromRedirectUrl(
   redirectUrl: UrlString,
   option: { fetch?: typeof fetch } = {}
 ): Promise<VerifiableCredential> {
@@ -75,4 +75,4 @@ export async function getGrantFromRedirectUrl(
   return accessGrant;
 }
 
-export default getGrantFromRedirectUrl;
+export default getAccessGrantFromRedirectUrl;

@@ -22,9 +22,9 @@
 // eslint-disable-next-line no-shadow
 import { describe, it, jest, expect } from "@jest/globals";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
-import { getGrantFromRedirectUrl } from "./getGrantFromRedirectUrl";
+import { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
+import { mockAccessGrantVc } from "./approveAccessRequest.mock";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { mockAccessGrantVc } from "../manage/approveAccessRequest.mock";
 
 jest.mock("../util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {
@@ -38,11 +38,29 @@ jest.mock("@inrupt/solid-client-vc", () => {
   };
 });
 
-describe("getGrantFromRedirectUrl", () => {
-  it("throws if the accessGrant query parameter is missing", async () => {
+describe("getAccessRequestFromRedirectUrl", () => {
+  it("throws if the requestVcUrl query parameter is missing", async () => {
+    const redirectUrl = new URL("https://redirect.url");
+    redirectUrl.searchParams.append(
+      "redirectUrl",
+      encodeURI("https://requestor.redirect.url")
+    );
+
     await expect(
-      getGrantFromRedirectUrl("https://redirect.url")
-    ).rejects.toThrow(/https:\/\/redirect.url.*accessGrant/);
+      getAccessRequestFromRedirectUrl(redirectUrl.href)
+    ).rejects.toThrow(/https:\/\/redirect.url.*requestVcUrl/);
+  });
+
+  it("throws if the redirectUrl query parameter is missing", async () => {
+    const redirectUrl = new URL("https://redirect.url");
+    redirectUrl.searchParams.append(
+      "requestVcUrl",
+      encodeURI("https://some.vc")
+    );
+
+    await expect(
+      getAccessRequestFromRedirectUrl(redirectUrl.href)
+    ).rejects.toThrow(/https:\/\/redirect.url.*redirectUrl/);
   });
 
   it("uses the default fetch if none is provided", async () => {
@@ -59,13 +77,17 @@ describe("getGrantFromRedirectUrl", () => {
     }>;
     vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
 
-    const redirectUrl = new URL("https://redirect.url");
-    redirectUrl.searchParams.set(
-      "accessGrantUrl",
+    const redirectedToUrl = new URL("https://redirect.url");
+    redirectedToUrl.searchParams.append(
+      "requestVcUrl",
       encodeURI("https://some.vc")
     );
+    redirectedToUrl.searchParams.append(
+      "redirectUrl",
+      encodeURI("https://requestor.redirect.url")
+    );
 
-    await getGrantFromRedirectUrl(redirectUrl.href, {
+    await getAccessRequestFromRedirectUrl(redirectedToUrl.href, {
       fetch: mockedFetch,
     });
     expect(vcModule.getVerifiableCredential).toHaveBeenCalledWith(
@@ -84,14 +106,18 @@ describe("getGrantFromRedirectUrl", () => {
     }>;
     vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
 
-    const redirectUrl = new URL("https://redirect.url");
-    redirectUrl.searchParams.set(
-      "accessGrantUrl",
+    const redirectedToUrl = new URL("https://redirect.url");
+    redirectedToUrl.searchParams.append(
+      "requestVcUrl",
       encodeURI("https://some.vc")
+    );
+    redirectedToUrl.searchParams.append(
+      "redirectUrl",
+      encodeURI("https://requestor.redirect.url")
     );
 
     const mockedFetch = jest.fn(fetch);
-    await getGrantFromRedirectUrl(redirectUrl.href, {
+    await getAccessRequestFromRedirectUrl(redirectedToUrl.href, {
       fetch: mockedFetch,
     });
     expect(vcModule.getVerifiableCredential).toHaveBeenCalledWith(
@@ -102,7 +128,7 @@ describe("getGrantFromRedirectUrl", () => {
     );
   });
 
-  it("returns the fetched VC", async () => {
+  it("returns the fetched VC and the redirect URL", async () => {
     const vcModule = jest.requireMock(
       "@inrupt/solid-client-vc"
     ) as jest.Mocked<{
@@ -110,41 +136,60 @@ describe("getGrantFromRedirectUrl", () => {
     }>;
     vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
 
-    const redirectUrl = new URL("https://redirect.url");
-    redirectUrl.searchParams.set(
-      "accessGrantUrl",
+    const redirectedToUrl = new URL("https://redirect.url");
+    redirectedToUrl.searchParams.append(
+      "requestVcUrl",
       encodeURI("https://some.vc")
     );
+    redirectedToUrl.searchParams.append(
+      "redirectUrl",
+      encodeURI("https://requestor.redirect.url")
+    );
 
-    const fetchedVc = await getGrantFromRedirectUrl(redirectUrl.href);
-    expect(fetchedVc).toStrictEqual(mockAccessGrantVc());
+    const { accessRequest, redirectUrl } =
+      await getAccessRequestFromRedirectUrl(redirectedToUrl.href);
+    expect(accessRequest).toStrictEqual(mockAccessGrantVc());
+    expect(redirectUrl).toBe("https://requestor.redirect.url");
   });
 
-  it("supports the legacy approach where the VC is provided by value", async () => {
+  it("supports the legacy approach of providing the VC as a value", async () => {
     const vcModule = jest.requireMock(
       "@inrupt/solid-client-vc"
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
+
     const redirectUrl = new URL("https://redirect.url");
-    redirectUrl.searchParams.set(
-      "accessGrant",
-      btoa(JSON.stringify(mockAccessGrantVc()))
+    redirectUrl.searchParams.append(
+      "requestVc",
+      encodeURIComponent(JSON.stringify(mockAccessGrantVc()))
+    );
+    redirectUrl.searchParams.append(
+      "redirectUrl",
+      encodeURI("https://requestor.redirect.url")
     );
 
-    const grantVc = await getGrantFromRedirectUrl(redirectUrl.href);
-    expect(grantVc).toStrictEqual(mockAccessGrantVc());
-    // If the VC is provided as a value, no dereferencing should happen.
+    const { accessRequest } = await getAccessRequestFromRedirectUrl(
+      redirectUrl.href
+    );
+    expect(accessRequest).toStrictEqual(mockAccessGrantVc());
+    // When the VC is passed as a value, nothing needs to be dereferenced.
     expect(vcModule.getVerifiableCredential).not.toHaveBeenCalled();
   });
 
   it("throws if the legacy provided value is not a VC", async () => {
     const redirectUrl = new URL("https://redirect.url");
-    redirectUrl.searchParams.set(
-      "accessGrant",
-      btoa(JSON.stringify({ someJson: "but not a VC" }))
+    redirectUrl.searchParams.append(
+      "requestVc",
+      encodeURIComponent(JSON.stringify({ someJson: "but not a VC" }))
+    );
+    redirectUrl.searchParams.append(
+      "redirectUrl",
+      encodeURI("https://requestor.redirect.url")
     );
 
-    await expect(getGrantFromRedirectUrl(redirectUrl.href)).rejects.toThrow();
+    await expect(
+      getAccessRequestFromRedirectUrl(redirectUrl.href)
+    ).rejects.toThrow();
   });
 });

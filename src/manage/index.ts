@@ -50,7 +50,7 @@ export {
   getAccessWithConsentAll,
 } from "./getAccessGrantAll";
 
-export { getRequestFromRedirectUrl } from "./getRequestFromRedirectUrl";
+export { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
 
 export { redirectToRequestor } from "./redirectToRequestor";
 

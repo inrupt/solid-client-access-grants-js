@@ -27,7 +27,7 @@
  * - `cancelAccessRequest`: For retracting an access request.
  */
 export { cancelAccessRequest } from "./cancelAccessRequest";
-export { getGrantFromRedirectUrl } from "./getGrantFromRedirectUrl";
+export { getAccessGrantFromRedirectUrl } from "./getAccessGrantFromRedirectUrl";
 export {
   issueAccessRequest,
   // deprecated APIs:
