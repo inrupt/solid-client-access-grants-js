@@ -25,12 +25,7 @@ export type {
   ConsentApiBaseOptions,
 } from "./type/AccessBaseOptions";
 
-export type {
-  IssueAccessRequestParameters,
-  // Deprecated Types:
-  RequestAccessParameters,
-  RequestAccessWithConsentParameters,
-} from "./type/IssueAccessRequestParameters";
+export type { IssueAccessRequestParameters } from "./type/IssueAccessRequestParameters";
 
 export {
   getAccessApiEndpoint,
@@ -41,12 +36,9 @@ export {
 export type { RedirectToAccessManagementUiOptions } from "./discover";
 
 export {
+  issueAccessRequest,
   cancelAccessRequest,
   getAccessGrantFromRedirectUrl,
-  issueAccessRequest,
-  // Deprecated APIs:
-  requestAccess,
-  requestAccessWithConsent,
 } from "./request";
 
 export {

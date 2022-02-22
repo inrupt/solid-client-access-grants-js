@@ -26,11 +26,7 @@ import {
   issueVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import {
-  issueAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./issueAccessRequest";
+import { issueAccessRequest } from "./issueAccessRequest";
 import { getRequestBody } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import {
@@ -122,18 +118,6 @@ describe("getRequestBody", () => {
       issuanceDate: "1955-06-08T13:37:42.042Z",
       type: ["SolidAccessRequest"],
     });
-  });
-});
-
-describe("requestAccess", () => {
-  it("should be an alias of issueAccessRequest", () => {
-    expect(requestAccess).toEqual(issueAccessRequest);
-  });
-});
-
-describe("requestAccessWithConsent", () => {
-  it("should be an alias of issueAccessRequest", () => {
-    expect(requestAccessWithConsent).toEqual(issueAccessRequest);
   });
 });
 

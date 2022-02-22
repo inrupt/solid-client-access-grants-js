@@ -90,9 +90,4 @@ async function getAccessGrantAll(
 
 export { getAccessGrantAll };
 export default getAccessGrantAll;
-export type {
-  IssueAccessRequestParameters,
-  IssueAccessRequestParameters as RequestAccessWithConsentParameters,
-  UrlString,
-  VerifiableCredential,
-};
+export type { IssueAccessRequestParameters, UrlString, VerifiableCredential };

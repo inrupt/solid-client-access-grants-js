@@ -62,30 +62,3 @@ async function issueAccessRequest(
 export default issueAccessRequest;
 export { issueAccessRequest };
 export type { IssueAccessRequestParameters, VerifiableCredential };
-
-/**
- * @hidden Deprecated alias of [[issueAccessRequest]]
- * @since 0.0.1
- * @deprecated
- */
-const requestAccess = issueAccessRequest;
-export { requestAccess };
-
-/**
- * @hidden Alias of [[issueAccessRequest]]
- * @deprecated
- */
-const requestAccessWithConsent = issueAccessRequest;
-export { requestAccessWithConsent };
-
-/**
- * @hidden Deprecated alias of [[IssueAccessRequestParameters]], note that
- * whilst the types file does have a specific RequestAccessWithConsentParameters
- * type, it is not used here as it is compatible with just
- * IssueAccessRequestParameters.
- * @deprecated
- */
-export type {
-  IssueAccessRequestParameters as RequestAccessParameters,
-  IssueAccessRequestParameters as RequestAccessWithConsentParameters,
-};
