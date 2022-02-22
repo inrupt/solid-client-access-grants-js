@@ -27,7 +27,7 @@ import {
   BaseGrantBody,
   BaseRequestBody,
 } from "../type/AccessVerifiableCredential";
-import { CONSENT_CONTEXT } from "../constants";
+import { ACCESS_GRANT_CONTEXT } from "../constants";
 import { ResourceAccessMode } from "../type/ResourceAccessMode";
 
 export const mockAccessRequestVc = (
@@ -37,7 +37,7 @@ export const mockAccessRequestVc = (
   }>
 ): VerifiableCredential & BaseRequestBody => {
   return {
-    "@context": CONSENT_CONTEXT,
+    "@context": ACCESS_GRANT_CONTEXT,
     id: "https://some.credential",
     credentialSubject: {
       id: "https://some.requestor",
@@ -63,7 +63,7 @@ export const mockAccessRequestVc = (
 
 export const mockAccessGrantVc = (): VerifiableCredential & BaseGrantBody => {
   return {
-    "@context": CONSENT_CONTEXT,
+    "@context": ACCESS_GRANT_CONTEXT,
     id: "https://some.credential",
     credentialSubject: {
       id: "https://some.resource.owner",

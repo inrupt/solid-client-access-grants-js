@@ -31,9 +31,6 @@ export type BaseRequestParameters = {
   requestorInboxUrl?: UrlString;
   resources: Array<UrlString>;
   status: ConsentStatus;
-};
-
-export type BaseConsentParameters = {
   purpose: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;
@@ -43,13 +40,7 @@ export type AccessRequestParameters = BaseRequestParameters & {
   status: typeof GC_CONSENT_STATUS_REQUESTED;
 };
 
-export type ConsentRequestParameters = AccessRequestParameters &
-  BaseConsentParameters;
-
 export type AccessGrantParameters = BaseRequestParameters & {
   status: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
   requestor: UrlString;
 };
-
-export type ConsentGrantParameters = AccessGrantParameters &
-  BaseConsentParameters;

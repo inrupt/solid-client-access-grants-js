@@ -37,7 +37,7 @@ import {
   MOCK_REQUESTOR_INBOX,
   MOCK_REQUESTEE_IRI,
 } from "./request.mock";
-import { CONSENT_CONTEXT } from "../constants";
+import { ACCESS_GRANT_CONTEXT } from "../constants";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -452,7 +452,7 @@ describe("isAccessRequest", () => {
   it("returns true if the credential matches the expected shape", () => {
     expect(
       isAccessRequest({
-        "@context": CONSENT_CONTEXT,
+        "@context": ACCESS_GRANT_CONTEXT,
         credentialSubject: {
           id: "https://some.id",
           inbox: "https://some.inbox",
