@@ -154,7 +154,7 @@ jobs:
         run: |
           cd .github/workflows/cd-packaging-tests/bundler-webpack
           npm install @inrupt/solid-client-access-grants
-          npm install webpack@5 webpack-cli buffer
+          npm install webpack@5 webpack-cli
           npx webpack --devtool source-map
       - name: Archive Webpack build artifacts
         uses: actions/upload-artifact@v2.3.1
