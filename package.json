@@ -79,8 +79,8 @@
   "devDependencies": {
     "@inrupt/eslint-config-base": "^0.2.0-alpha.1",
     "@inrupt/eslint-config-lib": "^0.3.0",
-    "@inrupt/solid-client-authn-browser": "^1.8.1",
-    "@inrupt/solid-client-authn-node": "^1.11.2",
+    "@inrupt/solid-client-authn-browser": "^1.11.5",
+    "@inrupt/solid-client-authn-node": "^1.11.5",
     "@playwright/test": "^1.18.1",
     "@skypack/package-check": "^0.2.2",
     "@testing-library/testcafe": "^4.4.0",
