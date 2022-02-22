@@ -29,10 +29,6 @@ export { getAccessApiEndpoint } from "./getAccessApiEndpoint";
 
 export { getAccessManagementUi } from "./getAccessManagementUi";
 
-export {
-  redirectToAccessManagementUi,
-  // Deprecated API:
-  redirectToConsentManagementUi,
-} from "./redirectToAccessManagementUi";
+export { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 
 export type { RedirectToAccessManagementUiOptions } from "./redirectToAccessManagementUi";

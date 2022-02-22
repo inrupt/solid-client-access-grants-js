@@ -42,7 +42,6 @@ import {
   getSolidDataset,
   saveSolidDatasetAt,
   // Deprecated APIs:
-  redirectToConsentManagementUi,
   requestAccess,
   requestAccessWithConsent,
   revokeAccess,
@@ -70,7 +69,6 @@ describe("Index exports", () => {
     expect(getSolidDataset).toBeDefined();
     expect(saveSolidDatasetAt).toBeDefined();
     // Deprecated APIs:
-    expect(redirectToConsentManagementUi).toBeDefined();
     expect(requestAccess).toBeDefined();
     expect(requestAccessWithConsent).toBeDefined();
     expect(revokeAccess).toBeDefined();

@@ -29,11 +29,7 @@ import {
   afterEach,
 } from "@jest/globals";
 /* eslint-enable no-shadow */
-import {
-  redirectToAccessManagementUi,
-  // Deprecated API:
-  redirectToConsentManagementUi,
-} from "./redirectToAccessManagementUi";
+import { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 import {
   getAccessManagementUiFromWellKnown,
   getAccessManagementUi,
@@ -54,12 +50,6 @@ const mockAccessManagementUiDiscovery = (url: string | undefined) => {
     .fn(getAccessManagementUi)
     .mockResolvedValueOnce(url);
 };
-
-describe("redirectToConsentManagementUi", () => {
-  it("should be an alias of redirectToAccessManagementUi", () => {
-    expect(redirectToConsentManagementUi).toBe(redirectToAccessManagementUi);
-  });
-});
 
 describe("redirectToAccessManagementUi", () => {
   describe("in a browser environment", () => {

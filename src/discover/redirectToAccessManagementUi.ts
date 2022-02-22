@@ -141,11 +141,3 @@ export async function redirectToAccessManagementUi(
     options
   );
 }
-
-/**
- * @hidden alias of [[redirectToAccessManagementUi]]
- * @since 0.1.0
- * @deprecated
- */
-const redirectToConsentManagementUi = redirectToAccessManagementUi;
-export { redirectToConsentManagementUi };
