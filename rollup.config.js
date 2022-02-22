@@ -36,7 +36,7 @@ export default [
       {
         dir: "umd",
         format: "umd",
-        name: "SolidConsent",
+        name: "SolidAccess",
       },
     ],
     ...rollupDefaultConfig,
@@ -63,7 +63,7 @@ export default [
       "./src/type/AccessBaseOptions.ts",
       "./src/type/AccessCredentialType.ts",
       "./src/type/AccessVerifiableCredential.ts",
-      "./src/type/ConsentContext.ts",
+      "./src/type/AccessGrantContext.ts",
       "./src/type/ConsentStatus.ts",
       "./src/type/FetchOptions.ts",
       "./src/type/Parameter.ts",

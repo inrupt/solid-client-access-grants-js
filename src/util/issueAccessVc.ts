@@ -24,7 +24,7 @@ import {
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import {
-  CONSENT_CONTEXT,
+  ACCESS_GRANT_CONTEXT,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_REQUEST,
 } from "../constants";
@@ -98,7 +98,7 @@ function getBaseBody(
   type: "BaseRequestBody" | "BaseGrantBody"
 ): BaseRequestPayload | BaseGrantPayload {
   const body = {
-    "@context": CONSENT_CONTEXT,
+    "@context": ACCESS_GRANT_CONTEXT,
     type: [
       type === "BaseGrantBody"
         ? CREDENTIAL_TYPE_ACCESS_GRANT

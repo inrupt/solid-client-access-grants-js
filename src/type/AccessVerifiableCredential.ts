@@ -21,7 +21,7 @@
 
 import type { UrlString } from "@inrupt/solid-client";
 import type {
-  CONSENT_CONTEXT,
+  ACCESS_GRANT_CONTEXT,
   GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   GC_CONSENT_STATUS_REQUESTED,
@@ -63,7 +63,7 @@ export type GrantCredentialSubject = Required<
 export type GrantCredentialSubjectPayload = Omit<GrantCredentialSubject, "id">;
 
 export type BaseAccessVcBody = {
-  "@context": typeof CONSENT_CONTEXT;
+  "@context": typeof ACCESS_GRANT_CONTEXT;
   type: AccessCredentialType[];
   credentialSubject:
     | RequestCredentialSubject

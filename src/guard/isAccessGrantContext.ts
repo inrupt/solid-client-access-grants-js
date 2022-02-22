@@ -19,9 +19,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { CONSENT_CONTEXT } from "../constants";
-import { ConsentContext } from "../type/ConsentContext";
+import { ACCESS_GRANT_CONTEXT } from "../constants";
+import { AccessGrantContext } from "../type/AccessGrantContext";
 
-export function isConsentContext(x: unknown): x is ConsentContext {
-  return Array.isArray(x) && CONSENT_CONTEXT.every((y) => x.includes(y));
+export function isAccessGrantContext(x: unknown): x is AccessGrantContext {
+  return Array.isArray(x) && ACCESS_GRANT_CONTEXT.every((y) => x.includes(y));
 }

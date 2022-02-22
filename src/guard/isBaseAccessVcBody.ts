@@ -21,13 +21,13 @@
 
 import type { BaseAccessVcBody } from "../type/AccessVerifiableCredential";
 import { isAccessCredentialType } from "./isAccessCredentialType";
-import { isConsentContext } from "./isConsentContext";
+import { isAccessGrantContext } from "./isAccessGrantContext";
 import { isUnknownObject } from "./isUnknownObject";
 
 export function isBaseAccessVcBody(x: unknown): x is BaseAccessVcBody {
   return (
     isUnknownObject(x) &&
-    isConsentContext(x["@context"]) &&
+    isAccessGrantContext(x["@context"]) &&
     Array.isArray(x.type) &&
     isAccessCredentialType(x.type) &&
     isUnknownObject(x.credentialSubject) &&

@@ -19,6 +19,6 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import type { CONSENT_CONTEXT } from "../constants";
+import type { ACCESS_GRANT_CONTEXT } from "../constants";
 
-export type ConsentContext = typeof CONSENT_CONTEXT;
+export type AccessGrantContext = typeof ACCESS_GRANT_CONTEXT;

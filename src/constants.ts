@@ -58,7 +58,7 @@ export const PIM_STORAGE = "http://www.w3.org/ns/pim/space#storage";
 export const PREFERRED_CONSENT_MANAGEMENT_UI =
   "http://inrupt.com/ns/ess#ConsentManagementUI";
 
-export const CONSENT_CONTEXT = [
+export const ACCESS_GRANT_CONTEXT = [
   "https://www.w3.org/2018/credentials/v1",
   "https://vc.inrupt.com/credentials/v1",
 ] as const;
