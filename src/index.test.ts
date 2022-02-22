@@ -24,7 +24,6 @@
 import { describe, it, expect } from "@jest/globals";
 import {
   approveAccessRequest,
-  approveAccessRequestWithConsent,
   cancelAccessRequest,
   denyAccessRequest,
   getAccessGrant,
@@ -57,7 +56,6 @@ import {
 describe("Index exports", () => {
   it("exposes expected things", () => {
     expect(approveAccessRequest).toBeDefined();
-    expect(approveAccessRequestWithConsent).toBeDefined();
     expect(cancelAccessRequest).toBeDefined();
     expect(denyAccessRequest).toBeDefined();
     expect(getAccessGrant).toBeDefined();

@@ -236,11 +236,3 @@ export async function approveAccessRequest(
 
 export default approveAccessRequest;
 export type { UrlString, VerifiableCredential };
-
-/**
- * @hidden alias for [[approveAccessRequest]]
- * @since 0.4.0
- * @deprecated
- */
-const approveAccessRequestWithConsent = approveAccessRequest;
-export { approveAccessRequestWithConsent };

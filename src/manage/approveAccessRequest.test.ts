@@ -26,10 +26,7 @@ import {
   mockAccessApiEndpoint,
   MOCKED_ACCESS_ISSUER,
 } from "../request/request.mock";
-import {
-  approveAccessRequest,
-  approveAccessRequestWithConsent,
-} from "./approveAccessRequest";
+import { approveAccessRequest } from "./approveAccessRequest";
 import {
   mockAccessRequestVc,
   mockConsentGrantVc,
@@ -57,12 +54,6 @@ jest.mock("@inrupt/solid-client", () => {
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
 jest.mock("cross-fetch");
-
-describe("approveAccessRequestWithConsent", () => {
-  it("should be an alias of approveAccessRequest", () => {
-    expect(approveAccessRequestWithConsent).toBe(approveAccessRequest);
-  });
-});
 
 const mockAcpClient = (
   options?: Partial<{

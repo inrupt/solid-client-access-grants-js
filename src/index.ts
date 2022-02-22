@@ -55,7 +55,6 @@ export {
 
 export {
   approveAccessRequest,
-  approveAccessRequestWithConsent,
   denyAccessRequest,
   getAccessGrant,
   getAccessGrantAll,
