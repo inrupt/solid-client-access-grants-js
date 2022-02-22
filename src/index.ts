@@ -38,7 +38,6 @@ export {
   redirectToAccessManagementUi,
   // Deprecated APIs:
   redirectToConsentManagementUi,
-  getConsentApiEndpoint,
   getConsentManagementUi,
 } from "./discover";
 

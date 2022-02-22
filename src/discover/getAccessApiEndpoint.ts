@@ -85,11 +85,3 @@ async function getAccessApiEndpoint(
 export { getAccessApiEndpoint };
 export default getAccessApiEndpoint;
 export type { UrlString };
-
-/**
- * @hidden deprecated alias of [[getAccessApiEndpoint]]
- * @since 0.0.1
- * @deprecated
- */
-const getConsentApiEndpoint = getAccessApiEndpoint;
-export { getConsentApiEndpoint };

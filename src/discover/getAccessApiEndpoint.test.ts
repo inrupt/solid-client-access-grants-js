@@ -27,19 +27,10 @@ import {
   mockAccessApiEndpoint,
 } from "../request/request.mock";
 
-import {
-  getAccessApiEndpoint,
-  getConsentApiEndpoint,
-} from "./getAccessApiEndpoint";
+import { getAccessApiEndpoint } from "./getAccessApiEndpoint";
 
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("cross-fetch");
-
-describe("getConsentApiEndpoint", () => {
-  it("should be an alias of getAccessApiEndpoint", () => {
-    expect(getConsentApiEndpoint).toBe(getAccessApiEndpoint);
-  });
-});
 
 describe("getAccessApiEndpoint", () => {
   it("can find the access endpoint for a given resource", async () => {
