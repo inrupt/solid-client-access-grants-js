@@ -65,7 +65,7 @@ app.get("/", async (req, res) => {
         </label>
       </div>
       <div>
-        <input type="submit" value="Request consent">
+        <input type="submit" value="Request Access">
       </div>
     </form>`
   );
@@ -79,7 +79,7 @@ app.post("/request", async (req, res) => {
     oidcIssuer: process.env.REQUESTOR_OIDC_ISSUER,
   });
 
-  const consentRequest = await issueAccessRequest(
+  const accessRequest = await issueAccessRequest(
     {
       access: { read: true },
       purpose: ["https://some.purpose", "https://some.other.purpose"],
@@ -91,15 +91,15 @@ app.post("/request", async (req, res) => {
       fetch: session.fetch,
     }
   );
-  await redirectToAccessManagementUi(consentRequest, REDIRECT_URL, {
+  await redirectToAccessManagementUi(accessRequest, REDIRECT_URL, {
     redirectCallback: (url) => {
       console.log(`redirecting to ${url}`);
       res.redirect(url);
     },
     // The following IRI redirects the user to PodBrowser so that they can approve/reny the request.
-    // fallbackConsentManagementUi: `https://podborowser.inrupt.com/privacy/consent/requests/`,
+    // fallbackAccessManagementUi: `https://podborowser.inrupt.com/privacy/consent/requests/`,
     // The following IRI redirects to the IRI used by the examples/grant-access demo.
-    fallbackConsentManagementUi: `http://localhost:${GRANT_ACCESS_PORT}/manage/`,
+    fallbackAccessManagementUi: `http://localhost:${GRANT_ACCESS_PORT}/manage/`,
     // Note: the following is only necessary because this projects depends for testing puspose
     // on solid-client-authn-browser, which is picked up automatically for convenience in
     // browser-side apps. A typical node app would not have this dependence.

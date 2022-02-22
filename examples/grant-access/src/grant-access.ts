@@ -36,7 +36,7 @@ const app = express();
 // Support parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-// Receive the consent request, and display a form to the user
+// Receive the access request, and display a form to the user
 app.get("/manage", async (req, res) => {
   if (req.query.requestVc === undefined) {
     res.send(`Error: no 'requestVc' query parameter has been found.`);
@@ -79,8 +79,8 @@ app.get("/manage", async (req, res) => {
   );
 });
 
-// Return the consent grant to the requestor
-// TODO: if the user denied access, deny consent grant instead of approving.
+// Return the access grant to the requestor
+// TODO: if the user denied access, deny access grant instead of approving.
 app.post("/redirect", async (req, res) => {
   const session = new Session();
   await session.login({
