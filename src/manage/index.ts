@@ -34,17 +34,9 @@ export type { ApproveAccessRequestOverrides } from "./approveAccessRequest";
 
 export { denyAccessRequest } from "./denyAccessRequest";
 
-export {
-  getAccessGrant,
-  // Deprecated APIs:
-  getAccessWithConsent,
-} from "./getAccessGrant";
+export { getAccessGrant } from "./getAccessGrant";
 
-export {
-  getAccessGrantAll,
-  // Deprecated APIs:
-  getAccessWithConsentAll,
-} from "./getAccessGrantAll";
+export { getAccessGrantAll } from "./getAccessGrantAll";
 
 export { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
 

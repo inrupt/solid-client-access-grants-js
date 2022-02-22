@@ -44,8 +44,6 @@ import {
   // Deprecated APIs:
   getConsentApiEndpoint,
   getConsentManagementUi,
-  getAccessWithConsent,
-  getAccessWithConsentAll,
   redirectToConsentManagementUi,
   requestAccess,
   requestAccessWithConsent,
@@ -76,8 +74,6 @@ describe("Index exports", () => {
     // Deprecated APIs:
     expect(getConsentApiEndpoint).toBeDefined();
     expect(getConsentManagementUi).toBeDefined();
-    expect(getAccessWithConsent).toBeDefined();
-    expect(getAccessWithConsentAll).toBeDefined();
     expect(redirectToConsentManagementUi).toBeDefined();
     expect(requestAccess).toBeDefined();
     expect(requestAccessWithConsent).toBeDefined();

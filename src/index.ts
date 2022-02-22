@@ -62,8 +62,6 @@ export {
   redirectToRequestor,
   revokeAccessGrant,
   // Deprecated APIs:
-  getAccessWithConsent,
-  getAccessWithConsentAll,
   revokeAccess,
 } from "./manage";
 

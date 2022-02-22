@@ -96,11 +96,3 @@ export type {
   UrlString,
   VerifiableCredential,
 };
-
-/**
- * @hidden Deprecated alias for [[getAccessGrantAll]]
- * @since 0.1.0
- * @deprecated
- */
-const getAccessWithConsentAll = getAccessGrantAll;
-export { getAccessWithConsentAll };
