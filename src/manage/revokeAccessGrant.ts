@@ -54,11 +54,3 @@ async function revokeAccessGrant(
 export { revokeAccessGrant };
 export default revokeAccessGrant;
 export type { UrlString, VerifiableCredential };
-
-/**
- * @hidden deprecated alias of [[revokeAccessGrant]]
- * @since 0.0.1
- * @deprecated
- */
-const revokeAccess = revokeAccessGrant;
-export { revokeAccess };

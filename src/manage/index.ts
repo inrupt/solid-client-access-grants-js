@@ -42,8 +42,4 @@ export { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectU
 
 export { redirectToRequestor } from "./redirectToRequestor";
 
-export {
-  revokeAccessGrant,
-  // Deprecated APIs:
-  revokeAccess,
-} from "./revokeAccessGrant";
+export { revokeAccessGrant } from "./revokeAccessGrant";

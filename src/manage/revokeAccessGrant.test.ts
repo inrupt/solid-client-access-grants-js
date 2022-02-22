@@ -23,18 +23,12 @@
 /* eslint-disable no-shadow */
 import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { jest, describe, it, expect } from "@jest/globals";
-import { revokeAccessGrant, revokeAccess } from "./revokeAccessGrant";
+import { revokeAccessGrant } from "./revokeAccessGrant";
 import { mockAccessGrant, MOCKED_CREDENTIAL_ID } from "../request/request.mock";
 import { mockAccessRequestVc } from "./approveAccessRequest.mock";
 
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
-
-describe("revokeAccess", () => {
-  it("should be an alias of revokeAccessGrant", () => {
-    expect(revokeAccess).toBe(revokeAccessGrant);
-  });
-});
 
 describe("revokeAccessGrant", () => {
   it("defaults to the authenticated fetch from solid-client-authn-browser", async () => {

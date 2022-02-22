@@ -49,8 +49,6 @@ export {
   getAccessRequestFromRedirectUrl,
   redirectToRequestor,
   revokeAccessGrant,
-  // Deprecated APIs:
-  revokeAccess,
 } from "./manage";
 
 export {

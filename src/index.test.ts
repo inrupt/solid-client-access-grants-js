@@ -42,7 +42,6 @@ import {
   getSolidDataset,
   saveSolidDatasetAt,
   // Deprecated APIs:
-  revokeAccess,
   isValidConsentGrant,
 } from "./index";
 
@@ -67,7 +66,6 @@ describe("Index exports", () => {
     expect(getSolidDataset).toBeDefined();
     expect(saveSolidDatasetAt).toBeDefined();
     // Deprecated APIs:
-    expect(revokeAccess).toBeDefined();
     expect(isValidConsentGrant).toBeDefined();
   });
 });
