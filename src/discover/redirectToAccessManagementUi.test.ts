@@ -192,8 +192,8 @@ describe("redirectToAccessManagementUi", () => {
       // Yield the event loop to make sure the blocking promises completes.
       await new Promise((resolve) => setImmediate(resolve));
       const targetIri = new URL(window.location.href);
-      const encodedVc = targetIri.searchParams.get("requestVc") as string;
-      expect(JSON.parse(atob(encodedVc))).toEqual(mockAccessRequestVc());
+      const encodedVc = targetIri.searchParams.get("requestVcUrl") as string;
+      expect(decodeURI(encodedVc)).toEqual(mockAccessRequestVc().id);
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri"
       );
@@ -265,6 +265,23 @@ describe("redirectToAccessManagementUi", () => {
         "https://some.redirect.iri"
       );
       expect(window.location.href).toBe("https://some.site");
+    });
+
+    // DEPRECATED: This test should be removed with the next major upgrade.
+    it("supports the legacy approach of passing the VC as a value in the query parameters", async () => {
+      mockAccessManagementUiDiscovery("https://some.access.ui");
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
+        mockAccessRequestVc(),
+        "https://some.redirect.iri"
+      );
+      // Yield the event loop to make sure the blocking promises completes.
+      await new Promise((resolve) => setImmediate(resolve));
+      const targetIri = new URL(window.location.href);
+      const encodedVc = targetIri.searchParams.get("requestVc") as string;
+      expect(JSON.parse(atob(encodedVc))).toStrictEqual(mockAccessRequestVc());
     });
   });
 

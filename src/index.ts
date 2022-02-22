@@ -45,8 +45,9 @@ export {
 export type { RedirectToAccessManagementUiOptions } from "./discover";
 
 export {
-  issueAccessRequest,
   cancelAccessRequest,
+  getAccessGrantFromRedirectUrl,
+  issueAccessRequest,
   // Deprecated APIs:
   requestAccess,
   requestAccessWithConsent,
@@ -58,6 +59,7 @@ export {
   denyAccessRequest,
   getAccessGrant,
   getAccessGrantAll,
+  getAccessRequestFromRedirectUrl,
   redirectToRequestor,
   revokeAccessGrant,
   // Deprecated APIs:

@@ -10,6 +10,11 @@ The following changes have been implemented but not released yet:
 
 - `redirectToRequestor` has been added to the `./manage` module to help access management
   apps redirect their users to the clients which requested access to a Resource.
+- `getAccessRequestFromRedirectUrl`: a function exported by the `./manage` module to
+  get the Access Request and requestor redirect URL from the redirect to the Access
+  Management App from the requestor.
+- `getAccessGrantFromRedirectUrl`: a function exported by the `./request` module to get
+  the Access Grant from the redirect to the requestor from the Access Management App.
 
 ### Bugfixes
 
