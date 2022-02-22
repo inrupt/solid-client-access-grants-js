@@ -168,7 +168,8 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [16.x]
+        environment-name: ["ESS Dev-Next"]
     needs: [prepare-deployment, publish-npm]
     steps:
       - uses: actions/checkout@v2.4.0
@@ -189,10 +190,13 @@ jobs:
           # replace `../index` (i.e. in the import statement) with `@inrupt/solid-client-access-grants`:
           find ./ -type f -exec sed --in-place --expression='s/\.\.\/index/@inrupt\/solid-client-access-grants/g' {} \;
       - name: Run the Node-based end-to-end tests
-        run: npm run e2e-test-node
+        run: npm run test:e2e
         env:
-          E2E_TEST_ESS_NOTIFICATION_GATEWAY: ${{secrets.E2E_TEST_ESS_PROD_NOTIFICATION_GATEWAY}}
-          E2E_TEST_ESS_POD: ${{ secrets.E2E_TEST_ESS_PROD_POD }}
-          E2E_TEST_ESS_IDP_URL: ${{ secrets.E2E_TEST_ESS_PROD_IDP_URL }}
-          E2E_TEST_ESS_CLIENT_ID: ${{ secrets.E2E_TEST_ESS_PROD_CLIENT_ID }}
-          E2E_TEST_ESS_CLIENT_SECRET: ${{ secrets.E2E_TEST_ESS_PROD_CLIENT_SECRET }}
+          E2E_TEST_IDP: ${{ secrets.E2E_TEST_IDP }}
+          E2E_TEST_ENVIRONMENT: ${{ matrix.environment-name }}
+          E2E_TEST_VC_SERVICE: ${{ secrets.E2E_TEST_VC_SERVICE }}
+          E2E_TEST_REQUESTOR_CLIENT_ID: ${{ secrets.E2E_TEST_REQUESTOR_CLIENT_ID }}
+          E2E_TEST_REQUESTOR_CLIENT_SECRET: ${{ secrets.E2E_TEST_REQUESTOR_CLIENT_SECRET }}
+          E2E_TEST_RESOURCE_OWNER_CLIENT_ID: ${{ secrets.E2E_TEST_RESOURCE_OWNER_CLIENT_ID }}
+          E2E_TEST_RESOURCE_OWNER_CLIENT_SECRET: ${{ secrets.E2E_TEST_RESOURCE_OWNER_CLIENT_SECRET }}
+
