@@ -47,15 +47,6 @@ describe("getAccessApiEndpoint", () => {
     expect(accessEndpoint).toBe("https://access.inrupt.com");
   });
 
-  // Deprecated API:
-  it("can find the access endpoint via the consentEndpoint option", async () => {
-    mockAccessApiEndpoint();
-    const accessEndpoint = await getAccessApiEndpoint(MOCK_REQUESTEE_IRI, {
-      consentEndpoint: "https://access.inrupt.com",
-    });
-    expect(accessEndpoint).toBe("https://access.inrupt.com");
-  });
-
   it("throws an error if the unauthenticated fetch does not fail", async () => {
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
       new Response("", {

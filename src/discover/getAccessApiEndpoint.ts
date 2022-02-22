@@ -75,10 +75,6 @@ async function getAccessApiEndpoint(
     return options.accessEndpoint.toString();
   }
 
-  if (options.consentEndpoint !== undefined) {
-    return options.consentEndpoint.toString();
-  }
-
   return getAccessEndpointForResource(resource.toString());
 }
 
