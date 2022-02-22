@@ -56,11 +56,6 @@ export type RedirectToAccessManagementUiOptions = RedirectOptions & {
    * @since 0.4.0
    */
   fallbackAccessManagementUi?: UrlString;
-  /**
-   * @hidden Replaced by [[fallbackAccessManagementUi]]
-   * @deprecated
-   */
-  fallbackConsentManagementUi?: UrlString;
 };
 
 async function discoverAccessManagementUi(options: {
@@ -100,9 +95,7 @@ export async function redirectToAccessManagementUi(
   redirectUrl: UrlString | URL,
   options: RedirectToAccessManagementUiOptions = {}
 ): Promise<void> {
-  // The former fallbackConsentManagementUi option is deprecated:
-  const fallbackUi =
-    options.fallbackAccessManagementUi ?? options.fallbackConsentManagementUi;
+  const fallbackUi = options.fallbackAccessManagementUi;
 
   // DEPRECATED: This should be removed on the next major upgrade: the VC should
   // be passed as an IRI, and doesn't need to be dereferenced.

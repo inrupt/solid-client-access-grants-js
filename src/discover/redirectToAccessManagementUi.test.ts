@@ -147,7 +147,7 @@ describe("redirectToAccessManagementUi", () => {
         mockAccessRequestVc(),
         "https://some.redirect.iri",
         {
-          fallbackConsentManagementUi: "https://some.app",
+          fallbackAccessManagementUi: "https://some.app",
         }
       );
       // Yield the event loop to make sure the blocking promises completes.
