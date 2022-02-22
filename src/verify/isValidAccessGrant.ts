@@ -93,11 +93,3 @@ async function isValidAccessGrant(
 export { isValidAccessGrant };
 export default isValidAccessGrant;
 export type { UrlString, VerifiableCredential };
-
-/**
- * @hidden Deprecated alias of [[isValidAccessGrant]]
- * @since 0.0.1
- * @deprecated
- */
-const isValidConsentGrant = isValidAccessGrant;
-export { isValidConsentGrant };

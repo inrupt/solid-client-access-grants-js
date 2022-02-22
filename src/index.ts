@@ -51,11 +51,7 @@ export {
   revokeAccessGrant,
 } from "./manage";
 
-export {
-  isValidAccessGrant,
-  // Deprecated API:
-  isValidConsentGrant,
-} from "./verify";
+export { isValidAccessGrant } from "./verify";
 
 export { fetchWithVc } from "./fetch";
 

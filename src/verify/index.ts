@@ -25,8 +25,4 @@
  * - `isValidAccessGrant`: Verifying an access grant.
  */
 // TODO: Allow verification of different types of consent & access grants
-export {
-  isValidAccessGrant,
-  // Deprecated APIs:
-  isValidConsentGrant,
-} from "./isValidAccessGrant";
+export { isValidAccessGrant } from "./isValidAccessGrant";
