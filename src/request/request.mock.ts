@@ -30,7 +30,10 @@ import {
   WithServerResourceInfo,
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { CONSENT_CONTEXT, PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
+import {
+  ACCESS_GRANT_CONTEXT,
+  PREFERRED_CONSENT_MANAGEMENT_UI,
+} from "../constants";
 
 export const MOCKED_CREDENTIAL_ID = "https://some.credential";
 export const MOCKED_ISSUANCE_DATE = "2021-09-07T09:59:00Z";
@@ -44,7 +47,7 @@ export const mockAccessGrant = (
   subjectClaims?: Record<string, string>
 ): VerifiableCredential => {
   return {
-    "@context": CONSENT_CONTEXT,
+    "@context": ACCESS_GRANT_CONTEXT,
     credentialSubject: {
       id: subjectId,
       providedConsent: {

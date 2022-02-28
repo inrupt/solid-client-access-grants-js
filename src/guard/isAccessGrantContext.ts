@@ -19,31 +19,9 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { UrlString } from "@inrupt/solid-client";
-import { CONSENT_STATUS, RESOURCE_ACCESS_MODE } from "../constants";
-import { ConsentAttributes } from "../type/AccessVerifiableCredential";
-import { ResourceAccessMode } from "../type/ResourceAccessMode";
-import { isUnknownObject } from "./isUnknownObject";
-import { ConsentStatus } from "../type/ConsentStatus";
+import { ACCESS_GRANT_CONTEXT } from "../constants";
+import { AccessGrantContext } from "../type/AccessGrantContext";
 
-function isResourceAccessModeArray(x: unknown): x is Array<ResourceAccessMode> {
-  return Array.isArray(x) && x.every((y) => RESOURCE_ACCESS_MODE.has(y));
-}
-
-function isConsentStatus(x: unknown): x is ConsentStatus {
-  return typeof x === "string" && (CONSENT_STATUS as Set<string>).has(x);
-}
-
-// TODO: Discuss a strongly typed UrlString guard (as a team).
-function isStringArray(x: unknown): x is Array<UrlString> {
-  return Array.isArray(x) && x.every((y) => typeof y === "string");
-}
-
-export function isConsentAttributes(x: unknown): x is ConsentAttributes {
-  return (
-    isUnknownObject(x) &&
-    isResourceAccessModeArray(x.mode) &&
-    isConsentStatus(x.hasStatus) &&
-    isStringArray(x.forPersonalData)
-  );
+export function isAccessGrantContext(x: unknown): x is AccessGrantContext {
+  return Array.isArray(x) && ACCESS_GRANT_CONTEXT.every((y) => x.includes(y));
 }

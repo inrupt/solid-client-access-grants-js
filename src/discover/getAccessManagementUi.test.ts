@@ -27,11 +27,7 @@ import {
   getSolidDataset,
 } from "@inrupt/solid-client";
 
-import {
-  getAccessManagementUi,
-  // Deprecated API:
-  getConsentManagementUi,
-} from "./getAccessManagementUi";
+import { getAccessManagementUi } from "./getAccessManagementUi";
 
 import {
   MOCKED_ACCESS_UI_IRI,
@@ -51,12 +47,6 @@ jest.mock("@inrupt/solid-client", () => {
   return solidClientModule;
 });
 jest.mock("@inrupt/solid-client-authn-browser");
-
-describe("getConsentManagementUi", () => {
-  it("should be an alias of getAccessManagementUi", () => {
-    expect(getConsentManagementUi).toBe(getAccessManagementUi);
-  });
-});
 
 describe("getAccessManagementUi", () => {
   it("defaults to the default session fetch if no fetch is provided", async () => {

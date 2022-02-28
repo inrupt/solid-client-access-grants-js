@@ -26,12 +26,12 @@ import {
 } from "@inrupt/solid-client-vc";
 import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
-import { BaseConsentGrantBody } from "../type/AccessVerifiableCredential";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { RecursivePartial } from "../type/RecursivePartial";
 import type { IssueAccessRequestParameters } from "../type/IssueAccessRequestParameters";
 import { accessToResourceAccessModeArray } from "../util/accessToResourceAccessModeArray";
 import { getSessionFetch } from "../util/getSessionFetch";
+import { BaseGrantBody } from "../type/AccessVerifiableCredential";
 
 /**
  * Retrieve Access Grants issued over a resource.
@@ -60,17 +60,16 @@ async function getAccessGrantAll(
     await getAccessApiEndpoint(resource, options)
   );
 
-  const vcShape: RecursivePartial<BaseConsentGrantBody & VerifiableCredential> =
-    {
-      credentialSubject: {
-        providedConsent: {
-          hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-          forPersonalData: [resource.toString()],
-          forPurpose: params.purpose,
-          isProvidedTo: params.requestor,
-        },
+  const vcShape: RecursivePartial<BaseGrantBody & VerifiableCredential> = {
+    credentialSubject: {
+      providedConsent: {
+        hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+        forPersonalData: [resource.toString()],
+        forPurpose: params.purpose,
+        isProvidedTo: params.requestor,
       },
-    };
+    },
+  };
 
   const specifiedModes = accessToResourceAccessModeArray(params.access ?? {});
   if (specifiedModes.length > 0) {
@@ -90,17 +89,4 @@ async function getAccessGrantAll(
 
 export { getAccessGrantAll };
 export default getAccessGrantAll;
-export type {
-  IssueAccessRequestParameters,
-  IssueAccessRequestParameters as RequestAccessWithConsentParameters,
-  UrlString,
-  VerifiableCredential,
-};
-
-/**
- * @hidden Deprecated alias for [[getAccessGrantAll]]
- * @since 0.1.0
- * @deprecated
- */
-const getAccessWithConsentAll = getAccessGrantAll;
-export { getAccessWithConsentAll };
+export type { IssueAccessRequestParameters, UrlString, VerifiableCredential };

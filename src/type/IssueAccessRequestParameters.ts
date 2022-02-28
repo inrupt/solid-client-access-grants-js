@@ -52,16 +52,3 @@ export type IssueAccessRequestParameters = {
 export type DeprecatedAccessRequestParameters = IssueAccessRequestParameters & {
   requestor: WebId;
 };
-
-/**
- * @hidden Alias of [[IssueAccessRequestParameters]]
- * @deprecated
- */
-export type RequestAccessParameters = IssueAccessRequestParameters;
-
-/**
- * @hidden Deprecated as we move towards just [[IssueAccessRequestParameters]]
- * @deprecated
- */
-export type RequestAccessWithConsentParameters = IssueAccessRequestParameters &
-  Required<Pick<IssueAccessRequestParameters, "purpose">>;

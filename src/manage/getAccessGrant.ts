@@ -73,11 +73,3 @@ export async function getAccessGrant(
   }
   return data;
 }
-
-/**
- * @hidden Deprecated alias of [[getAccessGrant]]
- * @since 0.1.0
- * @deprecated
- */
-const getAccessWithConsent = getAccessGrant;
-export { getAccessWithConsent };

@@ -28,34 +28,18 @@
  * - `getAccessGrantAll`: Retrieve the Access Grants issued over a resource;
  * - `revokeAccessGrant`: Revoke previously granted access over a resource.
  */
-export {
-  approveAccessRequest,
-  // Deprecated API:
-  approveAccessRequestWithConsent,
-} from "./approveAccessRequest";
+export { approveAccessRequest } from "./approveAccessRequest";
 
 export type { ApproveAccessRequestOverrides } from "./approveAccessRequest";
 
 export { denyAccessRequest } from "./denyAccessRequest";
 
-export {
-  getAccessGrant,
-  // Deprecated APIs:
-  getAccessWithConsent,
-} from "./getAccessGrant";
+export { getAccessGrant } from "./getAccessGrant";
 
-export {
-  getAccessGrantAll,
-  // Deprecated APIs:
-  getAccessWithConsentAll,
-} from "./getAccessGrantAll";
+export { getAccessGrantAll } from "./getAccessGrantAll";
 
 export { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
 
 export { redirectToRequestor } from "./redirectToRequestor";
 
-export {
-  revokeAccessGrant,
-  // Deprecated APIs:
-  revokeAccess,
-} from "./revokeAccessGrant";
+export { revokeAccessGrant } from "./revokeAccessGrant";

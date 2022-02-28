@@ -19,19 +19,16 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { access, UrlString, WebId } from "@inrupt/solid-client";
-import { isConsentRequest } from "../guard/isConsentRequest";
+import { access, UrlString } from "@inrupt/solid-client";
 import {
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_CONTROL,
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
 } from "../constants";
-import type {
-  AccessRequestBody,
-  ConsentRequestBody,
-} from "../type/AccessVerifiableCredential";
+import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import type { ResourceAccessMode } from "../type/ResourceAccessMode";
+import { ApproveAccessRequestOverrides } from "../manage/approveAccessRequest";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
   return requestVc.credentialSubject.id;
@@ -69,14 +66,14 @@ function getIssuanceFromRequest(
   return new Date(requestVc.issuanceDate);
 }
 
-function getPurposeFromConsentRequest(
-  requestVc: ConsentRequestBody
+function getPurposeFromRequest(
+  requestVc: AccessRequestBody
 ): UrlString[] | undefined {
   return requestVc.credentialSubject.hasConsent.forPurpose;
 }
 
-function getExpirationFromConsentRequest(
-  requestVc: ConsentRequestBody
+function getExpirationFromRequest(
+  requestVc: AccessRequestBody
 ): Date | undefined {
   return requestVc.expirationDate !== undefined
     ? new Date(requestVc.expirationDate)
@@ -84,53 +81,26 @@ function getExpirationFromConsentRequest(
 }
 
 export function initializeGrantParameters(
-  requestVc?:
-    | (AccessRequestBody & { issuanceDate: string })
-    | (ConsentRequestBody & { issuanceDate: string }),
-  requestOverride?: Partial<{
-    requestor: WebId;
-    access: Partial<access.Access>;
-    resources: Array<UrlString>;
-    requestorInboxIri: UrlString;
-    purpose: Array<UrlString>;
-    issuanceDate: Date;
-    expirationDate: Date;
-  }>
-): Omit<
-  Exclude<Required<typeof requestOverride>, undefined>,
-  "requestorInboxIri"
-> & { requestorInboxIri?: string } {
-  let internalOptions: typeof requestOverride;
-  if (requestVc === undefined) {
-    internalOptions = requestOverride;
-  } else {
-    internalOptions = {
-      requestor:
-        requestOverride?.requestor ?? getRequestorFromRequest(requestVc),
-      access:
-        requestOverride?.access ??
-        modesToAccess(getModesFromRequest(requestVc)),
-      resources:
-        requestOverride?.resources ?? getResourcesFromRequest(requestVc),
-      requestorInboxIri:
-        requestOverride?.requestorInboxIri ?? getInboxFromRequest(requestVc),
-      issuanceDate:
-        requestOverride?.issuanceDate ?? getIssuanceFromRequest(requestVc),
-    };
-    if (isConsentRequest(requestVc)) {
-      internalOptions = {
-        ...internalOptions,
-        purpose:
-          requestOverride?.purpose ??
-          getPurposeFromConsentRequest(requestVc as ConsentRequestBody),
+  requestVc: (AccessRequestBody & { issuanceDate: string }) | undefined,
+  requestOverride?: Partial<ApproveAccessRequestOverrides>
+): ApproveAccessRequestOverrides {
+  return requestVc === undefined
+    ? (requestOverride as ApproveAccessRequestOverrides)
+    : {
+        requestor:
+          requestOverride?.requestor ?? getRequestorFromRequest(requestVc),
+        access:
+          requestOverride?.access ??
+          modesToAccess(getModesFromRequest(requestVc)),
+        resources:
+          requestOverride?.resources ?? getResourcesFromRequest(requestVc),
+        requestorInboxUrl:
+          requestOverride?.requestorInboxUrl ?? getInboxFromRequest(requestVc),
+        issuanceDate:
+          requestOverride?.issuanceDate ?? getIssuanceFromRequest(requestVc),
+        purpose: requestOverride?.purpose ?? getPurposeFromRequest(requestVc),
         expirationDate:
           requestOverride?.expirationDate ??
-          getExpirationFromConsentRequest(requestVc as ConsentRequestBody),
+          getExpirationFromRequest(requestVc),
       };
-    }
-  }
-  // At this point, all the assertions in internalOptions are initialised, either
-  // from the provided VC or from the provided override.
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return (internalOptions as Required<typeof requestOverride>)!;
 }

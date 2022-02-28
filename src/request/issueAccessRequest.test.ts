@@ -26,11 +26,7 @@ import {
   issueVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import {
-  issueAccessRequest,
-  requestAccess,
-  requestAccessWithConsent,
-} from "./issueAccessRequest";
+import { issueAccessRequest } from "./issueAccessRequest";
 import { getRequestBody } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import {
@@ -41,7 +37,7 @@ import {
   MOCK_REQUESTOR_INBOX,
   MOCK_REQUESTEE_IRI,
 } from "./request.mock";
-import { CONSENT_CONTEXT } from "../constants";
+import { ACCESS_GRANT_CONTEXT } from "../constants";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -122,18 +118,6 @@ describe("getRequestBody", () => {
       issuanceDate: "1955-06-08T13:37:42.042Z",
       type: ["SolidAccessRequest"],
     });
-  });
-});
-
-describe("requestAccess", () => {
-  it("should be an alias of issueAccessRequest", () => {
-    expect(requestAccess).toEqual(issueAccessRequest);
-  });
-});
-
-describe("requestAccessWithConsent", () => {
-  it("should be an alias of issueAccessRequest", () => {
-    expect(requestAccessWithConsent).toEqual(issueAccessRequest);
   });
 });
 
@@ -468,7 +452,7 @@ describe("isAccessRequest", () => {
   it("returns true if the credential matches the expected shape", () => {
     expect(
       isAccessRequest({
-        "@context": CONSENT_CONTEXT,
+        "@context": ACCESS_GRANT_CONTEXT,
         credentialSubject: {
           id: "https://some.id",
           inbox: "https://some.inbox",

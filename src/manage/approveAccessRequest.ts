@@ -20,7 +20,7 @@
  */
 
 // eslint-disable-next-line camelcase
-import { Access, UrlString, WebId, acp_v4, access } from "@inrupt/solid-client";
+import { UrlString, WebId, acp_v4, access } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
@@ -35,16 +35,12 @@ import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessV
 import { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { AccessGrantBody } from "../type/AccessVerifiableCredential";
+import { AccessGrantParameters } from "../type/Parameter";
 
-export type ApproveAccessRequestOverrides = {
-  requestor: WebId;
-  access: Partial<Access>;
-  resources: Array<UrlString>;
-  requestorInboxIri?: UrlString;
-  purpose?: Array<UrlString>;
-  issuanceDate?: Date;
-  expirationDate?: Date;
-};
+export type ApproveAccessRequestOverrides = Omit<
+  AccessGrantParameters,
+  "status"
+>;
 
 function getAccessModesFromAccessGrant(
   request: AccessGrantBody
@@ -127,7 +123,7 @@ async function internal_approveAccessRequest(
     access: internalOptions.access,
     requestor: internalOptions.requestor,
     resources: internalOptions.resources,
-    requestorInboxUrl: internalOptions.requestorInboxIri,
+    requestorInboxUrl: internalOptions.requestorInboxUrl,
     purpose: internalOptions.purpose,
     issuanceDate: internalOptions.issuanceDate,
     expirationDate: internalOptions.expirationDate,
@@ -236,11 +232,3 @@ export async function approveAccessRequest(
 
 export default approveAccessRequest;
 export type { UrlString, VerifiableCredential };
-
-/**
- * @hidden alias for [[approveAccessRequest]]
- * @since 0.4.0
- * @deprecated
- */
-const approveAccessRequestWithConsent = approveAccessRequest;
-export { approveAccessRequestWithConsent };

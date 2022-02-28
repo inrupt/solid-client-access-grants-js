@@ -132,11 +132,3 @@ async function getAccessManagementUi(
 export { getAccessManagementUi };
 export default getAccessManagementUi;
 export type { UrlString };
-
-/**
- * @hidden alias of [[getAccessManagementUi]]
- * @since 0.0.1
- * @deprecated
- */
-const getConsentManagementUi = getAccessManagementUi;
-export { getConsentManagementUi };

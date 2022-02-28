@@ -24,7 +24,6 @@
 import { describe, it, expect } from "@jest/globals";
 import {
   approveAccessRequest,
-  approveAccessRequestWithConsent,
   cancelAccessRequest,
   denyAccessRequest,
   getAccessGrant,
@@ -42,22 +41,11 @@ import {
   getFile,
   getSolidDataset,
   saveSolidDatasetAt,
-  // Deprecated APIs:
-  getConsentApiEndpoint,
-  getConsentManagementUi,
-  getAccessWithConsent,
-  getAccessWithConsentAll,
-  redirectToConsentManagementUi,
-  requestAccess,
-  requestAccessWithConsent,
-  revokeAccess,
-  isValidConsentGrant,
 } from "./index";
 
 describe("Index exports", () => {
   it("exposes expected things", () => {
     expect(approveAccessRequest).toBeDefined();
-    expect(approveAccessRequestWithConsent).toBeDefined();
     expect(cancelAccessRequest).toBeDefined();
     expect(denyAccessRequest).toBeDefined();
     expect(getAccessGrant).toBeDefined();
@@ -75,15 +63,5 @@ describe("Index exports", () => {
     expect(getFile).toBeDefined();
     expect(getSolidDataset).toBeDefined();
     expect(saveSolidDatasetAt).toBeDefined();
-    // Deprecated APIs:
-    expect(getConsentApiEndpoint).toBeDefined();
-    expect(getConsentManagementUi).toBeDefined();
-    expect(getAccessWithConsent).toBeDefined();
-    expect(getAccessWithConsentAll).toBeDefined();
-    expect(redirectToConsentManagementUi).toBeDefined();
-    expect(requestAccess).toBeDefined();
-    expect(requestAccessWithConsent).toBeDefined();
-    expect(revokeAccess).toBeDefined();
-    expect(isValidConsentGrant).toBeDefined();
   });
 });

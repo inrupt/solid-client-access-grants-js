@@ -25,22 +25,10 @@
  * - `getAccessApiEndpoint`: Discover the preferred access API endpoint for a resource;
  * - `getAccessManagementUi`: Discover the preferred access management UI for an entity.
  */
-export {
-  getAccessApiEndpoint,
-  // Deprecated API:
-  getConsentApiEndpoint,
-} from "./getAccessApiEndpoint";
+export { getAccessApiEndpoint } from "./getAccessApiEndpoint";
 
-export {
-  getAccessManagementUi,
-  // Deprecated API:
-  getConsentManagementUi,
-} from "./getAccessManagementUi";
+export { getAccessManagementUi } from "./getAccessManagementUi";
 
-export {
-  redirectToAccessManagementUi,
-  // Deprecated API:
-  redirectToConsentManagementUi,
-} from "./redirectToAccessManagementUi";
+export { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 
 export type { RedirectToAccessManagementUiOptions } from "./redirectToAccessManagementUi";

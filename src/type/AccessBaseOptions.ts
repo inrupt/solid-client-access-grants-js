@@ -49,15 +49,4 @@ export type AccessBaseOptions = {
    * @since 0.4.0
    */
   accessEndpoint?: URL | UrlString;
-  /**
-   * @hidden alias of accessEndpoint
-   * @deprecated
-   */
-  consentEndpoint?: URL | UrlString;
 };
-
-/**
- * @hidden alias of AccessBaseOptions
- * @deprecated
- */
-export { AccessBaseOptions as ConsentApiBaseOptions };

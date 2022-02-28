@@ -26,7 +26,7 @@ import {
 // This rule complains about the `@jest/globals` variables overriding global vars:
 // eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
-import { isValidConsentGrant, isValidAccessGrant } from "./isValidAccessGrant";
+import { isValidAccessGrant } from "./isValidAccessGrant";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -42,12 +42,6 @@ jest.mock("@inrupt/solid-client", () => {
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
 jest.mock("cross-fetch");
-
-describe("isValidConsentGrant", () => {
-  it("should be an alias of isValidAccessGrant", () => {
-    expect(isValidConsentGrant).toBe(isValidAccessGrant);
-  });
-});
 
 describe("isValidAccessGrant", () => {
   const MOCK_ACCESS_GRANT = {

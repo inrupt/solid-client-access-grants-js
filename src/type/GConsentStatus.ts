@@ -19,32 +19,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import {
-  BaseAccessVcBody,
-  BaseConsentGrantBody,
-  BaseConsentRequestBody,
-} from "../type/AccessVerifiableCredential";
+import type { CONSENT_STATUS } from "../constants";
 
-export function isConsentRequest(
-  request: BaseAccessVcBody | BaseConsentGrantBody
-): request is BaseConsentGrantBody;
-export function isConsentRequest(
-  request: BaseAccessVcBody | BaseConsentRequestBody
-): request is BaseConsentRequestBody;
-export function isConsentRequest(
-  request: BaseAccessVcBody | BaseConsentRequestBody | BaseConsentGrantBody
-): request is BaseConsentRequestBody | BaseConsentGrantBody {
-  if (
-    (request as BaseConsentRequestBody).credentialSubject.hasConsent !==
-    undefined
-  ) {
-    return (
-      (request as BaseConsentRequestBody).credentialSubject.hasConsent
-        .forPurpose !== undefined
-    );
-  }
-  return (
-    (request as BaseConsentGrantBody).credentialSubject.providedConsent
-      .forPurpose !== undefined
-  );
-}
+export type GConsentStatus = typeof CONSENT_STATUS extends Set<infer T>
+  ? T
+  : never;

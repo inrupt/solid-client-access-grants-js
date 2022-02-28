@@ -19,11 +19,6 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import { BaseConsentParameters } from "../type/Parameter";
-import { isUnknownObject } from "./isUnknownObject";
+import type { ACCESS_GRANT_CONTEXT } from "../constants";
 
-export function isBaseConsentParameters(
-  x: unknown
-): x is BaseConsentParameters {
-  return isUnknownObject(x) && x.purpose !== undefined;
-}
+export type AccessGrantContext = typeof ACCESS_GRANT_CONTEXT;

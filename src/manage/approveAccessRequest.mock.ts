@@ -22,12 +22,10 @@
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { UrlString } from "@inrupt/solid-client";
 import {
-  BaseConsentGrantBody,
-  BaseConsentRequestBody,
   BaseGrantBody,
   BaseRequestBody,
 } from "../type/AccessVerifiableCredential";
-import { CONSENT_CONTEXT } from "../constants";
+import { ACCESS_GRANT_CONTEXT } from "../constants";
 import { ResourceAccessMode } from "../type/ResourceAccessMode";
 
 export const mockAccessRequestVc = (
@@ -37,7 +35,7 @@ export const mockAccessRequestVc = (
   }>
 ): VerifiableCredential & BaseRequestBody => {
   return {
-    "@context": CONSENT_CONTEXT,
+    "@context": ACCESS_GRANT_CONTEXT,
     id: "https://some.credential",
     credentialSubject: {
       id: "https://some.requestor",
@@ -48,7 +46,7 @@ export const mockAccessRequestVc = (
       },
       inbox: "https://some.inbox",
     },
-    issuanceDate: "some ISO date",
+    issuanceDate: "2022-02-22",
     issuer: "https://some.issuer",
     proof: {
       created: "some ISO date",
@@ -63,7 +61,7 @@ export const mockAccessRequestVc = (
 
 export const mockAccessGrantVc = (): VerifiableCredential & BaseGrantBody => {
   return {
-    "@context": CONSENT_CONTEXT,
+    "@context": ACCESS_GRANT_CONTEXT,
     id: "https://some.credential",
     credentialSubject: {
       id: "https://some.resource.owner",
@@ -89,21 +87,18 @@ export const mockAccessGrantVc = (): VerifiableCredential & BaseGrantBody => {
 };
 
 export const mockConsentRequestVc = (): VerifiableCredential &
-  BaseConsentRequestBody => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const requestVc = mockAccessRequestVc() as any as VerifiableCredential &
-    BaseConsentRequestBody;
+  BaseRequestBody => {
+  const requestVc = mockAccessRequestVc() as unknown as VerifiableCredential &
+    BaseRequestBody;
   requestVc.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
   requestVc.expirationDate = new Date(2021, 8, 14).toISOString();
   requestVc.issuanceDate = new Date(2021, 8, 13).toISOString();
   return requestVc;
 };
 
-export const mockConsentGrantVc = (): VerifiableCredential &
-  BaseConsentGrantBody => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const requestVc = mockAccessGrantVc() as any as VerifiableCredential &
-    BaseConsentGrantBody;
+export const mockConsentGrantVc = (): VerifiableCredential & BaseGrantBody => {
+  const requestVc = mockAccessGrantVc() as unknown as VerifiableCredential &
+    BaseGrantBody;
   requestVc.credentialSubject.providedConsent.forPurpose = [
     "https://some.purpose",
   ];

@@ -19,8 +19,33 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-import type { CONSENT_STATUS } from "../constants";
+import { UrlString } from "@inrupt/solid-client";
+import { CONSENT_STATUS, RESOURCE_ACCESS_MODE } from "../constants";
+import { GConsentRequestAttributes } from "../type/AccessVerifiableCredential";
+import { ResourceAccessMode } from "../type/ResourceAccessMode";
+import { isUnknownObject } from "./isUnknownObject";
+import { GConsentStatus } from "../type/GConsentStatus";
 
-export type ConsentStatus = typeof CONSENT_STATUS extends Set<infer T>
-  ? T
-  : never;
+function isResourceAccessModeArray(x: unknown): x is Array<ResourceAccessMode> {
+  return Array.isArray(x) && x.every((y) => RESOURCE_ACCESS_MODE.has(y));
+}
+
+function isGConsentStatus(x: unknown): x is GConsentStatus {
+  return typeof x === "string" && (CONSENT_STATUS as Set<string>).has(x);
+}
+
+// TODO: Discuss a strongly typed UrlString guard (as a team).
+function isStringArray(x: unknown): x is Array<UrlString> {
+  return Array.isArray(x) && x.every((y) => typeof y === "string");
+}
+
+export function isGConsentAttributes(
+  x: unknown
+): x is GConsentRequestAttributes {
+  return (
+    isUnknownObject(x) &&
+    isResourceAccessModeArray(x.mode) &&
+    isGConsentStatus(x.hasStatus) &&
+    isStringArray(x.forPersonalData)
+  );
+}

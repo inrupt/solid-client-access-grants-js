@@ -24,7 +24,6 @@ import { jest, it, describe, expect } from "@jest/globals";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
   getAccessGrantAll,
-  getAccessWithConsentAll,
   IssueAccessRequestParameters,
 } from "./getAccessGrantAll";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
@@ -45,12 +44,6 @@ jest.mock("../discover/getAccessApiEndpoint", () => {
   return {
     getAccessApiEndpoint: jest.fn(() => "https://some.api.endpoint"),
   };
-});
-
-describe("getAccessWithConsentAll", () => {
-  it("should be an alias for getAccessGrantAll", () => {
-    expect(getAccessWithConsentAll).toBe(getAccessGrantAll);
-  });
 });
 
 describe("getAccessGrantAll", () => {

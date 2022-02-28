@@ -27,19 +27,10 @@ import {
   mockAccessApiEndpoint,
 } from "../request/request.mock";
 
-import {
-  getAccessApiEndpoint,
-  getConsentApiEndpoint,
-} from "./getAccessApiEndpoint";
+import { getAccessApiEndpoint } from "./getAccessApiEndpoint";
 
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("cross-fetch");
-
-describe("getConsentApiEndpoint", () => {
-  it("should be an alias of getAccessApiEndpoint", () => {
-    expect(getConsentApiEndpoint).toBe(getAccessApiEndpoint);
-  });
-});
 
 describe("getAccessApiEndpoint", () => {
   it("can find the access endpoint for a given resource", async () => {
@@ -52,15 +43,6 @@ describe("getAccessApiEndpoint", () => {
     mockAccessApiEndpoint();
     const accessEndpoint = await getAccessApiEndpoint(MOCK_REQUESTEE_IRI, {
       accessEndpoint: "https://access.inrupt.com",
-    });
-    expect(accessEndpoint).toBe("https://access.inrupt.com");
-  });
-
-  // Deprecated API:
-  it("can find the access endpoint via the consentEndpoint option", async () => {
-    mockAccessApiEndpoint();
-    const accessEndpoint = await getAccessApiEndpoint(MOCK_REQUESTEE_IRI, {
-      consentEndpoint: "https://access.inrupt.com",
     });
     expect(accessEndpoint).toBe("https://access.inrupt.com");
   });

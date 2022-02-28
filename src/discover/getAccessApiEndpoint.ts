@@ -75,21 +75,9 @@ async function getAccessApiEndpoint(
     return options.accessEndpoint.toString();
   }
 
-  if (options.consentEndpoint !== undefined) {
-    return options.consentEndpoint.toString();
-  }
-
   return getAccessEndpointForResource(resource.toString());
 }
 
 export { getAccessApiEndpoint };
 export default getAccessApiEndpoint;
 export type { UrlString };
-
-/**
- * @hidden deprecated alias of [[getAccessApiEndpoint]]
- * @since 0.0.1
- * @deprecated
- */
-const getConsentApiEndpoint = getAccessApiEndpoint;
-export { getConsentApiEndpoint };

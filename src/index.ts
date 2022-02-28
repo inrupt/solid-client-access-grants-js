@@ -19,60 +19,35 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-export type {
-  AccessBaseOptions,
-  // Deprecated Type:
-  ConsentApiBaseOptions,
-} from "./type/AccessBaseOptions";
+export type { AccessBaseOptions } from "./type/AccessBaseOptions";
 
-export type {
-  IssueAccessRequestParameters,
-  // Deprecated Types:
-  RequestAccessParameters,
-  RequestAccessWithConsentParameters,
-} from "./type/IssueAccessRequestParameters";
+export type { IssueAccessRequestParameters } from "./type/IssueAccessRequestParameters";
 
 export {
   getAccessApiEndpoint,
   getAccessManagementUi,
   redirectToAccessManagementUi,
-  // Deprecated APIs:
-  redirectToConsentManagementUi,
-  getConsentApiEndpoint,
-  getConsentManagementUi,
 } from "./discover";
 
 export type { RedirectToAccessManagementUiOptions } from "./discover";
 
 export {
+  issueAccessRequest,
   cancelAccessRequest,
   getAccessGrantFromRedirectUrl,
-  issueAccessRequest,
-  // Deprecated APIs:
-  requestAccess,
-  requestAccessWithConsent,
 } from "./request";
 
 export {
   approveAccessRequest,
-  approveAccessRequestWithConsent,
   denyAccessRequest,
   getAccessGrant,
   getAccessGrantAll,
   getAccessRequestFromRedirectUrl,
   redirectToRequestor,
   revokeAccessGrant,
-  // Deprecated APIs:
-  getAccessWithConsent,
-  getAccessWithConsentAll,
-  revokeAccess,
 } from "./manage";
 
-export {
-  isValidAccessGrant,
-  // Deprecated API:
-  isValidConsentGrant,
-} from "./verify";
+export { isValidAccessGrant } from "./verify";
 
 export { fetchWithVc } from "./fetch";
 

@@ -26,16 +26,10 @@ import {
   mockAccessGrantVc,
   mockConsentRequestVc,
 } from "./approveAccessRequest.mock";
-import { getAccessGrant, getAccessWithConsent } from "./getAccessGrant";
+import { getAccessGrant } from "./getAccessGrant";
 
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("cross-fetch");
-
-describe("getAccessWithConsent", () => {
-  it("should be an alias of getAccessGrant", () => {
-    expect(getAccessWithConsent).toBe(getAccessGrant);
-  });
-});
 
 describe("getAccessGrant", () => {
   it("defaults to the session fetch if none is provided", async () => {
