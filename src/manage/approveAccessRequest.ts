@@ -20,7 +20,7 @@
  */
 
 // eslint-disable-next-line camelcase
-import { Access, UrlString, WebId, acp_v4, access } from "@inrupt/solid-client";
+import { UrlString, WebId, acp_v4, access } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
