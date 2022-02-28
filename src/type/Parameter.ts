@@ -31,7 +31,7 @@ export type BaseRequestParameters = {
   requestorInboxUrl?: UrlString;
   resources: Array<UrlString>;
   status: ConsentStatus;
-  purpose: Array<UrlString>;
+  purpose?: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;
 };

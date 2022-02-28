@@ -33,41 +33,34 @@ import { getSessionFetch } from "./getSessionFetch";
 import type {
   AccessGrantBody,
   AccessRequestBody,
-  BaseConsentGrantBody,
-  BaseConsentRequestBody,
+  BaseAccessVcBody,
   BaseGrantBody,
   BaseGrantPayload,
   BaseRequestBody,
   BaseRequestPayload,
   ConsentAttributes,
   ConsentGrantAttributes,
-  ConsentGrantBody,
-  ConsentRequestBody,
 } from "../type/AccessVerifiableCredential";
 import { isConsentRequest } from "../guard/isConsentRequest";
 import type {
-  BaseConsentParameters,
-  ConsentRequestParameters,
   AccessRequestParameters,
-  ConsentGrantParameters,
   AccessGrantParameters,
 } from "../type/Parameter";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArray";
-import { isBaseConsentParameters } from "../guard/isBaseConsentParameters";
 import { isBaseRequest } from "../guard/isBaseRequest";
 import type { AccessCredentialType } from "../type/AccessCredentialType";
 
 function getConsentAttributes(
-  params: ConsentRequestParameters,
+  params: AccessRequestParameters,
   type: "BaseRequestBody"
 ): ConsentAttributes;
 function getConsentAttributes(
-  params: ConsentGrantParameters,
+  params: AccessGrantParameters,
   type: "BaseGrantBody"
 ): ConsentGrantAttributes;
 function getConsentAttributes(
-  params: ConsentRequestParameters | ConsentGrantParameters,
+  params: AccessRequestParameters | AccessGrantParameters,
   type: "BaseRequestBody" | "BaseGrantBody"
 ): ConsentAttributes | ConsentGrantAttributes {
   const modes = accessToResourceAccessModeArray(params.access);
@@ -76,6 +69,10 @@ function getConsentAttributes(
     hasStatus: params.status,
     forPersonalData: params.resources,
   };
+  if (params.purpose !== undefined) {
+    consentAttributes.forPurpose = params.purpose;
+  }
+
   if (type === "BaseGrantBody") {
     return {
       ...consentAttributes,
@@ -108,13 +105,20 @@ function getBaseBody(
       inbox: params.requestorInboxUrl,
     },
   };
+  if (params.issuanceDate !== undefined) {
+    (body as BaseAccessVcBody).issuanceDate = params.issuanceDate.toISOString();
+  }
+  if (params.expirationDate !== undefined) {
+    (body as BaseAccessVcBody).expirationDate =
+      params.expirationDate.toISOString();
+  }
   if (type === "BaseGrantBody") {
     return {
       ...body,
       credentialSubject: {
         ...body.credentialSubject,
         providedConsent: getConsentAttributes(
-          params as ConsentGrantParameters,
+          params as AccessGrantParameters,
           type
         ),
       },
@@ -124,102 +128,29 @@ function getBaseBody(
     ...body,
     credentialSubject: {
       ...body.credentialSubject,
-      hasConsent: getConsentAttributes(
-        params as ConsentRequestParameters,
-        type
-      ),
+      hasConsent: getConsentAttributes(params as AccessRequestParameters, type),
     },
   };
 }
 
-function getConsentBaseBody(
-  params: BaseConsentParameters,
-  baseBody: BaseGrantPayload | BaseRequestPayload
-) {
-  const request = { ...baseBody };
-  // This makes request a ConsentGrantBody
-  if (params.issuanceDate) {
-    (request as ConsentGrantBody).issuanceDate =
-      params.issuanceDate.toISOString();
-  }
-  if (params.expirationDate) {
-    (request as ConsentGrantBody).expirationDate =
-      params.expirationDate.toISOString();
-  }
-  return request;
-}
-
-function getConsentGrantBody(
-  params: BaseConsentParameters,
-  baseBody: BaseGrantBody
-): ConsentGrantBody {
-  const request = getConsentBaseBody(params, baseBody);
-  (request as ConsentGrantBody).credentialSubject.providedConsent.forPurpose =
-    params.purpose;
-  return request as ConsentGrantBody;
-}
-
-function getConsentRequestBody(
-  params: BaseConsentParameters,
-  baseBody: BaseRequestPayload
-): ConsentRequestBody {
-  const request = getConsentBaseBody(params, baseBody);
-  (request as ConsentRequestBody).credentialSubject.hasConsent.forPurpose =
-    params.purpose;
-  return request as ConsentRequestBody;
-}
-
-export function getRequestBody(
-  params: ConsentRequestParameters
-): ConsentRequestBody;
 export function getRequestBody(
   params: AccessRequestParameters
-): AccessRequestBody;
-export function getRequestBody(
-  params: AccessRequestParameters | ConsentRequestParameters
-): AccessRequestBody | ConsentRequestBody {
-  if (isBaseConsentParameters(params)) {
-    // This makes request a ConsentRequestBody
-    return getConsentRequestBody(
-      params,
-      getBaseBody(params, "BaseRequestBody")
-    ) as ConsentRequestBody;
-  }
-  return getBaseBody(
-    params as AccessRequestParameters,
-    "BaseRequestBody"
-  ) as AccessRequestBody;
+): AccessRequestBody {
+  return getBaseBody(params, "BaseRequestBody") as AccessRequestBody;
 }
 
-export function getGrantBody(params: ConsentGrantParameters): ConsentGrantBody;
-export function getGrantBody(params: AccessGrantParameters): AccessGrantBody;
-export function getGrantBody(
-  params: AccessGrantParameters | ConsentGrantParameters
-): AccessGrantBody | ConsentGrantBody {
-  const grantBody = getBaseBody(params, "BaseGrantBody");
-  grantBody.type = [CREDENTIAL_TYPE_ACCESS_GRANT];
-  if (isBaseConsentParameters(params)) {
-    // This makes request a ConsentGrantBody
-    return getConsentGrantBody(
-      params as ConsentGrantParameters,
-      grantBody as ConsentGrantBody
-    );
-  }
-  return grantBody as AccessGrantBody;
+export function getGrantBody(params: AccessGrantParameters): AccessGrantBody {
+  return getBaseBody(params, "BaseGrantBody") as AccessGrantBody;
 }
 
 export async function issueAccessVc(
-  vcBody:
-    | BaseRequestBody
-    | BaseGrantBody
-    | BaseConsentRequestBody
-    | BaseConsentGrantBody,
+  vcBody: BaseRequestBody | BaseGrantBody,
   options: AccessBaseOptions
 ): Promise<VerifiableCredential> {
   const fetcher = await getSessionFetch(options);
   const targetResourceIri = isBaseRequest(vcBody)
     ? vcBody.credentialSubject.hasConsent.forPersonalData[0]
-    : (vcBody as ConsentGrantBody).credentialSubject.providedConsent
+    : (vcBody as BaseGrantBody).credentialSubject.providedConsent
         .forPersonalData[0];
 
   // TODO: find out if concatenating "issue" here is correct

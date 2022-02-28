@@ -34,6 +34,7 @@ export type ConsentAttributes = {
   mode: ResourceAccessMode[];
   hasStatus: ConsentStatus;
   forPersonalData: UrlString[];
+  forPurpose?: UrlString[];
 };
 
 export type ConsentGrantAttributes = ConsentAttributes & {
@@ -71,6 +72,7 @@ export type BaseAccessVcBody = {
     | Omit<RequestCredentialSubject, "id">
     | Omit<GrantCredentialSubject, "id">;
   issuanceDate?: string;
+  expirationDate?: string;
 };
 
 export type BaseRequestBody = BaseAccessVcBody & {

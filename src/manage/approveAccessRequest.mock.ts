@@ -48,7 +48,7 @@ export const mockAccessRequestVc = (
       },
       inbox: "https://some.inbox",
     },
-    issuanceDate: "some ISO date",
+    issuanceDate: "2022-02-22",
     issuer: "https://some.issuer",
     proof: {
       created: "some ISO date",
