@@ -24,13 +24,13 @@ import type {
   GC_CONSENT_STATUS_REQUESTED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
-import type { ConsentStatus } from "./ConsentStatus";
+import type { GConsentStatus } from "./GConsentStatus";
 
 export type BaseRequestParameters = {
   access: Partial<access.Access>;
   requestorInboxUrl?: UrlString;
   resources: Array<UrlString>;
-  status: ConsentStatus;
+  status: GConsentStatus;
   purpose?: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;

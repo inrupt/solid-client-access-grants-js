@@ -38,10 +38,9 @@ import type {
   BaseGrantPayload,
   BaseRequestBody,
   BaseRequestPayload,
-  ConsentAttributes,
-  ConsentGrantAttributes,
+  GConsentRequestAttributes,
+  GConsentGrantAttributes,
 } from "../type/AccessVerifiableCredential";
-import { isConsentRequest } from "../guard/isConsentRequest";
 import type {
   AccessRequestParameters,
   AccessGrantParameters,
@@ -51,20 +50,20 @@ import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArr
 import { isBaseRequest } from "../guard/isBaseRequest";
 import type { AccessCredentialType } from "../type/AccessCredentialType";
 
-function getConsentAttributes(
+function getGConsentAttributes(
   params: AccessRequestParameters,
   type: "BaseRequestBody"
-): ConsentAttributes;
-function getConsentAttributes(
+): GConsentRequestAttributes;
+function getGConsentAttributes(
   params: AccessGrantParameters,
   type: "BaseGrantBody"
-): ConsentGrantAttributes;
-function getConsentAttributes(
+): GConsentGrantAttributes;
+function getGConsentAttributes(
   params: AccessRequestParameters | AccessGrantParameters,
   type: "BaseRequestBody" | "BaseGrantBody"
-): ConsentAttributes | ConsentGrantAttributes {
+): GConsentRequestAttributes | GConsentGrantAttributes {
   const modes = accessToResourceAccessModeArray(params.access);
-  const consentAttributes: ConsentAttributes = {
+  const consentAttributes: GConsentRequestAttributes = {
     mode: modes,
     hasStatus: params.status,
     forPersonalData: params.resources,
@@ -77,7 +76,7 @@ function getConsentAttributes(
     return {
       ...consentAttributes,
       isProvidedTo: (params as AccessGrantParameters).requestor,
-    } as ConsentGrantAttributes;
+    } as GConsentGrantAttributes;
   }
   return consentAttributes;
 }
@@ -117,7 +116,7 @@ function getBaseBody(
       ...body,
       credentialSubject: {
         ...body.credentialSubject,
-        providedConsent: getConsentAttributes(
+        providedConsent: getGConsentAttributes(
           params as AccessGrantParameters,
           type
         ),
@@ -128,7 +127,10 @@ function getBaseBody(
     ...body,
     credentialSubject: {
       ...body.credentialSubject,
-      hasConsent: getConsentAttributes(params as AccessRequestParameters, type),
+      hasConsent: getGConsentAttributes(
+        params as AccessRequestParameters,
+        type
+      ),
     },
   };
 }
@@ -171,10 +173,8 @@ export async function issueAccessVc(
     {
       "@context": vcBody["@context"],
       type: vcBody.type,
-      issuanceDate: isConsentRequest(vcBody) ? vcBody.issuanceDate : undefined,
-      expirationDate: isConsentRequest(vcBody)
-        ? vcBody.expirationDate
-        : undefined,
+      issuanceDate: vcBody.issuanceDate,
+      expirationDate: vcBody.expirationDate,
     },
     {
       fetch: fetcher,

@@ -50,7 +50,7 @@ async function internal_denyAccessRequest(
     access: internalOptions.access,
     requestor: internalOptions.requestor,
     resources: internalOptions.resources,
-    requestorInboxUrl: internalOptions.requestorInboxIri,
+    requestorInboxUrl: internalOptions.requestorInboxUrl,
     status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   }) as any; // FIXME

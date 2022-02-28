@@ -22,8 +22,6 @@
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { UrlString } from "@inrupt/solid-client";
 import {
-  BaseConsentGrantBody,
-  BaseConsentRequestBody,
   BaseGrantBody,
   BaseRequestBody,
 } from "../type/AccessVerifiableCredential";
@@ -89,21 +87,18 @@ export const mockAccessGrantVc = (): VerifiableCredential & BaseGrantBody => {
 };
 
 export const mockConsentRequestVc = (): VerifiableCredential &
-  BaseConsentRequestBody => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const requestVc = mockAccessRequestVc() as any as VerifiableCredential &
-    BaseConsentRequestBody;
+  BaseRequestBody => {
+  const requestVc = mockAccessRequestVc() as unknown as VerifiableCredential &
+    BaseRequestBody;
   requestVc.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
   requestVc.expirationDate = new Date(2021, 8, 14).toISOString();
   requestVc.issuanceDate = new Date(2021, 8, 13).toISOString();
   return requestVc;
 };
 
-export const mockConsentGrantVc = (): VerifiableCredential &
-  BaseConsentGrantBody => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const requestVc = mockAccessGrantVc() as any as VerifiableCredential &
-    BaseConsentGrantBody;
+export const mockConsentGrantVc = (): VerifiableCredential & BaseGrantBody => {
+  const requestVc = mockAccessGrantVc() as unknown as VerifiableCredential &
+    BaseGrantBody;
   requestVc.credentialSubject.providedConsent.forPurpose = [
     "https://some.purpose",
   ];

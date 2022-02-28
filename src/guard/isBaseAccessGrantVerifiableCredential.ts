@@ -26,7 +26,7 @@ import {
   RequestCredentialSubject,
   RequestCredentialSubjectPayload,
 } from "../type/AccessVerifiableCredential";
-import { isConsentAttributes } from "./isConsentAttributes";
+import { isGConsentAttributes } from "./isGConsentAttributes";
 import { isBaseAccessVcBody } from "./isBaseAccessVcBody";
 
 function isGrantCredentialSubject(
@@ -45,6 +45,6 @@ export function isBaseAccessGrantVerifiableCredential(
   return (
     isBaseAccessVcBody(x) &&
     isGrantCredentialSubject(x.credentialSubject) &&
-    isConsentAttributes(x.credentialSubject.providedConsent)
+    isGConsentAttributes(x.credentialSubject.providedConsent)
   );
 }

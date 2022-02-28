@@ -27,25 +27,25 @@ import type {
   GC_CONSENT_STATUS_REQUESTED,
 } from "../constants";
 import type { ResourceAccessMode } from "./ResourceAccessMode";
-import type { ConsentStatus } from "./ConsentStatus";
+import type { GConsentStatus } from "./GConsentStatus";
 import type { AccessCredentialType } from "./AccessCredentialType";
 
-export type ConsentAttributes = {
+export type GConsentRequestAttributes = {
   mode: ResourceAccessMode[];
-  hasStatus: ConsentStatus;
+  hasStatus: GConsentStatus;
   forPersonalData: UrlString[];
   forPurpose?: UrlString[];
 };
 
-export type ConsentGrantAttributes = ConsentAttributes & {
+export type GConsentGrantAttributes = GConsentRequestAttributes & {
   isProvidedTo: UrlString;
 };
 
 export type CredentialSubject = {
   id: UrlString;
   inbox: UrlString | undefined;
-  hasConsent?: ConsentAttributes;
-  providedConsent?: ConsentGrantAttributes;
+  hasConsent?: GConsentRequestAttributes;
+  providedConsent?: GConsentGrantAttributes;
 };
 
 export type RequestCredentialSubject = Required<
@@ -93,25 +93,6 @@ export type BaseGrantPayload = BaseAccessVcBody & {
   credentialSubject: Omit<GrantCredentialSubject, "id">;
 };
 
-// TODO: Check why the access credentials would not have optional expiration dates
-export type BaseConsentRequestBody = BaseRequestBody & {
-  credentialSubject: {
-    hasConsent: {
-      forPurpose: UrlString[];
-    };
-  };
-  expirationDate?: string;
-};
-
-export type BaseConsentGrantBody = BaseGrantBody & {
-  credentialSubject: {
-    providedConsent: {
-      forPurpose: UrlString[];
-    };
-  };
-  expirationDate?: string;
-};
-
 // TODO: Check if AccessRequestBody always has an issuance date (as per guard)
 export type AccessRequestBody = BaseRequestBody & {
   credentialSubject: {
@@ -121,8 +102,6 @@ export type AccessRequestBody = BaseRequestBody & {
   };
 };
 
-export type ConsentRequestBody = AccessRequestBody & BaseConsentRequestBody;
-
 export type AccessDeniedBody = BaseGrantBody & {
   credentialSubject: {
     providedConsent: {
@@ -130,8 +109,6 @@ export type AccessDeniedBody = BaseGrantBody & {
     };
   };
 };
-
-export type ConsentDeniedBody = AccessRequestBody & BaseConsentRequestBody;
 
 export type AccessGrantBody = BaseGrantBody & {
   credentialSubject: {
@@ -142,12 +119,7 @@ export type AccessGrantBody = BaseGrantBody & {
   };
 };
 
-export type ConsentGrantBody = AccessGrantBody & BaseConsentGrantBody;
-
 export type AccessVerifiableCredentialBody =
   | AccessRequestBody
-  | ConsentRequestBody
   | AccessDeniedBody
-  | ConsentDeniedBody
-  | AccessGrantBody
-  | ConsentGrantBody;
+  | AccessGrantBody;

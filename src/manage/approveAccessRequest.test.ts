@@ -406,7 +406,7 @@ describe("approveAccessRequest", () => {
         purpose: ["https://some-custom.purpose"],
         requestor: "https://some-custom.requestor",
         resources: ["https://some-custom.resource"],
-        requestorInboxIri: "https://some-custom.inbox",
+        requestorInboxUrl: "https://some-custom.inbox",
       },
       {
         fetch: jest.fn(global.fetch),
@@ -451,7 +451,7 @@ describe("approveAccessRequest", () => {
         purpose: ["https://some-custom.purpose"],
         requestor: "https://some-custom.requestor",
         resources: ["https://some-custom.resource"],
-        requestorInboxIri: "https://some-custom.inbox",
+        requestorInboxUrl: "https://some-custom.inbox",
       },
       {
         fetch: jest.fn(global.fetch),
