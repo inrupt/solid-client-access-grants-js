@@ -64,7 +64,7 @@ export default [
       "./src/type/AccessCredentialType.ts",
       "./src/type/AccessVerifiableCredential.ts",
       "./src/type/AccessGrantContext.ts",
-      "./src/type/ConsentStatus.ts",
+      "./src/type/GConsentStatus.ts",
       "./src/type/FetchOptions.ts",
       "./src/type/Parameter.ts",
       "./src/type/RecursivePartial.ts",
