@@ -1,4 +1,8 @@
 {
   "name": "cd-packaging-test-webpack",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "webpack": "^5.31.0",
+    "webpack-cli": "^4.6.0"
+  }
 }
