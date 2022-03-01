@@ -1,4 +1,7 @@
 {
   "name": "cd-packaging-test-parcel",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@inrupt/solid-client-authn-browser": "^1.11.2"
+  }
 }
