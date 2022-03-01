@@ -8,6 +8,12 @@ The following changes have been implemented but not released yet:
 
 ### New features
 
+-
+
+## [0.5.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.5.0) - 2022-03-01
+
+### New features
+
 - `redirectToRequestor` has been added to the `./manage` module to help access management
   apps redirect their users to the clients which requested access to a Resource.
 - `getAccessRequestFromRedirectUrl`: a function exported by the `./manage` module to

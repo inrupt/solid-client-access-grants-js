@@ -38,6 +38,7 @@ export const GRANT_VC_PARAM_NAME = "accessGrant";
  * @returns A never resolving promise: the user is expected to be redirected away
  * from the page by this call, so no code should be expected to run in that context
  * after the redirect.
+ * @since 0.5.0
  */
 export async function redirectToRequestor(
   accessGrantVcId: UrlString | URL,
