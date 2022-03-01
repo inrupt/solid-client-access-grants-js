@@ -2,15 +2,10 @@
   "name": "cd-packaging-test-webpack",
   "private": true,
   "dependencies": {
-    "@inrupt/solid-client-authn-browser": "^1.11.2",
-    "@inrupt/solid-client-access-grants": "*",
-    "assert": "^2.0.0",
-    "browserify-zlib": "^0.2.0",
-    "buffer": "^6.0.3",
-    "crypto-browserify": "^3.12.0",
-    "os-browserify": "^0.3.0",
-    "stream-browserify": "^3.0.0",
+    "@inrupt/solid-client-authn-browser": "^1.11.5",
     "webpack": "^5.31.0",
-    "webpack-cli": "^4.6.0"
+    "webpack-cli": "^4.6.0",
+    "stream-browserify": "^3.0.0",
+    "buffer": "^6.0.3"
   }
 }
