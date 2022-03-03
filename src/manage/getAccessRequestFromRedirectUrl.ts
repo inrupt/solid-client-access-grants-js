@@ -42,6 +42,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
  * from @inrupt/solid-client-authn-browser will be used if available.
  * @returns An Access Request, and the URL to which the corresponding grant should
  * be sent when redirecting the resource owner back to the requestor.
+ * @since 0.5.0
  */
 export async function getAccessRequestFromRedirectUrl(
   redirectUrl: UrlString,

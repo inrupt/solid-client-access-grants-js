@@ -40,6 +40,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
  * - fetch: an authenticated fetch function. If not provided, the default session
  * from @inrupt/solid-client-authn-browser will be used if available.
  * @returns An Access Grant
+ * @since 0.5.0
  */
 export async function getAccessGrantFromRedirectUrl(
   redirectUrl: UrlString,
