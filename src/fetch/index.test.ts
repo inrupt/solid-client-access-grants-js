@@ -171,7 +171,7 @@ describe("exchangeTicketForAccessToken", () => {
       },
       body: simpleFormUrlEncoded({
         claim_token: btoa(JSON.stringify({ verifiableCredential: [MOCK_VC] })),
-        claim_token_type: "https://www.w3.org/TR/vc-data-model/#json-ld",
+        claim_token_format: "https://www.w3.org/TR/vc-data-model/#json-ld",
         grant_type: "urn:ietf:params:oauth:grant-type:uma-ticket",
         ticket: authTicket,
       }),
