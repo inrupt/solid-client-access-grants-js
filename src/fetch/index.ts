@@ -107,7 +107,7 @@ export async function exchangeTicketForAccessToken(
     },
     body: simpleFormUrlEncoded({
       claim_token: btoa(JSON.stringify(credentialPresentation)),
-      claim_token_type: VC_CLAIM_TOKEN_TYPE,
+      claim_token_format: VC_CLAIM_TOKEN_TYPE,
       grant_type: UMA_GRANT_TYPE,
       ticket: authTicket,
     }),

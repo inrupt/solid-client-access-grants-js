@@ -10,6 +10,13 @@ The following changes have been implemented but not released yet:
 
 -
 
+### Bugfix
+
+- When using an Access Grant to get an Access Token, one of the claims from the
+  server response was unaligned with the spec. This inconsistency has been fixed on
+  the server-side with backwards-compatibility, and now on the client side too. This
+  change is transparent to users.
+
 ## [0.5.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.5.0) - 2022-03-01
 
 ### New features
