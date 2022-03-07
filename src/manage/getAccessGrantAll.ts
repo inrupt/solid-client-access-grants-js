@@ -50,7 +50,7 @@ async function getAccessGrantAll(
       requestor: string;
     }
   > = {},
-  options: AccessBaseOptions = {}
+  options: AccessBaseOptions & { includeExpiredGrants?: boolean } = {}
 ): Promise<Array<VerifiableCredential>> {
   const sessionFetch = await getSessionFetch(options);
 
@@ -83,6 +83,7 @@ async function getAccessGrantAll(
     vcShape as Partial<VerifiableCredential>,
     {
       fetch: sessionFetch,
+      includeExpiredVc: options.includeExpiredGrants,
     }
   );
 }
