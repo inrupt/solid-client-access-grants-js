@@ -32,7 +32,7 @@ jobs:
           pip install -r requirements.txt
       - name: Build website
         run: |
-          npm run build-docs-preview-site
+          npm run preview:docs
           touch docs/dist/.nojekyll
       - name: Deploy to GitHub Pages
         run: ./publish-website.sh
