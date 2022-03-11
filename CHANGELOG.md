@@ -8,7 +8,9 @@ The following changes have been implemented but not released yet:
 
 ### New features
 
--
+- `getAccessGrantAll` supports a new option, `includeExpiredGrants`. By default,
+  only grants that are still valid are returned by the VC provider. If set to true,
+  grants that have expired will also be included in the response.
 
 ### Bugfix
 

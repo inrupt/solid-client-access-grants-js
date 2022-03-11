@@ -39,7 +39,12 @@ import { BaseGrantBody } from "../type/AccessVerifiableCredential";
  *
  * @param resource The URL of a resource to which access grants might have been issued.
  * @param grantShape The properties of grants to filter results.
- * @param options Optional properties to customise the request behaviour.
+ * @param options Optional parameter:
+ * - `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
+ * This can be typically used for authentication. Note that if it is omitted, and
+ * `@inrupt/solid-client-authn-browser` is in your dependencies, the default session
+ * is picked up.
+ * - `options.includeExpiredGrants`: include expired grants in the result set.
  * @returns A void promise.
  * @since 0.4.0
  */
@@ -50,7 +55,7 @@ async function getAccessGrantAll(
       requestor: string;
     }
   > = {},
-  options: AccessBaseOptions = {}
+  options: AccessBaseOptions & { includeExpired?: boolean } = {}
 ): Promise<Array<VerifiableCredential>> {
   const sessionFetch = await getSessionFetch(options);
 
@@ -83,6 +88,7 @@ async function getAccessGrantAll(
     vcShape as Partial<VerifiableCredential>,
     {
       fetch: sessionFetch,
+      includeExpiredVc: options.includeExpired,
     }
   );
 }

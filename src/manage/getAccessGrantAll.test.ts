@@ -171,4 +171,18 @@ describe("getAccessGrantAll", () => {
       }
     );
   });
+
+  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the expiration filter if specified", async () => {
+    await getAccessGrantAll(resource.href, undefined, {
+      includeExpired: true,
+    });
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      "https://some.api.endpoint/derive",
+      expect.anything(),
+      {
+        fetch: clientAuthnFetch,
+        includeExpiredVc: true,
+      }
+    );
+  });
 });
