@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Inrupt Inc.
+ * Copyright 2022 Inrupt Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal in
@@ -24,13 +24,21 @@ import { PlaywrightTestConfig } from "@playwright/test";
 const config: PlaywrightTestConfig = {
   testMatch: "*.playwright.ts",
   retries: 1,
-  globalSetup: require.resolve("./e2e/browser/test/globalSetup.ts"),
+  // Extends from the default 30s
+  timeout: 60000,
+  globalSetup: require.resolve("./globalSetup.ts"),
   use: {
-    baseURL: "http://localhost:1234",
+    baseURL: "http://localhost:3000",
     headless: true,
     screenshot: "only-on-failure",
     trace: "on",
     video: "on-first-retry",
+  },
+  webServer: {
+    command: "cd ../src/ ; npm run dev",
+    port: 3000,
+    timeout: 120 * 1000,
+    reuseExistingServer: !process.env.CI,
   },
   projects: [
     {
@@ -42,24 +50,24 @@ const config: PlaywrightTestConfig = {
         }. Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0`,
       },
     },
-    {
-      name: "Chromium",
-      use: {
-        browserName: "chromium",
-        userAgent: `Browser-based solid-client-access-grant end-to-end tests running ${
-          process.env.CI === "true" ? "in CI" : "locally"
-        }. Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36`,
-      },
-    },
-    {
-      name: "WebKit",
-      use: {
-        browserName: "webkit",
-        userAgent: `Browser-based solid-client-access-grant end-to-end tests running ${
-          process.env.CI === "true" ? "in CI" : "locally"
-        }. Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1`,
-      },
-    },
+    // {
+    //   name: "Chromium",
+    //   use: {
+    //     browserName: "chromium",
+    //     userAgent: `Browser-based solid-client-access-grant end-to-end tests running ${
+    //       process.env.CI === "true" ? "in CI" : "locally"
+    //     }. Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36`,
+    //   },
+    // },
+    // {
+    //   name: "WebKit",
+    //   use: {
+    //     browserName: "webkit",
+    //     userAgent: `Browser-based solid-client-access-grant end-to-end tests running ${
+    //       process.env.CI === "true" ? "in CI" : "locally"
+    //     }. Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1`,
+    //   },
+    // },
   ],
 };
 

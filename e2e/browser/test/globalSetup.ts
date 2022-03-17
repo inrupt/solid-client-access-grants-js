@@ -18,32 +18,13 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
-import { spawn } from "child_process";
-import { resolve } from "path";
+import { getTestingEnvironmentBrowser } from "../../e2e-setup";
 
 async function globalSetup() {
-  const childProcess = spawn("npm", ["run", "dev", "--", "-p", "1234"], {
-    cwd: resolve(__dirname, "../src"),
-    shell: true,
-  });
-  const devServerOutput = childProcess.stdout;
-
-  await new Promise((resolve) => {
-    const chunks = [];
-    devServerOutput.on("data", (data) => {
-      chunks.push(data);
-      const dataSoFar = Buffer.concat(chunks).toString("utf8");
-      // Wait until NextJS is satisfied with the dev server.
-      if (dataSoFar.indexOf("compiled client and server successfully") !== -1) {
-        resolve(undefined);
-      }
-    });
-  });
+  // Fail fast with dotenv:
+  getTestingEnvironmentBrowser();
 
   // Return the teardown function.
-  return () => {
-    childProcess.kill();
-  };
+  return async () => {};
 }
 export default globalSetup;
