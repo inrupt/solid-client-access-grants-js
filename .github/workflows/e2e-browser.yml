@@ -27,9 +27,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      # This is required to install some dependencies on the host system, in particular for WebKit
-      - run: npx playwright install-deps
-      - run: npx playwright install
+      - run: npx playwright install --with-deps
       - run: npm run test:e2e:browser:build
       - run: npm run test:e2e:browser
         env:

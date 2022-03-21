@@ -1,5 +1,5 @@
 /**
- * Copyright 2021 Inrupt Inc.
+ * Copyright 2022 Inrupt Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal in
@@ -24,13 +24,21 @@ import { PlaywrightTestConfig } from "@playwright/test";
 const config: PlaywrightTestConfig = {
   testMatch: "*.playwright.ts",
   retries: 1,
-  globalSetup: require.resolve("./e2e/browser/test/globalSetup.ts"),
+  // Extends from the default 30s
+  timeout: 60000,
+  globalSetup: require.resolve("./globalSetup.ts"),
   use: {
-    baseURL: "http://localhost:1234",
+    baseURL: "http://localhost:3000",
     headless: true,
     screenshot: "only-on-failure",
     trace: "on",
     video: "on-first-retry",
+  },
+  webServer: {
+    command: "cd ../src/ ; npm run dev",
+    port: 3000,
+    timeout: 120 * 1000,
+    reuseExistingServer: !process.env.CI,
   },
   projects: [
     {
