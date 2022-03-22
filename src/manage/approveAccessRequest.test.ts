@@ -72,13 +72,15 @@ const mockAcpClient = (
     options?.updatedResource ?? {}
   );
   solidClientModule.acp_v4.getResourceInfoWithAcr.mockResolvedValueOnce(
-    (options?.initialResource ?? {}) as never
+    options?.initialResource ?? {}
   );
+  solidClientModule.acp_v4.saveAcrFor = jest.fn();
+  return solidClientModule;
 };
 
 describe("approveAccessRequest", () => {
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    mockAcpClient();
+    const mockedAcpClient = mockAcpClient();
     const crossFetchModule = jest.requireMock("cross-fetch") as {
       fetch: typeof global.fetch;
     };
@@ -96,6 +98,12 @@ describe("approveAccessRequest", () => {
 
     await approveAccessRequest(mockAccessRequestVc());
 
+    expect(mockedAcpClient.acp_v4.saveAcrFor).toHaveBeenCalledWith(
+      expect.anything(),
+      {
+        fetch: scab.fetch,
+      }
+    );
     expect(mockedIssue).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),

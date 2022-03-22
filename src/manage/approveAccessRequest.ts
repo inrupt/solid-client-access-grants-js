@@ -34,6 +34,7 @@ import {
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
+import { getSessionFetch } from "../util/getSessionFetch";
 import { AccessGrantBody } from "../type/AccessVerifiableCredential";
 import { AccessGrantParameters } from "../type/Parameter";
 
@@ -103,9 +104,16 @@ async function internal_approveAccessRequest(
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options: AccessBaseOptions = {}
 ): Promise<VerifiableCredential> {
+  const internalOptions = {
+    ...options,
+    fetch: options.fetch ?? (await getSessionFetch(options)),
+  };
   const requestCredential =
     typeof requestVc !== "undefined"
-      ? await getBaseAccessRequestVerifiableCredential(requestVc, options)
+      ? await getBaseAccessRequestVerifiableCredential(
+          requestVc,
+          internalOptions
+        )
       : requestVc;
 
   if (requestCredential !== undefined && !isAccessRequest(requestCredential)) {
@@ -114,19 +122,19 @@ async function internal_approveAccessRequest(
     );
   }
 
-  const internalOptions = initializeGrantParameters(
+  const internalGrantOptions = initializeGrantParameters(
     requestCredential,
     requestOverride
   );
 
   const grantBody = getGrantBody({
-    access: internalOptions.access,
-    requestor: internalOptions.requestor,
-    resources: internalOptions.resources,
-    requestorInboxUrl: internalOptions.requestorInboxUrl,
-    purpose: internalOptions.purpose,
-    issuanceDate: internalOptions.issuanceDate,
-    expirationDate: internalOptions.expirationDate,
+    access: internalGrantOptions.access,
+    requestor: internalGrantOptions.requestor,
+    resources: internalGrantOptions.resources,
+    requestorInboxUrl: internalGrantOptions.requestorInboxUrl,
+    purpose: internalGrantOptions.purpose,
+    issuanceDate: internalGrantOptions.issuanceDate,
+    expirationDate: internalGrantOptions.expirationDate,
     status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   });
 
@@ -134,10 +142,10 @@ async function internal_approveAccessRequest(
   await addVcMatcher(
     grantBody.credentialSubject.providedConsent.forPersonalData,
     grantedAccess,
-    options
+    internalOptions
   );
 
-  return issueAccessVc(grantBody, options);
+  return issueAccessVc(grantBody, internalOptions);
 }
 
 /**

@@ -18,6 +18,8 @@ The following changes have been implemented but not released yet:
   server response was unaligned with the spec. This inconsistency has been fixed on
   the server-side with backwards-compatibility, and now on the client side too. This
   change is transparent to users.
+- `approveAccessRequest` wasn't using the default session from `@inrupt/solid-client-authn-browser`
+  to set the ACR access appropriately, resulting in `401 Unauthenticated` errors.
 
 ## [0.5.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.5.0) - 2022-03-01
 
