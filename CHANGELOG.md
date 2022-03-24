@@ -21,8 +21,8 @@ The following changes have been implemented but not released yet:
 - `approveAccessRequest` wasn't using the default session from `@inrupt/solid-client-authn-browser`
   to set the ACR access appropriately, resulting in `401 Unauthenticated` errors.
 - `getAccessRequestFromRedirectUrl` was deserializing the received VC expecting
-an URL-encoded value, instead of a base64-encoded value, which is how it is serialized
-when redirecting the user to the VC management app.
+  an URL-encoded value, instead of a base64-encoded value, which is how it is serialized
+  when redirecting the user to the VC management app.
 
 ## [0.5.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.5.0) - 2022-03-01
 
