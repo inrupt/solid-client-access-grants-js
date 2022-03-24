@@ -162,7 +162,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.append(
       "requestVc",
-      encodeURIComponent(JSON.stringify(mockAccessGrantVc()))
+      btoa(JSON.stringify(mockAccessGrantVc()))
     );
     redirectUrl.searchParams.append(
       "redirectUrl",
@@ -181,7 +181,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.append(
       "requestVc",
-      encodeURIComponent(JSON.stringify({ someJson: "but not a VC" }))
+      btoa(JSON.stringify({ someJson: "but not a VC" }))
     );
     redirectUrl.searchParams.append(
       "redirectUrl",

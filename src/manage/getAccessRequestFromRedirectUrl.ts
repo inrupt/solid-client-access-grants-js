@@ -84,7 +84,7 @@ export async function getAccessRequestFromRedirectUrl(
   // If the value is provided directly, no fetch is required. Providing the value
   // is deprecated though.
   const accessRequest = accessRequestValue
-    ? JSON.parse(decodeURIComponent(accessRequestValue))
+    ? JSON.parse(atob(accessRequestValue))
     : await getVerifiableCredential(accessRequestIri as string, {
         fetch: authFetch,
       });
