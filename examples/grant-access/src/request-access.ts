@@ -116,9 +116,14 @@ app.get("/redirect", async (req, res) => {
     // Note that using a Bearer token is mandatory for the UMA access token to be valid.
     tokenType: "Bearer",
   });
-  const accessGrant = await getAccessGrantFromRedirectUrl(req.url);
-  const targetResource = (accessGrant.credentialSubject.providedConsent as any)
-    .forPersonalData[0];
+  const accessGrant = await getAccessGrantFromRedirectUrl(req.url, {
+    fetch: session.fetch,
+  });
+  const targetResource = (
+    accessGrant.credentialSubject.providedConsent as {
+      forPersonalData: Array<string>;
+    }
+  ).forPersonalData[0];
   const file = await getFile(targetResource, accessGrant, {
     fetch: session.fetch,
   });

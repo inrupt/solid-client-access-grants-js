@@ -19,6 +19,8 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/* eslint-disable no-console */
+
 import { Session } from "@inrupt/solid-client-authn-node";
 import { config } from "dotenv-flow";
 // eslint-disable-next-line import/no-unresolved
@@ -50,7 +52,8 @@ app.get("/manage", async (req, res) => {
   });
   const { accessRequest, requestorRedirectUrl } =
     await getAccessRequestFromRedirectUrl(
-      `http://localhost:${GRANT_ACCESS_PORT}${req.url}`, {
+      `http://localhost:${GRANT_ACCESS_PORT}${req.url}`,
+      {
         fetch: session.fetch,
       }
     );
