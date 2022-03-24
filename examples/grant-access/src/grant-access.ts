@@ -74,10 +74,10 @@ app.get("/manage", async (req, res) => {
         <p>the requested access ?</p>
       </div>
       <div>
-        <input type="hidden" name="requestVc" id="requestVc" value=${JSON.stringify(
+        <input type="hidden" name="requestVc" id="requestVc" value="${JSON.stringify(
           accessRequest
-        )}>
-        <input type="hidden" name="redirectUrl" id="redirectUrl" value=${requestorRedirectUrl}>
+        )}>"
+        <input type="hidden" name="redirectUrl" id="redirectUrl" value="${requestorRedirectUrl}">
       </div>
       <div>
         <input type="submit" value="Respond to access request">
