@@ -31,7 +31,7 @@ import {
   redirectToAccessManagementUi,
   getFile,
   getAccessGrantFromRedirectUrl,
-} from "../../../dist/index";
+} from "@inrupt/solid-client-access-grants";
 
 const REQUEST_ACCESS_DEFAULT_PORT = 3001;
 const GRANT_ACCESS_PORT = 3002;

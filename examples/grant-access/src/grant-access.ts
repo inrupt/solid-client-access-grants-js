@@ -29,7 +29,7 @@ import {
   approveAccessRequest,
   getAccessRequestFromRedirectUrl,
   redirectToRequestor,
-} from "../../../dist/index";
+} from "@inrupt/solid-client-access-grants";
 
 const GRANT_ACCESS_DEFAULT_PORT = 3002;
 
