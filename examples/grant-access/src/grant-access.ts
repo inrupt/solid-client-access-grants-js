@@ -28,6 +28,8 @@ import {
   approveAccessRequest,
   getAccessRequestFromRedirectUrl,
   redirectToRequestor,
+  // This package is meant to be linked to the local deployment.
+  // eslint-disable-next-line import/no-unresolved
 } from "@inrupt/solid-client-access-grants";
 
 const GRANT_ACCESS_DEFAULT_PORT = 3002;
