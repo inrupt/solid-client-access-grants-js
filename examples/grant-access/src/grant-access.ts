@@ -19,11 +19,17 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+/* eslint-disable no-console */
+
 import { Session } from "@inrupt/solid-client-authn-node";
 import { config } from "dotenv-flow";
 // eslint-disable-next-line import/no-unresolved
 import express from "express";
-import { approveAccessRequest } from "../../../dist/index";
+import {
+  approveAccessRequest,
+  getAccessRequestFromRedirectUrl,
+  redirectToRequestor,
+} from "@inrupt/solid-client-access-grants";
 
 const GRANT_ACCESS_DEFAULT_PORT = 3002;
 
@@ -38,19 +44,22 @@ app.use(express.urlencoded({ extended: true }));
 
 // Receive the access request, and display a form to the user
 app.get("/manage", async (req, res) => {
-  if (req.query.requestVc === undefined) {
-    res.send(`Error: no 'requestVc' query parameter has been found.`);
-    return;
-  }
-  if (req.query.redirectUrl === undefined) {
-    res.send(`Error: no 'redirectUrl' query parameter has been found.`);
-    return;
-  }
-  // The request VC is base64-encoded.
-  const accessRequest = atob(req.query.requestVc as string);
+  const session = new Session();
+  await session.login({
+    clientId: process.env.OWNER_CLIENT_ID,
+    clientSecret: process.env.OWNER_CLIENT_SECRET,
+    oidcIssuer: process.env.OWNER_OIDC_ISSUER,
+  });
+  const { accessRequest, requestorRedirectUrl } =
+    await getAccessRequestFromRedirectUrl(
+      `http://localhost:${GRANT_ACCESS_PORT}${req.url}`,
+      {
+        fetch: session.fetch,
+      }
+    );
   res.send(
     `<div><p>Here is the requested access:</p>
-    <pre>${JSON.stringify(JSON.parse(accessRequest), undefined, "  ")}</pre>
+    <pre>${JSON.stringify(accessRequest, undefined, "  ")}</pre>
     <form action="/redirect", method="post">
       <div>
         <p>Do you want to:</p>
@@ -65,12 +74,10 @@ app.get("/manage", async (req, res) => {
         <p>the requested access ?</p>
       </div>
       <div>
-        <input type="hidden" name="requestVc" id="requestVc" value=${
-          req.query.requestVc
-        }>
-        <input type="hidden" name="redirectUrl" id="redirectUrl" value=${
-          req.query.redirectUrl
-        }>
+        <input type="hidden" name="requestVc" id="requestVc" value="${JSON.stringify(
+          accessRequest
+        )}>"
+        <input type="hidden" name="redirectUrl" id="redirectUrl" value="${requestorRedirectUrl}">
       </div>
       <div>
         <input type="submit" value="Respond to access request">
@@ -90,19 +97,19 @@ app.post("/redirect", async (req, res) => {
   });
 
   const accessGrant = await approveAccessRequest(
-    session.info.webId as string,
-    JSON.parse(atob(req.body.requestVc)),
+    JSON.parse(req.body.requestVc),
     undefined,
     {
       fetch: session.fetch,
     }
   );
   const redirectUrl = new URL(decodeURI(req.body.redirectUrl));
-  redirectUrl.searchParams.append(
-    "accessGrant",
-    btoa(JSON.stringify(accessGrant))
-  );
-  res.redirect(redirectUrl.href);
+  await redirectToRequestor(accessGrant.id, redirectUrl, {
+    redirectCallback: (url) => {
+      console.log(`redirecting to ${url}`);
+      res.redirect(url);
+    },
+  });
 });
 
 app.listen(GRANT_ACCESS_PORT, async () => {

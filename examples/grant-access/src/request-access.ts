@@ -30,7 +30,8 @@ import {
   issueAccessRequest,
   redirectToAccessManagementUi,
   getFile,
-} from "../../../dist/index";
+  getAccessGrantFromRedirectUrl,
+} from "@inrupt/solid-client-access-grants";
 
 const REQUEST_ACCESS_DEFAULT_PORT = 3001;
 const GRANT_ACCESS_PORT = 3002;
@@ -83,7 +84,6 @@ app.post("/request", async (req, res) => {
     {
       access: { read: true },
       purpose: ["https://some.purpose", "https://some.other.purpose"],
-      requestor: session.info.webId as string,
       resourceOwner: req.body.owner,
       resources: [req.body.resource],
     },
@@ -116,23 +116,22 @@ app.get("/redirect", async (req, res) => {
     // Note that using a Bearer token is mandatory for the UMA access token to be valid.
     tokenType: "Bearer",
   });
-  const { accessGrant } = req.query;
-  const decodedAccessGrant = JSON.parse(atob(accessGrant as string));
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const targetResource = (decodedAccessGrant as any).credentialSubject
-    .providedConsent.forPersonalData[0];
-  const file = await getFile(targetResource, decodedAccessGrant, {
+  const accessGrant = await getAccessGrantFromRedirectUrl(req.url, {
+    fetch: session.fetch,
+  });
+  const targetResource = (
+    accessGrant.credentialSubject.providedConsent as {
+      forPersonalData: Array<string>;
+    }
+  ).forPersonalData[0];
+  const file = await getFile(targetResource, accessGrant, {
     fetch: session.fetch,
   });
   const fileContent = await file.text();
 
   res.send(`<div>
     <p>Redirected with access grant: </p>
-    <pre>${JSON.stringify(
-      JSON.parse(atob(accessGrant as string)),
-      undefined,
-      "  "
-    )}</pre>
+    <pre>${JSON.stringify(accessGrant, undefined, "  ")}</pre>
     <hr/>
     <p>Fetched file content: </p>
     <pre>${fileContent}</pre>
