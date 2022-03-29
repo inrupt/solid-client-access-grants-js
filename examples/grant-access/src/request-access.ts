@@ -30,8 +30,6 @@ import {
   redirectToAccessManagementUi,
   getFile,
   getAccessGrantFromRedirectUrl,
-  // This package is meant to be linked to the local deployment.
-  // eslint-disable-next-line import/no-unresolved
 } from "@inrupt/solid-client-access-grants";
 
 const REQUEST_ACCESS_DEFAULT_PORT = 3001;
