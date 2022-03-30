@@ -25,6 +25,7 @@ import {
   makeStyles,
   LinkButton,
 } from "@inrupt/prism-react-components";
+// eslint-disable-next-line import/no-unresolved
 import { useBem } from "@solid/lit-prism-patterns";
 import Link from "next/link";
 

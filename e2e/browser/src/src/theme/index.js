@@ -20,7 +20,9 @@
 //
 
 /* istanbul ignore file */
+// eslint-disable-next-line import/no-unresolved
 import { createTheme } from "@solid/lit-prism-patterns";
+// eslint-disable-next-line import/no-unresolved
 import defaultTheme from "@solid/lit-prism-theme-sdk-default";
 
 export default createTheme(defaultTheme);
