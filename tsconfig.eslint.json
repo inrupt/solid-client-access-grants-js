@@ -8,5 +8,5 @@
     "./*.js",
     "./**/*.jsx"
   ],
-  "exclude": []
+  "exclude": ["**/node_modules", "**/dist/**"]
 }

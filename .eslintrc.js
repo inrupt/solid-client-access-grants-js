@@ -7,12 +7,12 @@ module.exports = {
     "import/extensions": [".mjs", ".js"],
     "import/resolver": {
       node: {
-        extensions: [".mjs", ".ts"],
+        extensions: [".mjs", ".ts", ".js", ".jsx"],
         moduleDirectory: [
           "src",
           "node_modules",
-          "examples/grant-access/node_modules",
-          "e2e/browser/src/node_modules"
+          "e2e/**/node_modules",
+          "examples/**/node_modules",
         ]
       },
     },
