@@ -4,3 +4,5 @@ jest.e2e.config.js
 license-header.js
 rollup.config.js
 tsconfig.json
+# The only check that applies here is really the license header:
+.eslintrc.js
