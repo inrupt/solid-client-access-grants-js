@@ -11,6 +11,14 @@ module.exports = {
       },
     },
   },
+  overrides: [
+    {
+      files: "examples/**/*",
+      rules: {
+        "import/no-unresolved": "off",
+      },
+    },
+  ],
   parserOptions: {
     project: "./tsconfig.eslint.json",
   },

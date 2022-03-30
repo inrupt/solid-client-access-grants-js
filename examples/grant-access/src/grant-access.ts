@@ -23,7 +23,6 @@
 
 import { Session } from "@inrupt/solid-client-authn-node";
 import { config } from "dotenv-flow";
-// eslint-disable-next-line import/no-unresolved
 import express from "express";
 import {
   approveAccessRequest,

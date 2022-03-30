@@ -24,7 +24,6 @@
 import { Session } from "@inrupt/solid-client-authn-node";
 import { config } from "dotenv-flow";
 import { fetch as crossFetch } from "cross-fetch";
-// eslint-disable-next-line import/no-unresolved
 import express from "express";
 import {
   issueAccessRequest,
