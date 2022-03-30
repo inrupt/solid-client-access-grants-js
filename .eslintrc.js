@@ -8,6 +8,12 @@ module.exports = {
     "import/resolver": {
       node: {
         extensions: [".mjs", ".ts"],
+        moduleDirectory: [
+          "src",
+          "node_modules",
+          "examples/grant-access/node_modules",
+          "e2e/browser/src/node_modules"
+        ]
       },
     },
   },
