@@ -18,6 +18,8 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+
+// This rule complains about the `@jest/globals` variables overriding global vars:
 /* eslint-disable no-shadow */
 import {
   jest,
@@ -27,6 +29,7 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
+
 import { redirectToRequestor } from "./redirectToRequestor";
 
 describe("redirectToRequestor", () => {
