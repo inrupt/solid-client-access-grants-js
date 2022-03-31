@@ -19,6 +19,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+/**
+ * @module interfaces
+ */
+
 import type { access, UrlString, WebId } from "@inrupt/solid-client";
 
 /**
@@ -39,7 +43,7 @@ import type { access, UrlString, WebId } from "@inrupt/solid-client";
 // TODO: Find out about the overlap with BaseRequestParameters (differs in status and resource owner)
 // This parameter if not present should be fetched from the profile according to the design document
 // TODO: Get rid of BaseRequestParameters in favour of this
-export type IssueAccessRequestParameters = {
+export interface IssueAccessRequestParameters {
   access: Partial<access.Access>;
   requestorInboxUrl?: UrlString;
   resourceOwner: WebId;
@@ -47,8 +51,12 @@ export type IssueAccessRequestParameters = {
   purpose?: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;
-};
+}
 
-export type DeprecatedAccessRequestParameters = IssueAccessRequestParameters & {
+/**
+ * @hidden
+ */
+export interface DeprecatedAccessRequestParameters
+  extends IssueAccessRequestParameters {
   requestor: WebId;
-};
+}

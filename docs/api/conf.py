@@ -17,6 +17,7 @@
 # -- Project information -----------------------------------------------------
 
 import datetime
+import re
 
 copyright = u'{0} Inrupt Inc.'.format(datetime.date.today().year)
 
@@ -134,3 +135,34 @@ gettext_compact = False     # optional.
 myst_heading_anchors = 6
 myst_url_schemes = [ 'https' ]
 myst_enable_extensions = ['colon_fence']
+
+
+# Typedoc by default outputs all files as relative to their directory, but for
+# Interfaces this is not what we want. Instead of
+# `modules/type_IssueAccessRequestParameters.html` we want
+# `interfaces/interfaces.IssueAccessRequestParameters.html`, additionally, we
+# don't want a Module generated for all the Interfaces.
+#
+# This code removes the link from generated Interfaces to the Interfaces Module,
+# and also excludes the Interfaces Module from being generated.
+#
+# This does require a doccomment of:
+# 
+#   /**
+#    * @module interfaces
+#    */
+# 
+# On each typescript file that declares Interfaces in src/types/*
+#
+duplicateInterfaceHeading = re.compile(r"^\[interfaces\]\([^\)]+\)\.(\w+)$", re.MULTILINE)
+
+def remove_interfaces_link(app, docname, source):  
+    if docname.startswith("interfaces/"):
+        # First we strip the duplicate heading that typedoc inserts:
+        source[0] = re.sub(duplicateInterfaceHeading, "", source[0])
+        # Then we remove any other links to the Interfaces module:
+        source[0] = source[0].replace("[interfaces](../modules/interfaces.md)", "Interfaces")
+
+def setup(app):
+    exclude_patterns.append("modules/interfaces.md")
+    app.connect("source-read", remove_interfaces_link) 

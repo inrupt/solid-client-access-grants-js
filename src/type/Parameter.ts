@@ -19,31 +19,38 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { access, UrlString } from "@inrupt/solid-client";
+/**
+ * @module interfaces
+ */
+
+import { access, UrlString } from "@inrupt/solid-client";
 import type {
   GC_CONSENT_STATUS_REQUESTED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
 import type { GConsentStatus } from "./GConsentStatus";
 
-/**
- * See the documentation in solid-client for [access.Access](https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.Access.html)
- */
-export type BaseRequestParameters = {
-  access: Partial<access.Access>;
+// Hack to show `Partial<Access>` instead of `Partial<access.Access>`
+export type Access = access.Access;
+
+export interface BaseRequestParameters {
+  /**
+   * See [Access](https://docs.inrupt.com/developer-tools/api/javascript/solid-client/modules/acl_acl.html#access) for details on this property.
+   */
+  access: Partial<Access>;
   requestorInboxUrl?: UrlString;
   resources: Array<UrlString>;
   status: GConsentStatus;
   purpose?: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;
-};
+}
 
-export type AccessRequestParameters = BaseRequestParameters & {
+export interface AccessRequestParameters extends BaseRequestParameters {
   status: typeof GC_CONSENT_STATUS_REQUESTED;
-};
+}
 
-export type AccessGrantParameters = BaseRequestParameters & {
+export interface AccessGrantParameters extends BaseRequestParameters {
   status: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
   requestor: UrlString;
-};
+}

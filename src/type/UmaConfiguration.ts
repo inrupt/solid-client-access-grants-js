@@ -19,6 +19,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+/**
+ * @module interfaces
+ */
+
 // Turning off the camelcase rule, as this is what we receive from the server.
 /* eslint camelcase: 0 */
 
@@ -29,7 +33,7 @@ import type { UrlString } from "@inrupt/solid-client";
  *
  * @since 0.4.0
  */
-export type UmaConfiguration = {
+export interface UmaConfiguration {
   dpop_signing_alg_values_supported: string[];
   grant_types_supported: string[];
   issuer: UrlString;
@@ -37,4 +41,4 @@ export type UmaConfiguration = {
   token_endpoint: UrlString;
   uma_profiles_supported: UrlString[];
   verifiable_credential_issuer: UrlString;
-};
+}

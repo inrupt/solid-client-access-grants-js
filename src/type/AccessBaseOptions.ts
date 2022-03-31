@@ -19,6 +19,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+/**
+ * @module interfaces
+ */
+
 import type { UrlString } from "@inrupt/solid-client";
 
 // TODO: Verify whether we need to support the podHost parameter and implement
@@ -43,10 +47,10 @@ import type { UrlString } from "@inrupt/solid-client";
  *
  * @since 0.4.0
  */
-export type AccessBaseOptions = {
+export interface AccessBaseOptions {
   fetch?: typeof fetch;
   /**
    * @since 0.4.0
    */
   accessEndpoint?: URL | UrlString;
-};
+}
