@@ -19,16 +19,5 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/**
- * @module interfaces
- */
-
-/**
- * Additional options for FetchWithVc and dependent methods
- * - `fetch`: A WHATWG Fetch compatible function
- *
- * @since 0.4.0
- */
-export interface FetchOptions {
-  fetch?: typeof fetch;
-}
+export { FetchOptions } from "./FetchOptions";
+export { RedirectOptions } from "./RedirectOptions";

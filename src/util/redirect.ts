@@ -20,10 +20,7 @@
 //
 
 import { UrlString } from "@inrupt/solid-client";
-
-export type RedirectOptions = {
-  redirectCallback?: (url: string) => void;
-};
+import { RedirectOptions } from "../type/RedirectOptions";
 
 /**
  * Internal function implementing redirection with some query parameters.

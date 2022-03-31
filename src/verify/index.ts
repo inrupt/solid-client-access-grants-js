@@ -21,8 +21,9 @@
 
 /**
  * Import this module for the access API functions available to an entity
- * verifying issued credentials for access over a resource:
- * - `isValidAccessGrant`: Verifying an access grant.
+ * verifying issued credentials for access over a resource.
+ * @packageDocumentation
  */
+
 // TODO: Allow verification of different types of consent & access grants
 export { isValidAccessGrant } from "./isValidAccessGrant";

@@ -24,11 +24,12 @@
  */
 
 /**
- * Additional options for FetchWithVc and dependent methods
- * - `fetch`: A WHATWG Fetch compatible function
+ * Optional parameters to customise the behaviour of methods the redirect a
+ * user, e.g., [[redirectToRequestor]]
  *
- * @since 0.4.0
+ *  - `redirectCallback`: used in Node.js for handling the redirect for handling
+ *    server-side usage
  */
-export interface FetchOptions {
-  fetch?: typeof fetch;
+export interface RedirectOptions {
+  redirectCallback?: (url: string) => void;
 }

@@ -22,10 +22,10 @@
 import type { UrlString } from "@inrupt/solid-client";
 
 // TODO: Verify whether we need to support the podHost parameter and implement
-/**
- * - `podHost`: The URL of the pod host, from which the `.well-known/solid` file
- *   can be derived.
- */
+//
+// - `podHost`: The URL of the pod host, from which the `.well-known/solid` file
+//   can be derived.
+//
 // podHost?: URL | UrlString;
 
 /**

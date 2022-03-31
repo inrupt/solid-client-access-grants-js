@@ -26,6 +26,9 @@ import type {
 } from "../constants";
 import type { GConsentStatus } from "./GConsentStatus";
 
+/**
+ * See the documentation in solid-client for [access.Access](https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.Access.html)
+ */
 export type BaseRequestParameters = {
   access: Partial<access.Access>;
   requestorInboxUrl?: UrlString;

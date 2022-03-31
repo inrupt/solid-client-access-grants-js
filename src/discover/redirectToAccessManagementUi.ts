@@ -27,7 +27,9 @@ import {
   getAccessManagementUi,
   getAccessManagementUiFromWellKnown,
 } from "./getAccessManagementUi";
-import { RedirectOptions, redirectWithParameters } from "../util/redirect";
+import { redirectWithParameters } from "../util/redirect";
+import { FetchOptions } from "../type/FetchOptions";
+import { RedirectOptions } from "../type/RedirectOptions";
 
 // DEPRECATED: the VC should be sent by IRI, and not by value.
 export const REQUEST_VC_PARAM_NAME = "requestVc";
@@ -49,14 +51,14 @@ export const REDIRECT_URL_PARAM_NAME = "redirectUrl";
  *
  * @since 0.4.0
  */
-export type RedirectToAccessManagementUiOptions = RedirectOptions & {
-  fetch?: typeof global.fetch;
-  resourceOwner?: WebId;
-  /**
-   * @since 0.4.0
-   */
-  fallbackAccessManagementUi?: UrlString;
-};
+export type RedirectToAccessManagementUiOptions = RedirectOptions &
+  FetchOptions & {
+    resourceOwner?: WebId;
+    /**
+     * @since 0.4.0
+     */
+    fallbackAccessManagementUi?: UrlString;
+  };
 
 async function discoverAccessManagementUi(options: {
   resourceUrl: UrlString;
