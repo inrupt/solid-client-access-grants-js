@@ -2,3 +2,7 @@ resources/
 *.snap
 *.env
 *.env.*
+
+# ignore automatically generated docs files:
+docs/api/build/**
+docs/api/source/api/**/*.md
