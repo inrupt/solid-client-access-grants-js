@@ -1,17 +1,18 @@
 node_modules
-coverage
 dist
 umd
+.DS_Store
 .eslintcache
 whitesource/
 LICENSE_DEPENDENCIES
 LICENSE_DEPENDENCIES_ALL
 docs/api/build/
 docs/api/source/api/
+docs/api/docs-assets/
 docs/dist/
-docs/.DS_Store
 .env*.local
 .cache
 .github/**/package-lock.json
-# playwright output
 test-results/
+.vercel
+.virtualenv

@@ -50,7 +50,8 @@
     ],
     "theme": "markdown",
     "readme": "none",
-    "entryDocument": "index.md",
+    "hideInPageTOC": true,
+    "entryDocument": "index.md"
   },
   "include": ["src/index.ts", ".eslintrc.js"],
   "exclude": [
