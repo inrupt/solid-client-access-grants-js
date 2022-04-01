@@ -28,7 +28,6 @@ import {
   approveAccessRequest,
   getAccessRequestFromRedirectUrl,
   redirectToRequestor,
-  // eslint-disable-next-line import/no-unresolved
 } from "@inrupt/solid-client-access-grants";
 
 const GRANT_ACCESS_DEFAULT_PORT = 3002;

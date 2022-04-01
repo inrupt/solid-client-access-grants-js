@@ -19,9 +19,9 @@ module.exports = {
   },
   overrides: [
     {
-      files: "examples/**/*",
+      files: ["examples/**/*", "e2e/**/*"],
       rules: {
-        "import/no-unresolved": "off",
+        "import/no-unresolved": "warn",
       },
     },
   ],
