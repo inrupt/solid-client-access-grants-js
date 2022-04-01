@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { Page, request } from "@playwright/test";
+import { Page } from "@playwright/test";
 
 export class IndexPage {
   page: Page;

@@ -7,15 +7,21 @@ module.exports = {
     "import/extensions": [".mjs", ".js"],
     "import/resolver": {
       node: {
-        extensions: [".mjs", ".ts"],
+        extensions: [".mjs", ".ts", ".js", ".jsx"],
+        moduleDirectory: [
+          "src",
+          "node_modules",
+          "e2e/**/node_modules",
+          "examples/**/node_modules",
+        ]
       },
     },
   },
   overrides: [
     {
-      files: "examples/**/*",
+      files: ["examples/**/*", "e2e/**/*"],
       rules: {
-        "import/no-unresolved": "off",
+        "import/no-unresolved": "warn",
       },
     },
   ],
