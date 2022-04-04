@@ -108,6 +108,21 @@ describe("getAccessGrant", () => {
     );
   });
 
+  it("supports denied access grants with a given IRI", async () => {
+    mockAccessApiEndpoint();
+    const mockedAccessGrant = mockAccessGrantVc();
+    mockedAccessGrant.credentialSubject.providedConsent.hasStatus =
+      "https://w3id.org/GConsent#ConsentStatusDenied";
+    const mockedFetch = jest
+      .fn(global.fetch)
+      .mockResolvedValueOnce(new Response(JSON.stringify(mockedAccessGrant)));
+
+    const accessGrant = await getAccessGrant("https://some.vc.url", {
+      fetch: mockedFetch,
+    });
+    expect(accessGrant).toEqual(mockedAccessGrant);
+  });
+
   it("returns the access grant with the given IRI", async () => {
     mockAccessApiEndpoint();
     const mockedAccessGrant = mockAccessGrantVc();

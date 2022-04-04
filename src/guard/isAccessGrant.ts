@@ -19,7 +19,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
+import {
+  GC_CONSENT_STATUS_DENIED,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+} from "../constants";
 import {
   AccessGrantBody,
   BaseAccessVcBody,
@@ -30,8 +33,9 @@ export function isAccessGrant(
 ): vc is BaseAccessVcBody & AccessGrantBody {
   return (
     (vc as AccessGrantBody).credentialSubject.providedConsent !== undefined &&
-    (vc as AccessGrantBody).credentialSubject.providedConsent.hasStatus ===
-      GC_CONSENT_STATUS_EXPLICITLY_GIVEN &&
+    [GC_CONSENT_STATUS_EXPLICITLY_GIVEN, GC_CONSENT_STATUS_DENIED].includes(
+      (vc as AccessGrantBody).credentialSubject.providedConsent.hasStatus
+    ) &&
     typeof (vc as AccessGrantBody).credentialSubject.providedConsent
       .isProvidedTo === "string"
   );
