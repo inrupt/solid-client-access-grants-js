@@ -14,6 +14,8 @@ The following changes have been implemented but not released yet:
 
 ### Bugfix
 
+- When type-checking an Access Grant (e.g. using `getAccessGrant`), only accepted
+  Grants were supported. Support for denied Grant has now been added.
 - When using an Access Grant to get an Access Token, one of the claims from the
   server response was unaligned with the spec. This inconsistency has been fixed on
   the server-side with backwards-compatibility, and now on the client side too. This
