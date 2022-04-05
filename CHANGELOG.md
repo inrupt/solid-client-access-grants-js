@@ -8,6 +8,12 @@ The following changes have been implemented but not released yet:
 
 ### New features
 
+-
+
+## [0.6.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.6.0) - 2022-04-05
+
+### New features
+
 - `getAccessGrantAll` supports a new option, `includeExpired`. By default,
   only grants that are still valid are returned by the VC provider. If set to true,
   grants that have expired will also be included in the response.
