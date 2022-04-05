@@ -35,7 +35,7 @@ import {
   MOCKED_ACCESS_ISSUER,
   MOCK_REQUESTOR_IRI,
   MOCK_REQUESTOR_INBOX,
-  MOCK_REQUESTEE_IRI,
+  MOCK_RESOURCE_OWNER_IRI,
 } from "./request.mock";
 import { ACCESS_GRANT_CONTEXT } from "../constants";
 
@@ -61,6 +61,7 @@ describe("getRequestBody", () => {
       resources: ["https://some.pod/resource"],
       status: "https://w3id.org/GConsent#ConsentStatusRequested",
       requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+      resourceOwner: MOCK_RESOURCE_OWNER_IRI,
     });
 
     expect(requestBody).toStrictEqual({
@@ -73,6 +74,7 @@ describe("getRequestBody", () => {
           forPersonalData: ["https://some.pod/resource"],
           hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
           mode: ["http://www.w3.org/ns/auth/acl#Append"],
+          isConsentForDataSubject: "https://some.pod/profile#you",
         },
         inbox: MOCK_REQUESTOR_INBOX,
       },
@@ -94,6 +96,7 @@ describe("getRequestBody", () => {
       purpose: ["https://some.vocab/purpose#save-the-world"],
       requestorInboxUrl: "https://some.pod/inbox/",
       status: "https://w3id.org/GConsent#ConsentStatusRequested",
+      resourceOwner: MOCK_RESOURCE_OWNER_IRI,
     });
 
     expect(requestBody).toStrictEqual({
@@ -111,6 +114,7 @@ describe("getRequestBody", () => {
             "http://www.w3.org/ns/auth/acl#Write",
             "http://www.w3.org/ns/auth/acl#Control",
           ],
+          isConsentForDataSubject: "https://some.pod/profile#you",
         },
         inbox: "https://some.pod/inbox/",
       },
@@ -139,7 +143,7 @@ describe("issueAccessRequest", () => {
     await issueAccessRequest(
       {
         access: { read: true },
-        resourceOwner: MOCK_REQUESTEE_IRI,
+        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
         resources: ["https://some.pod/resource"],
         requestorInboxUrl: MOCK_REQUESTOR_INBOX,
       },
@@ -155,6 +159,7 @@ describe("issueAccessRequest", () => {
           mode: ["http://www.w3.org/ns/auth/acl#Read"],
           hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
           forPersonalData: ["https://some.pod/resource"],
+          isConsentForDataSubject: "https://some.pod/profile#you",
         },
       }),
       expect.objectContaining({
@@ -179,7 +184,7 @@ describe("issueAccessRequest", () => {
 
     await issueAccessRequest({
       access: { read: true },
-      resourceOwner: MOCK_REQUESTEE_IRI,
+      resourceOwner: MOCK_RESOURCE_OWNER_IRI,
       resources: ["https://some.pod/resource"],
       requestorInboxUrl: MOCK_REQUESTOR_INBOX,
     });
@@ -211,7 +216,7 @@ describe("issueAccessRequest", () => {
     await issueAccessRequest(
       {
         access: { read: true },
-        resourceOwner: MOCK_REQUESTEE_IRI,
+        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
         resources: ["https://some.pod/resource"],
         purpose: ["https://some.vocab/purpose#save-the-world"],
         issuanceDate: new Date(Date.UTC(1955, 5, 8, 13, 37, 42, 42)),
@@ -231,6 +236,7 @@ describe("issueAccessRequest", () => {
           hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
           forPersonalData: ["https://some.pod/resource"],
           forPurpose: ["https://some.vocab/purpose#save-the-world"],
+          isConsentForDataSubject: "https://some.pod/profile#you",
         },
       }),
       expect.objectContaining({
@@ -258,7 +264,7 @@ describe("issueAccessRequest", () => {
 
     await issueAccessRequest({
       access: { read: true },
-      resourceOwner: MOCK_REQUESTEE_IRI,
+      resourceOwner: MOCK_RESOURCE_OWNER_IRI,
       resources: ["https://some.pod/resource"],
       purpose: ["https://some.vocab/purpose#save-the-world"],
       requestorInboxUrl: "https://some.pod/inbox/",
@@ -272,6 +278,7 @@ describe("issueAccessRequest", () => {
           hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
           forPersonalData: ["https://some.pod/resource"],
           forPurpose: ["https://some.vocab/purpose#save-the-world"],
+          isConsentForDataSubject: "https://some.pod/profile#you",
         },
       }),
       expect.objectContaining({
@@ -296,7 +303,7 @@ describe("issueAccessRequest", () => {
 
     await issueAccessRequest({
       access: { read: true },
-      resourceOwner: MOCK_REQUESTEE_IRI,
+      resourceOwner: MOCK_RESOURCE_OWNER_IRI,
       resources: ["https://some.pod/resource"],
       purpose: ["https://some.vocab/purpose#save-the-world"],
       issuanceDate: new Date(Date.UTC(1955, 5, 8, 13, 37, 42, 42)),
@@ -353,6 +360,7 @@ describe("isAccessRequest", () => {
           hasConsent: {
             hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
             forPersonalData: ["https://some.resource"],
+            isConsentForDataSubject: "https://some.pod/profile#you",
           },
         },
         id: "https://some.credential",
@@ -374,6 +382,7 @@ describe("isAccessRequest", () => {
           hasConsent: {
             mode: ["some mode"],
             forPersonalData: ["https://some.resource"],
+            isConsentForDataSubject: "https://some.pod/profile#you",
           },
         },
         id: "https://some.credential",
@@ -395,6 +404,29 @@ describe("isAccessRequest", () => {
           hasConsent: {
             mode: ["some mode"],
             hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+            isConsentForDataSubject: "https://some.pod/profile#you",
+          },
+        },
+        id: "https://some.credential",
+        proof: mockCredentialProof(),
+        issuer: "https://some.issuer",
+        issuanceDate: "some date",
+        type: ["SolidAccessRequest"],
+      })
+    ).toBe(false);
+  });
+
+  it("returns false if the credential subject 'hasConsent' is missing 'isConsentForDataSubject'", () => {
+    expect(
+      isAccessRequest({
+        "@context": "https://some.context",
+        credentialSubject: {
+          id: "https://some.id",
+          inbox: "https://some.inbox",
+          hasConsent: {
+            mode: ["some mode"],
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+            forPersonalData: ["https://some.resource"],
           },
         },
         id: "https://some.credential",
@@ -416,6 +448,7 @@ describe("isAccessRequest", () => {
             mode: ["some mode"],
             hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
             forPersonalData: ["https://some.resource"],
+            isConsentForDataSubject: "https://some.pod/profile#you",
           },
         },
         id: "https://some.credential",
@@ -438,6 +471,7 @@ describe("isAccessRequest", () => {
             mode: ["some mode"],
             hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
             forPersonalData: ["https://some.resource"],
+            isConsentForDataSubject: "https://some.pod/profile#you",
           },
         },
         id: "https://some.credential",
@@ -460,6 +494,7 @@ describe("isAccessRequest", () => {
             mode: ["http://www.w3.org/ns/auth/acl#Read"],
             hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
             forPersonalData: ["https://some.resource"],
+            isConsentForDataSubject: "https://some.pod/profile#you",
           },
         },
         id: "https://some.credential",

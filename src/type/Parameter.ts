@@ -23,29 +23,34 @@
  * @module interfaces
  */
 
-import { UrlString } from "@inrupt/solid-client";
+import type { UrlString } from "@inrupt/solid-client";
+
 import type {
   GC_CONSENT_STATUS_REQUESTED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
-import type { GConsentStatus } from "./GConsentStatus";
 import { AccessModes } from "./AccessModes";
 
 export interface BaseRequestParameters {
   access: AccessModes;
   requestorInboxUrl?: UrlString;
   resources: Array<UrlString>;
-  status: GConsentStatus;
   purpose?: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;
 }
 
-export interface AccessRequestParameters extends BaseRequestParameters {
+export interface InputAccessRequestParameters extends BaseRequestParameters {
+  resourceOwner: UrlString;
+}
+export interface AccessRequestParameters extends InputAccessRequestParameters {
   status: typeof GC_CONSENT_STATUS_REQUESTED;
 }
 
-export interface AccessGrantParameters extends BaseRequestParameters {
-  status: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
+export interface InputAccessGrantParameters extends BaseRequestParameters {
   requestor: UrlString;
+}
+
+export interface AccessGrantParameters extends InputAccessGrantParameters {
+  status: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
 }

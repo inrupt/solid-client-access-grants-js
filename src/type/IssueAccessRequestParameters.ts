@@ -23,8 +23,8 @@
  * @module interfaces
  */
 
-import type { UrlString, WebId } from "@inrupt/solid-client";
-import { AccessModes } from "./AccessModes";
+import type { WebId } from "@inrupt/solid-client";
+import { InputAccessRequestParameters } from "./Parameter";
 
 /**
  * Required parameters to request access to one or more Resources.
@@ -44,15 +44,7 @@ import { AccessModes } from "./AccessModes";
 // TODO: Find out about the overlap with BaseRequestParameters (differs in status and resource owner)
 // This parameter if not present should be fetched from the profile according to the design document
 // TODO: Get rid of BaseRequestParameters in favour of this
-export interface IssueAccessRequestParameters {
-  access: AccessModes;
-  requestorInboxUrl?: UrlString;
-  resourceOwner: WebId;
-  resources: Array<UrlString>;
-  purpose?: Array<UrlString>;
-  issuanceDate?: Date;
-  expirationDate?: Date;
-}
+export type IssueAccessRequestParameters = InputAccessRequestParameters;
 
 /**
  * @hidden

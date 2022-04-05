@@ -76,9 +76,12 @@ function getGConsentAttributes(
     return {
       ...consentAttributes,
       isProvidedTo: (params as AccessGrantParameters).requestor,
-    } as GConsentGrantAttributes;
+    };
   }
-  return consentAttributes;
+  return {
+    ...consentAttributes,
+    isConsentForDataSubject: (params as AccessRequestParameters).resourceOwner,
+  };
 }
 
 function getBaseBody(
