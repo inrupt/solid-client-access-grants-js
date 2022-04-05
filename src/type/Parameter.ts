@@ -23,21 +23,16 @@
  * @module interfaces
  */
 
-import { access, UrlString } from "@inrupt/solid-client";
+import { UrlString } from "@inrupt/solid-client";
 import type {
   GC_CONSENT_STATUS_REQUESTED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
 import type { GConsentStatus } from "./GConsentStatus";
-
-// Hack to show `Partial<Access>` instead of `Partial<access.Access>`
-export type Access = access.Access;
+import { AccessModes } from "./AccessModes";
 
 export interface BaseRequestParameters {
-  /**
-   * See [Access](https://docs.inrupt.com/developer-tools/api/javascript/solid-client/modules/acl_acl.html#access) for details on this property.
-   */
-  access: Partial<Access>;
+  access: AccessModes;
   requestorInboxUrl?: UrlString;
   resources: Array<UrlString>;
   status: GConsentStatus;

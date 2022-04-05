@@ -19,36 +19,21 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-export type { AccessModes } from "./type/AccessModes";
-export type { AccessBaseOptions } from "./type/AccessBaseOptions";
-export type { IssueAccessRequestParameters } from "./type/IssueAccessRequestParameters";
-
-export {
-  getAccessApiEndpoint,
-  getAccessManagementUi,
-  redirectToAccessManagementUi,
-} from "./discover";
-
-export type { RedirectToAccessManagementUiOptions } from "./discover";
-
-export {
-  issueAccessRequest,
-  cancelAccessRequest,
-  getAccessGrantFromRedirectUrl,
-} from "./request";
-
-export {
-  approveAccessRequest,
-  denyAccessRequest,
-  getAccessGrant,
-  getAccessGrantAll,
-  getAccessRequestFromRedirectUrl,
-  redirectToRequestor,
-  revokeAccessGrant,
-} from "./manage";
-
-export { isValidAccessGrant } from "./verify";
-
-export { fetchWithVc } from "./fetch";
-
-export { getSolidDataset, getFile, saveSolidDatasetAt } from "./resource";
+/**
+ * An object with the boolean properties read, append, write, controlRead, and
+ * ControlWrite, representing the respective Access Modes defined by the Web
+ * Access Control specification.
+ *
+ * Since that specification is not finalised yet, this interface is still
+ * experimental.
+ *
+ * @module interfaces
+ */
+export interface AccessModes {
+  read?: boolean;
+  write?: boolean;
+  append?: boolean;
+  // These aren't currently supported by ESS:
+  controlRead?: boolean;
+  controlWrite?: boolean;
+}

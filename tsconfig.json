@@ -32,6 +32,7 @@
       "src/verify/index.ts",
       // These types are reused across files, so give them a specific page for
       // them to be documented on:
+      "src/type/AccessModes.ts",
       "src/type/FetchOptions.ts",
       "src/type/UmaConfiguration.ts",
       "src/type/AccessBaseOptions.ts",

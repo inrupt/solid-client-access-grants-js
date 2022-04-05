@@ -22,3 +22,4 @@
 export { FetchOptions } from "./FetchOptions";
 export { RedirectOptions } from "./RedirectOptions";
 export { AccessBaseOptions } from "./AccessBaseOptions";
+export { AccessModes } from "./AccessModes";

@@ -23,7 +23,8 @@
  * @module interfaces
  */
 
-import type { access, UrlString, WebId } from "@inrupt/solid-client";
+import type { UrlString, WebId } from "@inrupt/solid-client";
+import { AccessModes } from "./AccessModes";
 
 /**
  * Required parameters to request access to one or more Resources.
@@ -44,7 +45,7 @@ import type { access, UrlString, WebId } from "@inrupt/solid-client";
 // This parameter if not present should be fetched from the profile according to the design document
 // TODO: Get rid of BaseRequestParameters in favour of this
 export interface IssueAccessRequestParameters {
-  access: Partial<access.Access>;
+  access: AccessModes;
   requestorInboxUrl?: UrlString;
   resourceOwner: WebId;
   resources: Array<UrlString>;

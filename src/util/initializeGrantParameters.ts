@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { access, UrlString } from "@inrupt/solid-client";
+import { UrlString } from "@inrupt/solid-client";
 import {
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_CONTROL,
@@ -29,6 +29,7 @@ import {
 import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import type { ResourceAccessMode } from "../type/ResourceAccessMode";
 import { ApproveAccessRequestOverrides } from "../manage/approveAccessRequest";
+import { AccessModes } from "../type/AccessModes";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
   return requestVc.credentialSubject.id;
@@ -40,8 +41,8 @@ function getModesFromRequest(
   return requestVc.credentialSubject.hasConsent.mode;
 }
 
-function modesToAccess(modes: ResourceAccessMode[]): Partial<access.Access> {
-  const accessMode: Partial<access.Access> = {};
+function modesToAccess(modes: ResourceAccessMode[]): AccessModes {
+  const accessMode: AccessModes = {};
   accessMode.append = modes.includes(ACL_RESOURCE_ACCESS_MODE_APPEND);
   accessMode.controlRead = modes.includes(ACL_RESOURCE_ACCESS_MODE_CONTROL);
   accessMode.controlWrite = modes.includes(ACL_RESOURCE_ACCESS_MODE_CONTROL);

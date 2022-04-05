@@ -20,7 +20,7 @@
 //
 
 // eslint-disable-next-line camelcase
-import { UrlString, WebId, acp_v4, access } from "@inrupt/solid-client";
+import { UrlString, WebId, acp_v4 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
@@ -37,16 +37,15 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getSessionFetch } from "../util/getSessionFetch";
 import { AccessGrantBody } from "../type/AccessVerifiableCredential";
 import { AccessGrantParameters } from "../type/Parameter";
+import { AccessModes } from "../type/AccessModes";
 
 export type ApproveAccessRequestOverrides = Omit<
   AccessGrantParameters,
   "status"
 >;
 
-function getAccessModesFromAccessGrant(
-  request: AccessGrantBody
-): Partial<access.Access> {
-  const accessMode: Partial<access.Access> = {};
+function getAccessModesFromAccessGrant(request: AccessGrantBody): AccessModes {
+  const accessMode: AccessModes = {};
   const requestModes = request.credentialSubject.providedConsent.mode;
   accessMode.append = requestModes.includes(ACL_RESOURCE_ACCESS_MODE_APPEND);
   accessMode.read = requestModes.includes(ACL_RESOURCE_ACCESS_MODE_READ);
@@ -62,7 +61,7 @@ function getAccessModesFromAccessGrant(
 
 async function addVcMatcher(
   targetResources: Array<UrlString>,
-  accessMode: Partial<access.Access>,
+  accessMode: AccessModes,
   options?: { fetch?: typeof global.fetch }
 ) {
   return Promise.all(
