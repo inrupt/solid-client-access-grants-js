@@ -17,6 +17,7 @@
 # -- Project information -----------------------------------------------------
 
 import datetime
+import re
 
 copyright = u'{0} Inrupt Inc.'.format(datetime.date.today().year)
 
@@ -52,12 +53,14 @@ extensions = [
 
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['./build/docs-assets/_templates']
+templates_path = ['./docs-assets/_templates']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = [ 'index.md' ]
+exclude_patterns = [ ]
+
+extlinks = { }
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -67,17 +70,17 @@ exclude_patterns = [ 'index.md' ]
 #html_theme = 'alabaster'
 
 html_theme = 'inrupt'
-html_theme_path = ['./build/docs-assets/themes']
+html_theme_path = ['./docs-assets/themes']
 
 html_copy_source = False
 
-html_title = 'Inrupt {0} API Documentation'.format(name)
+html_title = 'Inrupt {0} Documentation'.format(name)
 
 # These theme options are declared in ./themes/inrupt/theme.conf
 # as well as some for pydata_sphinx_theme
 
 html_theme_options = {
-    'project_title': 'Inrupt {0} API'.format(name),
+    'project_title': '@inrupt/{0} API'.format(name),
     'banner': True,
     'banner_msg': 'This is an Alpha release of the API.',
     'robots_index': True,
@@ -87,25 +90,25 @@ html_theme_options = {
     'github_branch': 'main',
     'docs_project': 'developer-tools/api/javascript/{0}'.format(name),
     'show_api_menu': True,
-
+    
     # below are pydata_sphinx_theme
     "footer_items": [ "copyright.html"],
     "navbar_align": "left",
     "icon_links": [
         {
-            "name": "Inrupt on Twitter",
-            "url": "https://twitter.com/inrupt",
-            "icon": "fab fa-twitter-square",
-        },
-        {
-            "name": "Inrupt on LinkedIn",
-            "url": "https://www.linkedin.com/company/inrupt/",
-            "icon": "fab fa-linkedin",
+            "name": "Support Desk",
+            "url": "https://inrupt.atlassian.net/servicedesk",
+            "icon": "fas fa-tools",
         },
         {
             "name": "Solid forum",
             "url": "https://forum.solidproject.org/",
             "icon": "fas fa-users",
+        },
+        {
+            "name": "Inrupt Blog",
+            "url": "https://inrupt.com/blog",
+            "icon": "fas fa-blog",
         },
     ],
     "favicons": [
@@ -120,11 +123,46 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['./build/docs-assets/_static']
+html_static_path = ['./docs-assets/_static']
 
 html_sidebars = {
-    '**': [  'search-field.html',  'docs-sidebar.html'],
+    '**': [ 'search-field.html',  'docs-sidebar.html'],
 }
 
 locale_dirs = ['locale/']   # path is example but recommended.
 gettext_compact = False     # optional.
+
+myst_heading_anchors = 6
+myst_url_schemes = [ 'https' ]
+myst_enable_extensions = ['colon_fence']
+
+
+# Typedoc by default outputs all files as relative to their directory, but for
+# Interfaces this is not what we want. Instead of
+# `modules/type_IssueAccessRequestParameters.html` we want
+# `interfaces/interfaces.IssueAccessRequestParameters.html`, additionally, we
+# don't want a Module generated for all the Interfaces.
+#
+# This code removes the link from generated Interfaces to the Interfaces Module,
+# and also excludes the Interfaces Module from being generated.
+#
+# This does require a doccomment of:
+# 
+#   /**
+#    * @module interfaces
+#    */
+# 
+# On each typescript file that declares Interfaces in src/types/*
+#
+duplicateInterfaceHeading = re.compile(r"^\[interfaces\]\([^\)]+\)\.(\w+)$", re.MULTILINE)
+
+def remove_interfaces_link(app, docname, source):  
+    if docname.startswith("interfaces/"):
+        # First we strip the duplicate heading that typedoc inserts:
+        source[0] = re.sub(duplicateInterfaceHeading, "", source[0])
+        # Then we remove any other links to the Interfaces module:
+        source[0] = source[0].replace("[interfaces](../modules/interfaces.md)", "Interfaces")
+
+def setup(app):
+    exclude_patterns.append("modules/interfaces.md")
+    app.connect("source-read", remove_interfaces_link) 

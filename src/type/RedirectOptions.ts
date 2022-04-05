@@ -20,10 +20,16 @@
 //
 
 /**
- * Import this module for the access API functions available to an entity
- * verifying issued credentials for access over a resource.
- * @packageDocumentation
+ * @module interfaces
  */
 
-// TODO: Allow verification of different types of consent & access grants
-export { isValidAccessGrant } from "./isValidAccessGrant";
+/**
+ * Optional parameters to customise the behaviour of methods the redirect a
+ * user, e.g., [[redirectToRequestor]]
+ *
+ *  - `redirectCallback`: used in Node.js for handling the redirect for handling
+ *    server-side usage
+ */
+export interface RedirectOptions {
+  redirectCallback?: (url: string) => void;
+}

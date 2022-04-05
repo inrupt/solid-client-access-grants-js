@@ -20,11 +20,15 @@
 //
 
 /**
+ * @module interfaces
+ */
+
+/**
  * Additional options for FetchWithVc and dependent methods
- * - `fetch`: A WHATWG Fetch compatible function
+ * - `fetch`: A Fetch API compatible function
  *
  * @since 0.4.0
  */
-export type FetchOptions = {
-  fetch: typeof fetch;
-};
+export interface FetchOptions {
+  fetch?: typeof fetch;
+}

@@ -19,8 +19,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+export type { AccessModes } from "./type/AccessModes";
 export type { AccessBaseOptions } from "./type/AccessBaseOptions";
-
 export type { IssueAccessRequestParameters } from "./type/IssueAccessRequestParameters";
 
 export {

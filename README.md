@@ -1,11 +1,13 @@
 # Solid Access Grants - solid-client-access-grants
 
-`@inrupt/solid-client-access-grants` is a JavaScript library for requesting and managing
-access given to an agent for a resource. These access grants are signed by a
-Solid Pod owner's private key, which itself is managed by the Solid Pod server.
+`@inrupt/solid-client-access-grants` is a JavaScript library for requesting
+and managing access given to an agent for a resource. These access grants are
+represented by Verifiable Credentials, signed by an Issuer associated to the Pod
+server where the resources are hosted.
 
-`@inrupt/solid-client-access-grants` is part of a family open source JavaScript
-libraries designed to support developers building Solid applications.
+It is part of a [family open source JavaScript
+libraries](https://docs.inrupt.com/developer-tools/javascript/client-libraries/)
+designed to support developers building Solid applications.
 
 # Server support
 

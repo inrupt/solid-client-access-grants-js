@@ -19,28 +19,33 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { access, UrlString } from "@inrupt/solid-client";
+/**
+ * @module interfaces
+ */
+
+import { UrlString } from "@inrupt/solid-client";
 import type {
   GC_CONSENT_STATUS_REQUESTED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
 import type { GConsentStatus } from "./GConsentStatus";
+import { AccessModes } from "./AccessModes";
 
-export type BaseRequestParameters = {
-  access: Partial<access.Access>;
+export interface BaseRequestParameters {
+  access: AccessModes;
   requestorInboxUrl?: UrlString;
   resources: Array<UrlString>;
   status: GConsentStatus;
   purpose?: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;
-};
+}
 
-export type AccessRequestParameters = BaseRequestParameters & {
+export interface AccessRequestParameters extends BaseRequestParameters {
   status: typeof GC_CONSENT_STATUS_REQUESTED;
-};
+}
 
-export type AccessGrantParameters = BaseRequestParameters & {
+export interface AccessGrantParameters extends BaseRequestParameters {
   status: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
   requestor: UrlString;
-};
+}

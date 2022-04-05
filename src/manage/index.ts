@@ -21,25 +21,16 @@
 
 /**
  * Import this module for the access API functions available to an entity
- * managing access requests over resources:
- * - `approveAccessRequest`: Approve an access request;
- * - `denyAccessRequest`: Deny access over a resource;
- * - `getAccessGrant`: Retrieve the Access Grant associated to the given URL.
- * - `getAccessGrantAll`: Retrieve the Access Grants issued over a resource;
- * - `revokeAccessGrant`: Revoke previously granted access over a resource.
+ * managing access requests over resources.
+ * @packageDocumentation
  */
-export { approveAccessRequest } from "./approveAccessRequest";
 
 export type { ApproveAccessRequestOverrides } from "./approveAccessRequest";
 
+export { approveAccessRequest } from "./approveAccessRequest";
 export { denyAccessRequest } from "./denyAccessRequest";
-
 export { getAccessGrant } from "./getAccessGrant";
-
 export { getAccessGrantAll } from "./getAccessGrantAll";
-
 export { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
-
 export { redirectToRequestor } from "./redirectToRequestor";
-
 export { revokeAccessGrant } from "./revokeAccessGrant";

@@ -20,10 +20,20 @@
 //
 
 /**
- * Import this module for the access API functions available to an entity
- * verifying issued credentials for access over a resource.
- * @packageDocumentation
+ * An object with the boolean properties read, append, write, controlRead, and
+ * ControlWrite, representing the respective Access Modes defined by the Web
+ * Access Control specification.
+ *
+ * Since that specification is not finalised yet, this interface is still
+ * experimental.
+ *
+ * @module interfaces
  */
-
-// TODO: Allow verification of different types of consent & access grants
-export { isValidAccessGrant } from "./isValidAccessGrant";
+export interface AccessModes {
+  read?: boolean;
+  write?: boolean;
+  append?: boolean;
+  // These aren't currently supported by ESS:
+  controlRead?: boolean;
+  controlWrite?: boolean;
+}

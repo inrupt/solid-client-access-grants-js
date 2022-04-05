@@ -21,10 +21,8 @@
 
 /**
  * Import this module for the access API functions available to an entity
- * requesting access over a resource:
- * - `issueAccessRequest`: Issues an access request for access to the given
- *   resource, resulting in a Verifiable Credential.
- * - `cancelAccessRequest`: For retracting an access request.
+ * requesting access over a resource.
+ * @packageDocumentation
  */
 export { cancelAccessRequest } from "./cancelAccessRequest";
 export { issueAccessRequest } from "./issueAccessRequest";

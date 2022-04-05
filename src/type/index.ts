@@ -19,11 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/**
- * Import this module for the access API functions available to an entity
- * verifying issued credentials for access over a resource.
- * @packageDocumentation
- */
-
-// TODO: Allow verification of different types of consent & access grants
-export { isValidAccessGrant } from "./isValidAccessGrant";
+export { FetchOptions } from "./FetchOptions";
+export { RedirectOptions } from "./RedirectOptions";
+export { AccessBaseOptions } from "./AccessBaseOptions";
+export { AccessModes } from "./AccessModes";

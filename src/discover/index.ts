@@ -21,14 +21,12 @@
 
 /**
  * Import this module for the access API functions available to an entity
- * discovering properties of the access API:
- * - `getAccessApiEndpoint`: Discover the preferred access API endpoint for a resource;
- * - `getAccessManagementUi`: Discover the preferred access management UI for an entity.
+ * discovering properties of the access API.
+ * @packageDocumentation
  */
-export { getAccessApiEndpoint } from "./getAccessApiEndpoint";
-
-export { getAccessManagementUi } from "./getAccessManagementUi";
-
-export { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 
 export type { RedirectToAccessManagementUiOptions } from "./redirectToAccessManagementUi";
+
+export { getAccessApiEndpoint } from "./getAccessApiEndpoint";
+export { getAccessManagementUi } from "./getAccessManagementUi";
+export { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";

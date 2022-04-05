@@ -19,17 +19,17 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { access } from "@inrupt/solid-client";
 import {
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
   ACL_RESOURCE_ACCESS_MODE_CONTROL,
 } from "../constants";
+import { AccessModes } from "../type/AccessModes";
 import { ResourceAccessMode } from "../type/ResourceAccessMode";
 
 export function accessToResourceAccessModeArray(
-  desiredAccess: Partial<access.Access>
+  desiredAccess: AccessModes
 ): ResourceAccessMode[] {
   const modes: ResourceAccessMode[] = [];
   if (desiredAccess.read === true) {
