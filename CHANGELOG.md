@@ -11,6 +11,9 @@ The following changes have been implemented but not released yet:
 - `getAccessGrantAll` supports a new option, `includeExpired`. By default,
   only grants that are still valid are returned by the VC provider. If set to true,
   grants that have expired will also be included in the response.
+- `issueAccessRequest` now generates an access request VC including the resource
+  owner in the `hasConsent` field with the `isConsentForDataSubject` predicate. This
+  will enable resource owners to dereference access requests IRIs to their resources.
 
 ### Bugfix
 
