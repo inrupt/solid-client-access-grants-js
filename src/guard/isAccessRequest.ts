@@ -29,6 +29,7 @@ export function isAccessRequest(
   return (
     isBaseAccessRequestVerifiableCredential(x) &&
     x.credentialSubject.hasConsent.hasStatus === GC_CONSENT_STATUS_REQUESTED &&
+    x.credentialSubject.hasConsent.isConsentForDataSubject !== undefined &&
     typeof x.issuanceDate === "string"
   );
 }

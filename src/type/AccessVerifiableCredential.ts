@@ -30,15 +30,19 @@ import type { ResourceAccessMode } from "./ResourceAccessMode";
 import type { GConsentStatus } from "./GConsentStatus";
 import type { AccessCredentialType } from "./AccessCredentialType";
 
-export type GConsentRequestAttributes = {
+export type GConsentAttributes = {
   mode: ResourceAccessMode[];
   hasStatus: GConsentStatus;
   forPersonalData: UrlString[];
   forPurpose?: UrlString[];
 };
 
-export type GConsentGrantAttributes = GConsentRequestAttributes & {
+export type GConsentGrantAttributes = GConsentAttributes & {
   isProvidedTo: UrlString;
+};
+
+export type GConsentRequestAttributes = GConsentAttributes & {
+  isConsentForDataSubject?: UrlString;
 };
 
 export type CredentialSubject = {

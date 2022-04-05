@@ -39,7 +39,7 @@ export const MOCKED_CREDENTIAL_ID = "https://some.credential";
 export const MOCKED_ISSUANCE_DATE = "2021-09-07T09:59:00Z";
 export const MOCK_REQUESTOR_IRI = "https://some.pod/profile#me";
 export const MOCK_REQUESTOR_INBOX = "https://some.pod/consent/inbox";
-export const MOCK_REQUESTEE_IRI = "https://some.pod/profile#you";
+export const MOCK_RESOURCE_OWNER_IRI = "https://some.pod/profile#you";
 
 export const mockAccessGrant = (
   issuer: string,

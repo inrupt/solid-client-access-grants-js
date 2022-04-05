@@ -43,6 +43,7 @@ export const mockAccessRequestVc = (
         forPersonalData: options?.resources ?? ["https://some.resource"],
         hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
         mode: options?.modes ?? ["http://www.w3.org/ns/auth/acl#Read"],
+        isConsentForDataSubject: "https://some.pod/profile#you",
       },
       inbox: "https://some.inbox",
     },

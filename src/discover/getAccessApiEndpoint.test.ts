@@ -23,7 +23,7 @@
 import { jest, describe, it, expect } from "@jest/globals";
 import {
   MOCKED_ACCESS_ISSUER,
-  MOCK_REQUESTEE_IRI,
+  MOCK_RESOURCE_OWNER_IRI,
   mockAccessApiEndpoint,
 } from "../request/request.mock";
 
@@ -35,13 +35,13 @@ jest.mock("cross-fetch");
 describe("getAccessApiEndpoint", () => {
   it("can find the access endpoint for a given resource", async () => {
     mockAccessApiEndpoint();
-    const accessEndpoint = await getAccessApiEndpoint(MOCK_REQUESTEE_IRI);
+    const accessEndpoint = await getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI);
     expect(accessEndpoint).toBe(MOCKED_ACCESS_ISSUER);
   });
 
   it("can find the access endpoint via the accessEndpoint option", async () => {
     mockAccessApiEndpoint();
-    const accessEndpoint = await getAccessApiEndpoint(MOCK_REQUESTEE_IRI, {
+    const accessEndpoint = await getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI, {
       accessEndpoint: "https://access.inrupt.com",
     });
     expect(accessEndpoint).toBe("https://access.inrupt.com");
@@ -58,7 +58,7 @@ describe("getAccessApiEndpoint", () => {
       fetch: typeof global.fetch;
     };
     crossFetchModule.fetch = mockedFetch;
-    await expect(getAccessApiEndpoint(MOCK_REQUESTEE_IRI)).rejects.toThrow(
+    await expect(getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI)).rejects.toThrow(
       "Expected a 401 error with a WWW-Authenticate header, got a [200: Ok] response lacking the WWW-Authenticate header"
     );
   });
@@ -76,7 +76,7 @@ describe("getAccessApiEndpoint", () => {
       fetch: typeof global.fetch;
     };
     crossFetchModule.fetch = mockedFetch;
-    await expect(getAccessApiEndpoint(MOCK_REQUESTEE_IRI)).rejects.toThrow(
+    await expect(getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI)).rejects.toThrow(
       "Unsupported authorization scheme: [someScheme]"
     );
   });
@@ -103,7 +103,7 @@ describe("getAccessApiEndpoint", () => {
       fetch: typeof global.fetch;
     };
     crossFetchModule.fetch = mockedFetch;
-    await expect(getAccessApiEndpoint(MOCK_REQUESTEE_IRI)).rejects.toThrow(
+    await expect(getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI)).rejects.toThrow(
       /No access issuer listed for property \[verifiable_credential_issuer\] in.*some_property.*some value/
     );
   });
