@@ -83,7 +83,6 @@
     "@inrupt/solid-client-authn-node": "^1.11.5",
     "@playwright/test": "^1.18.1",
     "@skypack/package-check": "^0.2.2",
-    "@testing-library/testcafe": "^4.4.0",
     "@types/auth-header": "^1.0.2",
     "@types/dotenv-flow": "^3.1.0",
     "@types/jest": "^27.4.0",
@@ -102,14 +101,13 @@
     "fast-check": "^2.17.0",
     "jest": "^27.5.1",
     "license-checker": "^25.0.1",
+    "nlfurniss-typedoc-plugin-sourcefile-url": "^2.0.0",
     "prettier": "^2.3.2",
     "rollup": "^2.52.4",
     "rollup-plugin-typescript2": "^0.31.1",
-    "testcafe": "^1.14.2",
     "ts-jest": "^27.0.3",
     "typedoc": "^0.22.12",
     "typedoc-plugin-markdown": "^3.11.14",
-    "nlfurniss-typedoc-plugin-sourcefile-url": "^2.0.0",
     "typescript": "^4.3.4"
   },
   "dependencies": {
