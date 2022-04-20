@@ -33,7 +33,4 @@ export interface AccessModes {
   read?: boolean;
   write?: boolean;
   append?: boolean;
-  // These aren't currently supported by ESS:
-  controlRead?: boolean;
-  controlWrite?: boolean;
 }

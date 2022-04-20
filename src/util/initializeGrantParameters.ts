@@ -22,7 +22,6 @@
 import { UrlString } from "@inrupt/solid-client";
 import {
   ACL_RESOURCE_ACCESS_MODE_APPEND,
-  ACL_RESOURCE_ACCESS_MODE_CONTROL,
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
 } from "../constants";
@@ -43,11 +42,11 @@ function getModesFromRequest(
 
 function modesToAccess(modes: ResourceAccessMode[]): AccessModes {
   const accessMode: AccessModes = {};
+
   accessMode.append = modes.includes(ACL_RESOURCE_ACCESS_MODE_APPEND);
-  accessMode.controlRead = modes.includes(ACL_RESOURCE_ACCESS_MODE_CONTROL);
-  accessMode.controlWrite = modes.includes(ACL_RESOURCE_ACCESS_MODE_CONTROL);
   accessMode.read = modes.includes(ACL_RESOURCE_ACCESS_MODE_READ);
   accessMode.write = modes.includes(ACL_RESOURCE_ACCESS_MODE_WRITE);
+
   return accessMode;
 }
 

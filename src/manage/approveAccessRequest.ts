@@ -26,7 +26,6 @@ import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import {
   ACL_RESOURCE_ACCESS_MODE_APPEND,
-  ACL_RESOURCE_ACCESS_MODE_CONTROL,
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
@@ -47,15 +46,11 @@ export type ApproveAccessRequestOverrides = Omit<
 function getAccessModesFromAccessGrant(request: AccessGrantBody): AccessModes {
   const accessMode: AccessModes = {};
   const requestModes = request.credentialSubject.providedConsent.mode;
+
   accessMode.append = requestModes.includes(ACL_RESOURCE_ACCESS_MODE_APPEND);
   accessMode.read = requestModes.includes(ACL_RESOURCE_ACCESS_MODE_READ);
   accessMode.write = requestModes.includes(ACL_RESOURCE_ACCESS_MODE_WRITE);
-  accessMode.controlRead = requestModes.includes(
-    ACL_RESOURCE_ACCESS_MODE_CONTROL
-  );
-  accessMode.controlWrite = requestModes.includes(
-    ACL_RESOURCE_ACCESS_MODE_CONTROL
-  );
+
   return accessMode;
 }
 
