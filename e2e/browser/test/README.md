@@ -43,7 +43,7 @@ To run the tests, run:
 
 1. `npm ci` at the root to install the test runner.
 2. `npx playwright install` to download the latest versions of all browsers the
-   tests run in. 3.`npm run test:e2e:browser:build` to install the dependencies of the
+   tests run in. 3.`npm run test:e2e:browser:setup` to install the dependencies of the
    application under test and link to the local library.
 
 You can then run the tests using `npm run test:e2e:browser` at the root.
