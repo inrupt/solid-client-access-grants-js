@@ -5,6 +5,7 @@ module.exports = {
   clearMocks: true,
   injectGlobals: false,
   collectCoverage: true,
+  coverageReporters: ["text"],
   coverageThreshold: {
     global: {
       branches: 100,
