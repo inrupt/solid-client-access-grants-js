@@ -87,7 +87,7 @@ export default function Home() {
       return;
     }
     (async () => {
-      const accessGrant = await approveAccessRequest(
+      const accessGrantRequest = await approveAccessRequest(
         session.info.webId,
         undefined,
         {
@@ -99,7 +99,7 @@ export default function Home() {
           fetch: session.fetch,
         }
       );
-      setAccessGrant(JSON.stringify(accessGrant, null, "  "));
+      setAccessGrant(JSON.stringify(accessGrantRequest, null, "  "));
     })();
   };
 

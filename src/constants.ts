@@ -29,8 +29,6 @@ export const AS_SUMMARY = "https://www.w3.org/ns/activitystreams#summary";
 //       although that is not listed in the example context.
 export const ACL_RESOURCE_ACCESS_MODE_APPEND =
   "http://www.w3.org/ns/auth/acl#Append";
-export const ACL_RESOURCE_ACCESS_MODE_CONTROL =
-  "http://www.w3.org/ns/auth/acl#Control";
 export const ACL_RESOURCE_ACCESS_MODE_READ =
   "http://www.w3.org/ns/auth/acl#Read";
 export const ACL_RESOURCE_ACCESS_MODE_WRITE =
@@ -91,7 +89,6 @@ export const CONSENT_STATUS = new Set([
 
 export const RESOURCE_ACCESS_MODE = new Set([
   ACL_RESOURCE_ACCESS_MODE_APPEND,
-  ACL_RESOURCE_ACCESS_MODE_CONTROL,
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
 ] as const);

@@ -23,7 +23,6 @@ import {
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
-  ACL_RESOURCE_ACCESS_MODE_CONTROL,
 } from "../constants";
 import { AccessModes } from "../type/AccessModes";
 import { ResourceAccessMode } from "../type/ResourceAccessMode";
@@ -32,20 +31,18 @@ export function accessToResourceAccessModeArray(
   desiredAccess: AccessModes
 ): ResourceAccessMode[] {
   const modes: ResourceAccessMode[] = [];
+
   if (desiredAccess.read === true) {
     modes.push(ACL_RESOURCE_ACCESS_MODE_READ);
   }
+
   if (desiredAccess.append === true) {
     modes.push(ACL_RESOURCE_ACCESS_MODE_APPEND);
   }
+
   if (desiredAccess.write === true) {
     modes.push(ACL_RESOURCE_ACCESS_MODE_WRITE);
   }
-  if (
-    desiredAccess.controlRead === true ||
-    desiredAccess.controlWrite === true
-  ) {
-    modes.push(ACL_RESOURCE_ACCESS_MODE_CONTROL);
-  }
+
   return modes;
 }

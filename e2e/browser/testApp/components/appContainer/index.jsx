@@ -50,7 +50,6 @@ const CONFIG = config();
 const jss = create(preset());
 const useStyles = makeStyles(() => createStyles(appLayout.styles(theme)));
 
-/* eslint react/prop-types: 0 */
 function AppContainer({ children }) {
   const bem = useBem(useStyles());
 

@@ -137,7 +137,7 @@ describe("approveAccessRequest", () => {
       mockAccessRequestVc({
         modes: [
           "http://www.w3.org/ns/auth/acl#Write",
-          "http://www.w3.org/ns/auth/acl#Control",
+          "http://www.w3.org/ns/auth/acl#Read",
         ],
         resources: ["https://some.custom.resource"],
       }),
@@ -153,11 +153,9 @@ describe("approveAccessRequest", () => {
     );
     // The resources' ACR is updated with the modes from the grant.
     expect(spiedAcrUpdate).toHaveBeenCalledWith(mockedInitialResource, {
-      read: false,
+      read: true,
       write: true,
       append: false,
-      controlRead: true,
-      controlWrite: true,
     });
     // The resources' ACR is written back.
     expect(spiedAcrSave).toHaveBeenCalledWith(

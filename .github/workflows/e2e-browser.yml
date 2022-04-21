@@ -28,7 +28,7 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps
-      - run: npm run test:e2e:browser:build
+      - run: npm run test:e2e:browser:setup
       - run: npm run test:e2e:browser
         env:
           E2E_TEST_ENVIRONMENT: ${{ matrix.environment-name }}

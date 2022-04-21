@@ -87,8 +87,7 @@ describe("getRequestBody", () => {
       access: {
         read: true,
         write: true,
-        controlRead: true,
-        controlWrite: true,
+        append: true,
       },
       resources: ["https://some.pod/resource"],
       issuanceDate: new Date(Date.UTC(1955, 5, 8, 13, 37, 42, 42)),
@@ -111,8 +110,8 @@ describe("getRequestBody", () => {
           hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
           mode: [
             "http://www.w3.org/ns/auth/acl#Read",
+            "http://www.w3.org/ns/auth/acl#Append",
             "http://www.w3.org/ns/auth/acl#Write",
-            "http://www.w3.org/ns/auth/acl#Control",
           ],
           isConsentForDataSubject: "https://some.pod/profile#you",
         },
