@@ -33,7 +33,7 @@ jobs:
           # The deployment runs in parallel with CI, so status checks will never have succeeded yet:
           required_contexts: "[]"
         env:
-          GITHUB_TOKEN: "${{ secrets.GH_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Determine npm tag
         id: determine-npm-tag
         run: |
@@ -62,7 +62,7 @@ jobs:
           state: in_progress
           mediaType: '{"previews": ["flash", "ant-man"]}'
         env:
-          GITHUB_TOKEN: "${{ secrets.GH_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - uses: actions/setup-node@v3
         with:
           node-version: "16.x"
@@ -108,7 +108,7 @@ jobs:
           mediaType: '{"previews": ["flash", "ant-man"]}'
           state: success
         env:
-          GITHUB_TOKEN: "${{ secrets.GH_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Mark GitHub Deployment as failed
         uses: octokit/request-action@v2.x
         if: failure()
@@ -122,7 +122,7 @@ jobs:
           mediaType: '{"previews": ["flash", "ant-man"]}'
           state: failure
         env:
-          GITHUB_TOKEN: "${{ secrets.GH_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Waiting for npm CDNs to update...
         run: |
           echo "Giving npm some time to make the newly-published package available…"
