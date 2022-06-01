@@ -22,7 +22,6 @@
 /* eslint-disable no-console */
 
 import { Session } from "@inrupt/solid-client-authn-node";
-import { config } from "dotenv-flow";
 import { fetch as crossFetch } from "cross-fetch";
 import express from "express";
 import {
@@ -31,44 +30,19 @@ import {
   getFile,
   getAccessGrantFromRedirectUrl,
 } from "@inrupt/solid-client-access-grants";
-
-const REQUEST_ACCESS_DEFAULT_PORT = 3001;
-const GRANT_ACCESS_PORT = 3002;
+import { getConfig } from "./getConfig";
 
 // Load env variables
-config();
-const REQUEST_ACCESS_PORT =
-  process.env.REQUEST_ACCESS_PORT ?? REQUEST_ACCESS_DEFAULT_PORT;
+const config = getConfig();
 
+// Setup app
 const app = express();
+app.set("view engine", "ejs");
 // Support parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-// This is the endpoint our NodeJS demo app listens on to receive incoming login
-const redirectUrl = new URL("/redirect", "http://localhost");
-redirectUrl.port = `${REQUEST_ACCESS_PORT}`;
-const REDIRECT_URL = redirectUrl.href;
-
 app.get("/", async (req, res) => {
-  res.send(
-    `<form action="/request", method="post">
-      <div>
-        <label for="resource">
-          Target resource:
-          <input type="url" name="resource" id="resource" required>
-        </label>
-      </div>
-      <div>
-        <label for="owner">
-          Owner WebID
-          <input type="url" name="owner" id="owner" required>
-        </label>
-      </div>
-      <div>
-        <input type="submit" value="Request Access">
-      </div>
-    </form>`
-  );
+  res.render("request-form");
 });
 
 app.post("/request", async (req, res) => {
@@ -88,22 +62,30 @@ app.post("/request", async (req, res) => {
     },
     {
       fetch: session.fetch,
+      accessEndpoint: "https://vc.inrupt.com",
     }
   );
-  await redirectToAccessManagementUi(accessRequest, REDIRECT_URL, {
-    redirectCallback: (url) => {
-      console.log(`redirecting to ${url}`);
-      res.redirect(url);
-    },
-    // The following IRI redirects the user to PodBrowser so that they can approve/reny the request.
-    // fallbackAccessManagementUi: `https://podborowser.inrupt.com/privacy/consent/requests/`,
-    // The following IRI redirects to the IRI used by the examples/grant-access demo.
-    fallbackAccessManagementUi: `http://localhost:${GRANT_ACCESS_PORT}/manage/`,
-    // Note: the following is only necessary because this projects depends for testing puspose
-    // on solid-client-authn-browser, which is picked up automatically for convenience in
-    // browser-side apps. A typical node app would not have this dependence.
-    fetch: crossFetch,
-  });
+
+  await redirectToAccessManagementUi(
+    accessRequest,
+    new URL("/redirect", config.request.href).href,
+    {
+      redirectCallback: (url) => {
+        console.log(`Redirecting to ${url}`);
+        res.redirect(url);
+      },
+      // The following IRI redirects the user to PodBrowser so that they can approve/reny the request.
+      // fallbackAccessManagementUi: `https://podborowser.inrupt.com/privacy/consent/requests/`,
+      // The following IRI redirects to the IRI used by the examples/grant-access demo.
+      fallbackAccessManagementUi: `${
+        new URL("/manage", config.grant.href).href
+      }`,
+      // Note: the following is only necessary because this projects depends for testing puspose
+      // on solid-client-authn-browser, which is picked up automatically for convenience in
+      // browser-side apps. A typical node app would not have this dependence.
+      fetch: crossFetch,
+    }
+  );
 });
 
 app.get("/redirect", async (req, res) => {
@@ -115,9 +97,13 @@ app.get("/redirect", async (req, res) => {
     // Note that using a Bearer token is mandatory for the UMA access token to be valid.
     tokenType: "Bearer",
   });
-  const accessGrant = await getAccessGrantFromRedirectUrl(req.url, {
-    fetch: session.fetch,
-  });
+
+  const accessGrant = await getAccessGrantFromRedirectUrl(
+    new URL(req.url, config.request.href).toString(),
+    {
+      fetch: session.fetch,
+    }
+  );
   const targetResource = (
     accessGrant.credentialSubject.providedConsent as {
       forPersonalData: Array<string>;
@@ -128,15 +114,9 @@ app.get("/redirect", async (req, res) => {
   });
   const fileContent = await file.text();
 
-  res.send(`<div>
-    <p>Redirected with access grant: </p>
-    <pre>${JSON.stringify(accessGrant, undefined, "  ")}</pre>
-    <hr/>
-    <p>Fetched file content: </p>
-    <pre>${fileContent}</pre>
-  <div>`);
+  res.render("granted", { accessGrant, fileContent });
 });
 
-app.listen(REQUEST_ACCESS_PORT, async () => {
-  console.log(`Listening on [${REQUEST_ACCESS_PORT}]...`);
+app.listen(config.request.port, async () => {
+  console.log(`Listening on [${config.request.port}]...`);
 });

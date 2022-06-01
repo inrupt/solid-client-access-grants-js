@@ -19,17 +19,21 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-export type { AccessModes } from "./type/AccessModes";
 export type { AccessBaseOptions } from "./type/AccessBaseOptions";
+export type { AccessCredentialType } from "./type/AccessCredentialType";
+export type { AccessGrantContext } from "./type/AccessGrantContext";
+export type { AccessModes } from "./type/AccessModes";
+export type { ApproveAccessRequestOverrides } from "./manage/approveAccessRequest";
+export type { FetchOptions } from "./type/FetchOptions";
 export type { IssueAccessRequestParameters } from "./type/IssueAccessRequestParameters";
+export type { RedirectOptions } from "./type/RedirectOptions";
+export type { RedirectToAccessManagementUiOptions } from "./discover";
 
 export {
   getAccessApiEndpoint,
   getAccessManagementUi,
   redirectToAccessManagementUi,
 } from "./discover";
-
-export type { RedirectToAccessManagementUiOptions } from "./discover";
 
 export {
   issueAccessRequest,
