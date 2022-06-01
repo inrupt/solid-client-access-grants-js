@@ -31,7 +31,7 @@ import type { RecursivePartial } from "../type/RecursivePartial";
 import type { IssueAccessRequestParameters } from "../type/IssueAccessRequestParameters";
 import { accessToResourceAccessModeArray } from "../util/accessToResourceAccessModeArray";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { BaseGrantBody } from "../type/AccessVerifiableCredential";
+import type { BaseGrantBody } from "../type/AccessVerifiableCredential";
 
 /**
  * Retrieve Access Grants issued over a resource.

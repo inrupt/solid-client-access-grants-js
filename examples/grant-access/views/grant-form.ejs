@@ -1,0 +1,17 @@
+<form action="/redirect" , method="post">
+    <fieldset>
+        <legend>Access Request VC</legend>
+        <pre><code><%= JSON.stringify(accessRequest, undefined, "  ") %></code></pre>
+        <p>
+            <label for="grant">Grant</label>
+            <input type="radio" name="manage" id="grant" value="grant" required />
+            <label for="deny">Deny</label>
+            <input type="radio" name="manage" id="deny" value="deny" required />
+            <input id="requestVc" type="hidden" name="requestVc" value='<%= JSON.stringify(accessRequest) %>'>
+            <input id="redirectUrl" type="hidden" name="redirectUrl" value="<%- requestorRedirectUrl %>">
+        </p>
+        <p>
+            <input type="submit" value="Respond to Access Request">
+        </p>
+    </fieldset>
+</form>

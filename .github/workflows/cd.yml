@@ -136,7 +136,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        node-version: [16.x, 14.x, 12.x]
+        node-version: ["16", "14"]
     needs: [prepare-deployment, publish-npm]
     steps:
       - uses: actions/checkout@v3
@@ -173,8 +173,7 @@ jobs:
           cd .github/workflows/cd-packaging-tests/bundler-parcel
           npm install
           npm install @inrupt/solid-client @inrupt/solid-client-access-grants@$VERSION_NR
-          # pin the version: https://github.com/parcel-bundler/parcel/issues/5943
-          npx parcel@1.12.3 build index.ts
+          npx parcel build index.ts
         env:
           VERSION_NR: ${{ needs.publish-npm.outputs.version-nr }}
       - name: Archive Parcel build artifacts

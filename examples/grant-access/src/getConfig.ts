@@ -18,8 +18,19 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+import { config } from "dotenv-flow";
 
-export { FetchOptions } from "./FetchOptions";
-export { RedirectOptions } from "./RedirectOptions";
-export { AccessBaseOptions } from "./AccessBaseOptions";
-export { AccessModes } from "./AccessModes";
+export function getConfig(): { grant: URL; request: URL } {
+  config();
+
+  const grant = new URL(process.env.BASE_URL ?? "http://localhost");
+  grant.port = process.env.GRANT_ACCESS_PORT ?? "3002";
+
+  const request = new URL(process.env.BASE_URL ?? "http://localhost");
+  request.port = process.env.REQUEST_ACCESS_PORT ?? "3001";
+
+  return {
+    grant,
+    request,
+  };
+}

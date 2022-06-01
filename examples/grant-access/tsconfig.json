@@ -1,36 +1,18 @@
 {
-  "include": ["src/**/*.ts"],
   "compilerOptions": {
+    /* Basic Options */
+    "target": "es2020",
     "module": "commonjs",
-    "strict": true,
+    "lib": ["es2020", "dom"],
     "declaration": true,
-    "noImplicitAny": true,
-    "removeComments": true,
-    "noLib": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
     "esModuleInterop": true,
-    "target": "es2018",
-    "sourceMap": true,
-    "lib": ["es2018", "dom"],
-    "moduleResolution": "node",
-    "outDir": "./dist"
-  },
-  "exclude": ["node_modules", "dist"],
-
-  // We don't provide an 'out' value here, each sub-package should provide its
-  // own.
-  "typedocOptions": {
-    "mode": "modules",
-    "exclude": [
-      // Re-exported functions are already documented in their own modules:
-      "./packages/*/src/index.ts",
-      "./packages/*/src/index.browser.ts"
-    ],
-    "excludeNotExported": true,
-    "excludePrivate": true,
+    // Prevent developers on different OSes from running into problems:
+    "forceConsistentCasingInFileNames": true,
+    /* Advanced Options */
     "stripInternal": true,
-    "theme": "markdown",
-    "readme": "none"
-  }
+  },
+  "include": ["src/**/*.ts"],
 }

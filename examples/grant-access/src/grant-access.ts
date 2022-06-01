@@ -22,67 +22,42 @@
 /* eslint-disable no-console */
 
 import { Session } from "@inrupt/solid-client-authn-node";
-import { config } from "dotenv-flow";
 import express from "express";
 import {
   approveAccessRequest,
   getAccessRequestFromRedirectUrl,
   redirectToRequestor,
 } from "@inrupt/solid-client-access-grants";
-
-const GRANT_ACCESS_DEFAULT_PORT = 3002;
+import { getConfig } from "./getConfig";
 
 // Load env variables
-config();
-export const GRANT_ACCESS_PORT =
-  process.env.GRANT_ACCESS_PORT ?? GRANT_ACCESS_DEFAULT_PORT;
+const config = getConfig();
 
+// Setup app
 const app = express();
+app.set("view engine", "ejs");
 // Support parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
 // Receive the access request, and display a form to the user
 app.get("/manage", async (req, res) => {
   const session = new Session();
+
   await session.login({
     clientId: process.env.OWNER_CLIENT_ID,
     clientSecret: process.env.OWNER_CLIENT_SECRET,
     oidcIssuer: process.env.OWNER_OIDC_ISSUER,
   });
+
   const { accessRequest, requestorRedirectUrl } =
     await getAccessRequestFromRedirectUrl(
-      `http://localhost:${GRANT_ACCESS_PORT}${req.url}`,
+      new URL(req.url, config.grant.href).href,
       {
         fetch: session.fetch,
       }
     );
-  res.send(
-    `<div><p>Here is the requested access:</p>
-    <pre>${JSON.stringify(accessRequest, undefined, "  ")}</pre>
-    <form action="/redirect", method="post">
-      <div>
-        <p>Do you want to:</p>
-        <label for="grant">
-          grant
-          <input type="radio" name="grant" id="grant" value="grant" required/>
-        </label>
-        <label for="grant">
-          deny
-          <input type="radio" name="grant" id="deny" value="deny" required/>
-          </label>
-        <p>the requested access ?</p>
-      </div>
-      <div>
-        <input type="hidden" name="requestVc" id="requestVc" value="${JSON.stringify(
-          accessRequest
-        )}>"
-        <input type="hidden" name="redirectUrl" id="redirectUrl" value="${requestorRedirectUrl}">
-      </div>
-      <div>
-        <input type="submit" value="Respond to access request">
-      </div>
-    </form></div>`
-  );
+
+  res.render("grant-form", { accessRequest, requestorRedirectUrl });
 });
 
 // Return the access grant to the requestor
@@ -111,7 +86,7 @@ app.post("/redirect", async (req, res) => {
   });
 });
 
-app.listen(GRANT_ACCESS_PORT, async () => {
+app.listen(config.grant.port, async () => {
   // eslint-disable-next-line no-console
-  console.log(`Listening on [${GRANT_ACCESS_PORT}]...`);
+  console.log(`Listening on [${config.grant.port}]...`);
 });
