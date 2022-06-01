@@ -7,3 +7,4 @@ tsconfig.json
 # The only check that applies here is really the license header:
 .eslintrc.js
 e2e/browser/testApp
+**/dist/*

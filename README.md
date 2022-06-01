@@ -24,8 +24,7 @@ like [Babel](https://babeljs.io), and to add polyfills for e.g. `Map`, `Set`,
 
 # Node support
 
-Our JavaScript Client Libraries track Node.js LTS releases, and support 12.x,
-14.x, and 16.x.
+Our JavaScript Client Libraries track Node.js LTS releases.
 
 # Installation
 
