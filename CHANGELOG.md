@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+## New features
+
+- `GRANT_VC_URL_PARAM_NAME` is now exported from the base package. This is the name of the parameter
+  used in URL redirects to an access grant management application.
+
 The following changes have been implemented but not released yet:
 
 ## [1.0.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v1.0.0) - 2022-06-06

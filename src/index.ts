@@ -49,6 +49,7 @@ export {
   getAccessRequestFromRedirectUrl,
   redirectToRequestor,
   revokeAccessGrant,
+  GRANT_VC_URL_PARAM_NAME,
 } from "./manage";
 
 export { isValidAccessGrant } from "./verify";
