@@ -6,6 +6,12 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 The following changes have been implemented but not released yet:
 
+## [1.0.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v1.0.0) - 2022-06-06
+
+## Other Changes
+
+- Release major version of package
+
 ## [0.6.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v0.6.1) - 2022-06-06
 
 ### Bugfix
