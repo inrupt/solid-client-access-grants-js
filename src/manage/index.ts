@@ -32,5 +32,9 @@ export { denyAccessRequest } from "./denyAccessRequest";
 export { getAccessGrant } from "./getAccessGrant";
 export { getAccessGrantAll } from "./getAccessGrantAll";
 export { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
-export { redirectToRequestor } from "./redirectToRequestor";
 export { revokeAccessGrant } from "./revokeAccessGrant";
+
+export {
+  redirectToRequestor,
+  GRANT_VC_URL_PARAM_NAME,
+} from "./redirectToRequestor";
