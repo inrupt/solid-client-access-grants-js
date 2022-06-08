@@ -25,10 +25,13 @@ import {
   isVerifiableCredential,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
+import { isAccessGrant } from "../guard/isAccessGrant";
+import { isBaseAccessVcBody } from "../guard/isBaseAccessVcBody";
 import {
   GRANT_VC_PARAM_NAME,
   GRANT_VC_URL_PARAM_NAME,
 } from "../manage/redirectToRequestor";
+import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
@@ -45,7 +48,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
 export async function getAccessGrantFromRedirectUrl(
   redirectUrl: UrlString,
   options: { fetch?: typeof fetch } = {}
-): Promise<VerifiableCredential> {
+): Promise<VerifiableCredential & AccessGrantBody> {
   const redirectUrlObj = new URL(redirectUrl);
   const authFetch = options.fetch ?? (await getSessionFetch(options));
 
@@ -71,6 +74,10 @@ export async function getAccessGrantFromRedirectUrl(
     throw new Error(
       `${JSON.stringify(accessGrant)} is not a Verifiable Credential`
     );
+  }
+
+  if (!isBaseAccessVcBody(accessGrant) || !isAccessGrant(accessGrant)) {
+    throw new Error(`${JSON.stringify(accessGrant)} is not an Access Grant`);
   }
 
   return accessGrant;

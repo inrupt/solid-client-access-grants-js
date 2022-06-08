@@ -30,6 +30,8 @@ import {
   REQUEST_VC_PARAM_NAME,
   REQUEST_VC_URL_PARAM_NAME,
 } from "../discover/redirectToAccessManagementUi";
+import { isAccessRequest } from "../guard/isAccessRequest";
+import { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
@@ -48,7 +50,7 @@ export async function getAccessRequestFromRedirectUrl(
   redirectUrl: UrlString,
   options: { fetch?: typeof fetch } = {}
 ): Promise<{
-  accessRequest: VerifiableCredential;
+  accessRequest: VerifiableCredential & AccessRequestBody;
   requestorRedirectUrl: UrlString;
 }> {
   const redirectUrlObj = new URL(redirectUrl);
@@ -94,6 +96,12 @@ export async function getAccessRequestFromRedirectUrl(
   if (!isVerifiableCredential(accessRequest)) {
     throw new Error(
       `${JSON.stringify(accessRequest)} is not a Verifiable Credential`
+    );
+  }
+
+  if (!isAccessRequest(accessRequest)) {
+    throw new Error(
+      `${JSON.stringify(accessRequest)} is not an Access Request`
     );
   }
   return { accessRequest, requestorRedirectUrl };
