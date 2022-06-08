@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    /* Basic Options */
+    "target": "es2020",
+    "module": "commonjs",
+    "lib": ["es2020", "dom"],
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    // Prevent developers on different OSes from running into problems:
+    "forceConsistentCasingInFileNames": true,
+    /* Advanced Options */
+    "stripInternal": true,
+  },
+  "include": ["src/**/*.ts"],
+}
