@@ -38,13 +38,9 @@ app.set("view engine", "ejs");
 // Support parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-
-
 app.get("/", async (req, res) => {
   res.render("request-form");
 });
-
-
 
 app.post("/request", async (req, res) => {
   const session = new Session();
@@ -57,7 +53,10 @@ app.post("/request", async (req, res) => {
   const accessRequest = await issueAccessRequest(
     {
       access: { read: true },
-      purpose: ["https://w3id.org/dpv#AcademicResearch", "https://w3id.org/dpv#PersonnelHiring"],
+      purpose: [
+        "https://w3id.org/dpv#AcademicResearch",
+        "https://w3id.org/dpv#PersonnelHiring",
+      ],
       resourceOwner: req.body.owner,
       resources: [req.body.resource],
     },
@@ -79,8 +78,6 @@ app.post("/request", async (req, res) => {
     }
   );
 });
-
-
 
 app.get("/redirect", async (req, res) => {
   const session = new Session();
@@ -113,8 +110,6 @@ app.get("/redirect", async (req, res) => {
 
   res.render("granted", { accessGrant, fileContent });
 });
-
-
 
 app.listen(config.url.port, async () => {
   /* eslint-disable-next-line no-console */
