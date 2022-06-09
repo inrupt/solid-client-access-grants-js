@@ -53,10 +53,7 @@ app.post("/request", async (req, res) => {
   const accessRequest = await issueAccessRequest(
     {
       access: { read: true },
-      purpose: [
-        "https://w3id.org/dpv#AcademicResearch",
-        "https://w3id.org/dpv#PersonnelHiring",
-      ],
+      purpose: req.body.purpose,
       resourceOwner: req.body.owner,
       resources: [req.body.resource],
     },
