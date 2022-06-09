@@ -9,6 +9,7 @@
     "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
+    "sourceMap": true,
     // Prevent developers on different OSes from running into problems:
     "forceConsistentCasingInFileNames": true,
     /* Advanced Options */
