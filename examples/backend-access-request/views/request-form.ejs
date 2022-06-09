@@ -9,11 +9,22 @@
             <label for="owner">Resource Owner's WebID</label>
             <input type="url" name="owner" id="owner" required>
         </p>
-        <p>
-            <label>Purposes</label>
-            <input type="text" name="purpose" value="https://w3id.org/dpv#AcademicResearch" readonly>
-            <input type="text" name="purpose" value="https://w3id.org/dpv#PersonnelHiring" readonly>
-        </p>
+        <fieldset>
+            <legend>Access modes</legend>
+            <label>Read</label>
+            <input type="checkbox" name="read" onclick="return false;" checked>
+        </fieldset>
+        <fieldset>
+            <legend>Purposes</legend>
+            <p>
+                <label>Accademic research</label>
+                <input type="checkbox" name="purpose" value="https://w3id.org/dpv#AcademicResearch" onclick="return false;" checked>
+            </p>
+            <p>
+                <label>Personel hiring</label>
+                <input type="checkbox" name="purpose" value="https://w3id.org/dpv#PersonnelHiring" onclick="return false;" checked>
+            </p>
+        </fieldset>
         <p>
             <input type="submit" value="Request Access">
         </p>

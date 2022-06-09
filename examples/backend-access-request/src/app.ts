@@ -52,7 +52,9 @@ app.post("/request", async (req, res) => {
 
   const accessRequest = await issueAccessRequest(
     {
-      access: { read: true },
+      access: {
+        read: !!req.body.read,
+      },
       purpose: req.body.purpose,
       resourceOwner: req.body.owner,
       resources: [req.body.resource],
