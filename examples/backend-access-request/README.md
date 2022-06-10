@@ -30,7 +30,12 @@ Let X be a resource Alice owns (it is a resource in Alice's Pod).
    - the URI of the resource Alice intends to share.
 6. ACME's server uses its client credentials to obtain a session.
 7. ACME's server discovers the VC endpoint via the resource URI.
-8. ACME uses the VC endpoint to create an Access Request.
+   - Get the resource
+   - Check for the WWW-Authenticate header's UMA challenge
+   - Retrieve UMA well known configuration
+   - Retrieve the VC issuer service URI from the well known UMA configuration
+   - Retrieve the VC service well known configuration (for VC endpoints)
+8. ACME uses the VC issuer endpoint to create an Access Request.
 9. ACME redirects Alice to PodBrowser with the Access Request URI as parameter.
 10. Alice uses PodBrowser to create an Access Grant from ACME's Access Request.
 11. PodBrowser redirects Alice to ACME with the Access Grant URI as parameter.
