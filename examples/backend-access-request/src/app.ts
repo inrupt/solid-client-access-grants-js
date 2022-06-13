@@ -33,11 +33,11 @@ const app = express();
 // Support parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-// Home route: get or post the request form
+// Home route: get or post the access request form
 app.get("/", getAccessRequestForm);
 app.post("/", postAccessRequestForm);
 
-// Redirect: get resource from Access Grant
+// Redirect: get resource using the issued Access Grant
 app.get("/redirect", getResourceFromAccessGrant);
 
 app.listen(config.url.port, async () => {
