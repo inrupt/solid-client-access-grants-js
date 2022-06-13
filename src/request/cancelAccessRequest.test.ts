@@ -23,7 +23,8 @@
 import { jest, describe, it, expect } from "@jest/globals";
 import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { cancelAccessRequest } from "./cancelAccessRequest";
-import { mockAccessGrant, MOCKED_CREDENTIAL_ID } from "./request.mock";
+import { MOCKED_CREDENTIAL_ID } from "./request.mock";
+import { mockAccessGrantVc } from "../util/access.mock";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -49,7 +50,7 @@ describe("cancelAccessRequest", () => {
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify(
-            mockAccessGrant("https://some.issuer", "https://some.subject")
+            mockAccessGrantVc("https://some.issuer", "https://some.subject")
           )
         )
       );
@@ -83,7 +84,7 @@ describe("cancelAccessRequest", () => {
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify(
-            mockAccessGrant("https://some.issuer", "https://some.subject")
+            mockAccessGrantVc("https://some.issuer", "https://some.subject")
           )
         )
       );
@@ -107,7 +108,7 @@ describe("cancelAccessRequest", () => {
       mockedVcModule,
       "revokeVerifiableCredential"
     );
-    const mockedVc = mockAccessGrant(
+    const mockedVc = mockAccessGrantVc(
       "https://some.issuer",
       "https://some.subject"
     );
@@ -147,7 +148,7 @@ describe("cancelAccessRequest", () => {
     );
     const mockedFetch = jest.fn(global.fetch);
     await cancelAccessRequest(
-      mockAccessGrant("https://some.issuer", "https://some.subject"),
+      mockAccessGrantVc("https://some.issuer", "https://some.subject"),
       {
         fetch: mockedFetch,
       }

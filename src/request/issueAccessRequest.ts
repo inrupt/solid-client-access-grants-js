@@ -61,7 +61,9 @@ async function issueAccessRequest(
   const accessRequest = await issueAccessVc(requestBody, options);
 
   if (!isAccessRequest(accessRequest)) {
-    throw new Error(`${JSON.stringify(accessRequest)} is not an Access Request`);
+    throw new Error(
+      `${JSON.stringify(accessRequest)} is not an Access Request`
+    );
   }
 
   return accessRequest;

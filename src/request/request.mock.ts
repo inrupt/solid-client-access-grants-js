@@ -29,49 +29,13 @@ import {
   UrlString,
   WithServerResourceInfo,
 } from "@inrupt/solid-client";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import {
-  ACCESS_GRANT_CONTEXT,
-  PREFERRED_CONSENT_MANAGEMENT_UI,
-} from "../constants";
+import { PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
 export const MOCKED_CREDENTIAL_ID = "https://some.credential";
 export const MOCKED_ISSUANCE_DATE = "2021-09-07T09:59:00Z";
 export const MOCK_REQUESTOR_IRI = "https://some.pod/profile#me";
 export const MOCK_REQUESTOR_INBOX = "https://some.pod/consent/inbox";
 export const MOCK_RESOURCE_OWNER_IRI = "https://some.pod/profile#you";
-
-export const mockAccessGrant = (
-  issuer: string,
-  subjectId: string,
-  subjectClaims?: Record<string, string>
-): VerifiableCredential => {
-  return {
-    "@context": ACCESS_GRANT_CONTEXT,
-    credentialSubject: {
-      id: subjectId,
-      providedConsent: {
-        forPersonalData: ["https://some.resource"],
-        hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-        mode: ["http://www.w3.org/ns/auth/acl#Read"],
-      },
-      inbox: "https://some.inbox",
-      ...subjectClaims,
-    },
-    type: ["SolidCredential", "SolidAccessRequest"],
-    id: MOCKED_CREDENTIAL_ID,
-    issuanceDate: MOCKED_ISSUANCE_DATE,
-    issuer,
-    proof: {
-      created: MOCKED_ISSUANCE_DATE,
-      proofPurpose: "assertionMethod",
-      verificationMethod: "https://issuer.jwks",
-      proofValue: "eyJhbGciO..E1og50tS9tH8WyXMlXyo45CA",
-      type: "Ed25519Signature2018",
-    },
-  };
-};
-
 export const MOCKED_ACCESS_ISSUER = "https://access-issuer.iri";
 export const MOCKED_ACCESS_UI_IRI = "https://some-consent.app";
 export const MOCKED_STORAGE = "https://pod-provider.iri";

@@ -24,7 +24,7 @@ import { describe, it, jest, expect } from "@jest/globals";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
 import { getAccessGrantFromRedirectUrl } from "./getAccessGrantFromRedirectUrl";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { mockAccessGrantVc } from "../manage/approveAccessRequest.mock";
+import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 
 jest.mock("../util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {
@@ -118,6 +118,27 @@ describe("getAccessGrantFromRedirectUrl", () => {
 
     const fetchedVc = await getAccessGrantFromRedirectUrl(redirectUrl.href);
     expect(fetchedVc).toStrictEqual(mockAccessGrantVc());
+  });
+
+  it("throws if the fetched VC is not an Access Grant", async () => {
+    const vcModule = jest.requireMock(
+      "@inrupt/solid-client-vc"
+    ) as jest.Mocked<{
+      getVerifiableCredential: typeof getVerifiableCredential;
+    }>;
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(
+      mockAccessRequestVc()
+    );
+
+    const redirectUrl = new URL("https://redirect.url");
+    redirectUrl.searchParams.set(
+      "accessGrantUrl",
+      encodeURI("https://some.vc")
+    );
+
+    await expect(
+      getAccessGrantFromRedirectUrl(redirectUrl.href)
+    ).rejects.toThrow();
   });
 
   it("supports the legacy approach where the VC is provided by value", async () => {

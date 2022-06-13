@@ -23,7 +23,7 @@
 // eslint-disable-next-line no-shadow
 import { it, jest, describe, expect } from "@jest/globals";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
-import { mockAccessRequestVc } from "../manage/approveAccessRequest.mock";
+import { mockAccessRequestVc } from "../util/access.mock";
 import { getSolidDataset } from "./getSolidDataset";
 import { fetchWithVc } from "../fetch";
 
