@@ -19,96 +19,26 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { Session } from "@inrupt/solid-client-authn-node";
 import express from "express";
-import {
-  issueAccessRequest,
-  redirectToAccessManagementUi,
-  getFile,
-  getAccessGrantFromRedirectUrl,
-} from "@inrupt/solid-client-access-grants";
-import { getConfig } from "./getConfig";
+import { getConfig } from "./utils/getConfig";
+import { getAccessRequestForm } from "./routes/getAccessRequestForm";
+import { postAccessRequestForm } from "./routes/postAccessRequestForm";
+import { getResourceFromAccessGrant } from "./routes/getResourceFromAccessGrant";
 
 // Load env variables
 const config = getConfig();
 
 // Setup app
 const app = express();
-app.set("view engine", "ejs");
 // Support parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-app.get("/", async (req, res) => {
-  res.render("request-form");
-});
+// Home route: get or post the request form
+app.get("/", getAccessRequestForm);
+app.post("/", postAccessRequestForm);
 
-app.post("/request", async (req, res) => {
-  const session = new Session();
-  await session.login({
-    clientId: config.clientId,
-    clientSecret: config.clientSecret,
-    oidcIssuer: config.oidcIssuer.href,
-  });
-
-  const accessRequest = await issueAccessRequest(
-    {
-      access: {
-        read: !!req.body.read,
-      },
-      purpose: req.body.purpose,
-      resourceOwner: req.body.owner,
-      resources: [req.body.resource],
-    },
-    {
-      fetch: session.fetch as typeof fetch,
-      accessEndpoint: "https://vc.inrupt.com",
-    }
-  );
-
-  await redirectToAccessManagementUi(
-    accessRequest.id,
-    new URL("/redirect", config.url.href).href,
-    {
-      redirectCallback: (url) => {
-        res.redirect(url);
-      },
-      fallbackAccessManagementUi: config.managementApp.href,
-      fetch: session.fetch as typeof fetch,
-    }
-  );
-});
-
-app.get("/redirect", async (req, res) => {
-  const session = new Session();
-  await session.login({
-    clientId: config.clientId,
-    clientSecret: config.clientSecret,
-    oidcIssuer: config.oidcIssuer.href,
-    // Note that using a Bearer token is mandatory for the UMA access token to be valid.
-    tokenType: "Bearer",
-  });
-
-  const accessGrant = await getAccessGrantFromRedirectUrl(
-    new URL(req.url, config.url.href).toString(),
-    {
-      fetch: session.fetch as typeof fetch,
-    }
-  );
-
-  const targetResource = (
-    accessGrant.credentialSubject.providedConsent as {
-      forPersonalData: Array<string>;
-    }
-  ).forPersonalData[0];
-
-  const file = await getFile(targetResource, accessGrant, {
-    fetch: session.fetch as typeof fetch,
-  });
-
-  const fileContent = await file.text();
-
-  res.render("granted", { accessGrant, fileContent });
-});
+// Redirect: get resource from Access Grant
+app.get("/redirect", getResourceFromAccessGrant);
 
 app.listen(config.url.port, async () => {
   /* eslint-disable-next-line no-console */

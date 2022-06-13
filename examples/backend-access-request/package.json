@@ -15,7 +15,6 @@
     "@inrupt/solid-client-access-grants": "^1.0.1",
     "@inrupt/solid-client-authn-node": "^1.12.0",
     "dotenv-flow": "^3.2.0",
-    "ejs": "^3.1.8",
     "express": "^4.18.1"
   },
   "devDependencies": {

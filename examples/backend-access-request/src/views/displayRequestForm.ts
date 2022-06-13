@@ -1,4 +1,5 @@
-<form action="/request" , method="post">
+export function displayRequestForm() {
+    return `<form action="/" , method="post">
     <fieldset>
         <legend>Solid resource access request form</legend>
         <p>
@@ -30,4 +31,5 @@
         </p>
         <p>Note: purposes are for <a href="https://gdpr-info.eu/issues/consent/">informed consent</a>, here taken from <a href="https://w3c.github.io/dpv/dpv/#vocab-purpose">Purposes defined by the Data Privacy Vocabulary</a>.</p>
     </fieldset>
-</form>
+</form>`;
+}
