@@ -28,14 +28,14 @@ interface Environment {
 }
 
 export function getEnvironment(): Environment {
-
   const url = new URL(process.env.BASE_URL ?? "http://localhost");
   url.port = process.env.PORT ?? "8080";
 
   return {
     url,
     managementApp: new URL(
-      process.env.ACCESS_MANAGEMENT_APP ?? "https://podbrowser.inrupt.com/privacy/access/requests/"
+      process.env.ACCESS_MANAGEMENT_APP ??
+        "https://podbrowser.inrupt.com/privacy/access/requests/"
     ),
     clientId: process.env.CLIENT_ID ?? "",
     clientSecret: process.env.CLIENT_SECRET ?? "",
