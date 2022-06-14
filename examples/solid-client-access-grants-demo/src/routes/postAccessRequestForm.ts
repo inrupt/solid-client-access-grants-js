@@ -23,6 +23,7 @@
 import type { Request, Response } from "express";
 
 import {
+  getAccessApiEndpoint,
   issueAccessRequest,
   redirectToAccessManagementUi,
 } from "@inrupt/solid-client-access-grants";
@@ -41,6 +42,8 @@ export async function postAccessRequestForm(
     oidcIssuer: env.oidcIssuer.href,
   });
 
+  const accessEndpoint = await getAccessApiEndpoint(req.body.resource);
+
   const accessRequest = await issueAccessRequest(
     {
       access: {
@@ -52,7 +55,7 @@ export async function postAccessRequestForm(
     },
     {
       fetch: session.fetch as typeof fetch,
-      accessEndpoint: "https://vc.inrupt.com",
+      accessEndpoint,
     }
   );
 
