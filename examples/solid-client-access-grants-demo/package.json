@@ -1,7 +1,7 @@
 {
-  "name": "@inrupt/solid-client-access-grants-demo-backend-access-request",
+  "name": "@inrupt/solid-client-access-grants-demo",
   "version": "0.0.1",
-  "description": "Access Grants backend Access Request demo app.",
+  "description": "Access Grants and Access Requests demo application.",
   "author": "Inrupt, Inc.",
   "license": "MIT",
   "main": "./dist/app.js",
