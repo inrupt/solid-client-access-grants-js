@@ -20,13 +20,14 @@
 //
 
 import express from "express";
-import { getConfig } from "./utils/getConfig";
+import { config } from "dotenv-flow";
 import { getAccessRequestForm } from "./routes/getAccessRequestForm";
 import { postAccessRequestForm } from "./routes/postAccessRequestForm";
 import { getResourceFromAccessGrant } from "./routes/getResourceFromAccessGrant";
+import { getEnvironment } from "./utils/getEnvironment";
 
-// Load env variables
-const config = getConfig();
+// Load env
+config();
 
 // Setup app
 const app = express();
@@ -40,7 +41,8 @@ app.post("/", postAccessRequestForm);
 // Redirect: get resource using the issued Access Grant
 app.get("/redirect", getResourceFromAccessGrant);
 
-app.listen(config.url.port, async () => {
+const env = getEnvironment();
+app.listen(env.url.port, async () => {
   /* eslint-disable-next-line no-console */
-  console.log(`Running on [${config.url.href}]...`);
+  console.log(`Running on [${env.url.href}]...`);
 });

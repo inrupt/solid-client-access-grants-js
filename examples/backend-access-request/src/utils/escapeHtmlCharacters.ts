@@ -1,4 +1,4 @@
-export function escapeHtml(text: string) {
+export function escapeHtmlCharacters(text: string) {
     let lookup: Record<string, string> = {
         '&': "&amp;",
         '"': "&quot;",
