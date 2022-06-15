@@ -24,8 +24,9 @@ import {
   ACCESS_GRANT_FETCHER_PATHNAME,
   RESOURCE_FETCHER_PATHNAME,
 } from "./constants.js";
+import {GRANT_VC_URL_PARAM_NAME } from "@inrupt/solid-client-access-grants";
 
-const accessGrantParam = "accessGrantUrl";
+const accessGrantParam = GRANT_VC_URL_PARAM_NAME;
 
 const accessGrantUrl =
   new URLSearchParams(document.location.search).get(accessGrantParam) ?? "";
