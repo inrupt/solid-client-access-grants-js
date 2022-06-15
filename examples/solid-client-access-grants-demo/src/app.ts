@@ -21,27 +21,39 @@
 
 import express from "express";
 import { config } from "dotenv-flow";
-import { getAccessRequestForm } from "./routes/getAccessRequestForm";
 import { postAccessRequestForm } from "./routes/postAccessRequestForm";
-import { getResourceFromAccessGrant } from "./routes/getResourceFromAccessGrant";
+import { getResourceFromAccessGrantUrl } from "./routes/getResourceFromAccessGrantUrl";
 import { getEnvironment } from "./utils/getEnvironment";
+import {
+  ACCESS_GRANT_FETCHER_PATHNAME,
+  RESOURCE_FETCHER_PATHNAME,
+  RESOURCE_REDIRECT_FETCHER_PATHNAME,
+} from "./static/constants";
+import { getAccessGrantFromUrl } from "./routes/getAccessGrantFromUrl";
+import { getResourceFromRedirectUrl } from "./routes/getResourceFromRedirectUrl";
 
 // Load env
 config();
+const env = getEnvironment();
 
 // Setup app
 const app = express();
 // Support parsing application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static("static"));
 
-// Home route: get or post the access request form
-app.get("/", getAccessRequestForm);
-app.post("/", postAccessRequestForm);
+// Post the access request form
+app.post("/request", postAccessRequestForm);
 
-// Redirect: get resource using the issued Access Grant
-app.get("/redirect", getResourceFromAccessGrant);
+// Get an issued Access Grant from its URL
+app.get(ACCESS_GRANT_FETCHER_PATHNAME, getAccessGrantFromUrl);
 
-const env = getEnvironment();
+// Get resource using an Access Grant URL
+app.get(RESOURCE_FETCHER_PATHNAME, getResourceFromAccessGrantUrl);
+
+// Get resource from the redirect URL
+app.get(RESOURCE_REDIRECT_FETCHER_PATHNAME, getResourceFromRedirectUrl);
+
 app.listen(env.url.port, async () => {
   /* eslint-disable-next-line no-console */
   console.log(`Running on [${env.url.href}]...`);

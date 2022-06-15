@@ -22,20 +22,14 @@
 // eslint-disable-next-line no-shadow
 import type { Request, Response } from "express";
 
-import {
-  getAccessApiEndpoint,
-  issueAccessRequest,
-  redirectToAccessManagementUi,
-} from "@inrupt/solid-client-access-grants";
 import { Session } from "@inrupt/solid-client-authn-node";
+import {
+  getAccessGrantFromRedirectUrl,
+  getFile,
+} from "@inrupt/solid-client-access-grants";
 import { getEnvironment } from "../utils/getEnvironment";
 
-/**
- *
- * @param req
- * @param res
- */
-export async function postAccessRequestForm(
+export async function getResourceFromRedirectUrl(
   req: Request,
   res: Response
 ): Promise<void> {
@@ -45,40 +39,43 @@ export async function postAccessRequestForm(
     clientId: env.clientId,
     clientSecret: env.clientSecret,
     oidcIssuer: env.oidcIssuer.href,
+    // Note that using a Bearer token is mandatory for the UMA access token to be valid.
+    tokenType: "Bearer",
   });
 
   /**
-   * Access Point discovery:
-   * 1.
+   * Retrieve an Access Grant issued to the application from the redirect URL.
    */
-  const accessEndpoint = await getAccessApiEndpoint(req.body.resource);
-
-  /**
-   * Create an Access Request:
-   */
-  const accessRequest = await issueAccessRequest(
-    {
-      access: {
-        read: !!req.body.read,
-      },
-      purpose: req.body.purpose,
-      resourceOwner: req.body.owner,
-      resources: [req.body.resource],
-    },
+  const accessGrant = await getAccessGrantFromRedirectUrl(
+    new URL(req.url, env.url.href).toString(),
     {
       fetch: session.fetch as typeof fetch,
-      accessEndpoint,
     }
   );
 
   /**
-   * Redirect to Access Management application:
+   * Retrieve the URL of a resource to which access was granted.
    */
-  await redirectToAccessManagementUi(accessRequest.id, env.redirectUrl.href, {
-    redirectCallback: (url) => {
-      res.redirect(url);
-    },
-    fallbackAccessManagementUi: env.managementApp.href,
+  const targetResource = (
+    accessGrant.credentialSubject.providedConsent as {
+      forPersonalData: Array<string>;
+    }
+  ).forPersonalData[0];
+
+  /**
+   * Retrieve a resource using an Access Grant.
+   */
+  const file = await getFile(targetResource, accessGrant, {
     fetch: session.fetch as typeof fetch,
+  });
+
+  /**
+   * Send back the resource.
+   */
+  // Note: this should be handled properly with file.type but browsers are not too good with ttl...
+  res.type("text/plain");
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  file.arrayBuffer().then((buf) => {
+    res.send(Buffer.from(buf));
   });
 }

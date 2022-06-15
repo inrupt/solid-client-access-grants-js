@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Solid Access Grants Demo</title>
+</head>
+
+<body>
+  <form action="/request" , method="post">
+    <fieldset>
+      <legend>Solid resource access request form</legend>
+      <p>
+        <label for="resource">Resource URL</label>
+        <input type="url" name="resource" id="resource" required>
+      </p>
+      <p>
+        <label for="owner">Resource Owner's WebID</label>
+        <input type="url" name="owner" id="owner" required>
+      </p>
+      <fieldset>
+        <legend>Access modes</legend>
+        <label>Read</label>
+        <input type="checkbox" name="read" onclick="return false;" checked>
+      </fieldset>
+      <fieldset>
+        <legend>Purposes</legend>
+        <p>
+          <label>Accademic research</label>
+          <input type="checkbox" name="purpose" value="https://w3id.org/dpv#AcademicResearch" onclick="return false;"
+            checked>
+        </p>
+        <p>
+          <label>Personel hiring</label>
+          <input type="checkbox" name="purpose" value="https://w3id.org/dpv#PersonnelHiring" onclick="return false;"
+            checked>
+        </p>
+      </fieldset>
+      <p>
+        <input type="submit" value="Request Access">
+      </p>
+      <p>Note: purposes are for <a href="https://gdpr-info.eu/issues/consent/">informed consent</a>, here taken from <a
+          href="https://w3c.github.io/dpv/dpv/#vocab-purpose">Purposes defined by the Data Privacy Vocabulary</a>.</p>
+    </fieldset>
+  </form>
+</body>
+
+</html>

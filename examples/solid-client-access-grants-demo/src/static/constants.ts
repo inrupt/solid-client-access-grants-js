@@ -19,14 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// eslint-disable-next-line no-shadow
-import type { Request, Response } from "express";
-
-import { displayRequestForm } from "../views/displayRequestForm";
-
-export async function getAccessRequestForm(
-  req: Request,
-  res: Response
-): Promise<void> {
-  res.send(displayRequestForm());
-}
+export const ACCESS_GRANT_FETCHER_PATHNAME = "/getAccessGrantFromUrl";
+export const RESOURCE_FETCHER_PATHNAME = "/getResourceFromAccessGrantUrl";
+export const RESOURCE_REDIRECT_FETCHER_PATHNAME = "/getResourceFromRedirectUrl";

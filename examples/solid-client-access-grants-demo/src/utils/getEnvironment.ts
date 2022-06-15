@@ -19,12 +19,15 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import { RESOURCE_FETCHER_PATHNAME } from "../static/constants";
+
 interface Environment {
   url: URL;
   managementApp: URL;
   clientId: string;
   clientSecret: string;
   oidcIssuer: URL;
+  redirectUrl: URL;
 }
 
 export function getEnvironment(): Environment {
@@ -40,5 +43,8 @@ export function getEnvironment(): Environment {
     clientId: process.env.CLIENT_ID ?? "",
     clientSecret: process.env.CLIENT_SECRET ?? "",
     oidcIssuer: new URL(process.env.OIDC_ISSUER ?? "https://login.inrupt.com"),
+    redirectUrl: new URL(
+      process.env.FRONTENT_REDIRECT ?? new URL(RESOURCE_FETCHER_PATHNAME, url)
+    ),
   };
 }

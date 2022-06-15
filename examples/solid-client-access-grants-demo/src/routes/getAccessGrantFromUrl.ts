@@ -23,14 +23,10 @@
 import type { Request, Response } from "express";
 
 import { Session } from "@inrupt/solid-client-authn-node";
-import {
-  getAccessGrantFromRedirectUrl,
-  getFile,
-} from "@inrupt/solid-client-access-grants";
+import { getAccessGrant } from "@inrupt/solid-client-access-grants";
 import { getEnvironment } from "../utils/getEnvironment";
-import { displayGrantedAccess } from "../views/displayGrantedAccess";
 
-export async function getResourceFromAccessGrant(
+export async function getAccessGrantFromUrl(
   req: Request,
   res: Response
 ): Promise<void> {
@@ -44,24 +40,12 @@ export async function getResourceFromAccessGrant(
     tokenType: "Bearer",
   });
 
-  const accessGrant = await getAccessGrantFromRedirectUrl(
-    new URL(req.url, env.url.href).toString(),
-    {
-      fetch: session.fetch as typeof fetch,
-    }
-  );
-
-  const targetResource = (
-    accessGrant.credentialSubject.providedConsent as {
-      forPersonalData: Array<string>;
-    }
-  ).forPersonalData[0];
-
-  const file = await getFile(targetResource, accessGrant, {
+  /**
+   * Retrieve an Access Grant issued to the application.
+   */
+  const accessGrant = await getAccessGrant(req.query.accessGrantUrl as string, {
     fetch: session.fetch as typeof fetch,
   });
 
-  const fileContent = await file.text();
-
-  res.send(displayGrantedAccess(accessGrant, fileContent));
+  res.send(accessGrant);
 }

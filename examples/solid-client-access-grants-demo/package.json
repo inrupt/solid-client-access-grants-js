@@ -5,10 +5,12 @@
   "author": "Inrupt, Inc.",
   "license": "MIT",
   "main": "./dist/app.js",
-  "files": ["dist", "src"],
+  "files": ["dist", "src", "static"],
   "scripts": {
-    "build": "tsc",
-    "build:local": "npm link ../../ && tsc -p tsconfig.json",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:local": "npm link ../../ && npm run build",
+    "build:backend": "tsc",
+    "build:frontend": "tsc -p tsconfig.static.json",
     "start": "node ."
   },
   "dependencies": {
