@@ -1,13 +1,13 @@
-# Backend Access Request demo app
+# Solid Access Requests and Access Grants Demo
 
-## Run the app
+## Run the demo app
 
 - Run `npm ci` and `npm run build` in the current directory to build the demo app.
 - Create a `.env.local` file based on `.env.local.example`.
 - Fill in the required settings following the instructions in `.env.local.example`.
 - Start the app `npm start`.
 
-## Run the app using the local library
+## Run the demo app using the local library
 
 - Instead of `npm run build`, use `npm run build:local` to build the demo app using
   the local `solid-client-access-grant-js` code (instead of the installed dependency
