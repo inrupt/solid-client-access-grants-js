@@ -17,3 +17,4 @@ test-results/
 .vercel
 .virtualenv
 .vscode/settings.json
+coverage
