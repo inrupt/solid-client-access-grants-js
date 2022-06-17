@@ -19,11 +19,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { AccessBaseOptions } from "../type/AccessBaseOptions";
-import type { AccessGrant } from "../type/AccessGrant";
-
 import { UrlString } from "@inrupt/solid-client";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
+import type { AccessBaseOptions } from "../type/AccessBaseOptions";
+import type { AccessGrant } from "../type/AccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { getSessionFetch } from "../util/getSessionFetch";

@@ -19,15 +19,14 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+// eslint-disable-next-line camelcase
+import { UrlString, WebId, acp_v4 } from "@inrupt/solid-client";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
 import type { AccessGrantParameters } from "../type/Parameter";
 import type { AccessModes } from "../type/AccessModes";
 import type { AccessGrant } from "../type/AccessGrant";
-
-// eslint-disable-next-line camelcase
-import { UrlString, WebId, acp_v4 } from "@inrupt/solid-client";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import {

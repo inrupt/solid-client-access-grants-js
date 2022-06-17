@@ -19,13 +19,12 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { AccessGrant } from "../type/AccessGrant";
-
 import { UrlString } from "@inrupt/solid-client";
 import {
   getVerifiableCredential,
   isVerifiableCredential,
 } from "@inrupt/solid-client-vc";
+import type { AccessGrant } from "../type/AccessGrant";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessVcBody } from "../guard/isBaseAccessVcBody";
 import {

@@ -762,13 +762,6 @@ describe("approveAccessRequest", () => {
   it("throws if the returned VC is not an Access Grant using the deprecated signature", async () => {
     mockAcpClient();
     mockAccessApiEndpoint();
-    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      issueVerifiableCredential: () => unknown;
-    };
-    const spiedIssueRequest = jest.spyOn(
-      mockedVcModule,
-      "issueVerifiableCredential"
-    );
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
