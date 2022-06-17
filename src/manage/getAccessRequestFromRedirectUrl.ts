@@ -23,7 +23,6 @@ import { UrlString } from "@inrupt/solid-client";
 import {
   isVerifiableCredential,
   getVerifiableCredential,
-  VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import {
   REDIRECT_URL_PARAM_NAME,
@@ -31,7 +30,7 @@ import {
   REQUEST_VC_URL_PARAM_NAME,
 } from "../discover/redirectToAccessManagementUi";
 import { isAccessRequest } from "../guard/isAccessRequest";
-import { AccessRequestBody } from "../type/AccessVerifiableCredential";
+import type { AccessRequest } from "../type/AccessRequest";
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
@@ -50,7 +49,7 @@ export async function getAccessRequestFromRedirectUrl(
   redirectUrl: UrlString,
   options: { fetch?: typeof fetch } = {}
 ): Promise<{
-  accessRequest: VerifiableCredential & AccessRequestBody;
+  accessRequest: AccessRequest;
   requestorRedirectUrl: UrlString;
 }> {
   const redirectUrlObj = new URL(redirectUrl);

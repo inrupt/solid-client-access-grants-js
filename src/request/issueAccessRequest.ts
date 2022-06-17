@@ -27,7 +27,7 @@ import type {
   DeprecatedAccessRequestParameters,
   IssueAccessRequestParameters,
 } from "../type/IssueAccessRequestParameters";
-import { AccessRequestBody } from "../type/AccessVerifiableCredential";
+import type { AccessRequest } from "../type/AccessRequest";
 import { isAccessRequest } from "../guard/isAccessRequest";
 
 /**
@@ -41,18 +41,18 @@ import { isAccessRequest } from "../guard/isAccessRequest";
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential & AccessRequestBody>;
+): Promise<AccessRequest>;
 /**
  * @deprecated Please remove the `requestor` parameter.
  */
 async function issueAccessRequest(
   params: DeprecatedAccessRequestParameters,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential & AccessRequestBody>;
+): Promise<AccessRequest>;
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options: AccessBaseOptions = {}
-): Promise<VerifiableCredential & AccessRequestBody> {
+): Promise<AccessRequest> {
   const requestBody = getRequestBody({
     ...params,
     status: GC_CONSENT_STATUS_REQUESTED,
