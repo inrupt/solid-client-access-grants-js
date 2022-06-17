@@ -22,7 +22,7 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 // eslint-disable-next-line no-shadow
 import { it, jest, describe, expect } from "@jest/globals";
-import { mockAccessRequestVc } from "../manage/approveAccessRequest.mock";
+import { mockAccessRequestVc } from "../util/access.mock";
 import { getFile } from "./getFile";
 import { fetchWithVc } from "../fetch";
 
