@@ -50,11 +50,8 @@ export async function getResourceFromAccessGrantUrl(
   /**
    * Retrieve the URL of a resource to which access was granted.
    */
-  const targetResource = (
-    accessGrant.credentialSubject.providedConsent as {
-      forPersonalData: Array<string>;
-    }
-  ).forPersonalData[0];
+  const targetResource =
+    accessGrant.credentialSubject.providedConsent.forPersonalData[0];
 
   /**
    * Retrieve a resource using an Access Grant.
