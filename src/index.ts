@@ -19,6 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+export type { AccessGrant } from "./type/AccessGrant";
 export type { AccessBaseOptions } from "./type/AccessBaseOptions";
 export type { AccessCredentialType } from "./type/AccessCredentialType";
 export type { AccessGrantContext } from "./type/AccessGrantContext";

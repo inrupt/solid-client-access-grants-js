@@ -19,6 +19,12 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import type { AccessBaseOptions } from "../type/AccessBaseOptions";
+import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
+import type { AccessGrantParameters } from "../type/Parameter";
+import type { AccessModes } from "../type/AccessModes";
+import type { AccessGrant } from "../type/AccessGrant";
+
 // eslint-disable-next-line camelcase
 import { UrlString, WebId, acp_v4 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
@@ -31,14 +37,9 @@ import {
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
-import { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { AccessGrantBody } from "../type/AccessVerifiableCredential";
-import { AccessGrantParameters } from "../type/Parameter";
-import { AccessModes } from "../type/AccessModes";
 import { isAccessGrant } from "../guard/isAccessGrant";
-import { isBaseAccessVcBody } from "../guard/isBaseAccessVcBody";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 
 export type ApproveAccessRequestOverrides = Omit<
@@ -161,7 +162,7 @@ export async function approveAccessRequest(
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential & AccessGrantBody>;
+): Promise<AccessGrant>;
 
 /**
  * Approve an access request. The content of the approved access request is provided
@@ -178,7 +179,7 @@ export async function approveAccessRequest(
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential & AccessGrantBody>;
+): Promise<AccessGrant>;
 
 /**
  * @deprecated Please remove the `resourceOwner` parameter.
@@ -190,7 +191,7 @@ export async function approveAccessRequest(
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential & AccessGrantBody>;
+): Promise<AccessGrant>;
 
 /**
  * @deprecated Please remove the `resourceOwner` parameter.
@@ -202,7 +203,7 @@ export async function approveAccessRequest(
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential & AccessGrantBody>;
+): Promise<AccessGrant>;
 export async function approveAccessRequest(
   resourceOwnerOrRequestVc:
     | WebId
@@ -219,7 +220,7 @@ export async function approveAccessRequest(
     | Partial<ApproveAccessRequestOverrides>
     | AccessBaseOptions,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential & AccessGrantBody> {
+): Promise<AccessGrant> {
   if (typeof options === "object") {
     // The deprecated signature is being used, so ignore the first parameter.
     const accessGrant = await internal_approveAccessRequest(
