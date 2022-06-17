@@ -20,11 +20,11 @@
 //
 
 /* eslint-disable camelcase, import/no-unresolved */
+import { GRANT_VC_URL_PARAM_NAME } from "@inrupt/solid-client-access-grants";
 import {
   ACCESS_GRANT_FETCHER_PATHNAME,
   RESOURCE_FETCHER_PATHNAME,
 } from "./constants.js";
-import {GRANT_VC_URL_PARAM_NAME } from "@inrupt/solid-client-access-grants";
 
 const accessGrantParam = GRANT_VC_URL_PARAM_NAME;
 

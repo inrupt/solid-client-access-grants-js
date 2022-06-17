@@ -2,7 +2,7 @@
 
 ## Run the demo app
 
-- Run `npm ci` and `npm run build` in the current directory to build the demo app.
+- Run `npm ci` and `npm run build` in the current directory (/examples/solid-client-access-grants-demo/) to build the demo app.
 - Create a `.env.local` file based on `.env.local.example`.
 - Fill in the required settings following the instructions in `.env.local.example`.
 - Start the app `npm start`.
