@@ -60,10 +60,12 @@ export default [
   },
   {
     input: [
+      "./src/type/AccessGrant.ts",
       "./src/type/AccessBaseOptions.ts",
       "./src/type/AccessCredentialType.ts",
       "./src/type/AccessGrantContext.ts",
       "./src/type/AccessModes.ts",
+      "./src/type/AccessRequest.ts",
       "./src/type/AccessVerifiableCredential.ts",
       "./src/type/FetchOptions.ts",
       "./src/type/GConsentStatus.ts",
