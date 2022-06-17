@@ -26,7 +26,7 @@ Let X be a resource Alice owns (it is a resource in Alice's Pod).
 3. Alice wants to share access to X with ACME.
 4. Alice fills ACME's create Access Request form.
 5. The application needs to know:
-   - Alice's WebID in order for Alice to have access to ACME's Access Request, and,
+   - Alice's WebID in order for Alice to have access to ACME's Access Request,
    - the URI of the resource Alice intends to share.
 6. ACME's server uses its client credentials to obtain a session.
 7. ACME's server discovers the VC endpoint via the resource URI.
