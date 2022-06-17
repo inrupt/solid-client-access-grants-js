@@ -24,8 +24,8 @@
 import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { jest, describe, it, expect } from "@jest/globals";
 import { revokeAccessGrant } from "./revokeAccessGrant";
-import { mockAccessGrant, MOCKED_CREDENTIAL_ID } from "../request/request.mock";
-import { mockAccessRequestVc } from "./approveAccessRequest.mock";
+import { MOCKED_CREDENTIAL_ID } from "../request/request.mock";
+import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
@@ -40,7 +40,7 @@ describe("revokeAccessGrant", () => {
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify(
-            mockAccessGrant("https://some.issuer", "https://some.subject")
+            mockAccessGrantVc("https://some.issuer", "https://some.subject")
           )
         )
       );
@@ -74,7 +74,7 @@ describe("revokeAccessGrant", () => {
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify(
-            mockAccessGrant("https://some.issuer", "https://some.subject")
+            mockAccessGrantVc("https://some.issuer", "https://some.subject")
           )
         )
       );
@@ -98,7 +98,7 @@ describe("revokeAccessGrant", () => {
       mockedVcModule,
       "revokeVerifiableCredential"
     );
-    const mockedVc = mockAccessGrant(
+    const mockedVc = mockAccessGrantVc(
       "https://some.issuer",
       "https://some.subject"
     );
@@ -144,7 +144,7 @@ describe("revokeAccessGrant", () => {
     );
     const mockedFetch = jest.fn(global.fetch);
     await revokeAccessGrant(
-      mockAccessGrant("https://some.issuer", "https://some.subject"),
+      mockAccessGrantVc("https://some.issuer", "https://some.subject"),
       {
         fetch: mockedFetch,
       }
