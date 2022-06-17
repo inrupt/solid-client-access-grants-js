@@ -22,7 +22,7 @@
 /* eslint-disable no-shadow */
 import { jest, it, describe, expect } from "@jest/globals";
 import { denyAccessRequest } from "./denyAccessRequest";
-import { mockAccessRequestVc } from "./approveAccessRequest.mock";
+import { mockAccessRequestVc } from "../util/access.mock";
 import {
   mockAccessApiEndpoint,
   MOCKED_ACCESS_ISSUER,

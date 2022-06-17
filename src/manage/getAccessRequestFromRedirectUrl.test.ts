@@ -23,7 +23,7 @@
 import { describe, it, jest, expect } from "@jest/globals";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
 import { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
-import { mockAccessGrantVc } from "./approveAccessRequest.mock";
+import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import { getSessionFetch } from "../util/getSessionFetch";
 
 jest.mock("../util/getSessionFetch");
@@ -75,7 +75,9 @@ describe("getAccessRequestFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(
+      mockAccessRequestVc()
+    );
 
     const redirectedToUrl = new URL("https://redirect.url");
     redirectedToUrl.searchParams.append(
@@ -104,7 +106,9 @@ describe("getAccessRequestFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(
+      mockAccessRequestVc()
+    );
 
     const redirectedToUrl = new URL("https://redirect.url");
     redirectedToUrl.searchParams.append(
@@ -134,7 +138,9 @@ describe("getAccessRequestFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(
+      mockAccessRequestVc()
+    );
 
     const redirectedToUrl = new URL("https://redirect.url");
     redirectedToUrl.searchParams.append(
@@ -148,8 +154,31 @@ describe("getAccessRequestFromRedirectUrl", () => {
 
     const { accessRequest, requestorRedirectUrl } =
       await getAccessRequestFromRedirectUrl(redirectedToUrl.href);
-    expect(accessRequest).toStrictEqual(mockAccessGrantVc());
+    expect(accessRequest).toStrictEqual(mockAccessRequestVc());
     expect(requestorRedirectUrl).toBe("https://requestor.redirect.url");
+  });
+
+  it("throws if the fetched VC is not an Access Request", async () => {
+    const vcModule = jest.requireMock(
+      "@inrupt/solid-client-vc"
+    ) as jest.Mocked<{
+      getVerifiableCredential: typeof getVerifiableCredential;
+    }>;
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
+
+    const redirectedToUrl = new URL("https://redirect.url");
+    redirectedToUrl.searchParams.append(
+      "requestVcUrl",
+      encodeURI("https://some.vc")
+    );
+    redirectedToUrl.searchParams.append(
+      "redirectUrl",
+      encodeURI("https://requestor.redirect.url")
+    );
+
+    await expect(
+      getAccessRequestFromRedirectUrl(redirectedToUrl.href)
+    ).rejects.toThrow();
   });
 
   it("supports the legacy approach of providing the VC as a value", async () => {
@@ -162,7 +191,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.append(
       "requestVc",
-      btoa(JSON.stringify(mockAccessGrantVc()))
+      btoa(JSON.stringify(mockAccessRequestVc()))
     );
     redirectUrl.searchParams.append(
       "redirectUrl",
@@ -172,7 +201,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
     const { accessRequest } = await getAccessRequestFromRedirectUrl(
       redirectUrl.href
     );
-    expect(accessRequest).toStrictEqual(mockAccessGrantVc());
+    expect(accessRequest).toStrictEqual(mockAccessRequestVc());
     // When the VC is passed as a value, nothing needs to be dereferenced.
     expect(vcModule.getVerifiableCredential).not.toHaveBeenCalled();
   });
