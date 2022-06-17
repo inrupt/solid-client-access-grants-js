@@ -30,13 +30,12 @@ import { issueAccessRequest } from "./issueAccessRequest";
 import { getRequestBody } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import {
-  mockAccessGrant,
   mockAccessApiEndpoint,
   MOCKED_ACCESS_ISSUER,
-  MOCK_REQUESTOR_IRI,
   MOCK_REQUESTOR_INBOX,
   MOCK_RESOURCE_OWNER_IRI,
 } from "./request.mock";
+import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import { ACCESS_GRANT_CONTEXT } from "../constants";
 
 jest.mock("@inrupt/solid-client", () => {
@@ -133,11 +132,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential"
     );
-    mockedIssue.mockResolvedValueOnce(
-      mockAccessGrant(MOCKED_ACCESS_ISSUER, MOCK_REQUESTOR_IRI, {
-        someClaim: "some value",
-      })
-    );
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
 
     await issueAccessRequest(
       {
@@ -168,6 +163,31 @@ describe("issueAccessRequest", () => {
     );
   });
 
+  it("throws if the VC returned is not an Access Request", async () => {
+    mockAccessApiEndpoint();
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
+
+    await expect(
+      issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+          resources: ["https://some.pod/resource"],
+          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+        },
+        {
+          fetch: jest.fn(),
+        }
+      )
+    ).rejects.toThrow();
+  });
+
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
@@ -176,6 +196,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential"
     );
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
     // TypeScript can't infer the type of mock modules imported via Jest;
     // skip type checking for those:
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -206,11 +227,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential"
     );
-    mockedIssue.mockResolvedValueOnce(
-      mockAccessGrant(MOCKED_ACCESS_ISSUER, MOCK_REQUESTOR_IRI, {
-        someClaim: "some value",
-      })
-    );
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
 
     await issueAccessRequest(
       {
@@ -255,11 +272,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential"
     );
-    mockedIssue.mockResolvedValueOnce(
-      mockAccessGrant(MOCKED_ACCESS_ISSUER, MOCK_REQUESTOR_IRI, {
-        someClaim: "some value",
-      })
-    );
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
 
     await issueAccessRequest({
       access: { read: true },
@@ -295,6 +308,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential"
     );
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
     // TypeScript can't infer the type of mock modules imported via Jest;
     // skip type checking for those:
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

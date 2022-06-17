@@ -20,12 +20,11 @@
 //
 
 import { UrlString } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
+import type { AccessBaseOptions } from "../type/AccessBaseOptions";
+import type { AccessGrant } from "../type/AccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 import { isAccessGrant } from "../guard/isAccessGrant";
-import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
-import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
@@ -39,7 +38,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
 export async function getAccessGrant(
   accessGrantVcUrl: UrlString | URL,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential & AccessGrantBody> {
+): Promise<AccessGrant> {
   const sessionFetch = await getSessionFetch(options ?? {});
   const vcUrl =
     typeof accessGrantVcUrl === "string"

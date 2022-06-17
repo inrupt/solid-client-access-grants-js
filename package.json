@@ -78,7 +78,7 @@
   },
   "devDependencies": {
     "@inrupt/eslint-config-base": "^0.4.0",
-    "@inrupt/eslint-config-lib": "^0.4.0",
+    "@inrupt/eslint-config-lib": "^0.4.1",
     "@inrupt/solid-client-authn-browser": "^1.11.5",
     "@inrupt/solid-client-authn-node": "^1.11.5",
     "@playwright/test": "^1.18.1",
@@ -95,7 +95,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-jest": "^26.0.0",
+    "eslint-plugin-jest": "^26.1.4",
     "eslint-plugin-license-header": "^0.4.0",
     "eslint-plugin-prettier": "^4.0.0",
     "fast-check": "^2.17.0",
@@ -122,6 +122,9 @@
   },
   "resolutions": {
     "glob-parent": "^5.1.2"
+  },
+  "overrides": {
+    "eslint-plugin-jest@23.13.2": "26.1.4"
   },
   "publishConfig": {
     "access": "public"

@@ -25,7 +25,13 @@ import {
   BaseGrantBody,
   BaseRequestBody,
 } from "../type/AccessVerifiableCredential";
-import { ACCESS_GRANT_CONTEXT } from "../constants";
+import {
+  ACCESS_GRANT_CONTEXT,
+  CREDENTIAL_TYPE_ACCESS_GRANT,
+  CREDENTIAL_TYPE_ACCESS_REQUEST,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+  GC_CONSENT_STATUS_REQUESTED,
+} from "../constants";
 import { ResourceAccessMode } from "../type/ResourceAccessMode";
 
 export const mockAccessRequestVc = (
@@ -41,7 +47,7 @@ export const mockAccessRequestVc = (
       id: "https://some.requestor",
       hasConsent: {
         forPersonalData: options?.resources ?? ["https://some.resource"],
-        hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+        hasStatus: GC_CONSENT_STATUS_REQUESTED,
         mode: options?.modes ?? ["http://www.w3.org/ns/auth/acl#Read"],
         isConsentForDataSubject: "https://some.pod/profile#you",
       },
@@ -50,32 +56,35 @@ export const mockAccessRequestVc = (
     issuanceDate: "2022-02-22",
     issuer: "https://some.issuer",
     proof: {
-      created: "some ISO date",
+      created: "2022-06-08T15:28:51.810Z",
       proofPurpose: "some proof purpose",
       proofValue: "some proof",
       type: "some proof type",
       verificationMethod: "some method",
     },
-    type: ["SolidAccessRequest"],
+    type: [CREDENTIAL_TYPE_ACCESS_REQUEST],
   };
 };
 
-export const mockAccessGrantVc = (): VerifiableCredential & BaseGrantBody => {
+export const mockAccessGrantVc = (
+  issuer = "https://some.issuer",
+  subjectId = "https://some.resource.owner"
+): VerifiableCredential & BaseGrantBody => {
   return {
     "@context": ACCESS_GRANT_CONTEXT,
     id: "https://some.credential",
     credentialSubject: {
-      id: "https://some.resource.owner",
+      id: subjectId,
       providedConsent: {
         forPersonalData: ["https://some.resource"],
-        hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+        hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
         mode: ["http://www.w3.org/ns/auth/acl#Read"],
         isProvidedTo: "https://some.requestor",
       },
       inbox: "https://some.inbox",
     },
     issuanceDate: "1965-08-28",
-    issuer: "https://some.issuer",
+    issuer,
     proof: {
       created: "2021-10-05",
       proofPurpose: "some proof purpose",
@@ -83,14 +92,13 @@ export const mockAccessGrantVc = (): VerifiableCredential & BaseGrantBody => {
       type: "some proof type",
       verificationMethod: "some method",
     },
-    type: ["SolidAccessRequest"],
+    type: [CREDENTIAL_TYPE_ACCESS_GRANT],
   };
 };
 
 export const mockConsentRequestVc = (): VerifiableCredential &
   BaseRequestBody => {
-  const requestVc = mockAccessRequestVc() as unknown as VerifiableCredential &
-    BaseRequestBody;
+  const requestVc = mockAccessRequestVc();
   requestVc.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
   requestVc.expirationDate = new Date(2021, 8, 14).toISOString();
   requestVc.issuanceDate = new Date(2021, 8, 13).toISOString();
@@ -98,8 +106,7 @@ export const mockConsentRequestVc = (): VerifiableCredential &
 };
 
 export const mockConsentGrantVc = (): VerifiableCredential & BaseGrantBody => {
-  const requestVc = mockAccessGrantVc() as unknown as VerifiableCredential &
-    BaseGrantBody;
+  const requestVc = mockAccessGrantVc();
   requestVc.credentialSubject.providedConsent.forPurpose = [
     "https://some.purpose",
   ];

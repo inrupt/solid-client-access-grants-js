@@ -22,6 +22,11 @@
 // eslint-disable-next-line camelcase
 import { UrlString, WebId, acp_v4 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { AccessBaseOptions } from "../type/AccessBaseOptions";
+import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
+import type { AccessGrantParameters } from "../type/Parameter";
+import type { AccessModes } from "../type/AccessModes";
+import type { AccessGrant } from "../type/AccessGrant";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import {
@@ -31,12 +36,10 @@ import {
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
-import { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { AccessGrantBody } from "../type/AccessVerifiableCredential";
-import { AccessGrantParameters } from "../type/Parameter";
-import { AccessModes } from "../type/AccessModes";
+import { isAccessGrant } from "../guard/isAccessGrant";
+import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 
 export type ApproveAccessRequestOverrides = Omit<
   AccessGrantParameters,
@@ -158,7 +161,7 @@ export async function approveAccessRequest(
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential>;
+): Promise<AccessGrant>;
 
 /**
  * Approve an access request. The content of the approved access request is provided
@@ -175,7 +178,7 @@ export async function approveAccessRequest(
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential>;
+): Promise<AccessGrant>;
 
 /**
  * @deprecated Please remove the `resourceOwner` parameter.
@@ -187,7 +190,7 @@ export async function approveAccessRequest(
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential>;
+): Promise<AccessGrant>;
 
 /**
  * @deprecated Please remove the `resourceOwner` parameter.
@@ -199,7 +202,7 @@ export async function approveAccessRequest(
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential>;
+): Promise<AccessGrant>;
 export async function approveAccessRequest(
   resourceOwnerOrRequestVc:
     | WebId
@@ -216,20 +219,47 @@ export async function approveAccessRequest(
     | Partial<ApproveAccessRequestOverrides>
     | AccessBaseOptions,
   options?: AccessBaseOptions
-): Promise<VerifiableCredential> {
+): Promise<AccessGrant> {
   if (typeof options === "object") {
     // The deprecated signature is being used, so ignore the first parameter.
-    return internal_approveAccessRequest(
+    const accessGrant = await internal_approveAccessRequest(
       requestVcOrOverride as VerifiableCredential | URL | UrlString,
       requestOverrideOrOptions as Partial<ApproveAccessRequestOverrides>,
       options
     );
+
+    if (
+      !isBaseAccessGrantVerifiableCredential(accessGrant) ||
+      !isAccessGrant(accessGrant)
+    ) {
+      throw new Error(
+        `Unexpected response when approving Access Request, the result is not an Access Grant: ${JSON.stringify(
+          accessGrant
+        )}`
+      );
+    }
+
+    return accessGrant;
   }
-  return internal_approveAccessRequest(
+
+  const accessGrant = await internal_approveAccessRequest(
     resourceOwnerOrRequestVc as VerifiableCredential | URL | UrlString,
     requestVcOrOverride as Partial<ApproveAccessRequestOverrides>,
     requestOverrideOrOptions as AccessBaseOptions
   );
+
+  if (
+    !isBaseAccessGrantVerifiableCredential(accessGrant) ||
+    !isAccessGrant(accessGrant)
+  ) {
+    throw new Error(
+      `Unexpected response when approving Access Request, the result is not an Access Grant: ${JSON.stringify(
+        accessGrant
+      )}`
+    );
+  }
+
+  return accessGrant;
 }
 
 export default approveAccessRequest;

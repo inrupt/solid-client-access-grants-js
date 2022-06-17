@@ -5,7 +5,7 @@ module.exports = {
   clearMocks: true,
   injectGlobals: false,
   collectCoverage: true,
-  coverageReporters: ["text"],
+  coverageReporters: process.env.CI ? ["text", "lcov"] : ["text"],
   coverageThreshold: {
     global: {
       branches: 100,
