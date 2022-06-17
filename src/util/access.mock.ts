@@ -26,7 +26,7 @@ import {
   BaseRequestBody,
 } from "../type/AccessVerifiableCredential";
 import {
-  ACCESS_GRANT_CONTEXT,
+  ACCESS_GRANT_CONTEXT_DEFAULT,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_REQUEST,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
@@ -41,7 +41,7 @@ export const mockAccessRequestVc = (
   }>
 ): VerifiableCredential & BaseRequestBody => {
   return {
-    "@context": ACCESS_GRANT_CONTEXT,
+    "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
     id: "https://some.credential",
     credentialSubject: {
       id: "https://some.requestor",
@@ -71,7 +71,7 @@ export const mockAccessGrantVc = (
   subjectId = "https://some.resource.owner"
 ): VerifiableCredential & BaseGrantBody => {
   return {
-    "@context": ACCESS_GRANT_CONTEXT,
+    "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
     id: "https://some.credential",
     credentialSubject: {
       id: subjectId,

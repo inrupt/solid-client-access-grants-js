@@ -19,6 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { ACCESS_GRANT_CONTEXT } from "../constants";
+import type { ACCESS_GRANT_CONTEXT_DEFAULT } from "../constants";
 
-export type AccessGrantContext = typeof ACCESS_GRANT_CONTEXT;
+export type AccessGrantContext = typeof ACCESS_GRANT_CONTEXT_DEFAULT;

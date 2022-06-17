@@ -19,9 +19,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { ACCESS_GRANT_CONTEXT } from "../constants";
+import { ACCESS_GRANT_CONTEXT_DEFAULT } from "../constants";
 import { AccessGrantContext } from "../type/AccessGrantContext";
 
 export function isAccessGrantContext(x: unknown): x is AccessGrantContext {
-  return Array.isArray(x) && ACCESS_GRANT_CONTEXT.every((y) => x.includes(y));
+  return Array.isArray(x) && ACCESS_GRANT_CONTEXT_DEFAULT.every((y) => x.includes(y));
 }
