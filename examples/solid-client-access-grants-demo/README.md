@@ -18,7 +18,7 @@
 
 Let the application be ACME.
 Let the user be Alice.
-Let the access management app be PodBrowser).
+Let the access management app be PodBrowser.
 Let X be a resource Alice owns (it is a resource in Alice's Pod).
 
 1. ACME has a WebID and a set of client credentials.
