@@ -31,6 +31,7 @@ import {
 } from "./static/constants";
 import { getAccessGrantFromUrl } from "./routes/getAccessGrantFromUrl";
 import { getResourceFromRedirectUrl } from "./routes/getResourceFromRedirectUrl";
+import "./polyfill/node14";
 
 // Load env
 config();
