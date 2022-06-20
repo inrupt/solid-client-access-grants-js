@@ -7,7 +7,6 @@
   - run `npm ci` and `npm run build` in the root repository to make sure the library is built,
   - run `npm ci` and `npm run build:local` in the current directory to build the demo app.
 
-
 ## Run the two services
 
 - Create a `.env.local` file based on `.env.local.example`. You'll need two client ID/secret pair
@@ -20,7 +19,6 @@
   - `node dist/grant-access.js`
 - (Optional) Alternatively, you can use Podbrowser as an access management app. In that case,
   make sure to edit `src/request-access.ts` appropriately.
-
 
 ## Go through the access request flow
 
