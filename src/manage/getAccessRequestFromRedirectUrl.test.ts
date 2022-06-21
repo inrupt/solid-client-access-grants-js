@@ -22,6 +22,8 @@
 // eslint-disable-next-line no-shadow
 import { describe, it, jest, expect } from "@jest/globals";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
+// eslint-disable-next-line no-shadow
+import { btoa } from "node:buffer";
 import { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import { getSessionFetch } from "../util/getSessionFetch";
