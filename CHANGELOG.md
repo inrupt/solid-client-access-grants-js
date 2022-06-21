@@ -9,6 +9,10 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 - `approveAccessRequest`, `getAccessGrant`, `getAccessGrantFromRedirectUrl` now accurately return an `AccessGrant`.
 - `getAccessRequestFromRedirectUrl` now accurately return an `AccessRequest`.
 
+### Bugfix
+
+- Node 14 atob/btoa compatibility issue.
+
 ## [1.0.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v1.0.0) - 2022-06-06
 
 ### New features
