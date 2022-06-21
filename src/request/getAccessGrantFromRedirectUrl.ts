@@ -32,6 +32,7 @@ import {
   GRANT_VC_URL_PARAM_NAME,
 } from "../manage/redirectToRequestor";
 import { getSessionFetch } from "../util/getSessionFetch";
+import { base64url } from "jose";
 
 /**
  * Get the Access Grant out of the incoming redirect from the Access Management app.
@@ -62,7 +63,7 @@ export async function getAccessGrantFromRedirectUrl(
     );
   }
   const accessGrant = accessGrantValue
-    ? JSON.parse(atob(accessGrantValue))
+    ? JSON.parse(base64url.decode(accessGrantValue).toString())
     : await getVerifiableCredential(accessGrantIri as string, {
         fetch: authFetch,
       });

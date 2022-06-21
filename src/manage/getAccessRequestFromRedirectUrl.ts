@@ -32,6 +32,7 @@ import {
 import { isAccessRequest } from "../guard/isAccessRequest";
 import type { AccessRequest } from "../type/AccessRequest";
 import { getSessionFetch } from "../util/getSessionFetch";
+import { base64url } from "jose";
 
 /**
  * Get the Access Request out of the incoming redirect from the Access Management app.
@@ -85,7 +86,7 @@ export async function getAccessRequestFromRedirectUrl(
   // If the value is provided directly, no fetch is required. Providing the value
   // is deprecated though.
   const accessRequest = accessRequestValue
-    ? JSON.parse(atob(accessRequestValue))
+    ? JSON.parse(base64url.decode(accessRequestValue).toString())
     : await getVerifiableCredential(accessRequestIri as string, {
         fetch: authFetch,
       });

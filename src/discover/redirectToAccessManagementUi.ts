@@ -30,6 +30,7 @@ import {
 import { redirectWithParameters } from "../util/redirect";
 import { FetchOptions } from "../type/FetchOptions";
 import { RedirectOptions } from "../type/RedirectOptions";
+import { base64url } from "jose";
 
 // DEPRECATED: the VC should be sent by IRI, and not by value.
 export const REQUEST_VC_PARAM_NAME = "requestVc";
@@ -127,7 +128,7 @@ export async function redirectToAccessManagementUi(
     {
       // DEPRECATED: This should be removed on the next major upgrade. The VC should
       // be passed as an IRI, using the REQUEST_VC_URL_PARAM_NAME query param only.
-      [`${REQUEST_VC_PARAM_NAME}`]: btoa(JSON.stringify(requestVc)),
+      [`${REQUEST_VC_PARAM_NAME}`]: base64url.encode(JSON.stringify(requestVc)),
       [`${REQUEST_VC_URL_PARAM_NAME}`]: encodeURI(requestVc.id),
       [`${REDIRECT_URL_PARAM_NAME}`]: encodeURI(
         typeof redirectUrl === "string" ? redirectUrl : redirectUrl.href

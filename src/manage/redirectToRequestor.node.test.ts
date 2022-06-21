@@ -18,10 +18,31 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-if (!globalThis.atob) {
-  globalThis.atob = (a) => Buffer.from(a, "base64").toString("binary");
-}
 
-if (!globalThis.btoa) {
-  globalThis.btoa = (b) => Buffer.from(b).toString("base64");
-}
+// This rule complains about the `@jest/globals` variables overriding global vars:
+/* eslint-disable no-shadow */
+import {
+  jest,
+  it,
+  describe,
+  expect,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
+
+import { redirectToRequestor } from "./redirectToRequestor";
+
+describe("redirectToRequestor", () => {
+  describe("in a Node environment", () => {
+    it("throws if the callback is undefined", async () => {
+      await expect(
+        redirectToRequestor(
+          "https://some.grant-vc.iri",
+          "https://some.redirect.iri"
+        )
+      ).rejects.toThrow(
+        `In a non-browser environment, a redirectCallback must be provided by the user.`
+      );
+    });
+  });
+});

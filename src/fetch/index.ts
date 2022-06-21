@@ -20,9 +20,9 @@
 //
 
 import { fetch as crossFetch } from "cross-fetch";
+import { base64url } from "jose";
 import type { UrlString } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-
 import type { UmaConfiguration } from "../type/UmaConfiguration";
 import type { FetchOptions } from "../type/FetchOptions";
 
@@ -106,7 +106,7 @@ export async function exchangeTicketForAccessToken(
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: simpleFormUrlEncoded({
-      claim_token: btoa(JSON.stringify(credentialPresentation)),
+      claim_token: base64url.encode(JSON.stringify(credentialPresentation)),
       claim_token_format: VC_CLAIM_TOKEN_TYPE,
       grant_type: UMA_GRANT_TYPE,
       ticket: authTicket,

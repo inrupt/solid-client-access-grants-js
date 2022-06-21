@@ -29,7 +29,6 @@ import {
   redirectToRequestor,
 } from "@inrupt/solid-client-access-grants";
 import { getConfig } from "./getConfig";
-import "./polyfill/node14";
 
 // Load env variables
 const config = getConfig();
