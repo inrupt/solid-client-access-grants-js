@@ -250,7 +250,7 @@ describe("redirectToAccessManagementUi", () => {
       const redirectIri = new URL(redirectCallback.mock.calls[0][0] as string);
       expect(redirectIri.origin).toBe("https://some.access.ui");
       expect(redirectIri.searchParams.get("requestVc")).toBe(
-        base64url.encode(JSON.stringify(mockAccessRequestVc())).toString()
+        base64url.encode(JSON.stringify(mockAccessRequestVc()))
       );
       expect(redirectIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri"

@@ -23,7 +23,7 @@
 import { describe, it, jest, expect } from "@jest/globals";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
 // eslint-disable-next-line no-shadow
-import { btoa } from "node:buffer";
+import { base64url } from "jose";
 import { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import { getSessionFetch } from "../util/getSessionFetch";
@@ -193,7 +193,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.append(
       "requestVc",
-      btoa(JSON.stringify(mockAccessRequestVc()))
+      base64url.encode(JSON.stringify(mockAccessRequestVc()))
     );
     redirectUrl.searchParams.append(
       "redirectUrl",
@@ -212,7 +212,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.append(
       "requestVc",
-      btoa(JSON.stringify({ someJson: "but not a VC" }))
+      base64url.encode(JSON.stringify({ someJson: "but not a VC" }))
     );
     redirectUrl.searchParams.append(
       "redirectUrl",
