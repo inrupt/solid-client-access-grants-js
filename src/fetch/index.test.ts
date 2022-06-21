@@ -32,6 +32,7 @@ import { jest, describe, it, expect } from "@jest/globals";
 // eslint-disable-next-line no-shadow
 import { fetch as crossFetch, Response } from "cross-fetch";
 
+import { base64url } from "jose";
 import {
   parseUMAAuthTicket,
   parseUMAAuthIri,
@@ -41,7 +42,6 @@ import {
   fetchWithVc,
   simpleFormUrlEncoded,
 } from "./index";
-import { base64url } from "jose";
 
 jest.mock("cross-fetch", () => {
   const crossFetchModule = jest.requireActual("cross-fetch") as any;
@@ -171,7 +171,9 @@ describe("exchangeTicketForAccessToken", () => {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: simpleFormUrlEncoded({
-        claim_token: base64url.encode(JSON.stringify({ verifiableCredential: [MOCK_VC] })),
+        claim_token: base64url.encode(
+          JSON.stringify({ verifiableCredential: [MOCK_VC] })
+        ),
         claim_token_format: "https://www.w3.org/TR/vc-data-model/#json-ld",
         grant_type: "urn:ietf:params:oauth:grant-type:uma-ticket",
         ticket: authTicket,

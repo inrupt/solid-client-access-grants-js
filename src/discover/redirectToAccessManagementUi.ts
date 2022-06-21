@@ -21,6 +21,7 @@
 
 import { UrlString, WebId } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { base64url } from "jose";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
 import {
@@ -30,7 +31,6 @@ import {
 import { redirectWithParameters } from "../util/redirect";
 import { FetchOptions } from "../type/FetchOptions";
 import { RedirectOptions } from "../type/RedirectOptions";
-import { base64url } from "jose";
 
 // DEPRECATED: the VC should be sent by IRI, and not by value.
 export const REQUEST_VC_PARAM_NAME = "requestVc";

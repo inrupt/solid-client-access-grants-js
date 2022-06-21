@@ -21,14 +21,7 @@
 
 // This rule complains about the `@jest/globals` variables overriding global vars:
 /* eslint-disable no-shadow */
-import {
-  jest,
-  it,
-  describe,
-  expect,
-  beforeEach,
-  afterEach,
-} from "@jest/globals";
+import { it, describe, expect } from "@jest/globals";
 
 import { redirectToRequestor } from "./redirectToRequestor";
 

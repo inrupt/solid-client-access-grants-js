@@ -29,13 +29,13 @@ import {
   afterEach,
 } from "@jest/globals";
 /* eslint-enable no-shadow */
+import { base64url } from "jose";
 import { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 import {
   getAccessManagementUiFromWellKnown,
   getAccessManagementUi,
 } from "./getAccessManagementUi";
 import { mockAccessRequestVc } from "../util/access.mock";
-import { base64url } from "jose";
 
 jest.mock("./getAccessManagementUi");
 
@@ -272,7 +272,9 @@ describe("redirectToAccessManagementUi", () => {
       await new Promise((resolve) => setImmediate(resolve));
       const targetIri = new URL(window.location.href);
       const encodedVc = targetIri.searchParams.get("requestVc") as string;
-      expect(JSON.parse(base64url.decode(encodedVc).toString())).toStrictEqual(mockAccessRequestVc());
+      expect(JSON.parse(base64url.decode(encodedVc).toString())).toStrictEqual(
+        mockAccessRequestVc()
+      );
     });
   });
 });

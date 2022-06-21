@@ -24,6 +24,7 @@ import {
   isVerifiableCredential,
   getVerifiableCredential,
 } from "@inrupt/solid-client-vc";
+import { base64url } from "jose";
 import {
   REDIRECT_URL_PARAM_NAME,
   REQUEST_VC_PARAM_NAME,
@@ -32,7 +33,6 @@ import {
 import { isAccessRequest } from "../guard/isAccessRequest";
 import type { AccessRequest } from "../type/AccessRequest";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { base64url } from "jose";
 
 /**
  * Get the Access Request out of the incoming redirect from the Access Management app.

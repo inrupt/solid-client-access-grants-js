@@ -22,10 +22,11 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 // eslint-disable-next-line no-shadow
 import { it, jest, describe, expect } from "@jest/globals";
+// eslint-disable-next-line no-shadow
+import { Blob } from "node:buffer";
 import { mockAccessRequestVc } from "../util/access.mock";
 import { getFile } from "./getFile";
 import { fetchWithVc } from "../fetch";
-import { Blob } from "node:buffer";
 
 jest.mock("../fetch");
 jest.mock("@inrupt/solid-client-authn-core");

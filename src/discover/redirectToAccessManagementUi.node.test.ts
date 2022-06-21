@@ -19,23 +19,14 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/* eslint-disable no-shadow */
-import {
-  it,
-  describe,
-  expect,
-  jest,
-  beforeEach,
-  afterEach,
-} from "@jest/globals";
-/* eslint-enable no-shadow */
+// eslint-disable-next-line no-shadow
+import { it, describe, expect, jest } from "@jest/globals";
 import { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 import {
   getAccessManagementUiFromWellKnown,
   getAccessManagementUi,
 } from "./getAccessManagementUi";
 import { mockAccessRequestVc } from "../util/access.mock";
-import { base64url } from "jose";
 
 jest.mock("./getAccessManagementUi");
 
