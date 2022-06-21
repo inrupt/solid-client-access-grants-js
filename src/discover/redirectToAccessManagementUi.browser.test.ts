@@ -29,6 +29,7 @@ import {
   afterEach,
 } from "@jest/globals";
 /* eslint-enable no-shadow */
+import { base64url } from "jose";
 import { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 import {
   getAccessManagementUiFromWellKnown,
@@ -249,7 +250,7 @@ describe("redirectToAccessManagementUi", () => {
       const redirectIri = new URL(redirectCallback.mock.calls[0][0] as string);
       expect(redirectIri.origin).toBe("https://some.access.ui");
       expect(redirectIri.searchParams.get("requestVc")).toBe(
-        btoa(JSON.stringify(mockAccessRequestVc()))
+        base64url.encode(JSON.stringify(mockAccessRequestVc()))
       );
       expect(redirectIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri"
@@ -271,33 +272,8 @@ describe("redirectToAccessManagementUi", () => {
       await new Promise((resolve) => setImmediate(resolve));
       const targetIri = new URL(window.location.href);
       const encodedVc = targetIri.searchParams.get("requestVc") as string;
-      expect(JSON.parse(atob(encodedVc))).toStrictEqual(mockAccessRequestVc());
-    });
-  });
-
-  describe("in a Node environment", () => {
-    const windowSpy = jest.spyOn(window, "window", "get");
-
-    beforeEach(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      windowSpy.mockImplementation(() => undefined);
-    });
-
-    afterEach(() => {
-      windowSpy.mockRestore();
-    });
-
-    it("throws if the window", async () => {
-      mockAccessManagementUiDiscovery("https://some.access.ui");
-      expect(window).toBeUndefined();
-      await expect(
-        redirectToAccessManagementUi(
-          mockAccessRequestVc(),
-          "https://some.redirect.iri"
-        )
-      ).rejects.toThrow(
-        `In a non-browser environment, a redirectCallback must be provided by the user.`
+      expect(JSON.parse(base64url.decode(encodedVc).toString())).toStrictEqual(
+        mockAccessRequestVc()
       );
     });
   });
