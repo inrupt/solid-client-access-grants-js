@@ -22,6 +22,8 @@
 /* eslint @typescript-eslint/no-explicit-any: 0 */
 // eslint-disable-next-line no-shadow
 import { it, jest, describe, expect } from "@jest/globals";
+// eslint-disable-next-line no-shadow
+import { Blob } from "node:buffer";
 import { mockAccessRequestVc } from "../util/access.mock";
 import { getFile } from "./getFile";
 import { fetchWithVc } from "../fetch";
@@ -39,7 +41,7 @@ jest.mock("@inrupt/solid-client", () => {
 describe("getFile", () => {
   it("authenticates using the provided VC", async () => {
     const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
-    const mockedFile = new Blob();
+    const mockedFile = new Blob([]);
     solidClientModule.getFile.mockResolvedValueOnce(mockedFile);
     const mockedFetch = jest.fn() as typeof fetch;
     // TODO: change to mockAccessGrantVc when rebasing

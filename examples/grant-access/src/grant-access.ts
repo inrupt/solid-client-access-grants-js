@@ -53,7 +53,7 @@ app.get("/manage", async (req, res) => {
     await getAccessRequestFromRedirectUrl(
       new URL(req.url, config.grant.href).href,
       {
-        fetch: session.fetch,
+        fetch: session.fetch as typeof fetch,
       }
     );
 
@@ -74,7 +74,7 @@ app.post("/redirect", async (req, res) => {
     JSON.parse(req.body.requestVc),
     undefined,
     {
-      fetch: session.fetch,
+      fetch: session.fetch as typeof fetch,
     }
   );
   const redirectUrl = new URL(decodeURI(req.body.redirectUrl));

@@ -24,6 +24,7 @@ import {
   getVerifiableCredential,
   isVerifiableCredential,
 } from "@inrupt/solid-client-vc";
+import { base64url } from "jose";
 import type { AccessGrant } from "../type/AccessGrant";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessVcBody } from "../guard/isBaseAccessVcBody";
@@ -62,7 +63,7 @@ export async function getAccessGrantFromRedirectUrl(
     );
   }
   const accessGrant = accessGrantValue
-    ? JSON.parse(atob(accessGrantValue))
+    ? JSON.parse(base64url.decode(accessGrantValue).toString())
     : await getVerifiableCredential(accessGrantIri as string, {
         fetch: authFetch,
       });

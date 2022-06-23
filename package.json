@@ -1,7 +1,7 @@
 {
   "name": "@inrupt/solid-client-access-grants",
   "description": "A library for managing access grants in Solid",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "MIT",
   "scripts": {
     "build": "rollup --config rollup.config.js",
@@ -13,7 +13,9 @@
     "lint:check": "npm run lint:eslint && npm run lint:prettier -- --check",
     "lint:eslint": "eslint --config .eslintrc.js \"src/\" \"e2e/\" \"examples/\"",
     "lint:prettier": "prettier \"{src,e2e,examples}/*.{ts,tsx,js,jsx,css}\" \"**/*.{md,mdx,yml}\"",
-    "test": "jest src",
+    "test": "npm run test:unit:browser && npm run test:unit:node",
+    "test:unit:browser": "jest --testPathIgnorePatterns=e2e --testPathIgnorePatterns=node.test.ts",
+    "test:unit:node": "jest --env=node --testPathIgnorePatterns=e2e --testPathIgnorePatterns=browser.test.ts --coverage=false",
     "test:e2e": "jest --config=jest.e2e.config.js e2e/node",
     "test:e2e:browser": "cd e2e/browser/test && playwright test",
     "test:e2e:browser:setup": "cd e2e/browser/testApp && npm ci",
@@ -117,6 +119,7 @@
     "auth-header": "^1.0.0",
     "cross-fetch": "^3.1.4",
     "events": "^3.3.0",
+    "jose": "^4.8.1",
     "parse-link-header": "^2.0.0",
     "rdf-namespaces": "^1.9.2"
   },

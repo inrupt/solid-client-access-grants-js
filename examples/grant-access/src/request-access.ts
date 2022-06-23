@@ -61,7 +61,7 @@ app.post("/request", async (req, res) => {
       resources: [req.body.resource],
     },
     {
-      fetch: session.fetch,
+      fetch: session.fetch as typeof fetch,
       accessEndpoint: "https://vc.inrupt.com",
     }
   );
@@ -101,7 +101,7 @@ app.get("/redirect", async (req, res) => {
   const accessGrant = await getAccessGrantFromRedirectUrl(
     new URL(req.url, config.request.href).toString(),
     {
-      fetch: session.fetch,
+      fetch: session.fetch as typeof fetch,
     }
   );
   const targetResource = (
@@ -110,7 +110,7 @@ app.get("/redirect", async (req, res) => {
     }
   ).forPersonalData[0];
   const file = await getFile(targetResource, accessGrant, {
-    fetch: session.fetch,
+    fetch: session.fetch as typeof fetch,
   });
   const fileContent = await file.text();
 

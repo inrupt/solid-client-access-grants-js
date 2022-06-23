@@ -2,8 +2,10 @@
 
 ## Install and build
 
-- Run `npm ci` and `npm run build` in the root repository to make sure the library is built.
-- Run `npm ci` and `npm run build` in the current directory to build the demo app
+- Run `npm ci` and `npm run build` in the current directory to build the demo app.
+- (Optional, requires node16+) Run the app using the local repository's code:
+  - run `npm ci` and `npm run build` in the root repository to make sure the library is built,
+  - run `npm ci` and `npm run build:local` in the current directory to build the demo app.
 
 ## Run the two services
 
@@ -11,10 +13,12 @@
   statically registered at your Solid-OIDC provider of choice: one for the resource
   owner, and one for the requestor. For instance, you can register clients at
   [Inrupt's app registration page](https://broker.pod.inrupt.com/registration.html).
-- Run `node dist/request-access.js`
-- (Optional) Run `node dist/grant-access.js`. Alternatively, you can use Podbrowser
-  as an access management app. In that case, make sure to edit `src/request-access.ts`
-  appropriately.
+- Run `npm start`
+- (Optional) Run the services separately:
+  - `node dist/request-access.js`
+  - `node dist/grant-access.js`
+- (Optional) Alternatively, you can use Podbrowser as an access management app. In that case,
+  make sure to edit `src/request-access.ts` appropriately.
 
 ## Go through the access request flow
 

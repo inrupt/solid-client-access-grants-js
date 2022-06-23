@@ -21,6 +21,7 @@
 
 import { UrlString, WebId } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { base64url } from "jose";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
 import {
@@ -127,7 +128,7 @@ export async function redirectToAccessManagementUi(
     {
       // DEPRECATED: This should be removed on the next major upgrade. The VC should
       // be passed as an IRI, using the REQUEST_VC_URL_PARAM_NAME query param only.
-      [`${REQUEST_VC_PARAM_NAME}`]: btoa(JSON.stringify(requestVc)),
+      [`${REQUEST_VC_PARAM_NAME}`]: base64url.encode(JSON.stringify(requestVc)),
       [`${REQUEST_VC_URL_PARAM_NAME}`]: encodeURI(requestVc.id),
       [`${REDIRECT_URL_PARAM_NAME}`]: encodeURI(
         typeof redirectUrl === "string" ? redirectUrl : redirectUrl.href

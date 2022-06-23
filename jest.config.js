@@ -14,11 +14,4 @@ module.exports = {
       statements: 100,
     },
   },
-  coveragePathIgnorePatterns: ["/node_modules/", "<rootDir>/dist"],
-  testPathIgnorePatterns: [
-    "/node_modules/",
-    // By default we only run unit tests:
-    "/src/e2e-node/",
-    "/src/e2e-browser/",
-  ],
 };

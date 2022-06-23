@@ -24,6 +24,7 @@ import {
   isVerifiableCredential,
   getVerifiableCredential,
 } from "@inrupt/solid-client-vc";
+import { base64url } from "jose";
 import {
   REDIRECT_URL_PARAM_NAME,
   REQUEST_VC_PARAM_NAME,
@@ -85,7 +86,7 @@ export async function getAccessRequestFromRedirectUrl(
   // If the value is provided directly, no fetch is required. Providing the value
   // is deprecated though.
   const accessRequest = accessRequestValue
-    ? JSON.parse(atob(accessRequestValue))
+    ? JSON.parse(base64url.decode(accessRequestValue).toString())
     : await getVerifiableCredential(accessRequestIri as string, {
         fetch: authFetch,
       });
