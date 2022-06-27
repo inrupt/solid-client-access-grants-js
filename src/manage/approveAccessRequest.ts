@@ -20,7 +20,7 @@
 //
 
 // eslint-disable-next-line camelcase
-import { UrlString, WebId, acp_v4 } from "@inrupt/solid-client";
+import { UrlString, WebId, acp_ess_2 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
@@ -64,17 +64,21 @@ async function addVcMatcher(
 ) {
   return Promise.all(
     targetResources.map(async (targetResource) => {
-      const resourceInfo = await acp_v4.getResourceInfoWithAcr(
+      // eslint-disable-next-line camelcase
+      const resourceInfo = await acp_ess_2.getResourceInfoWithAcr(
         targetResource,
         options
       );
-      if (!acp_v4.hasAccessibleAcr(resourceInfo)) {
+      // eslint-disable-next-line camelcase
+      if (!acp_ess_2.hasAccessibleAcr(resourceInfo)) {
         throw new Error(
           "The current user does not have access to the resource's Access Control Resource. Either they have insufficiant credentials, or the resource is not controlled using ACP. In either case, an Access Grant cannot be issued."
         );
       }
-      const updatedResource = acp_v4.setVcAccess(resourceInfo, accessMode);
-      return acp_v4.saveAcrFor(updatedResource, options);
+      // eslint-disable-next-line camelcase
+      const updatedResource = acp_ess_2.setVcAccess(resourceInfo, accessMode);
+      // eslint-disable-next-line camelcase
+      return acp_ess_2.saveAcrFor(updatedResource, options);
     })
   );
 }

@@ -79,8 +79,8 @@
     "url": "https://github.com/inrupt/solid-client-access-grants-js.git"
   },
   "devDependencies": {
-    "@inrupt/eslint-config-base": "^0.4.0",
-    "@inrupt/eslint-config-lib": "^0.4.1",
+    "@inrupt/eslint-config-base": "^1.0.0",
+    "@inrupt/eslint-config-lib": "^1.0.0",
     "@inrupt/solid-client-authn-browser": "^1.11.5",
     "@inrupt/solid-client-authn-node": "^1.11.5",
     "@playwright/test": "^1.18.1",
@@ -89,11 +89,11 @@
     "@types/dotenv-flow": "^3.1.0",
     "@types/jest": "^27.4.0",
     "@types/parse-link-header": "^2.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.14.0",
-    "@typescript-eslint/parser": "^5.10.1",
+    "@typescript-eslint/eslint-plugin": "^5.29.0",
+    "@typescript-eslint/parser": "^5.29.0",
     "dotenv-flow": "^3.2.0",
-    "eslint": "^7.29.0",
-    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint": "^8.18.0",
+    "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-header": "^3.1.1",
     "eslint-plugin-import": "^2.23.4",
@@ -113,7 +113,7 @@
     "typescript": "^4.3.4"
   },
   "dependencies": {
-    "@inrupt/solid-client": "^1.18.0",
+    "@inrupt/solid-client": "^1.23.1",
     "@inrupt/solid-client-authn-core": "^1.11.2",
     "@inrupt/solid-client-vc": "^0.5.0",
     "auth-header": "^1.0.0",
@@ -125,9 +125,6 @@
   },
   "resolutions": {
     "glob-parent": "^5.1.2"
-  },
-  "overrides": {
-    "eslint-plugin-jest@23.13.2": "26.1.4"
   },
   "publishConfig": {
     "access": "public"

@@ -51,5 +51,5 @@ export async function redirectWithParameters(
   // This redirects the user away from the app, so unless it throws an error,
   // there is no code that should run afterwards (since there is no "after" in
   // script's lifetime). Hence, this Promise never resolves:
-  return new Promise(() => undefined);
+  return new Promise(() => {});
 }
