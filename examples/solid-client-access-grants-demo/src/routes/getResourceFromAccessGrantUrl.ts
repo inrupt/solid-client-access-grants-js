@@ -44,7 +44,7 @@ export async function getResourceFromAccessGrantUrl(
    * Retrieve an Access Grant issued to the application.
    */
   const accessGrant = await getAccessGrant(req.query.accessGrantUrl as string, {
-    fetch: session.fetch as typeof fetch,
+    fetch: session.fetch,
   });
 
   /**
@@ -57,7 +57,7 @@ export async function getResourceFromAccessGrantUrl(
    * Retrieve a resource using an Access Grant.
    */
   const file = await getFile(targetResource, accessGrant, {
-    fetch: session.fetch as typeof fetch,
+    fetch: session.fetch,
   });
 
   /**

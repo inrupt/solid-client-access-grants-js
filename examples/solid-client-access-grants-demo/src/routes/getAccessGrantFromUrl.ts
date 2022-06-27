@@ -44,7 +44,7 @@ export async function getAccessGrantFromUrl(
    * Retrieve an Access Grant issued to the application.
    */
   const accessGrant = await getAccessGrant(req.query.accessGrantUrl as string, {
-    fetch: session.fetch as typeof fetch,
+    fetch: session.fetch,
   });
 
   res.send(accessGrant);
