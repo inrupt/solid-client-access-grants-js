@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/* eslint-disable no-shadow, no-promise-executor-return */
+/* eslint-disable no-shadow */
 import {
   it,
   describe,
@@ -118,7 +118,9 @@ describe("redirectToAccessManagementUi", () => {
         }
       );
       // Yield the event loop to make sure the blocking promises completes.
-      await new Promise((resolve) => setImmediate(resolve));
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
       const targetIri = window.location.href;
       expect(targetIri).toContain("https://some.app");
     });
@@ -135,7 +137,9 @@ describe("redirectToAccessManagementUi", () => {
         }
       );
       // Yield the event loop to make sure the blocking promises completes.
-      await new Promise((resolve) => setImmediate(resolve));
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
       const targetIri = window.location.href;
       expect(targetIri).toContain("https://some.app");
     });
@@ -152,7 +156,9 @@ describe("redirectToAccessManagementUi", () => {
         }
       );
       // Yield the event loop to make sure the blocking promises completes.
-      await new Promise((resolve) => setImmediate(resolve));
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
       const targetIri = window.location.href;
       expect(targetIri).toContain("https://some.app");
     });
@@ -167,7 +173,9 @@ describe("redirectToAccessManagementUi", () => {
         "https://some.redirect.iri"
       );
       // Yield the event loop to make sure the blocking promises completes.
-      await new Promise((resolve) => setImmediate(resolve));
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
       expect(window.location.href).toContain("https://some.access.ui");
     });
 
@@ -181,7 +189,9 @@ describe("redirectToAccessManagementUi", () => {
         "https://some.redirect.iri"
       );
       // Yield the event loop to make sure the blocking promises completes.
-      await new Promise((resolve) => setImmediate(resolve));
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
       const targetIri = new URL(window.location.href);
       const encodedVc = targetIri.searchParams.get("requestVcUrl") as string;
       expect(decodeURI(encodedVc)).toEqual(mockAccessRequestVc().id);
@@ -208,7 +218,9 @@ describe("redirectToAccessManagementUi", () => {
         }
       );
       // Yield the event loop to make sure the blocking promises completes.
-      await new Promise((resolve) => setImmediate(resolve));
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
       const targetIri = new URL(window.location.href);
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri/"
@@ -225,7 +237,9 @@ describe("redirectToAccessManagementUi", () => {
         new URL("https://some.redirect.iri")
       );
       // Yield the event loop to make sure the blocking promises completes.
-      await new Promise((resolve) => setImmediate(resolve));
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
       const targetIri = new URL(window.location.href);
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri/"
@@ -246,7 +260,9 @@ describe("redirectToAccessManagementUi", () => {
         }
       );
       // Yield the event loop to make sure the blocking promises completes.
-      await new Promise((resolve) => setImmediate(resolve));
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
       const redirectIri = new URL(redirectCallback.mock.calls[0][0] as string);
       expect(redirectIri.origin).toBe("https://some.access.ui");
       expect(redirectIri.searchParams.get("requestVc")).toBe(
@@ -269,7 +285,9 @@ describe("redirectToAccessManagementUi", () => {
         "https://some.redirect.iri"
       );
       // Yield the event loop to make sure the blocking promises completes.
-      await new Promise((resolve) => setImmediate(resolve));
+      await new Promise((resolve) => {
+        setImmediate(resolve);
+      });
       const targetIri = new URL(window.location.href);
       const encodedVc = targetIri.searchParams.get("requestVc") as string;
       expect(JSON.parse(base64url.decode(encodedVc).toString())).toStrictEqual(

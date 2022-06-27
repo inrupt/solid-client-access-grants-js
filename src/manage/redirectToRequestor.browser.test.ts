@@ -20,7 +20,7 @@
 //
 
 // This rule complains about the `@jest/globals` variables overriding global vars:
-/* eslint-disable no-shadow, no-promise-executor-return */
+/* eslint-disable no-shadow */
 import {
   jest,
   it,
@@ -62,7 +62,9 @@ describe("redirectToRequestor", () => {
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
       const targetIri = window.location.href;
       expect(targetIri).toContain("https://some.redirect.iri");
     });
@@ -77,7 +79,9 @@ describe("redirectToRequestor", () => {
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
       const targetIri = new URL(window.location.href);
       expect(
         decodeURIComponent(
@@ -96,7 +100,9 @@ describe("redirectToRequestor", () => {
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
       const targetIri = new URL(window.location.href);
       expect(
         decodeURIComponent(
@@ -119,7 +125,9 @@ describe("redirectToRequestor", () => {
         }
       );
       // Yield the event loop to make sure the blocking promises completes.
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
       const redirectIri = new URL(redirectCallback.mock.calls[0][0] as string);
       expect(redirectIri.origin).toBe("https://some.redirect.iri");
       expect(
