@@ -133,7 +133,10 @@ describe("approveAccessRequest", () => {
       mockedClientModule.acp_ess_2,
       "getResourceInfoWithAcr"
     );
-    const spiedAcrUpdate = jest.spyOn(mockedClientModule.acp_ess_2, "setVcAccess");
+    const spiedAcrUpdate = jest.spyOn(
+      mockedClientModule.acp_ess_2,
+      "setVcAccess"
+    );
     const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
