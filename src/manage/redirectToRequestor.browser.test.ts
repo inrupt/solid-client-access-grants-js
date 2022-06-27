@@ -20,7 +20,7 @@
 //
 
 // This rule complains about the `@jest/globals` variables overriding global vars:
-/* eslint-disable no-shadow */
+/* eslint-disable no-shadow, no-promise-executor-return */
 import {
   jest,
   it,
