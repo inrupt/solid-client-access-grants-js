@@ -44,7 +44,7 @@ jest.mock("@inrupt/solid-client", () => {
     solidClientModule.getSolidDataset
   );
   solidClientModule.getWellKnownSolid = jest.fn();
-  solidClientModule.acp_v4 = {
+  solidClientModule.acp_ess_2 = {
     getResourceInfoWithAcr: jest.fn(),
     hasAccessibleAcr: jest.fn(),
     saveAcrFor: jest.fn(),
@@ -66,17 +66,17 @@ const mockAcpClient = (
 ) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
-  solidClientModule.acp_v4.hasAccessibleAcr.mockReturnValueOnce(
+  solidClientModule.acp_ess_2.hasAccessibleAcr.mockReturnValueOnce(
     options?.hasAccessibleAcr ?? true
   );
 
-  solidClientModule.acp_v4.setVcAccess.mockReturnValueOnce(
+  solidClientModule.acp_ess_2.setVcAccess.mockReturnValueOnce(
     options?.updatedResource ?? {}
   );
-  solidClientModule.acp_v4.getResourceInfoWithAcr.mockResolvedValueOnce(
+  solidClientModule.acp_ess_2.getResourceInfoWithAcr.mockResolvedValueOnce(
     options?.initialResource ?? {}
   );
-  solidClientModule.acp_v4.saveAcrFor = jest.fn();
+  solidClientModule.acp_ess_2.saveAcrFor = jest.fn();
   return solidClientModule;
 };
 
@@ -101,7 +101,7 @@ describe("approveAccessRequest", () => {
 
     await approveAccessRequest(mockAccessRequestVc());
 
-    expect(mockedAcpClient.acp_v4.saveAcrFor).toHaveBeenCalledWith(
+    expect(mockedAcpClient.acp_ess_2.saveAcrFor).toHaveBeenCalledWith(
       expect.anything(),
       {
         fetch: scab.fetch,
@@ -130,11 +130,14 @@ describe("approveAccessRequest", () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mockedClientModule = jest.requireMock("@inrupt/solid-client") as any;
     const spiedAcrLookup = jest.spyOn(
-      mockedClientModule.acp_v4,
+      mockedClientModule.acp_ess_2,
       "getResourceInfoWithAcr"
     );
-    const spiedAcrUpdate = jest.spyOn(mockedClientModule.acp_v4, "setVcAccess");
-    const spiedAcrSave = jest.spyOn(mockedClientModule.acp_v4, "saveAcrFor");
+    const spiedAcrUpdate = jest.spyOn(
+      mockedClientModule.acp_ess_2,
+      "setVcAccess"
+    );
+    const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
