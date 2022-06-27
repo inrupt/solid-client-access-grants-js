@@ -10,6 +10,7 @@ docs/api/build/
 docs/api/source/api/
 docs/api/docs-assets/
 docs/dist/
+examples/solid-client-access-grants-demo/static/javascript/
 .env*.local
 .cache
 .github/**/package-lock.json
