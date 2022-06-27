@@ -79,8 +79,8 @@
     "url": "https://github.com/inrupt/solid-client-access-grants-js.git"
   },
   "devDependencies": {
-    "@inrupt/eslint-config-base": "^0.4.0",
-    "@inrupt/eslint-config-lib": "^0.4.1",
+    "@inrupt/eslint-config-base": "^1.0.0",
+    "@inrupt/eslint-config-lib": "^1.0.0",
     "@inrupt/solid-client-authn-browser": "^1.11.5",
     "@inrupt/solid-client-authn-node": "^1.11.5",
     "@playwright/test": "^1.18.1",
@@ -125,9 +125,6 @@
   },
   "resolutions": {
     "glob-parent": "^5.1.2"
-  },
-  "overrides": {
-    "eslint-plugin-jest@23.13.2": "26.1.4"
   },
   "publishConfig": {
     "access": "public"
