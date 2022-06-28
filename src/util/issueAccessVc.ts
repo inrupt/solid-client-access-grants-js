@@ -24,9 +24,10 @@ import {
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import {
-  ACCESS_GRANT_CONTEXT,
+  ACCESS_GRANT_CONTEXT_DEFAULT,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_REQUEST,
+  instanciateEssAccessGrantContext,
 } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getSessionFetch } from "./getSessionFetch";
@@ -97,7 +98,7 @@ function getBaseBody(
   type: "BaseRequestBody" | "BaseGrantBody"
 ): BaseRequestPayload | BaseGrantPayload {
   const body = {
-    "@context": ACCESS_GRANT_CONTEXT,
+    "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
     type: [
       type === "BaseGrantBody"
         ? CREDENTIAL_TYPE_ACCESS_GRANT
@@ -170,7 +171,9 @@ export async function issueAccessVc(
   return issueVerifiableCredential(
     accessIssuerEndpoint.href,
     {
-      "@context": vcBody["@context"],
+      "@context": instanciateEssAccessGrantContext(
+        accessIssuerEndpoint.hostname
+      ),
       ...vcBody.credentialSubject,
     },
     {

@@ -36,7 +36,7 @@ import {
   MOCK_RESOURCE_OWNER_IRI,
 } from "./request.mock";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
-import { ACCESS_GRANT_CONTEXT } from "../constants";
+import { ACCESS_GRANT_CONTEXT_DEFAULT } from "../constants";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -186,6 +186,40 @@ describe("issueAccessRequest", () => {
         }
       )
     ).rejects.toThrow();
+  });
+
+  it("computes the correct context based on the issuer", async () => {
+    mockAccessApiEndpoint();
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+
+    await issueAccessRequest(
+      {
+        access: { read: true },
+        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+        resources: ["https://some.pod/resource"],
+        requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+      },
+      {
+        fetch: jest.fn(),
+      }
+    );
+
+    expect(mockedIssue).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        "@context": expect.arrayContaining([
+          "https://vc.access-issuer.iri/credentials/v1",
+        ]),
+      }),
+      expect.anything(),
+      expect.anything()
+    );
   });
 
   it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
@@ -499,7 +533,7 @@ describe("isAccessRequest", () => {
   it("returns true if the credential matches the expected shape", () => {
     expect(
       isAccessRequest({
-        "@context": ACCESS_GRANT_CONTEXT,
+        "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
         credentialSubject: {
           id: "https://some.id",
           inbox: "https://some.inbox",
