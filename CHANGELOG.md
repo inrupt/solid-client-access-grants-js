@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+### New features
+
+- `getAccessRequestFromRedirectUrl` and `getAccessGrantFromRedirectUrl` now accept URL
+  objects as well as plain strings.
+
 ## [1.1.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v1.1.0) - 2022-09-02
 
 ### New Features
