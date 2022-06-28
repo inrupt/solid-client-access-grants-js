@@ -177,6 +177,9 @@ export async function issueAccessVc(
       ...vcBody.credentialSubject,
     },
     {
+      // All the required context is provided by instanciateEssAccessGrantContext,
+      // and vcBody contains a default context we don't want to include in the
+      // result VC.
       "@context": [],
       type: vcBody.type,
       issuanceDate: vcBody.issuanceDate,
