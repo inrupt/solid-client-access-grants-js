@@ -196,7 +196,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential"
     );
-    mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
 
     await issueAccessRequest(
       {
