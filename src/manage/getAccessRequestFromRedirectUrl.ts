@@ -47,13 +47,14 @@ import { getSessionFetch } from "../util/getSessionFetch";
  * @since 0.5.0
  */
 export async function getAccessRequestFromRedirectUrl(
-  redirectUrl: UrlString,
+  redirectUrl: UrlString | URL,
   options: { fetch?: typeof fetch } = {}
 ): Promise<{
   accessRequest: AccessRequest;
   requestorRedirectUrl: UrlString;
 }> {
-  const redirectUrlObj = new URL(redirectUrl);
+  const redirectUrlObj =
+    typeof redirectUrl === "string" ? new URL(redirectUrl) : redirectUrl;
   const authFetch = options.fetch ?? (await getSessionFetch(options));
 
   // Get the URL where the requestor expects the user to be redirected with
