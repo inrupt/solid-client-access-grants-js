@@ -49,7 +49,7 @@ export async function getResourceFromRedirectUrl(
   const accessGrant = await getAccessGrantFromRedirectUrl(
     new URL(req.url, env.url.href).toString(),
     {
-      fetch: session.fetch as typeof fetch,
+      fetch: session.fetch,
     }
   );
 
@@ -63,7 +63,7 @@ export async function getResourceFromRedirectUrl(
    * Retrieve a resource using an Access Grant.
    */
   const file = await getFile(targetResource, accessGrant, {
-    fetch: session.fetch as typeof fetch,
+    fetch: session.fetch,
   });
 
   /**

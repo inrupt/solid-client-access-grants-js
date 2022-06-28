@@ -66,7 +66,7 @@ export async function postAccessRequestForm(
       resources: [req.body.resource],
     },
     {
-      fetch: session.fetch as typeof fetch,
+      fetch: session.fetch,
       accessEndpoint,
     }
   );
@@ -79,6 +79,6 @@ export async function postAccessRequestForm(
       res.redirect(url);
     },
     fallbackAccessManagementUi: env.managementApp.href,
-    fetch: session.fetch as typeof fetch,
+    fetch: session.fetch,
   });
 }
