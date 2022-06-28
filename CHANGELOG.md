@@ -19,7 +19,7 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 - Fix Node 14 atob/btoa compatibility issue.
 - The JSON-LD context of issued VCs was hard-coded, instead of being relative to
-the issuer domain as mandated by the [ESS documentation](https://docs.inrupt.com/ess/latest/services/service-vc/#ess-vc-service-endpoints).
+  the issuer domain as mandated by the [ESS documentation](https://docs.inrupt.com/ess/latest/services/service-vc/#ess-vc-service-endpoints).
 
 ## [1.0.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v1.0.1) - 2022-06-06
 

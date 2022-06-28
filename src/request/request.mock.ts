@@ -32,7 +32,7 @@ import {
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   ACCESS_GRANT_CONTEXT_DEFAULT,
-  PREFERRED_CONSENT_MANAGEMENT_UI
+  PREFERRED_CONSENT_MANAGEMENT_UI,
 } from "../constants";
 
 export const MOCKED_CREDENTIAL_ID = "https://some.credential";
