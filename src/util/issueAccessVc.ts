@@ -177,7 +177,7 @@ export async function issueAccessVc(
       ...vcBody.credentialSubject,
     },
     {
-      "@context": vcBody["@context"],
+      "@context": [],
       type: vcBody.type,
       issuanceDate: vcBody.issuanceDate,
       expirationDate: vcBody.expirationDate,

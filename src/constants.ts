@@ -60,18 +60,18 @@ export const CONTEXT_VC_W3C = "https://www.w3.org/2018/credentials/v1" as const;
 
 // According to the [ESS documentation](https://docs.inrupt.com/ess/latest/services/service-vc/#ess-vc-service-endpoints),
 // the JSON-LD context for ESS-issued VCs will match the following template.
-const instanciateContextVcEssTemplate = (essDomain: string): string =>
-  `https://vc.${essDomain}/credentials/v1`;
+const instanciateContextVcEssTemplate = (essVcDomain: string): string =>
+  `https://${essVcDomain}/credentials/v1`;
 
 // When issuing a VC using a given service, be sure to set the context using the following.
 export const instanciateEssAccessGrantContext = (
-  essDomain: string
-): string[] => [CONTEXT_VC_W3C, instanciateContextVcEssTemplate(essDomain)];
+  essVcDomain: string
+): string[] => [CONTEXT_VC_W3C, instanciateContextVcEssTemplate(essVcDomain)];
 
 // A default context value is provided for mocking purpose accross the codebase.
 export const ACCESS_GRANT_CONTEXT_DEFAULT = [
   CONTEXT_VC_W3C,
-  instanciateContextVcEssTemplate("inrupt.com"),
+  instanciateContextVcEssTemplate("vc.inrupt.com"),
 ] as const;
 
 export const WELL_KNOWN_SOLID = ".well-known/solid";
