@@ -150,7 +150,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
     );
 
     const { accessRequest, requestorRedirectUrl } =
-      await getAccessRequestFromRedirectUrl(redirectedToUrl.href);
+      await getAccessRequestFromRedirectUrl(redirectedToUrl);
     expect(accessRequest).toStrictEqual(mockAccessRequestVc());
     expect(requestorRedirectUrl).toBe("https://requestor.redirect.url");
   });
