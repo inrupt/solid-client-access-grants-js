@@ -24,6 +24,7 @@
 import { jest, describe, it, expect } from "@jest/globals";
 import {
   issueVerifiableCredential,
+  JsonLd,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { issueAccessRequest } from "./issueAccessRequest";
@@ -210,15 +211,27 @@ describe("issueAccessRequest", () => {
       }
     );
 
-    expect(mockedIssue).toHaveBeenCalledWith(
-      expect.anything(),
+    // Casting is required because TS picks up the deprecated signature.
+    const subjectClaims = mockedIssue.mock.calls[0][1] as unknown as JsonLd;
+    const credentialClaims = mockedIssue.mock.calls[0][2] as unknown as
+      | JsonLd
+      | undefined;
+
+    expect(subjectClaims).toStrictEqual(
       expect.objectContaining({
         "@context": expect.arrayContaining([
-          "https://vc.access-issuer.iri/credentials/v1",
+          "https://access-issuer.iri/credentials/v1",
         ]),
-      }),
-      expect.anything(),
-      expect.anything()
+      })
+    );
+
+    // Ensure that the default context has been removed
+    expect(subjectClaims["@context"]).not.toContain(
+      ACCESS_GRANT_CONTEXT_DEFAULT
+    );
+
+    expect(credentialClaims?.["@context"]).not.toContain(
+      ACCESS_GRANT_CONTEXT_DEFAULT
     );
   });
 
