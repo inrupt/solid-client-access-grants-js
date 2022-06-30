@@ -56,7 +56,10 @@ app.post("/request", async (req, res) => {
   const accessRequest = await issueAccessRequest(
     {
       access: { read: true },
-      purpose: ["https://some.purpose", "https://some.other.purpose"],
+      purpose: [
+        "https://w3c.github.io/dpv/dpv/#UserInterfacePersonalisation",
+        "https://w3c.github.io/dpv/dpv/#OptimiseUserInterface",
+      ],
       resourceOwner: req.body.owner,
       resources: [req.body.resource],
     },
