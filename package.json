@@ -82,7 +82,7 @@
     "@inrupt/eslint-config-lib": "^1.0.0",
     "@inrupt/solid-client-authn-browser": "^1.11.5",
     "@inrupt/solid-client-authn-node": "^1.11.5",
-    "@playwright/test": "^1.18.1",
+    "@playwright/test": "^1.23.0",
     "@rushstack/eslint-patch": "^1.1.4",
     "@skypack/package-check": "^0.2.2",
     "@types/auth-header": "^1.0.2",
