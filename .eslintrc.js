@@ -1,21 +1,9 @@
+require("@rushstack/eslint-patch/modern-module-resolution");
+
 module.exports = {
   extends: ["@inrupt/eslint-config-lib"],
   rules: {
     "import/prefer-default-export": "off",
-  },
-  settings: {
-    "import/extensions": [".mjs", ".js"],
-    "import/resolver": {
-      node: {
-        extensions: [".mjs", ".ts", ".js", ".jsx"],
-        moduleDirectory: [
-          "src",
-          "node_modules",
-          "e2e/**/node_modules",
-          "examples/**/node_modules",
-        ]
-      },
-    },
   },
   overrides: [
     {

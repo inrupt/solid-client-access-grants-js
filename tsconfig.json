@@ -12,7 +12,7 @@
     // Prevent developers on different OSes from running into problems:
     "forceConsistentCasingInFileNames": true,
     /* Advanced Options */
-    "stripInternal": true,
+    "stripInternal": true
   },
   "include": ["src/index.ts"],
   "typedocOptions": {
@@ -51,9 +51,6 @@
     "theme": "markdown",
     "readme": "none",
     "hideInPageTOC": true,
-    "entryDocument": "index.md",
-    // This is used to get source URLs working on Vercel, where the git remote
-    // isn't automatically detected. See the nlfurniss-typedoc-plugin-sourcefile-url plugin
-    "sourcefile-url-prefix": "https://github.com/inrupt/solid-client-access-grants-js/blob/main/"
+    "entryDocument": "index.md"
   }
 }

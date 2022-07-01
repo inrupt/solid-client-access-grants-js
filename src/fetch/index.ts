@@ -126,18 +126,14 @@ export async function exchangeTicketForAccessToken(
  * @hidden This is just an internal utility function to bind a fetch function to the UMA auth token.
  */
 export function boundFetch(accessToken: string): typeof fetch {
-  return async function fetchBoundToUMA(
-    url: RequestInfo,
-    init?: RequestInit
-  ): Promise<Response> {
-    return crossFetch(url, {
+  return (url, init) =>
+    crossFetch(url, {
       ...init,
       headers: {
         ...(init?.headers || {}),
         authorization: `Bearer ${accessToken}`,
       },
     });
-  };
 }
 
 /**
