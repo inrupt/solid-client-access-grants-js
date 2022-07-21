@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+### New features
+
+- `getAccessRequestFromRedirectUrl` and `getAccessGrantFromRedirectUrl` now accept URL
+  objects as well as plain strings.
+
 ### Other Changes
 
 - Added a more extensive demo app.

@@ -118,7 +118,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
       encodeURI("https://some.vc")
     );
 
-    const fetchedVc = await getAccessGrantFromRedirectUrl(redirectUrl.href);
+    const fetchedVc = await getAccessGrantFromRedirectUrl(redirectUrl);
     expect(fetchedVc).toStrictEqual(mockAccessGrantVc());
   });
 

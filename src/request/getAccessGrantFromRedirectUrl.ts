@@ -46,10 +46,11 @@ import { getSessionFetch } from "../util/getSessionFetch";
  * @since 0.5.0
  */
 export async function getAccessGrantFromRedirectUrl(
-  redirectUrl: UrlString,
+  redirectUrl: UrlString | URL,
   options: { fetch?: typeof fetch } = {}
 ): Promise<AccessGrant> {
-  const redirectUrlObj = new URL(redirectUrl);
+  const redirectUrlObj =
+    typeof redirectUrl === "string" ? new URL(redirectUrl) : redirectUrl;
   const authFetch = options.fetch ?? (await getSessionFetch(options));
 
   const accessGrantValue = redirectUrlObj.searchParams.get(GRANT_VC_PARAM_NAME);
