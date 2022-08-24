@@ -29,33 +29,43 @@ import { fetchWithVc } from "../fetch";
 import { FetchOptions } from "../type/FetchOptions";
 
 /**
- * Retrieve a Dataset from a Solid Pod using an Access Grant to prove the caller
- * is authorized to access the tarsave dataset.
+ * Saves a Dataset in a Solid Pod using an Access Grant to prove the caller is
+ * authorized to write or append to the dataset at the given dataset URL.
  *
- * @param datasetUrl The URL of the tarsave dataset.
+ * ```{note} This function does not support saving a dataset if the
+ * dataset does not yet exist, unlike its `@inrupt/solid-client`
+ * counterpart.
+ * ```
+ *
+ * @see [@inrupt/solid-client's
+ * saveSolidDatasetAt](https://docs.inrupt.com/developer-tools/api/javascript/solid-client/modules/resource_solidDataset.html#savesoliddatasetat)
+ *
+ * @param datasetUrl The URL of the dataset to save.
  * @param accessGrant The Access Grant VC proving the caller is authorized.
  * @param options Optional properties to customise the request behaviour.
- * @returns A promise that resolves to a SolidDataset if successful, and that rejects otherwise.
+ * @returns A promise that resolves to a SolidDataset if successful, and that
+ * rejects otherwise.
  * @since 0.4.0
  */
-export async function saveSolidDatasetAt(
+export async function saveSolidDatasetAt<Dataset extends SolidDataset>(
   datasetUrl: UrlString,
-  solidDataset: SolidDataset,
+  solidDataset: Dataset,
   accessGrant: VerifiableCredential,
   options?: FetchOptions
-): ReturnType<typeof coreSaveSolidDatasetAt> {
+) {
+  const fetchOptions: FetchOptions = {};
+  if (options && options.fetch) {
+    fetchOptions.fetch = options.fetch;
+  }
+
   const authenticatedFetch = await fetchWithVc(
     datasetUrl,
     accessGrant,
-    options
+    fetchOptions
   );
 
-  return coreSaveSolidDatasetAt.apply(undefined, [
-    datasetUrl,
-    solidDataset,
-    {
-      ...options,
-      fetch: authenticatedFetch,
-    },
-  ]);
+  return await coreSaveSolidDatasetAt(datasetUrl, solidDataset, {
+    ...options,
+    fetch: authenticatedFetch,
+  });
 }

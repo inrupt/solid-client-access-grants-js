@@ -19,6 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-export { getFile } from "./getFile";
+export { getFile, overwriteFile, saveFileInContainer } from "./file";
 export { getSolidDataset } from "./getSolidDataset";
 export { saveSolidDatasetAt } from "./saveSolidDatasetAt";

@@ -31,28 +31,34 @@ import { FetchOptions } from "../type/FetchOptions";
  * Retrieve a Dataset from a Solid Pod using an Access Grant to prove the caller
  * is authorized to access the target dataset.
  *
+ * @see [@inrupt/solid-client's
+ * getSolidDataset](https://docs.inrupt.com/developer-tools/api/javascript/solid-client/modules/resource_solidDataset.html#getsoliddataset)
+ *
  * @param datasetUrl The URL of the target dataset.
  * @param accessGrant The Access Grant VC proving the caller is authorized.
  * @param options Optional properties to customise the request behaviour.
- * @returns A promise that resolves to a SolidDataset if successful, and that rejects otherwise.
+ * @returns A promise that resolves to a SolidDataset if successful, and that
+ * rejects otherwise.
  * @since 0.4.0
  */
 export async function getSolidDataset(
   datasetUrl: UrlString,
   accessGrant: VerifiableCredential,
   options?: FetchOptions
-): ReturnType<typeof coreGetSolidDataset> {
+) {
+  const fetchOptions: FetchOptions = {};
+  if (options && options.fetch) {
+    fetchOptions.fetch = options.fetch;
+  }
+
   const authenticatedFetch = await fetchWithVc(
     datasetUrl,
     accessGrant,
-    options
+    fetchOptions
   );
 
-  return coreGetSolidDataset.apply(undefined, [
-    datasetUrl,
-    {
-      ...options,
-      fetch: authenticatedFetch,
-    },
-  ]);
+  return await coreGetSolidDataset(datasetUrl, {
+    ...options,
+    fetch: authenticatedFetch,
+  });
 }

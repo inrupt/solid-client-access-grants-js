@@ -58,4 +58,10 @@ export { isValidAccessGrant } from "./verify";
 
 export { fetchWithVc } from "./fetch";
 
-export { getSolidDataset, getFile, saveSolidDatasetAt } from "./resource";
+export {
+  getSolidDataset,
+  getFile,
+  overwriteFile,
+  saveFileInContainer,
+  saveSolidDatasetAt,
+} from "./resource";
