@@ -12,6 +12,28 @@ module.exports = {
         "import/no-unresolved": "warn",
       },
     },
+    {
+      files: ["**/*.test.ts"],
+      rules: {
+        "no-shadow": [
+          "warn",
+          {
+            allow: [
+              "describe",
+              "it",
+              "jest",
+              "expect",
+              "beforeEach",
+              "beforeAll",
+              "afterEach",
+              "afterAll",
+            ],
+          },
+        ],
+        // explicit any is currently required for jest module mocking:
+        "@typescript-eslint/no-explicit-any": "off",
+      },
+    },
   ],
   parserOptions: {
     project: "./tsconfig.eslint.json",

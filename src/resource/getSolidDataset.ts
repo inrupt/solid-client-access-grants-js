@@ -42,10 +42,15 @@ export async function getSolidDataset(
   accessGrant: VerifiableCredential,
   options?: FetchOptions
 ): ReturnType<typeof coreGetSolidDataset> {
+  const fetchOptions: FetchOptions = {};
+  if (options && options.fetch) {
+    fetchOptions.fetch = options.fetch;
+  }
+
   const authenticatedFetch = await fetchWithVc(
     datasetUrl,
     accessGrant,
-    options
+    fetchOptions
   );
 
   return coreGetSolidDataset.apply(undefined, [

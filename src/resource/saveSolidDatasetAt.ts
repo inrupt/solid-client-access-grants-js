@@ -44,10 +44,15 @@ export async function saveSolidDatasetAt(
   accessGrant: VerifiableCredential,
   options?: FetchOptions
 ): ReturnType<typeof coreSaveSolidDatasetAt> {
+  const fetchOptions: FetchOptions = {};
+  if (options && options.fetch) {
+    fetchOptions.fetch = options.fetch;
+  }
+
   const authenticatedFetch = await fetchWithVc(
     datasetUrl,
     accessGrant,
-    options
+    fetchOptions
   );
 
   return coreSaveSolidDatasetAt.apply(undefined, [

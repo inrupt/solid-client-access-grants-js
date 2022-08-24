@@ -19,8 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/* eslint @typescript-eslint/no-explicit-any: 0 */
-// eslint-disable-next-line no-shadow
 import { it, jest, describe, expect } from "@jest/globals";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import { mockAccessRequestVc } from "../util/access.mock";
@@ -31,7 +29,6 @@ jest.mock("../fetch");
 jest.mock("@inrupt/solid-client-authn-core");
 jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client", () => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getSolidDataset = jest.fn();
   return solidClientModule;
@@ -39,7 +36,6 @@ jest.mock("@inrupt/solid-client", () => {
 
 describe("getSolidDataset", () => {
   it("authenticates using the provided VC", async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
     const mockedDataset = mockSolidDatasetFrom("https://some.url");
     solidClientModule.getSolidDataset.mockResolvedValueOnce(mockedDataset);

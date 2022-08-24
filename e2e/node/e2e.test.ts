@@ -20,14 +20,17 @@
 //
 
 // Globals are actually not injected, so this does not shadow anything.
-// eslint-disable-next-line no-shadow
-import { describe, it, expect, beforeAll, afterAll } from "@jest/globals";
 import {
-  saveFileInContainer,
-  getPodUrlAll,
-  getSourceUrl,
-  deleteFile,
-} from "@inrupt/solid-client";
+  describe,
+  it,
+  expect,
+  beforeAll,
+  afterAll,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
+
+import * as solidClient from "@inrupt/solid-client";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
@@ -37,6 +40,11 @@ import {
   issueAccessRequest,
   revokeAccessGrant,
   getFile,
+  AccessGrant,
+  overwriteFile,
+  saveFileInContainer,
+  saveSolidDatasetAt,
+  getSolidDataset,
 } from "../../src/index";
 import { getTestingEnvironmentNode } from "../e2e-setup";
 
@@ -48,6 +56,10 @@ const {
   vcProvider,
 } = getTestingEnvironmentNode();
 
+global.btoa = (str: string) => Buffer.from(str).toString("base64");
+
+const VERIFY_ENDPOINT = new URL("/verify", vcProvider).href;
+
 // This is the content of the file uploaded manually at SHARED_FILE_IRI.
 const SHARED_FILE_CONTENT = "Some content.\n";
 
@@ -55,6 +67,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
   const requestorSession = new Session();
   const resourceOwnerSession = new Session();
 
+  let resourceOwnerPod: string;
   let sharedFileIri: string;
 
   // Setup the shared file
@@ -74,8 +87,13 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       clientSecret: resourceOwner.secret,
     });
 
+    console.log({
+      requestor: requestorSession.info.webId,
+      resourceOwner: resourceOwnerSession.info.webId,
+    });
+
     // Create a file in the resource owner's Pod
-    const resourceOwnerPodAll = await getPodUrlAll(
+    const resourceOwnerPodAll = await solidClient.getPodUrlAll(
       resourceOwnerSession.info.webId as string
     );
     if (resourceOwnerPodAll.length === 0) {
@@ -83,7 +101,10 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         "The Resource Owner WebID Profile is missing a link to at least one Pod root."
       );
     }
-    const savedFile = await saveFileInContainer(
+    // eslint-disable-next-line prefer-destructuring
+    resourceOwnerPod = resourceOwnerPodAll[0];
+
+    const savedFile = await solidClient.saveFileInContainer(
       resourceOwnerPodAll[0],
       Buffer.from(SHARED_FILE_CONTENT),
       {
@@ -92,15 +113,18 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         fetch: resourceOwnerSession.fetch,
       }
     );
-    sharedFileIri = getSourceUrl(savedFile);
+
+    sharedFileIri = solidClient.getSourceUrl(savedFile);
   });
 
   // Cleanup the shared file
   afterAll(async () => {
-    // Remove the shared file from the resource owner's Pod.
-    await deleteFile(sharedFileIri, {
-      fetch: resourceOwnerSession.fetch,
-    });
+    if (sharedFileIri) {
+      // Remove the shared file from the resource owner's Pod.
+      await solidClient.deleteFile(sharedFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+    }
     // Making sure the session is logged out prevents tests from hanging due
     // to the callback refreshing the access token.
     await requestorSession.logout();
@@ -112,7 +136,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       const request = await issueAccessRequest(
         {
           access: { read: true },
-          requestor: requestorSession.info.webId as string,
           resourceOwner: resourceOwnerSession.info.webId as string,
           resources: [sharedFileIri],
           purpose: [
@@ -128,7 +151,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       expect(isVerifiableCredential(request)).toBe(true);
 
       const grant = await approveAccessRequest(
-        resourceOwnerSession.info.webId as string,
         request,
         {},
         {
@@ -301,6 +323,359 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
             .includes(JSON.stringify(vc))
         )
       ).toBe(true);
+    });
+  });
+
+  describe("requestor can use the resource Dataset APIs to interact with Datasets", () => {
+    let accessGrant: AccessGrant;
+    let testFileName: string;
+    let testFileIri: string;
+    let testContainerIri: string;
+
+    beforeEach(async () => {
+      const containerPath = `${resourceOwnerSession.info.sessionId}-dataset-apis`;
+
+      testContainerIri = new URL(`${containerPath}/`, resourceOwnerPod).href;
+      testFileName = "dataset.ttl";
+      testFileIri = new URL(testFileName, testContainerIri).href;
+
+      await solidClient.createContainerAt(testContainerIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      const newThing = solidClient.setStringNoLocale(
+        solidClient.createThing({
+          name: "e2e-test-thing",
+        }),
+        "https://arbitrary.vocab/regular-predicate",
+        "initial-dataset"
+      );
+
+      const dataset = solidClient.setThing(
+        solidClient.createSolidDataset(),
+        newThing
+      );
+
+      await solidClient.saveSolidDatasetInContainer(testContainerIri, dataset, {
+        fetch: resourceOwnerSession.fetch,
+        slugSuggestion: testFileName,
+      });
+
+      const request = await issueAccessRequest(
+        {
+          access: { read: true, write: true, append: true },
+          resourceOwner: resourceOwnerSession.info.webId as string,
+          resources: [testFileIri, testContainerIri],
+          purpose: [
+            "https://some.purpose/not-a-nefarious-one/i-promise",
+            "https://some.other.purpose/",
+          ],
+        },
+        {
+          fetch: requestorSession.fetch,
+          accessEndpoint: vcProvider,
+        }
+      );
+
+      accessGrant = await approveAccessRequest(
+        request,
+        {},
+        {
+          fetch: resourceOwnerSession.fetch,
+          accessEndpoint: vcProvider,
+        }
+      );
+    });
+
+    afterEach(async () => {
+      await revokeAccessGrant(accessGrant, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      await solidClient.deleteFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      await solidClient.deleteContainer(testContainerIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+    });
+
+    it("can use the getSolidDataset API to fetch an existing dataset", async () => {
+      const ownerDataset = await solidClient.getSolidDataset(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      const requestorDataset = await getSolidDataset(testFileIri, accessGrant, {
+        fetch: requestorSession.fetch,
+      });
+
+      const ownerTtl = await solidClient.solidDatasetAsTurtle(ownerDataset);
+      const requestorTtl = await solidClient.solidDatasetAsTurtle(
+        requestorDataset
+      );
+
+      expect(ownerTtl).toBe(requestorTtl);
+    });
+
+    it("can use the saveSolidDatasetAt API for an existing dataset", async () => {
+      await expect(
+        isValidAccessGrant(accessGrant, {
+          fetch: resourceOwnerSession.fetch,
+          // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+          // It is an issue documented in the VC library e2e test, and in a ticket
+          // to be fixed.
+          verificationEndpoint: VERIFY_ENDPOINT,
+        })
+      ).resolves.toMatchObject({ errors: [] });
+
+      // Here we request the dataset as the resource owner, but in real-world
+      // applications, you'd need to use an Access Grant to request the dataset
+      // as the requestor, this is just to limit how much of the Access Grants
+      // library we're testing in a single test case:
+      const dataset = await solidClient.getSolidDataset(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      // Create a thing and add it to the dataset:
+      let newThing = solidClient.createThing({
+        name: "e2e-test-thing",
+      });
+      newThing = solidClient.setBoolean(
+        newThing,
+        "https://arbitrary.vocab/regular-predicate",
+        true
+      );
+      const datasetUpdate = solidClient.setThing(dataset, newThing);
+
+      // Try to update the dataset as a requestor of the Access Grant:
+      const updatedDataset = await saveSolidDatasetAt(
+        testFileIri,
+        datasetUpdate,
+        accessGrant,
+        {
+          fetch: requestorSession.fetch,
+        }
+      );
+
+      // Fetch it back as the owner to prove the dataset was actually updated:
+      const updatedDatasetAsOwner = await solidClient.getSolidDataset(
+        testFileIri,
+        {
+          fetch: resourceOwnerSession.fetch,
+        }
+      );
+
+      // Serialize each to turtle:
+      const updatedDatasetTtl = await solidClient.solidDatasetAsTurtle(
+        updatedDataset
+      );
+      const existingDatasetAsOwnerTtl = await solidClient.solidDatasetAsTurtle(
+        dataset
+      );
+      const updatedDatasetAsOwnerTtl = await solidClient.solidDatasetAsTurtle(
+        updatedDatasetAsOwner
+      );
+
+      // Assert that the dataset changed:
+      expect(updatedDatasetTtl).not.toBe(existingDatasetAsOwnerTtl);
+      expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
+    });
+
+    it.skip("can use the saveSolidDatasetAt API for a new dataset", async () => {
+      await expect(
+        isValidAccessGrant(accessGrant, {
+          fetch: resourceOwnerSession.fetch,
+          // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+          // It is an issue documented in the VC library e2e test, and in a ticket
+          // to be fixed.
+          verificationEndpoint: VERIFY_ENDPOINT,
+        })
+      ).resolves.toMatchObject({ errors: [] });
+
+      // Delete the dataset created in the beforeEach:
+      await solidClient.deleteFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      const dataset = solidClient.createSolidDataset();
+      const newDatasetIri = testFileIri;
+
+      const updatedDataset = await saveSolidDatasetAt(
+        newDatasetIri,
+        dataset,
+        accessGrant,
+        {
+          fetch: requestorSession.fetch,
+        }
+      );
+
+      console.log(updatedDataset);
+    });
+  });
+
+  describe("requestor can use the resource File APIs to interact with resources", () => {
+    let accessGrant: AccessGrant;
+    let testFileName: string;
+    let testFileIri: string;
+    let testContainerIri: string;
+    let fileContents: Buffer;
+
+    beforeEach(async () => {
+      const containerPath = `${resourceOwnerSession.info.sessionId}-file-apis`;
+
+      testContainerIri = new URL(`${containerPath}/`, resourceOwnerPod).href;
+      testFileName = `upload-${Date.now()}.txt`;
+      testFileIri = new URL(testFileName, testContainerIri).href;
+
+      fileContents = Buffer.from("hello world", "utf-8");
+
+      await solidClient.createContainerAt(testContainerIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      await solidClient.saveFileInContainer(testContainerIri, fileContents, {
+        fetch: resourceOwnerSession.fetch,
+        slug: testFileName,
+      });
+
+      const request = await issueAccessRequest(
+        {
+          access: { read: true, write: true, append: true },
+          resourceOwner: resourceOwnerSession.info.webId as string,
+          resources: [testContainerIri, testFileIri],
+          purpose: [
+            "https://some.purpose/not-a-nefarious-one/i-promise",
+            "https://some.other.purpose/",
+          ],
+        },
+        {
+          fetch: requestorSession.fetch,
+          accessEndpoint: vcProvider,
+        }
+      );
+
+      accessGrant = await approveAccessRequest(
+        request,
+        {},
+        {
+          fetch: resourceOwnerSession.fetch,
+          accessEndpoint: vcProvider,
+        }
+      );
+    });
+
+    afterEach(async () => {
+      await revokeAccessGrant(accessGrant, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      await solidClient.deleteFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      await solidClient.deleteContainer(testContainerIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+    });
+
+    it("can use the saveFileInContainer API", async () => {
+      await expect(
+        isValidAccessGrant(accessGrant, {
+          fetch: resourceOwnerSession.fetch,
+          // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+          // It is an issue documented in the VC library e2e test, and in a ticket
+          // to be fixed.
+          verificationEndpoint: VERIFY_ENDPOINT,
+        })
+      ).resolves.toMatchObject({ errors: [] });
+
+      // Delete the existing file as to be able to save a new file:
+      await solidClient.deleteFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      const newFileContents = Buffer.from("new contents", "utf-8");
+
+      const newFile = await saveFileInContainer(
+        testContainerIri,
+        newFileContents,
+        accessGrant,
+        {
+          fetch: requestorSession.fetch,
+          slug: testFileName,
+        }
+      );
+
+      expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
+      expect(solidClient.getSourceUrl(newFile)).toBe(testFileIri);
+
+      // Verify as the resource owner that the file was actually created:
+      const fileAsResourceOwner = await solidClient.getFile(
+        solidClient.getSourceUrl(newFile),
+        {
+          fetch: resourceOwnerSession.fetch,
+        }
+      );
+
+      await expect(fileAsResourceOwner.text()).resolves.toBe(
+        newFileContents.toString()
+      );
+    });
+
+    it("can use the getFile API", async () => {
+      await expect(
+        isValidAccessGrant(accessGrant, {
+          fetch: resourceOwnerSession.fetch,
+          // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+          // It is an issue documented in the VC library e2e test, and in a ticket
+          // to be fixed.
+          verificationEndpoint: VERIFY_ENDPOINT,
+        })
+      ).resolves.toMatchObject({ errors: [] });
+
+      // Try fetching it as the requestor of the access grant:
+      const existingFile = await getFile(testFileIri, accessGrant, {
+        fetch: requestorSession.fetch,
+      });
+
+      expect(solidClient.getSourceUrl(existingFile)).toBe(testFileIri);
+      await expect(existingFile.text()).resolves.toBe(fileContents.toString());
+    });
+
+    it("can use the overwriteFile API", async () => {
+      await expect(
+        isValidAccessGrant(accessGrant, {
+          fetch: resourceOwnerSession.fetch,
+          // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+          // It is an issue documented in the VC library e2e test, and in a ticket
+          // to be fixed.
+          verificationEndpoint: VERIFY_ENDPOINT,
+        })
+      ).resolves.toMatchObject({ errors: [] });
+
+      const newFileContents = Buffer.from("overwritten contents", "utf-8");
+
+      const newFile = await overwriteFile(
+        testFileIri,
+        newFileContents,
+        accessGrant,
+        {
+          fetch: requestorSession.fetch,
+        }
+      );
+
+      expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
+      expect(solidClient.getSourceUrl(newFile)).toBe(testFileIri);
+
+      // Verify as the resource owner that the file was actually created:
+      const fileAsResourceOwner = await solidClient.getFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      await expect(fileAsResourceOwner.text()).resolves.toBe(
+        newFileContents.toString()
+      );
     });
   });
 });
