@@ -19,8 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// This rule complains about the `@jest/globals` variables overriding global vars:
-// eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
 import {
   issueVerifiableCredential,

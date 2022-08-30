@@ -19,19 +19,15 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import { jest, describe, it, expect } from "@jest/globals";
+
 import {
   isVerifiableCredential,
   getVerifiableCredentialApiConfiguration,
 } from "@inrupt/solid-client-vc";
-// This rule complains about the `@jest/globals` variables overriding global vars:
-// eslint-disable-next-line no-shadow
-import { jest, describe, it, expect } from "@jest/globals";
 import { isValidAccessGrant } from "./isValidAccessGrant";
 
 jest.mock("@inrupt/solid-client", () => {
-  // TypeScript can't infer the type of modules imported via Jest;
-  // skip type checking for those:
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getSolidDataset = jest.fn(
     solidClientModule.getSolidDataset
@@ -95,9 +91,7 @@ describe("isValidAccessGrant", () => {
     jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
       verifierService: "https://some.vc.verifier",
     });
-    // TypeScript can't infer the type of mock modules imported via Jest;
-    // skip type checking for those:
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
     try {
       await isValidAccessGrant(MOCK_ACCESS_GRANT);
