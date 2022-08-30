@@ -26,7 +26,6 @@ import {
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
 import { FetchOptions } from "../type/FetchOptions";
-import { wrapSolidClientFunction } from "./wrapSolidClientFunction";
 
 /**
  * Retrieve a Dataset from a Solid Pod using an Access Grant to prove the caller
@@ -49,8 +48,11 @@ export async function getSolidDataset(
     options
   );
 
-  return wrapSolidClientFunction(coreGetSolidDataset, [datasetUrl], {
-    ...options,
-    fetch: authenticatedFetch,
-  });
+  return coreGetSolidDataset.apply(undefined, [
+    datasetUrl,
+    {
+      ...options,
+      fetch: authenticatedFetch,
+    },
+  ]);
 }
