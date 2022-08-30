@@ -19,7 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// eslint-disable-next-line no-shadow
 import { jest, it, describe, expect } from "@jest/globals";
 import { mockAccessApiEndpoint } from "../request/request.mock";
 import { mockAccessGrantVc, mockConsentRequestVc } from "../util/access.mock";
@@ -36,7 +35,6 @@ describe("getAccessGrant", () => {
       .mockResolvedValueOnce(new Response(JSON.stringify(mockAccessGrantVc())));
     const fetchModule = jest.requireMock(
       "@inrupt/solid-client-authn-browser"
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) as any;
     fetchModule.fetch = mockedFetch;
 

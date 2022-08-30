@@ -19,7 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// eslint-disable-next-line no-shadow
 import { jest } from "@jest/globals";
 import {
   buildThing,
@@ -29,11 +28,8 @@ import {
   UrlString,
   WithServerResourceInfo,
 } from "@inrupt/solid-client";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import {
-  ACCESS_GRANT_CONTEXT_DEFAULT,
-  PREFERRED_CONSENT_MANAGEMENT_UI,
-} from "../constants";
+
+import { PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
 export const MOCKED_CREDENTIAL_ID = "https://some.credential";
 export const MOCKED_ISSUANCE_DATE = "2021-09-07T09:59:00Z";

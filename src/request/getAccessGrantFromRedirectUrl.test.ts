@@ -19,10 +19,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// eslint-disable-next-line no-shadow
 import { describe, it, jest, expect } from "@jest/globals";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
-// eslint-disable-next-line no-shadow
 import { base64url } from "jose";
 import { getAccessGrantFromRedirectUrl } from "./getAccessGrantFromRedirectUrl";
 import { getSessionFetch } from "../util/getSessionFetch";

@@ -19,7 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
 import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { cancelAccessRequest } from "./cancelAccessRequest";
@@ -27,9 +26,6 @@ import { MOCKED_CREDENTIAL_ID } from "./request.mock";
 import { mockAccessGrantVc } from "../util/access.mock";
 
 jest.mock("@inrupt/solid-client", () => {
-  // TypeScript can't infer the type of modules imported via Jest;
-  // skip type checking for those:
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getSolidDataset = jest.fn(
     solidClientModule.getSolidDataset

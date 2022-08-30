@@ -19,10 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/* eslint-disable no-shadow */
-import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import { jest, it, describe, expect } from "@jest/globals";
+
+import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import type { issueVerifiableCredential } from "@inrupt/solid-client-vc";
+
 import {
   mockAccessApiEndpoint,
   MOCKED_ACCESS_ISSUER,
@@ -36,9 +37,6 @@ import {
 } from "../util/access.mock";
 
 jest.mock("@inrupt/solid-client", () => {
-  // TypeScript can't infer the type of modules imported via Jest;
-  // skip type checking for those:
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getSolidDataset = jest.fn(
     solidClientModule.getSolidDataset
@@ -94,9 +92,7 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential"
     );
     mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
-    // TypeScript can't infer the type of mock modules imported via Jest;
-    // skip type checking for those:
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
 
     await approveAccessRequest(mockAccessRequestVc());
@@ -127,7 +123,7 @@ describe("approveAccessRequest", () => {
       updatedResource: mockedUpdatedResource,
     });
     mockAccessApiEndpoint();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const mockedClientModule = jest.requireMock("@inrupt/solid-client") as any;
     const spiedAcrLookup = jest.spyOn(
       mockedClientModule.acp_ess_2,
@@ -159,7 +155,7 @@ describe("approveAccessRequest", () => {
         fetch: jest.fn(global.fetch),
       }
     );
-    // Thehe resource's IRI is picked up from the access grant.
+    // The resource's IRI is picked up from the access grant.
     expect(spiedAcrLookup).toHaveBeenCalledWith(
       "https://some.custom.resource",
       expect.anything()

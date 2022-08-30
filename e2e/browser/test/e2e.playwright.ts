@@ -19,9 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/* eslint-disable jest/no-done-callback */
-
-// eslint-disable-next-line no-shadow
 import { test, expect } from "@playwright/test";
 import { essUserLogin } from "./roles";
 
