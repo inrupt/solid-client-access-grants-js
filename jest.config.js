@@ -1,7 +1,6 @@
 module.exports = {
   preset: "ts-jest",
-  // this test environment adds TextEncoder to jsdom, which we require.
-  testEnvironment: "<rootDir>/tests/environment/customEnvironment.js",
+  setupFilesAfterEnv: ["<rootDir>/tests/setupFile.js"],
   clearMocks: true,
   injectGlobals: false,
   collectCoverage: true,
