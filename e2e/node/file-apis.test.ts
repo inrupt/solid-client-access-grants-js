@@ -46,11 +46,11 @@ describe.only("File APIs for Access Grants", () => {
 
   beforeAll(async () => {
     testSessions = await setupSessions();
-    resourceTracker = new TestResourceTracker(testSessions);
+    resourceTracker = new TestResourceTracker(
+      testSessions.resourceOwnerSession
+    );
 
-    await resourceTracker.setup();
-
-    resourceTracker.debug();
+    await resourceTracker.setup({ debug: true });
   });
 
   afterAll(async () => {
@@ -98,6 +98,11 @@ describe.only("File APIs for Access Grants", () => {
     });
 
     test("getFile", async () => {
+      console.log("test running...");
+      expect(true).toBe(false);
+    });
+
+    test("overwriteFile", async () => {
       console.log("test running...");
       expect(true).toBe(false);
     });

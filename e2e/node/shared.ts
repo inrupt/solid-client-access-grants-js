@@ -40,7 +40,6 @@ import {
 } from "../../src";
 
 import { getTestingEnvironmentNode } from "../e2e-setup";
-import { result } from "rdf-namespaces/dist/as";
 
 const {
   idp: oidcIssuer,
@@ -51,8 +50,6 @@ const {
 
 export interface TestSessions {
   resourceOwnerSession: Session;
-  resourceOwnerPodIri: string;
-
   requestorSession: Session;
 }
 
@@ -76,23 +73,8 @@ export async function setupSessions(): Promise<TestSessions> {
     clientSecret: resourceOwnerOptions.secret,
   });
 
-  const resourceOwnerPodAll = await getPodUrlAll(
-    resourceOwnerSession.info.webId as string
-  );
-
-  if (resourceOwnerPodAll.length === 0) {
-    throw new Error(
-      "The Resource Owner WebID Profile is missing a link to at least one Pod root."
-    );
-  }
-
-  // eslint-disable-next-line prefer-destructuring
-  const resourceOwnerPodIri = resourceOwnerPodAll[0];
-
   return {
     resourceOwnerSession,
-    resourceOwnerPodIri,
-
     requestorSession,
   };
 }
@@ -103,22 +85,6 @@ export async function teardownSessions(
   await testSessions.resourceOwnerSession.logout();
   await testSessions.requestorSession.logout();
 }
-
-// export async function createTestContainer(
-//   groupName: string,
-//   testSessions: TestSessions
-// ): Promise<string> {
-//   const { resourceOwnerSession, resourceOwnerPodIri } = testSessions;
-
-//   const containerPath = `${resourceOwnerSession.info.sessionId}-${groupName}-${}`;
-//   const testContainerIri = new URL(`${containerPath}/`, resourceOwnerPodIri).href;
-
-//       testFileIri = new URL(testFileName, testContainerIri).href;
-
-//       await createContainerAt(testContainerIri, {
-//         fetch: testSessions.resourceOwnerSession.fetch,
-//       });
-// }
 
 interface CreateAccessGrantOptions {
   resources: string[];
@@ -169,7 +135,7 @@ export async function createAccessGrant(
 export class TestResourceTracker {
   private id: string;
 
-  private testSessions: TestSessions;
+  private resourceOwnerSession: Session;
 
   private fetchOptions: { fetch: typeof fetch };
 
@@ -181,13 +147,13 @@ export class TestResourceTracker {
 
   private debugPrefixes: Set<string> = new Set();
 
-  constructor(testSessions: TestSessions) {
+  constructor(resourceOwnerSession: Session) {
     this.id = randomUUID();
 
-    this.testSessions = testSessions;
+    this.resourceOwnerSession = resourceOwnerSession;
 
     this.fetchOptions = {
-      fetch: this.testSessions.resourceOwnerSession.fetch,
+      fetch: resourceOwnerSession.fetch,
     };
   }
 
@@ -207,23 +173,38 @@ export class TestResourceTracker {
     return false;
   }
 
-  debug(containerIri?: string) {
+  private debug(containerIri?: string) {
     if (containerIri) {
       this.debugPrefixes.add(containerIri);
     } else if (this.rootContainerIri) {
       this.debugPrefixes.add(this.rootContainerIri);
     }
-
-    console.log(Array.from(this.debugPrefixes.values()));
   }
 
-  async setup() {
+  async setup(options?: { debug: boolean }) {
+    const resourceOwnerPodAll = await getPodUrlAll(
+      this.resourceOwnerSession.info.webId as string
+    );
+
+    if (resourceOwnerPodAll.length === 0) {
+      throw new Error(
+        "The Resource Owner WebID Profile is missing a link to at least one Pod root."
+      );
+    }
+
+    // eslint-disable-next-line prefer-destructuring
+    const resourceOwnerPodIri = resourceOwnerPodAll[0];
+
     this.rootContainerIri = new URL(
       `test-${this.id}/`,
-      this.testSessions.resourceOwnerPodIri
+      resourceOwnerPodIri
     ).href;
 
     await createContainerAt(this.rootContainerIri, this.fetchOptions);
+
+    if (options?.debug) {
+      this.debug(this.rootContainerIri);
+    }
 
     this.log(
       this.rootContainerIri,
