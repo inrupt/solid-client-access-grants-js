@@ -35,7 +35,7 @@ import {
   setupSessions,
   teardownSessions,
   TestResourceTracker,
-  TestSessions,
+  type TestSessions,
 } from "./shared";
 
 import { AccessGrant, revokeAccessGrant } from "../../src";
