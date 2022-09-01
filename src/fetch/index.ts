@@ -21,7 +21,7 @@
 
 import { fetch as crossFetch } from "cross-fetch";
 import { base64url } from "jose";
-import type { UrlString } from "@inrupt/solid-client";
+import { access, UrlString } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UmaConfiguration } from "../type/UmaConfiguration";
 import type { FetchOptions } from "../type/FetchOptions";
@@ -115,14 +115,23 @@ export async function exchangeTicketForAccessToken(
  */
 export function boundFetch(accessToken: string): typeof fetch {
   // Explicitly use a named function such that it appears in stacktraces
-  return function authenticatedFetch(url, init) {
-    return crossFetch(url, {
+  return async function authenticatedFetch(url, init) {
+    console.log(`authenticatedFetch ${url} ${accessToken}`);
+
+    const response = await crossFetch(url, {
       ...init,
       headers: {
         ...(init?.headers || {}),
         authorization: `Bearer ${accessToken}`,
       },
     });
+
+    console.log(
+      `authenticatedFetch response ${response.status} ${url}`,
+      response.headers
+    );
+
+    return response;
   };
 }
 
@@ -155,8 +164,10 @@ export async function fetchWithVc(
 ): Promise<typeof fetch> {
   // Use an authenticated session to fetch the resource so that we can parse
   // its headers to find the UMA endpoint information and ticket
+  console.log(`requesting ${resourceIri}`);
   const response = await crossFetch(resourceIri);
   const { headers } = response;
+  console.log(`response ${response.status} ${resourceIri}`, headers);
 
   const wwwAuthentication = headers.get(WWW_AUTH_HEADER);
 
