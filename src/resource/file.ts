@@ -84,7 +84,7 @@ export async function getFile(
  * override the Content-Type of the file.
  * @returns A promise that resolves to a File if successful, and that rejects
  * otherwise.
- * @since unreleased
+ * @since 1.1.0
  */
 export async function overwriteFile(
   resourceUrl: UrlString,
@@ -127,7 +127,7 @@ export async function overwriteFile(
  * @param options Optional properties to customise the request behaviour, or override the Content-Type of the file.
  * @returns A promise that resolves to a File if successful, and that rejects
  * otherwise.
- * @since unreleased
+ * @since 1.1.0
  */
 
 export async function saveFileInContainer(

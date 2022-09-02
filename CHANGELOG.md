@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+## [1.1.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v1.1.0) - 2022-09-02
+
 ### New Features
 
 - Added resource APIs for `overwriteFile` and `saveFileInContainer`, these
