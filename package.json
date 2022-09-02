@@ -29,7 +29,7 @@
     "linked data",
     "turtle"
   ],
-  "homepage": "https://docs.inrupt.com/client-libraries/solid-client-access-grants-js/",
+  "homepage": "https://docs.inrupt.com/developer-tools/api/javascript/solid-client-access-grants/",
   "bugs": "https://github.com/inrupt/solid-client-access-grants-js/issues",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
