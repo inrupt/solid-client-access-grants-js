@@ -19,7 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/* eslint-disable no-shadow */
 import {
   it,
   describe,
@@ -28,7 +27,6 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
-/* eslint-enable no-shadow */
 import { base64url } from "jose";
 import { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 import {
@@ -42,7 +40,6 @@ jest.mock("./getAccessManagementUi");
 const mockAccessManagementUiDiscovery = (url: string | undefined) => {
   const accessUiDiscoveryModule = jest.requireMock(
     "./getAccessManagementUi"
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) as any;
   accessUiDiscoveryModule.getAccessManagementUiFromWellKnown = jest
     .fn(getAccessManagementUiFromWellKnown)

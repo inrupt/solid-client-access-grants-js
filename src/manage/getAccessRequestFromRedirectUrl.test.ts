@@ -19,10 +19,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// eslint-disable-next-line no-shadow
 import { describe, it, jest, expect } from "@jest/globals";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
-// eslint-disable-next-line no-shadow
 import { base64url } from "jose";
 import { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
@@ -30,9 +28,6 @@ import { getSessionFetch } from "../util/getSessionFetch";
 
 jest.mock("../util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {
-  // TypeScript can't infer the type of modules imported via Jest;
-  // skip type checking for those:
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const vcModule = jest.requireActual("@inrupt/solid-client-vc") as any;
   return {
     ...vcModule,

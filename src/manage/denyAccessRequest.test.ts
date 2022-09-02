@@ -19,7 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/* eslint-disable no-shadow */
 import { jest, it, describe, expect } from "@jest/globals";
 import { denyAccessRequest } from "./denyAccessRequest";
 import { mockAccessRequestVc } from "../util/access.mock";
@@ -29,9 +28,6 @@ import {
 } from "../request/request.mock";
 
 jest.mock("@inrupt/solid-client", () => {
-  // TypeScript can't infer the type of modules imported via Jest;
-  // skip type checking for those:
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getSolidDataset = jest.fn(
     solidClientModule.getSolidDataset
@@ -53,9 +49,7 @@ describe("denyAccessRequest", () => {
       },
       "issueVerifiableCredential"
     );
-    // TypeScript can't infer the type of mock modules imported via Jest;
-    // skip type checking for those:
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
 
     await denyAccessRequest(mockAccessRequestVc());
@@ -286,7 +280,7 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
     scab.fetch = jest
       .fn(global.fetch)

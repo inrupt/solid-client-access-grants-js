@@ -77,18 +77,6 @@ export async function getUmaConfiguration(
 }
 
 /**
- * @hidden
- */
-export function simpleFormUrlEncoded(form: Record<string, string>): string {
-  return Object.keys(form)
-    .reduce((encoded, key) => {
-      encoded.push(`${key}=${encodeURIComponent(form[key])}`);
-      return encoded;
-    }, new Array<string>())
-    .join("&");
-}
-
-/**
  * @hidden This is just an internal utility function to exchange a VC and ticket for an auth token.
  */
 export async function exchangeTicketForAccessToken(
@@ -105,12 +93,12 @@ export async function exchangeTicketForAccessToken(
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
     },
-    body: simpleFormUrlEncoded({
+    body: new URLSearchParams({
       claim_token: base64url.encode(JSON.stringify(credentialPresentation)),
       claim_token_format: VC_CLAIM_TOKEN_TYPE,
       grant_type: UMA_GRANT_TYPE,
       ticket: authTicket,
-    }),
+    }).toString(),
   });
 
   try {
@@ -126,14 +114,16 @@ export async function exchangeTicketForAccessToken(
  * @hidden This is just an internal utility function to bind a fetch function to the UMA auth token.
  */
 export function boundFetch(accessToken: string): typeof fetch {
-  return (url, init) =>
-    crossFetch(url, {
+  // Explicitly use a named function such that it appears in stacktraces
+  return function authenticatedFetch(url, init) {
+    return crossFetch(url, {
       ...init,
       headers: {
         ...(init?.headers || {}),
         authorization: `Bearer ${accessToken}`,
       },
     });
+  };
 }
 
 /**

@@ -19,7 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
 import {
   mockSolidDatasetFrom,
@@ -36,9 +35,6 @@ import {
 } from "../request/request.mock";
 
 jest.mock("@inrupt/solid-client", () => {
-  // TypeScript can't infer the type of modules imported via Jest;
-  // skip type checking for those:
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getSolidDataset = jest.fn(
     solidClientModule.getSolidDataset
@@ -50,9 +46,6 @@ jest.mock("@inrupt/solid-client-authn-browser");
 
 describe("getAccessManagementUi", () => {
   it("defaults to the default session fetch if no fetch is provided", async () => {
-    // TypeScript can't infer the type of mock modules imported via Jest;
-    // skip type checking for those:
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
     const spiedGetDataset = jest
       .spyOn(

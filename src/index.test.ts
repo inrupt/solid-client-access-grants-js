@@ -19,8 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// This rule complains about the `@jest/globals` variables overriding global vars:
-/* eslint-disable no-shadow */
 import { describe, it, expect } from "@jest/globals";
 import {
   approveAccessRequest,
@@ -39,6 +37,8 @@ import {
   revokeAccessGrant,
   fetchWithVc,
   getFile,
+  saveFileInContainer,
+  overwriteFile,
   getSolidDataset,
   saveSolidDatasetAt,
   GRANT_VC_URL_PARAM_NAME,
@@ -62,6 +62,8 @@ describe("Index exports", () => {
     expect(revokeAccessGrant).toBeDefined();
     expect(fetchWithVc).toBeDefined();
     expect(getFile).toBeDefined();
+    expect(overwriteFile).toBeDefined();
+    expect(saveFileInContainer).toBeDefined();
     expect(getSolidDataset).toBeDefined();
     expect(saveSolidDatasetAt).toBeDefined();
     expect(GRANT_VC_URL_PARAM_NAME).toBeDefined();

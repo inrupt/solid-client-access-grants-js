@@ -19,17 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// This rule complains about testing promises as described in the Jest docs:
-// https://jestjs.io/docs/asynchronous#promises
-/* eslint jest/no-conditional-expect: 0 */
-
-// Also disabling this to make my fetch mocking easy.
-/* eslint @typescript-eslint/no-explicit-any: 0 */
-
-// This rule complains about the `@jest/globals` variables overriding global vars:
-// eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
-// eslint-disable-next-line no-shadow
 import { fetch as crossFetch, Response } from "cross-fetch";
 
 import { base64url } from "jose";
@@ -40,7 +30,6 @@ import {
   exchangeTicketForAccessToken,
   boundFetch,
   fetchWithVc,
-  simpleFormUrlEncoded,
 } from "./index";
 
 jest.mock("cross-fetch", () => {
@@ -170,14 +159,14 @@ describe("exchangeTicketForAccessToken", () => {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: simpleFormUrlEncoded({
+      body: new URLSearchParams({
         claim_token: base64url.encode(
           JSON.stringify({ verifiableCredential: [MOCK_VC] })
         ),
         claim_token_format: "https://www.w3.org/TR/vc-data-model/#json-ld",
         grant_type: "urn:ietf:params:oauth:grant-type:uma-ticket",
         ticket: authTicket,
-      }),
+      }).toString(),
     });
   });
 

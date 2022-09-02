@@ -4,8 +4,16 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+### New Features
+
+- Added resource APIs for `overwriteFile` and `saveFileInContainer`, these
+  compliment the existing `getFile` method.
+
 ### Other Changes
 
+- Refactored resource APIs (`getFile`, `getSolidDataset`, `saveSolidDatasetAt`)
+  and added end-to-end test coverage of these APIs.
+- Improved jest setup for node & browser unit tests.
 - Added a more extensive demo app.
 
 ## [1.0.2](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v1.0.2) - 2022-06-21

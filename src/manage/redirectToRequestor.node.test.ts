@@ -19,8 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// This rule complains about the `@jest/globals` variables overriding global vars:
-/* eslint-disable no-shadow */
 import { it, describe, expect } from "@jest/globals";
 
 import { redirectToRequestor } from "./redirectToRequestor";

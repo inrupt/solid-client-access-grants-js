@@ -19,7 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// eslint-disable-next-line no-shadow
 import { jest, describe, it, expect } from "@jest/globals";
 import {
   MOCKED_ACCESS_ISSUER,
