@@ -24,14 +24,12 @@ This PR fixes #<issue ID>.
 
 This PR bumps the version to <version number>.
 
-# Checklist
+# Release steps:
 
-- [ ] I used `npm version <major|minor|patch>` to update `package.json`, inspecting the changelog to determine if the release was major, minor or patch.
-- [ ] The CHANGELOG has been updated to show version and release date - https://keepachangelog.com/en/1.0.0/.
-- [ ] `@since X.Y.Z` annotations have been added to new APIs.
-- [ ] The **only** commits in this PR are:
-  - the CHANGELOG update.
-  - the version update.
-  - `@since` annotations.
-- [ ] I will make sure **not** to squash these commits, but **rebase** instead.
-- [ ] Once this PR is merged, I will push the tag created by `npm version ...` (e.g. `git push origin vX.Y.Z`).
+1. Inspecting the `CHANGELOG.md` to determine if the release was major, minor or patch. Make sure you align with the rest of the team first.
+2. Use `npm version --no-git-tag-version <major|minor|patch>` to update `package.json`.
+3. Update the `CHANGELOG.md` has been updated to show version and release date.
+4. Add any `@since X.Y.Z` annotations if there have been any added or deprecated APIs.
+5. Commit the changes as `release: prepare vX.Y.Z` on a branch named `release/X.Y.Z`
+6. Create a PR, once CI passes, merge as a squash merge.
+7. Create and publish the release via GitHub, this will create the tag and trigger the npm publish.
