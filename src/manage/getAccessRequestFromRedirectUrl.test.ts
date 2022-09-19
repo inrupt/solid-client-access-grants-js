@@ -135,9 +135,10 @@ describe("getAccessRequestFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(
-      mockAccessRequestVc()
-    );
+    vcModule.getVerifiableCredential
+      .mockResolvedValueOnce(mockAccessRequestVc())
+      // We test this twice, once for string and one for URL object.
+      .mockResolvedValueOnce(mockAccessRequestVc());
 
     const redirectedToUrl = new URL("https://redirect.url");
     redirectedToUrl.searchParams.append(
@@ -149,8 +150,23 @@ describe("getAccessRequestFromRedirectUrl", () => {
       encodeURI("https://requestor.redirect.url")
     );
 
-    const { accessRequest, requestorRedirectUrl } =
-      await getAccessRequestFromRedirectUrl(redirectedToUrl);
+    // Check that both URL strings and objects are supported.
+    const accessRequestFromString = await getAccessRequestFromRedirectUrl(
+      redirectedToUrl.href
+    );
+    const accessRequestFromUrl = await getAccessRequestFromRedirectUrl(
+      redirectedToUrl
+    );
+
+    expect(accessRequestFromString.accessRequest).toStrictEqual(
+      accessRequestFromUrl.accessRequest
+    );
+    expect(accessRequestFromString.requestorRedirectUrl).toBe(
+      accessRequestFromUrl.requestorRedirectUrl
+    );
+
+    const { accessRequest, requestorRedirectUrl } = accessRequestFromUrl;
+
     expect(accessRequest).toStrictEqual(mockAccessRequestVc());
     expect(requestorRedirectUrl).toBe("https://requestor.redirect.url");
   });
