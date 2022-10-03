@@ -20,14 +20,9 @@
 //
 
 import { UrlString } from "@inrupt/solid-client";
-import {
-  isVerifiableCredential,
-  getVerifiableCredential,
-} from "@inrupt/solid-client-vc";
-import { base64url } from "jose";
+import { getVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   REDIRECT_URL_PARAM_NAME,
-  REQUEST_VC_PARAM_NAME,
   REQUEST_VC_URL_PARAM_NAME,
 } from "../discover/redirectToAccessManagementUi";
 import { isAccessRequest } from "../guard/isAccessRequest";
@@ -68,37 +63,19 @@ export async function getAccessRequestFromRedirectUrl(
     );
   }
 
-  // DEPRECATED: Get the Access Request. The IRI should be used instead, which is why
-  // this parameter missing doesn't result in an exception.
-  const accessRequestValue = redirectUrlObj.searchParams.get(
-    REQUEST_VC_PARAM_NAME
-  );
-
   // Get the Access Request IRI.
   const accessRequestIri = redirectUrlObj.searchParams.get(
     REQUEST_VC_URL_PARAM_NAME
   );
-  if (accessRequestIri === null && accessRequestValue === null) {
+  if (accessRequestIri === null) {
     throw new Error(
       `The provided redirect URL [${redirectUrl}] is missing the expected [${REQUEST_VC_URL_PARAM_NAME}] query parameter`
     );
   }
 
-  // If the value is provided directly, no fetch is required. Providing the value
-  // is deprecated though.
-  const accessRequest = accessRequestValue
-    ? JSON.parse(base64url.decode(accessRequestValue).toString())
-    : await getVerifiableCredential(accessRequestIri as string, {
-        fetch: authFetch,
-      });
-
-  // DEPRECATED: This is only required when passing the VC by value, it is already
-  // implemented upstream in getVerifiableCredential.
-  if (!isVerifiableCredential(accessRequest)) {
-    throw new Error(
-      `${JSON.stringify(accessRequest)} is not a Verifiable Credential`
-    );
-  }
+  const accessRequest = await getVerifiableCredential(accessRequestIri, {
+    fetch: authFetch,
+  });
 
   if (!isAccessRequest(accessRequest)) {
     throw new Error(

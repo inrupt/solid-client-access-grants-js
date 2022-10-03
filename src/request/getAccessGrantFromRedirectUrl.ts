@@ -20,18 +20,11 @@
 //
 
 import { UrlString } from "@inrupt/solid-client";
-import {
-  getVerifiableCredential,
-  isVerifiableCredential,
-} from "@inrupt/solid-client-vc";
-import { base64url } from "jose";
+import { getVerifiableCredential } from "@inrupt/solid-client-vc";
 import type { AccessGrant } from "../type/AccessGrant";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessVcBody } from "../guard/isBaseAccessVcBody";
-import {
-  GRANT_VC_PARAM_NAME,
-  GRANT_VC_URL_PARAM_NAME,
-} from "../manage/redirectToRequestor";
+import { GRANT_VC_URL_PARAM_NAME } from "../manage/redirectToRequestor";
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
@@ -53,29 +46,18 @@ export async function getAccessGrantFromRedirectUrl(
     typeof redirectUrl === "string" ? new URL(redirectUrl) : redirectUrl;
   const authFetch = options.fetch ?? (await getSessionFetch(options));
 
-  const accessGrantValue = redirectUrlObj.searchParams.get(GRANT_VC_PARAM_NAME);
-
   const accessGrantIri = redirectUrlObj.searchParams.get(
     GRANT_VC_URL_PARAM_NAME
   );
-  if (accessGrantIri === null && accessGrantValue === null) {
+  if (accessGrantIri === null) {
     throw new Error(
       `The provided redirect URL [${redirectUrl}] is missing the expected [${GRANT_VC_URL_PARAM_NAME}] query parameter`
     );
   }
-  const accessGrant = accessGrantValue
-    ? JSON.parse(base64url.decode(accessGrantValue).toString())
-    : await getVerifiableCredential(accessGrantIri as string, {
-        fetch: authFetch,
-      });
 
-  // DEPRECATED: This is only required when passing the VC by value, it is already
-  // implemented upstream in getVerifiableCredential.
-  if (!isVerifiableCredential(accessGrant)) {
-    throw new Error(
-      `${JSON.stringify(accessGrant)} is not a Verifiable Credential`
-    );
-  }
+  const accessGrant = await getVerifiableCredential(accessGrantIri, {
+    fetch: authFetch,
+  });
 
   if (!isBaseAccessVcBody(accessGrant) || !isAccessGrant(accessGrant)) {
     throw new Error(`${JSON.stringify(accessGrant)} is not an Access Grant`);

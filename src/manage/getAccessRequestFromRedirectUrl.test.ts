@@ -21,7 +21,6 @@
 
 import { describe, it, jest, expect } from "@jest/globals";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
-import { base64url } from "jose";
 import { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import { getSessionFetch } from "../util/getSessionFetch";
@@ -191,47 +190,6 @@ describe("getAccessRequestFromRedirectUrl", () => {
 
     await expect(
       getAccessRequestFromRedirectUrl(redirectedToUrl.href)
-    ).rejects.toThrow();
-  });
-
-  it("supports the legacy approach of providing the VC as a value", async () => {
-    const vcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
-    ) as jest.Mocked<{
-      getVerifiableCredential: typeof getVerifiableCredential;
-    }>;
-
-    const redirectUrl = new URL("https://redirect.url");
-    redirectUrl.searchParams.append(
-      "requestVc",
-      base64url.encode(JSON.stringify(mockAccessRequestVc()))
-    );
-    redirectUrl.searchParams.append(
-      "redirectUrl",
-      encodeURI("https://requestor.redirect.url")
-    );
-
-    const { accessRequest } = await getAccessRequestFromRedirectUrl(
-      redirectUrl.href
-    );
-    expect(accessRequest).toStrictEqual(mockAccessRequestVc());
-    // When the VC is passed as a value, nothing needs to be dereferenced.
-    expect(vcModule.getVerifiableCredential).not.toHaveBeenCalled();
-  });
-
-  it("throws if the legacy provided value is not a VC", async () => {
-    const redirectUrl = new URL("https://redirect.url");
-    redirectUrl.searchParams.append(
-      "requestVc",
-      base64url.encode(JSON.stringify({ someJson: "but not a VC" }))
-    );
-    redirectUrl.searchParams.append(
-      "redirectUrl",
-      encodeURI("https://requestor.redirect.url")
-    );
-
-    await expect(
-      getAccessRequestFromRedirectUrl(redirectUrl.href)
     ).rejects.toThrow();
   });
 });

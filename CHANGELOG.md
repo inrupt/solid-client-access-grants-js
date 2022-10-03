@@ -4,6 +4,12 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+### Deprecation notice
+
+- `getAccessRequestFromRedirectUrl` and `getAccessGrantFromRedirectUrl` no longer
+  pick up VC passed by value, and only support passing by IRI. This is for security
+  reasons, as passing a VC by value in the IR leaks information.
+
 ### New features
 
 - `getAccessRequestFromRedirectUrl` and `getAccessGrantFromRedirectUrl` now accept URL
