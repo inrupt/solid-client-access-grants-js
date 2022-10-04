@@ -4,6 +4,15 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+### Breaking change
+
+- `getAccessRequestFromRedirectUrl` and `getAccessGrantFromRedirectUrl` no longer
+  pick up VC passed by value, and only support passing by IRI. This is for security
+  reasons, as passing a VC by value in the IRI leaks information. This removes a
+  behavior that has been deprecated in v0.5.0. This change doesn't affect you if
+  you are using the query parameters accessors (`getAccessRequestFromRedirectUrl`
+  and `getAccessGrantFromRedirectUrl`).
+
 ### New features
 
 - `getAccessRequestFromRedirectUrl` and `getAccessGrantFromRedirectUrl` now accept URL
@@ -42,8 +51,6 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 - `GRANT_VC_URL_PARAM_NAME` is now exported from the base package. This is the name of the parameter
   used in URL redirects to an access grant management application.
-
-The following changes have been implemented but not released yet:
 
 ## [1.0.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v1.0.0) - 2022-06-06
 

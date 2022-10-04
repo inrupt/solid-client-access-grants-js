@@ -21,7 +21,6 @@
 
 import { describe, it, jest, expect } from "@jest/globals";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
-import { base64url } from "jose";
 import { getAccessGrantFromRedirectUrl } from "./getAccessGrantFromRedirectUrl";
 import { getSessionFetch } from "../util/getSessionFetch";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
@@ -134,36 +133,6 @@ describe("getAccessGrantFromRedirectUrl", () => {
     redirectUrl.searchParams.set(
       "accessGrantUrl",
       encodeURI("https://some.vc")
-    );
-
-    await expect(
-      getAccessGrantFromRedirectUrl(redirectUrl.href)
-    ).rejects.toThrow();
-  });
-
-  it("supports the legacy approach where the VC is provided by value", async () => {
-    const vcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
-    ) as jest.Mocked<{
-      getVerifiableCredential: typeof getVerifiableCredential;
-    }>;
-    const redirectUrl = new URL("https://redirect.url");
-    redirectUrl.searchParams.set(
-      "accessGrant",
-      base64url.encode(JSON.stringify(mockAccessGrantVc()))
-    );
-
-    const grantVc = await getAccessGrantFromRedirectUrl(redirectUrl.href);
-    expect(grantVc).toStrictEqual(mockAccessGrantVc());
-    // If the VC is provided as a value, no dereferencing should happen.
-    expect(vcModule.getVerifiableCredential).not.toHaveBeenCalled();
-  });
-
-  it("throws if the legacy provided value is not a VC", async () => {
-    const redirectUrl = new URL("https://redirect.url");
-    redirectUrl.searchParams.set(
-      "accessGrant",
-      base64url.encode(JSON.stringify({ someJson: "but not a VC" }))
     );
 
     await expect(
