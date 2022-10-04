@@ -27,7 +27,6 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
-import { base64url } from "jose";
 import { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 import {
   getAccessManagementUiFromWellKnown,
