@@ -663,6 +663,57 @@ describe("approveAccessRequest", () => {
     );
   });
 
+  it("issues a proper access grant nullifying only the expiration of the provided VC", async () => {
+    mockAcpClient();
+    mockAccessApiEndpoint();
+    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      issueVerifiableCredential: () => unknown;
+    };
+    const spiedIssueRequest = jest.spyOn(
+      mockedVcModule,
+      "issueVerifiableCredential"
+    );
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
+    await approveAccessRequest(
+      mockConsentRequestVc(),
+      {
+        expirationDate: null,
+      },
+      {
+        fetch: jest.fn(global.fetch),
+      }
+    );
+
+    expect(spiedIssueRequest).toHaveBeenCalledWith(
+      `${MOCKED_ACCESS_ISSUER}/issue`,
+      expect.objectContaining({
+        providedConsent: {
+          mode: mockConsentRequestVc().credentialSubject.hasConsent.mode,
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          forPersonalData:
+            mockConsentRequestVc().credentialSubject.hasConsent.forPersonalData,
+          isProvidedTo: mockConsentRequestVc().credentialSubject.id,
+          forPurpose:
+            mockConsentRequestVc().credentialSubject.hasConsent.forPurpose,
+        },
+        inbox: mockConsentRequestVc().credentialSubject.inbox,
+      }),
+      expect.objectContaining({
+        type: ["SolidAccessGrant"],
+        issuanceDate: mockConsentRequestVc().issuanceDate,
+        // The expiration date should have been overridden.
+        expirationDate: undefined,
+      }),
+      expect.anything()
+    );
+  });
+
   it("issues a proper access grant with undefined expiration date", async () => {
     mockAcpClient();
     mockAccessApiEndpoint();

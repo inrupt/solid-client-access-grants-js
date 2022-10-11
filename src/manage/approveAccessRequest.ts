@@ -42,9 +42,9 @@ import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 
 export type ApproveAccessRequestOverrides = Omit<
-  AccessGrantParameters,
-  "status"
->;
+  Omit<AccessGrantParameters, "status">,
+  "expirationDate"
+> & { expirationDate?: Date | null };
 
 function getAccessModesFromAccessGrant(request: AccessGrantBody): AccessModes {
   const accessMode: AccessModes = {};
@@ -135,7 +135,7 @@ async function internal_approveAccessRequest(
     requestorInboxUrl: internalGrantOptions.requestorInboxUrl,
     purpose: internalGrantOptions.purpose,
     issuanceDate: internalGrantOptions.issuanceDate,
-    expirationDate: internalGrantOptions.expirationDate,
+    expirationDate: internalGrantOptions.expirationDate ?? undefined,
     status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   });
 

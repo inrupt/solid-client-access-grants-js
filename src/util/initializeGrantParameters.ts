@@ -84,23 +84,29 @@ export function initializeGrantParameters(
   requestVc: (AccessRequestBody & { issuanceDate: string }) | undefined,
   requestOverride?: Partial<ApproveAccessRequestOverrides>
 ): ApproveAccessRequestOverrides {
-  return requestVc === undefined
-    ? (requestOverride as ApproveAccessRequestOverrides)
-    : {
-        requestor:
-          requestOverride?.requestor ?? getRequestorFromRequest(requestVc),
-        access:
-          requestOverride?.access ??
-          modesToAccess(getModesFromRequest(requestVc)),
-        resources:
-          requestOverride?.resources ?? getResourcesFromRequest(requestVc),
-        requestorInboxUrl:
-          requestOverride?.requestorInboxUrl ?? getInboxFromRequest(requestVc),
-        issuanceDate:
-          requestOverride?.issuanceDate ?? getIssuanceFromRequest(requestVc),
-        purpose: requestOverride?.purpose ?? getPurposeFromRequest(requestVc),
-        expirationDate:
-          requestOverride?.expirationDate ??
-          getExpirationFromRequest(requestVc),
-      };
+  const resultGrant =
+    requestVc === undefined
+      ? (requestOverride as ApproveAccessRequestOverrides)
+      : {
+          requestor:
+            requestOverride?.requestor ?? getRequestorFromRequest(requestVc),
+          access:
+            requestOverride?.access ??
+            modesToAccess(getModesFromRequest(requestVc)),
+          resources:
+            requestOverride?.resources ?? getResourcesFromRequest(requestVc),
+          requestorInboxUrl:
+            requestOverride?.requestorInboxUrl ??
+            getInboxFromRequest(requestVc),
+          issuanceDate:
+            requestOverride?.issuanceDate ?? getIssuanceFromRequest(requestVc),
+          purpose: requestOverride?.purpose ?? getPurposeFromRequest(requestVc),
+          expirationDate:
+            requestOverride?.expirationDate ??
+            getExpirationFromRequest(requestVc),
+        };
+  if (requestOverride?.expirationDate === null) {
+    resultGrant.expirationDate = undefined;
+  }
+  return resultGrant;
 }
