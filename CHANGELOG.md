@@ -18,7 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 - `getAccessRequestFromRedirectUrl` and `getAccessGrantFromRedirectUrl` now accept URL
   objects as well as plain strings.
 - `approveAccessRequest` now accepts a `null` expiration date override, resulting
-in the expiration date from the Access Request not being applied to the Access Grant.
+  in the expiration date from the Access Request not being applied to the Access Grant.
 
 ## [1.1.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v1.1.0) - 2022-09-02
 
