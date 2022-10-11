@@ -194,6 +194,58 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         ).errors
       ).toHaveLength(1);
     });
+
+    it("can issue an access grant overriding an access request", async () => {
+      const expirationDate = new Date();
+      // Request a 3-month grant
+      expirationDate.setMonth((expirationDate.getMonth() + 3) % 12);
+      const request = await issueAccessRequest(
+        {
+          access: { read: true, append: true },
+          resourceOwner: resourceOwnerSession.info.webId as string,
+          resources: [sharedFileIri],
+          purpose: [
+            "https://some.purpose/not-a-nefarious-one/i-promise",
+            "https://some.other.purpose/",
+          ],
+          expirationDate,
+        },
+        {
+          fetch: requestorSession.fetch,
+          accessEndpoint: vcProvider,
+        }
+      );
+
+      const grant = await approveAccessRequest(
+        request,
+        {
+          // Only grant a subset of the required access.
+          access: { read: true },
+          requestor: requestorSession.info.webId as string,
+          resources: [sharedFileIri],
+          // Remove the expiration date from the grant.
+          expirationDate: null,
+        },
+        {
+          fetch: resourceOwnerSession.fetch,
+          accessEndpoint: vcProvider,
+        }
+      );
+
+      await expect(
+        isValidAccessGrant(grant, {
+          fetch: resourceOwnerSession.fetch,
+          // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+          // It is an issue documented in the VC library e2e test, and in a ticket
+          // to be fixed.
+          verificationEndpoint: `${vcProvider}/verify`,
+        })
+      ).resolves.toMatchObject({ errors: [] });
+      expect(grant.expirationDate).toBeUndefined();
+      expect(grant.credentialSubject.providedConsent.mode).toStrictEqual([
+        "http://www.w3.org/ns/auth/acl#Read",
+      ]);
+    });
   });
 
   describe("resource owner interaction with VC provider", () => {
