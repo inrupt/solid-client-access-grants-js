@@ -1,6 +1,6 @@
 module.exports = {
   preset: "ts-jest",
-  setupFilesAfterEnv: ["<rootDir>/tests/setupFile.js"],
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   clearMocks: true,
   injectGlobals: false,
   collectCoverage: true,
