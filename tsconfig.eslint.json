@@ -4,6 +4,7 @@
     "src/**/*.test.ts",
     "e2e/**/*.ts",
     "examples/**/*.ts",
-    "tests/**/*.js"
+    "jest.config.ts",
+    "jest.setup.ts"
   ]
 }
