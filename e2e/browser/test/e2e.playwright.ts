@@ -20,10 +20,13 @@
 //
 
 import { test, expect } from "@playwright/test";
+import {
+  setupEnv,
+  getTestingEnvironmentBrowser,
+} from "@inrupt/test-env-helpers";
 import { essUserLogin } from "./roles";
 
-import { getTestingEnvironmentBrowser } from "../../e2e-setup";
-
+setupEnv();
 const { login, password } = getTestingEnvironmentBrowser();
 
 test("Granting access to a resource, then revoking it", async ({ page }) => {
