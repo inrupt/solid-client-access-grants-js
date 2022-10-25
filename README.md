@@ -1,5 +1,11 @@
 # Solid Access Grants - solid-client-access-grants
 
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE-OF-CONDUCT.md)
+
+This project adheres to the Contributor Covenant [code of conduct](CODE-OF-CONDUCT.md).
+By participating, you are expected to uphold this code. Please report unacceptable
+behavior to [engineering@inrupt.com](mailto:engineering@inrupt.com).
+
 `@inrupt/solid-client-access-grants` is a JavaScript library for requesting
 and managing access given to an agent for a resource. These access grants are
 represented by Verifiable Credentials, signed by an Issuer associated to the Pod
