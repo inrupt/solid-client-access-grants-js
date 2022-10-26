@@ -42,6 +42,8 @@ import {
   getSolidDataset,
   saveSolidDatasetAt,
   GRANT_VC_URL_PARAM_NAME,
+  gConsent,
+  odrl
 } from "./index";
 
 describe("Index exports", () => {
@@ -67,5 +69,7 @@ describe("Index exports", () => {
     expect(getSolidDataset).toBeDefined();
     expect(saveSolidDatasetAt).toBeDefined();
     expect(GRANT_VC_URL_PARAM_NAME).toBeDefined();
+    expect(gConsent).toBeDefined();
+    expect(odrl).toBeDefined();
   });
 });
