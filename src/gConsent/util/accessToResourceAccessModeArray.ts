@@ -24,7 +24,7 @@ import {
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
 } from "../constants";
-import { AccessModes } from "../type/AccessModes";
+import { AccessModes } from "../../type/AccessModes";
 import { ResourceAccessMode } from "../type/ResourceAccessMode";
 
 export function accessToResourceAccessModeArray(

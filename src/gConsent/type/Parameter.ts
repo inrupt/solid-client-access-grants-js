@@ -29,7 +29,7 @@ import type {
   GC_CONSENT_STATUS_REQUESTED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
-import { AccessModes } from "./AccessModes";
+import { AccessModes } from "../../type/AccessModes";
 
 export interface BaseRequestParameters {
   access: AccessModes;
