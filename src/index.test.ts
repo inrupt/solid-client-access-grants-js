@@ -43,7 +43,7 @@ import {
   saveSolidDatasetAt,
   GRANT_VC_URL_PARAM_NAME,
   gConsent,
-  odrl
+  odrl,
 } from "./index";
 
 describe("Index exports", () => {
