@@ -56,6 +56,10 @@ export {
 // functions even when not relying on named exports.
 export * as gConsent from "./gConsent";
 
+// For backwards compatibility, all the functions handling odrl-based Access Grants
+// are exported from an API object to avoid clashes with the gConsent ones.
+export * as odrl from "./odrl";
+
 export { fetchWithVc } from "./fetch";
 
 export {
