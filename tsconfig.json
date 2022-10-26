@@ -23,10 +23,12 @@
       "src/index.ts",
       "src/resource/index.ts",
       "src/fetch/index.ts",
+      "src/gConsent/index.ts",
       "src/gConsent/discover/index.ts",
       "src/gConsent/manage/index.ts",
       "src/gConsent/request/index.ts",
       "src/gConsent/verify/index.ts",
+      "src/odrl/index.ts",
       // These types are reused across files, so give them a specific page for
       // them to be documented on:
       "src/type/RedirectOptions.ts",

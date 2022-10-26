@@ -45,10 +45,12 @@
     "./manage": "./dist/gConsent/manage/index.mjs",
     "./request": "./dist/gConsent/request/index.mjs",
     "./verify": "./dist/gConsent/verify/index.mjs",
+    "./gConsent": "./dist/gConsent/index.mjs",
     "./gConsent/discover": "./dist/gConsent/discover/index.mjs",
     "./gConsent/manage": "./dist/gConsent/manage/index.mjs",
     "./gConsent/request": "./dist/gConsent/request/index.mjs",
-    "./gConsent/verify": "./dist/gConsent/verify/index.mjs"
+    "./gConsent/verify": "./dist/gConsent/verify/index.mjs",
+    "./odrl": "./dist/odrl/index.mjs"
   },
   "typesVersions": {
     "*": {
