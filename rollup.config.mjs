@@ -68,6 +68,7 @@ export default [
   },
   {
     input: [
+      "./src/type/AccessModes.ts",
       "./src/type/FetchOptions.ts",
       "./src/type/RecursivePartial.ts",
       "./src/type/RedirectOptions.ts",
@@ -76,7 +77,6 @@ export default [
       "./src/gConsent/type/AccessBaseOptions.ts",
       "./src/gConsent/type/AccessCredentialType.ts",
       "./src/gConsent/type/AccessGrantContext.ts",
-      "./src/gConsent/type/AccessModes.ts",
       "./src/gConsent/type/AccessRequest.ts",
       "./src/gConsent/type/AccessVerifiableCredential.ts",
       "./src/gConsent/type/GConsentStatus.ts",
