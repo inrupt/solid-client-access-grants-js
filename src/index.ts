@@ -34,7 +34,6 @@ export type { FetchOptions } from "./type/FetchOptions";
 export type { RedirectOptions } from "./type/RedirectOptions";
 export type { AccessModes } from "./type/AccessModes";
 
-
 export {
   getAccessApiEndpoint,
   getAccessManagementUi,
