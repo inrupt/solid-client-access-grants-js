@@ -19,12 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/**
- * Import this module for the access API functions available to an entity
- * verifying issued credentials for access over a resource.
- * @packageDocumentation
- */
+import { describe, it, expect } from "@jest/globals";
+import { isValidAccessGrant } from "./index";
 
-// This reexports code that has been moved to the common package, because it isn't
-// GConsent-specific.
-export { isValidAccessGrant } from "../../common/verify/isValidAccessGrant";
+describe("Index exports", () => {
+  it("exposes expected things", () => {
+    expect(isValidAccessGrant).toBeDefined();
+  });
+});

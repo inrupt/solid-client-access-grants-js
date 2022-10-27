@@ -19,37 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-export type { AccessGrant, AccessGrantGConsent } from "./type/AccessGrant";
-export type {
-  AccessRequest,
-  AccessRequestGConsent,
-} from "./type/AccessRequest";
-export type { AccessBaseOptions } from "./type/AccessBaseOptions";
-export type { AccessCredentialType } from "./type/AccessCredentialType";
-export type { AccessGrantContext } from "./type/AccessGrantContext";
-export type { ApproveAccessRequestOverrides } from "./manage/approveAccessRequest";
-export type { IssueAccessRequestParameters } from "./type/IssueAccessRequestParameters";
-export type { RedirectToAccessManagementUiOptions } from "./discover";
+import { describe, it, expect } from "@jest/globals";
+import { isValidAccessGrant } from "./index";
 
-export {
-  getAccessApiEndpoint,
-  getAccessManagementUi,
-  redirectToAccessManagementUi,
-} from "./discover";
-
-export {
-  issueAccessRequest,
-  cancelAccessRequest,
-  getAccessGrantFromRedirectUrl,
-} from "./request";
-
-export {
-  approveAccessRequest,
-  denyAccessRequest,
-  getAccessGrant,
-  getAccessGrantAll,
-  getAccessRequestFromRedirectUrl,
-  redirectToRequestor,
-  revokeAccessGrant,
-  GRANT_VC_URL_PARAM_NAME,
-} from "./manage";
+describe("Index exports", () => {
+  it("exposes expected things", () => {
+    expect(isValidAccessGrant).toBeDefined();
+  });
+});

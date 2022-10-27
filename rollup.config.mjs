@@ -56,7 +56,8 @@ export default [
       "./src/gConsent/discover/index.ts",
       "./src/gConsent/manage/index.ts",
       "./src/gConsent/request/index.ts",
-      "./src/gConsent/verify/index.ts",
+      "./src/common/verify/index.ts",
+      "./src/odrl/index.ts",
     ],
     output: {
       dir: "dist",
