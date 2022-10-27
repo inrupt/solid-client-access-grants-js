@@ -83,6 +83,7 @@ export default [
       "./src/gConsent/type/IssueAccessRequestParameters.ts",
       "./src/gConsent/type/Parameter.ts",
       "./src/gConsent/type/ResourceAccessMode.ts",
+      "./src/odrl/type/AccessGrant.ts",
     ],
     output: {
       dir: "dist",

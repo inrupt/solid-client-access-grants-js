@@ -19,5 +19,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// TODO Remove when actually exporting functions from the odrl module.
-export const DUMMY_CONSTANT = 0;
+export type {
+  AccessGrantOdrl,
+  CredentialSubjectOdrl,
+  OdrlConstraint,
+  OdrlPermission,
+} from "./type/AccessGrant";
