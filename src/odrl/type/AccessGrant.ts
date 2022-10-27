@@ -120,6 +120,24 @@ function isOdrlPermission(permission: unknown): permission is OdrlPermission {
  * Access Grant. This function only performs type validation, it does not verify
  * that the provided Credential is valid.
  *
+ * Example usage:
+ *
+ * ```
+ * // Get a JSON object that may be an Access Grant
+ * const candidateCredential = await fetchCredentialFromElsewhere();
+ *
+ * // Validate the Access Grant payload
+ * if (!isCredentialAccessGrantOdrl(candidateCredential)) {
+ *  throw new Error("Invalid ODRL Access Grant");
+ * }
+ *
+ * // Verify the credential
+ * const validationResult = await isValidAccessGrant(candidateCredential, {
+ *  verificationEndpoint: "https://some.verifier",
+ *  fetch: someAuthenticatedFetch
+ * });
+ * ```
+ *
  * @param vc A Verifiable Credential
  * @returns true if the VC is a valid ODRL-based Access Grant
  * @since unreleased
