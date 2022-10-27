@@ -124,9 +124,6 @@ describe("isValidAccessGrant", () => {
   });
 
   it("retrieves the vc if a url was passed", async () => {
-    jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
-      verifierService: "https://some.vc.verifier",
-    });
     jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
     const mockedFetch = jest
       .fn(global.fetch)
@@ -143,7 +140,7 @@ describe("isValidAccessGrant", () => {
 
     await isValidAccessGrant("https://example.com/someVc", {
       fetch: mockedFetch as typeof fetch,
-      accessEndpoint: MOCK_ACCESS_ENDPOINT,
+      verificationEndpoint: MOCK_ACCESS_ENDPOINT,
     });
 
     expect(mockedFetch).toHaveBeenCalledWith("https://example.com/someVc");
@@ -160,7 +157,7 @@ describe("isValidAccessGrant", () => {
     await expect(
       isValidAccessGrant("https://example.com/someVc", {
         fetch: mockedFetch as typeof fetch,
-        accessEndpoint: MOCK_ACCESS_ENDPOINT,
+        verificationEndpoint: MOCK_ACCESS_ENDPOINT,
       })
     ).rejects.toThrow(
       "The request to [https://example.com/someVc] returned an unexpected response:"

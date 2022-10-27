@@ -26,7 +26,7 @@ import type {
   AccessGrantBody,
   AccessRequestBody,
 } from "../type/AccessVerifiableCredential";
-import { getSessionFetch } from "./getSessionFetch";
+import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { isBaseAccessRequestVerifiableCredential } from "../guard/isBaseAccessRequestVerifiableCredential";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 

@@ -30,7 +30,7 @@ import {
   instanciateEssAccessGrantContext,
 } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
-import { getSessionFetch } from "./getSessionFetch";
+import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type {
   AccessGrantBody,
   AccessRequestBody,

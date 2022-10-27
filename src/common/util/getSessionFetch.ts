@@ -20,7 +20,7 @@
 //
 
 import { fetch as crossFetch } from "cross-fetch";
-import { AccessBaseOptions } from "../type/AccessBaseOptions";
+import { AccessBaseOptions } from "../../gConsent/type/AccessBaseOptions";
 
 /**
  * Dynamically import solid-client-authn-browser so that

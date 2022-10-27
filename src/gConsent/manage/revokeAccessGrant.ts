@@ -26,7 +26,7 @@ import {
 } from "@inrupt/solid-client-vc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getBaseAccessGrantVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
-import { getSessionFetch } from "../util/getSessionFetch";
+import { getSessionFetch } from "../../common/util/getSessionFetch";
 
 /**
  * Makes a request to the access server to revoke a given Verifiable Credential (VC).

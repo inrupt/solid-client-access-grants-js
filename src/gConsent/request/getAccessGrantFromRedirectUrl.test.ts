@@ -22,10 +22,10 @@
 import { describe, it, jest, expect } from "@jest/globals";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
 import { getAccessGrantFromRedirectUrl } from "./getAccessGrantFromRedirectUrl";
-import { getSessionFetch } from "../util/getSessionFetch";
+import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 
-jest.mock("../util/getSessionFetch");
+jest.mock("../../common/util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {
   // TypeScript can't infer the type of modules imported via Jest;
   // skip type checking for those:
@@ -47,7 +47,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
   it("uses the default fetch if none is provided", async () => {
     const mockedFetch = jest.fn(fetch);
     const embeddedFetch = jest.requireMock(
-      "../util/getSessionFetch"
+      "../../common/util/getSessionFetch"
     ) as jest.Mocked<{ getSessionFetch: typeof getSessionFetch }>;
     embeddedFetch.getSessionFetch.mockResolvedValueOnce(mockedFetch);
 

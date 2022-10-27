@@ -37,7 +37,7 @@ import {
 } from "../constants";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
-import { getSessionFetch } from "../util/getSessionFetch";
+import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 

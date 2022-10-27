@@ -25,7 +25,7 @@ import type { AccessGrant } from "../type/AccessGrant";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessVcBody } from "../guard/isBaseAccessVcBody";
 import { GRANT_VC_URL_PARAM_NAME } from "../manage/redirectToRequestor";
-import { getSessionFetch } from "../util/getSessionFetch";
+import { getSessionFetch } from "../../common/util/getSessionFetch";
 
 /**
  * Get the Access Grant out of the incoming redirect from the Access Management app.

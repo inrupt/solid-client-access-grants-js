@@ -25,5 +25,6 @@
  * @packageDocumentation
  */
 
-// TODO: Allow verification of different types of consent & access grants
-export { isValidAccessGrant } from "./isValidAccessGrant";
+// This reexports code that has been moved to the common package, because it isn't
+// GConsent-specific.
+export { isValidAccessGrant } from "../../common/verify/isValidAccessGrant";

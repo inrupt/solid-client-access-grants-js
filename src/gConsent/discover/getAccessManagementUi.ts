@@ -27,7 +27,7 @@ import {
   getWellKnownSolid,
   UrlString,
 } from "@inrupt/solid-client";
-import { getSessionFetch } from "../util/getSessionFetch";
+import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { PIM_STORAGE, PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
