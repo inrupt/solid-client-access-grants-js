@@ -19,11 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-export type {
-  AccessGrantOdrl,
-  CredentialSubjectOdrl,
-  OdrlConstraint,
-  OdrlPermission,
-} from "./type/AccessGrant";
+import { describe, it, expect } from "@jest/globals";
+import { isCredentialAccessGrantOdrl } from "./index";
 
-export { isCredentialAccessGrantOdrl } from "./type/AccessGrant";
+describe("Index exports", () => {
+  it("exposes expected things", () => {
+    expect(isCredentialAccessGrantOdrl).toBeDefined();
+  });
+});

@@ -115,6 +115,15 @@ function isOdrlPermission(permission: unknown): permission is OdrlPermission {
   return true;
 }
 
+/**
+ * Verify that the provided Verifiable Credential has the shape of an ODRL-based
+ * Access Grant. This function only performs type validation, it does not verify
+ * that the provided Credential is valid.
+ *
+ * @param vc A Verifiable Credential
+ * @returns true if the VC is a valid ODRL-based Access Grant
+ * @since unreleased
+ */
 export function isCredentialAccessGrantOdrl(
   vc: VerifiableCredential
 ): vc is AccessGrantOdrl {
