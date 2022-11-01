@@ -21,13 +21,13 @@
 
 import {
   setupEnv,
-  getTestingEnvironmentBrowser,
+  getBrowserTestingEnvironment,
 } from "@inrupt/test-env-helpers";
 
 async function globalSetup() {
   setupEnv();
   // Fail fast with dotenv:
-  getTestingEnvironmentBrowser();
+  getBrowserTestingEnvironment();
 
   // Return the teardown function.
   return async () => {};

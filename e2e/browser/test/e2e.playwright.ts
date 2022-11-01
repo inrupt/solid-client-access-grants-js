@@ -22,12 +22,12 @@
 import { test, expect } from "@playwright/test";
 import {
   setupEnv,
-  getTestingEnvironmentBrowser,
+  getBrowserTestingEnvironment,
 } from "@inrupt/test-env-helpers";
 import { essUserLogin } from "./roles";
 
 setupEnv();
-const { login, password } = getTestingEnvironmentBrowser();
+const { login, password } = getBrowserTestingEnvironment();
 
 test("Granting access to a resource, then revoking it", async ({ page }) => {
   // Navigate to the test page and log in.
