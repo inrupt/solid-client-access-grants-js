@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+## [2.0.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.0.0) - 2022-11-03
+
 ### Breaking change
 
 - `getAccessRequestFromRedirectUrl` and `getAccessGrantFromRedirectUrl` no longer
