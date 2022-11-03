@@ -53,7 +53,7 @@ const {
   environment,
   clientCredentials: { requestor, resourceOwner },
   vcProvider,
-} = getNodeAccessGrantTestingEnvironment();
+} = getNodeAccessGrantTestingEnvironment({});
 
 // For some reason, the Node jest runner throws an undefined error when
 // calling to btoa. This overrides it, while keeping the actual code
