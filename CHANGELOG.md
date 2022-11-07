@@ -17,6 +17,11 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ### New features
 
+- `gConsent` and `odrl` API objects: in order to support a new schema for Access
+  Grants, new functions will be added to the API. They will not be compatible with
+  the current data model, so the new API will be exported via the `odrl` object
+  for backwards compatibility. After the current API is deprecated, the default
+  exports will point to `odrl`.
 - `getAccessRequestFromRedirectUrl` and `getAccessGrantFromRedirectUrl` now accept URL
   objects as well as plain strings.
 - `approveAccessRequest` now accepts a `null` expiration date override, resulting

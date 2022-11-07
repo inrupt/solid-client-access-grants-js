@@ -39,32 +39,52 @@
       "require": "./dist/index.js",
       "import": "./dist/index.mjs"
     },
-    "./discover": "./dist/discover/index.mjs",
-    "./manage": "./dist/manage/index.mjs",
-    "./request": "./dist/request/index.mjs",
-    "./verify": "./dist/verify/index.mjs",
     "./resource": "./dist/resource/index.mjs",
-    "./fetch": "./dist/resource/index.mjs"
+    "./fetch": "./dist/resource/index.mjs",
+    "./discover": "./dist/gConsent/discover/index.mjs",
+    "./manage": "./dist/gConsent/manage/index.mjs",
+    "./request": "./dist/gConsent/request/index.mjs",
+    "./verify": "./dist/gConsent/verify/index.mjs",
+    "./gConsent": "./dist/gConsent/index.mjs",
+    "./gConsent/discover": "./dist/gConsent/discover/index.mjs",
+    "./gConsent/manage": "./dist/gConsent/manage/index.mjs",
+    "./gConsent/request": "./dist/gConsent/request/index.mjs",
+    "./gConsent/verify": "./dist/gConsent/verify/index.mjs",
+    "./odrl": "./dist/odrl/index.mjs"
   },
   "typesVersions": {
     "*": {
       "discover": [
-        "dist/discover/index.d.ts"
+        "dist/gConsent/discover/index.d.ts"
       ],
       "manage": [
-        "dist/manage/index.d.ts"
+        "dist/gConsent/manage/index.d.ts"
       ],
       "request": [
-        "dist/request/index.d.ts"
+        "dist/gConsent/request/index.d.ts"
       ],
       "verify": [
-        "dist/verify/index.d.ts"
+        "dist/gConsent/verify/index.d.ts"
       ],
       "resource": [
         "dist/resource/index.d.ts"
       ],
       "fetch": [
         "dist/fetch/index.d.ts"
+      ]
+    },
+    "gConsent": {
+      "discover": [
+        "dist/gConsent/discover/index.d.ts"
+      ],
+      "manage": [
+        "dist/gConsent/manage/index.d.ts"
+      ],
+      "request": [
+        "dist/gConsent/request/index.d.ts"
+      ],
+      "verify": [
+        "dist/gConsent/verify/index.d.ts"
       ]
     }
   },

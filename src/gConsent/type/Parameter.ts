@@ -19,30 +19,38 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import {
-  ACL_RESOURCE_ACCESS_MODE_READ,
-  ACL_RESOURCE_ACCESS_MODE_APPEND,
-  ACL_RESOURCE_ACCESS_MODE_WRITE,
+/**
+ * @module interfaces
+ */
+
+import type { UrlString } from "@inrupt/solid-client";
+
+import type {
+  GC_CONSENT_STATUS_REQUESTED,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
-import { AccessModes } from "../type/AccessModes";
-import { ResourceAccessMode } from "../type/ResourceAccessMode";
+import { AccessModes } from "../../type/AccessModes";
 
-export function accessToResourceAccessModeArray(
-  desiredAccess: AccessModes
-): ResourceAccessMode[] {
-  const modes: ResourceAccessMode[] = [];
+export interface BaseRequestParameters {
+  access: AccessModes;
+  requestorInboxUrl?: UrlString;
+  resources: Array<UrlString>;
+  purpose?: Array<UrlString>;
+  issuanceDate?: Date;
+  expirationDate?: Date;
+}
 
-  if (desiredAccess.read === true) {
-    modes.push(ACL_RESOURCE_ACCESS_MODE_READ);
-  }
+export interface InputAccessRequestParameters extends BaseRequestParameters {
+  resourceOwner: UrlString;
+}
+export interface AccessRequestParameters extends InputAccessRequestParameters {
+  status: typeof GC_CONSENT_STATUS_REQUESTED;
+}
 
-  if (desiredAccess.append === true) {
-    modes.push(ACL_RESOURCE_ACCESS_MODE_APPEND);
-  }
+export interface InputAccessGrantParameters extends BaseRequestParameters {
+  requestor: UrlString;
+}
 
-  if (desiredAccess.write === true) {
-    modes.push(ACL_RESOURCE_ACCESS_MODE_WRITE);
-  }
-
-  return modes;
+export interface AccessGrantParameters extends InputAccessGrantParameters {
+  status: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
 }

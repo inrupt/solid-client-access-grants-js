@@ -28,8 +28,8 @@ import {
   getAccessManagementUiFromWellKnown,
 } from "./getAccessManagementUi";
 import { redirectWithParameters } from "../util/redirect";
-import { FetchOptions } from "../type/FetchOptions";
-import { RedirectOptions } from "../type/RedirectOptions";
+import { FetchOptions } from "../../type/FetchOptions";
+import { RedirectOptions } from "../../type/RedirectOptions";
 
 // DEPRECATED: the VC should be sent by IRI, and not by value.
 export const REQUEST_VC_PARAM_NAME = "requestVc";

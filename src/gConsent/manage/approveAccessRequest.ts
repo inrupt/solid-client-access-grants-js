@@ -25,7 +25,7 @@ import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
 import type { AccessGrantParameters } from "../type/Parameter";
-import type { AccessModes } from "../type/AccessModes";
+import type { AccessModes } from "../../type/AccessModes";
 import type { AccessGrant } from "../type/AccessGrant";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";

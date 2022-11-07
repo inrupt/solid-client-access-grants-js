@@ -19,31 +19,28 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-export type { AccessGrant } from "./type/AccessGrant";
-export type { AccessBaseOptions } from "./type/AccessBaseOptions";
-export type { AccessCredentialType } from "./type/AccessCredentialType";
-export type { AccessGrantContext } from "./type/AccessGrantContext";
-export type { AccessModes } from "./type/AccessModes";
-export type { AccessRequest } from "./type/AccessRequest";
-export type { ApproveAccessRequestOverrides } from "./manage/approveAccessRequest";
+export type {
+  AccessGrant,
+  AccessBaseOptions,
+  AccessCredentialType,
+  AccessGrantContext,
+  AccessRequest,
+  ApproveAccessRequestOverrides,
+  IssueAccessRequestParameters,
+  RedirectToAccessManagementUiOptions,
+} from "./gConsent";
+
 export type { FetchOptions } from "./type/FetchOptions";
-export type { IssueAccessRequestParameters } from "./type/IssueAccessRequestParameters";
 export type { RedirectOptions } from "./type/RedirectOptions";
-export type { RedirectToAccessManagementUiOptions } from "./discover";
+export type { AccessModes } from "./type/AccessModes";
 
 export {
   getAccessApiEndpoint,
   getAccessManagementUi,
   redirectToAccessManagementUi,
-} from "./discover";
-
-export {
   issueAccessRequest,
   cancelAccessRequest,
   getAccessGrantFromRedirectUrl,
-} from "./request";
-
-export {
   approveAccessRequest,
   denyAccessRequest,
   getAccessGrant,
@@ -52,9 +49,20 @@ export {
   redirectToRequestor,
   revokeAccessGrant,
   GRANT_VC_URL_PARAM_NAME,
-} from "./manage";
+  isValidAccessGrant,
+} from "./gConsent";
 
-export { isValidAccessGrant } from "./verify";
+// Add an API object to the exports to allow explicitly relying on the gConsent-based
+// functions even when not relying on named exports.
+export * as gConsent from "./gConsent";
+
+// For backwards compatibility, all the functions handling odrl-based Access Grants
+// are exported from an API object to avoid clashes with the gConsent ones.
+/**
+ * @unstable
+ * @from unreleased
+ */
+export * as odrl from "./odrl";
 
 export { fetchWithVc } from "./fetch";
 

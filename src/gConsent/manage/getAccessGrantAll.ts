@@ -27,7 +27,7 @@ import {
 import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
-import type { RecursivePartial } from "../type/RecursivePartial";
+import type { RecursivePartial } from "../../type/RecursivePartial";
 import type { IssueAccessRequestParameters } from "../type/IssueAccessRequestParameters";
 import { accessToResourceAccessModeArray } from "../util/accessToResourceAccessModeArray";
 import { getSessionFetch } from "../util/getSessionFetch";

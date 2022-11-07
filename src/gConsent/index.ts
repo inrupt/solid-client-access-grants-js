@@ -19,37 +19,36 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { UrlString } from "@inrupt/solid-client";
-import { RedirectOptions } from "../type/RedirectOptions";
+export type { AccessGrant } from "./type/AccessGrant";
+export type { AccessBaseOptions } from "./type/AccessBaseOptions";
+export type { AccessCredentialType } from "./type/AccessCredentialType";
+export type { AccessGrantContext } from "./type/AccessGrantContext";
+export type { AccessRequest } from "./type/AccessRequest";
+export type { ApproveAccessRequestOverrides } from "./manage/approveAccessRequest";
+export type { IssueAccessRequestParameters } from "./type/IssueAccessRequestParameters";
+export type { RedirectToAccessManagementUiOptions } from "./discover";
 
-/**
- * Internal function implementing redirection with some query parameters.
- *
- * @hidden
- */
-export async function redirectWithParameters(
-  target: UrlString,
-  queryParams: Record<string, string>,
-  options: RedirectOptions
-): Promise<void> {
-  const targetUrl = new URL(target);
+export {
+  getAccessApiEndpoint,
+  getAccessManagementUi,
+  redirectToAccessManagementUi,
+} from "./discover";
 
-  Object.entries(queryParams).forEach(([key, value]) => {
-    targetUrl.searchParams.append(key, value);
-  });
+export {
+  issueAccessRequest,
+  cancelAccessRequest,
+  getAccessGrantFromRedirectUrl,
+} from "./request";
 
-  if (options.redirectCallback !== undefined) {
-    options.redirectCallback(targetUrl.href);
-  } else {
-    if (typeof window === "undefined") {
-      throw new Error(
-        "In a non-browser environment, a redirectCallback must be provided by the user."
-      );
-    }
-    window.location.href = targetUrl.href;
-  }
-  // This redirects the user away from the app, so unless it throws an error,
-  // there is no code that should run afterwards (since there is no "after" in
-  // script's lifetime). Hence, this Promise never resolves:
-  return new Promise(() => {});
-}
+export {
+  approveAccessRequest,
+  denyAccessRequest,
+  getAccessGrant,
+  getAccessGrantAll,
+  getAccessRequestFromRedirectUrl,
+  redirectToRequestor,
+  revokeAccessGrant,
+  GRANT_VC_URL_PARAM_NAME,
+} from "./manage";
+
+export { isValidAccessGrant } from "./verify";

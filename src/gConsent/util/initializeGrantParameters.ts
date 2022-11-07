@@ -28,7 +28,7 @@ import {
 import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import type { ResourceAccessMode } from "../type/ResourceAccessMode";
 import { ApproveAccessRequestOverrides } from "../manage/approveAccessRequest";
-import { AccessModes } from "../type/AccessModes";
+import { AccessModes } from "../../type/AccessModes";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
   return requestVc.credentialSubject.id;

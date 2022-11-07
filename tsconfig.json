@@ -21,21 +21,23 @@
       // The source files of everything listed under `exports` in our package.json
       // (i.e. public API's that should be documented) should be listed here:
       "src/index.ts",
-      "src/discover/index.ts",
-      "src/fetch/index.ts",
-      "src/manage/index.ts",
-      "src/request/index.ts",
       "src/resource/index.ts",
-      "src/verify/index.ts",
+      "src/fetch/index.ts",
+      "src/gConsent/index.ts",
+      "src/gConsent/discover/index.ts",
+      "src/gConsent/manage/index.ts",
+      "src/gConsent/request/index.ts",
+      "src/gConsent/verify/index.ts",
+      "src/odrl/index.ts",
       // These types are reused across files, so give them a specific page for
       // them to be documented on:
-      "src/type/AccessModes.ts",
+      "src/type/RedirectOptions.ts",
       "src/type/FetchOptions.ts",
       "src/type/UmaConfiguration.ts",
-      "src/type/AccessBaseOptions.ts",
-      "src/type/IssueAccessRequestParameters.ts",
-      "src/type/RedirectOptions.ts",
-      "src/type/Parameter.ts"
+      "src/gConsent/type/AccessModes.ts",
+      "src/gConsent/type/AccessBaseOptions.ts",
+      "src/gConsent/type/IssueAccessRequestParameters.ts",
+      "src/gConsent/type/Parameter.ts"
     ],
     "exclude": [
       "node_modules/**",

@@ -19,38 +19,5 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/**
- * @module interfaces
- */
-
-import type { UrlString } from "@inrupt/solid-client";
-
-import type {
-  GC_CONSENT_STATUS_REQUESTED,
-  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-} from "../constants";
-import { AccessModes } from "./AccessModes";
-
-export interface BaseRequestParameters {
-  access: AccessModes;
-  requestorInboxUrl?: UrlString;
-  resources: Array<UrlString>;
-  purpose?: Array<UrlString>;
-  issuanceDate?: Date;
-  expirationDate?: Date;
-}
-
-export interface InputAccessRequestParameters extends BaseRequestParameters {
-  resourceOwner: UrlString;
-}
-export interface AccessRequestParameters extends InputAccessRequestParameters {
-  status: typeof GC_CONSENT_STATUS_REQUESTED;
-}
-
-export interface InputAccessGrantParameters extends BaseRequestParameters {
-  requestor: UrlString;
-}
-
-export interface AccessGrantParameters extends InputAccessGrantParameters {
-  status: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
-}
+// TODO Remove when actually exporting functions from the odrl module.
+export const DUMMY_CONSTANT = 0;

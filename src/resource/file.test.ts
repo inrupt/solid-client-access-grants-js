@@ -20,7 +20,7 @@
 //
 
 import { it, jest, describe, expect } from "@jest/globals";
-import { mockAccessRequestVc } from "../util/access.mock";
+import { mockAccessRequestVc } from "../gConsent/util/access.mock";
 import { getFile, overwriteFile, saveFileInContainer } from "./file";
 import { fetchWithVc } from "../fetch";
 
