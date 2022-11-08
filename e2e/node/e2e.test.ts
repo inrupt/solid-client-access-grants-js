@@ -33,7 +33,7 @@ import {
 import * as solidClient from "@inrupt/solid-client";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
-import { getNodeAccessGrantTestingEnvironment } from "@inrupt/test-env-helpers";
+import { getNodeTestingEnvironment } from "@inrupt/test-env-helpers";
 import {
   approveAccessRequest,
   getAccessGrantAll,
@@ -53,7 +53,7 @@ const {
   environment,
   clientCredentials: { requestor, resourceOwner },
   vcProvider,
-} = getNodeAccessGrantTestingEnvironment({});
+} = getNodeTestingEnvironment();
 
 // For some reason, the Node jest runner throws an undefined error when
 // calling to btoa. This overrides it, while keeping the actual code

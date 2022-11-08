@@ -29,7 +29,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npm run test:e2e
+      - run: npm run test:e2e:node
         env:
           E2E_TEST_IDP: ${{ secrets.E2E_TEST_IDP }}
           E2E_TEST_ENVIRONMENT: ${{ matrix.environment-name }}
