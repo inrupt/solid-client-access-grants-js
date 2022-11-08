@@ -40,5 +40,9 @@ export const SERIALIZED_ACCESS_MODES = [
   "write" as const,
   "append" as const,
 ];
+
+/**
+ * Acceptable values for Access being granted.
+ */
 export type SerializedAccessModes =
   typeof SERIALIZED_ACCESS_MODES extends Array<infer E> ? E : never;
