@@ -19,14 +19,22 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { AccessGrantOdrl, isCredentialAccessGrantOdrl } from "../odrl/type/AccessGrant";
+import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import {
+  AccessGrantOdrl,
+  isCredentialAccessGrantOdrl,
+} from "../odrl/type/AccessGrant";
 import { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import { CredentialIsAccessGrantGConsent } from "../gConsent/guard/isAccessGrant";
 import { isBaseAccessVcBody } from "../gConsent/guard/isBaseAccessVcBody";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
 
 export type AccessGrantAny = AccessGrantOdrl | AccessGrantGConsent;
 
-export function CredentialIsAccessGrantAny(vc: VerifiableCredential): vc is AccessGrantAny {
-  return isCredentialAccessGrantOdrl(vc) || (isBaseAccessVcBody(vc) && CredentialIsAccessGrantGConsent(vc))
+export function CredentialIsAccessGrantAny(
+  vc: VerifiableCredential
+): vc is AccessGrantAny {
+  return (
+    isCredentialAccessGrantOdrl(vc) ||
+    (isBaseAccessVcBody(vc) && CredentialIsAccessGrantGConsent(vc))
+  );
 }

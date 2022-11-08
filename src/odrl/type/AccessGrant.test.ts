@@ -22,7 +22,6 @@
 import { it, describe, expect } from "@jest/globals";
 import {
   AccessGrantOdrl,
-  CredentialSubjectOdrl,
   isCredentialAccessGrantOdrl,
   OdrlConstraint,
   OdrlPermission,
