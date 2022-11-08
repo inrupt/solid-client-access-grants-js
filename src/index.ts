@@ -32,7 +32,8 @@ export type {
 
 export type { FetchOptions } from "./type/FetchOptions";
 export type { RedirectOptions } from "./type/RedirectOptions";
-export type { AccessModes } from "./type/AccessModes";
+export type { AccessModes, SerializedAccessModes } from "./type/AccessModes";
+export type { AccessGrantAny } from "./type/AccessGrant";
 
 export {
   getAccessApiEndpoint,
@@ -49,7 +50,6 @@ export {
   redirectToRequestor,
   revokeAccessGrant,
   GRANT_VC_URL_PARAM_NAME,
-  isValidAccessGrant,
 } from "./gConsent";
 
 // Add an API object to the exports to allow explicitly relying on the gConsent-based
@@ -63,6 +63,10 @@ export * as gConsent from "./gConsent";
  * @from unreleased
  */
 export * as odrl from "./odrl";
+
+export { isValidAccessGrant } from "./common/verify";
+
+export * as common from "./common";
 
 export { fetchWithVc } from "./fetch";
 

@@ -40,3 +40,5 @@ export function isAccessGrant(
       .isProvidedTo === "string"
   );
 }
+
+export const CredentialIsAccessGrantGConsent = isAccessGrant;

@@ -19,11 +19,14 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-export type { AccessGrant } from "./type/AccessGrant";
+export type { AccessGrant, AccessGrantGConsent } from "./type/AccessGrant";
+export type {
+  AccessRequest,
+  AccessRequestGConsent,
+} from "./type/AccessRequest";
 export type { AccessBaseOptions } from "./type/AccessBaseOptions";
 export type { AccessCredentialType } from "./type/AccessCredentialType";
 export type { AccessGrantContext } from "./type/AccessGrantContext";
-export type { AccessRequest } from "./type/AccessRequest";
 export type { ApproveAccessRequestOverrides } from "./manage/approveAccessRequest";
 export type { IssueAccessRequestParameters } from "./type/IssueAccessRequestParameters";
 export type { RedirectToAccessManagementUiOptions } from "./discover";
@@ -50,5 +53,3 @@ export {
   revokeAccessGrant,
   GRANT_VC_URL_PARAM_NAME,
 } from "./manage";
-
-export { isValidAccessGrant } from "./verify";

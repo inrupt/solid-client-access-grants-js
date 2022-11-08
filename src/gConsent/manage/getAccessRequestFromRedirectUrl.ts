@@ -27,7 +27,7 @@ import {
 } from "../discover/redirectToAccessManagementUi";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import type { AccessRequest } from "../type/AccessRequest";
-import { getSessionFetch } from "../util/getSessionFetch";
+import { getSessionFetch } from "../../common/util/getSessionFetch";
 
 /**
  * Get the Access Request out of the incoming redirect from the Access Management app.

@@ -19,10 +19,4 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import type { AccessGrantBody } from "./AccessVerifiableCredential";
-
-export type AccessGrant = VerifiableCredential & AccessGrantBody;
-// Alias with the explicit GConsent suffix, to be used in functions accepting both
-// gConsent-based and ODRL-based grants.
-export type AccessGrantGConsent = AccessGrant;
+export { isValidAccessGrant } from "./isValidAccessGrant";

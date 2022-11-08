@@ -44,12 +44,11 @@
     "./discover": "./dist/gConsent/discover/index.mjs",
     "./manage": "./dist/gConsent/manage/index.mjs",
     "./request": "./dist/gConsent/request/index.mjs",
-    "./verify": "./dist/gConsent/verify/index.mjs",
+    "./verify": "./dist/common/verify/index.mjs",
     "./gConsent": "./dist/gConsent/index.mjs",
     "./gConsent/discover": "./dist/gConsent/discover/index.mjs",
     "./gConsent/manage": "./dist/gConsent/manage/index.mjs",
     "./gConsent/request": "./dist/gConsent/request/index.mjs",
-    "./gConsent/verify": "./dist/gConsent/verify/index.mjs",
     "./odrl": "./dist/odrl/index.mjs"
   },
   "typesVersions": {
@@ -64,7 +63,7 @@
         "dist/gConsent/request/index.d.ts"
       ],
       "verify": [
-        "dist/gConsent/verify/index.d.ts"
+        "dist/common/verify/index.d.ts"
       ],
       "resource": [
         "dist/resource/index.d.ts"
@@ -84,7 +83,7 @@
         "dist/gConsent/request/index.d.ts"
       ],
       "verify": [
-        "dist/gConsent/verify/index.d.ts"
+        "dist/common/verify/index.d.ts"
       ]
     }
   },

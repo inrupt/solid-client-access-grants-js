@@ -19,10 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import type { AccessGrantBody } from "./AccessVerifiableCredential";
+// This file is used to create a 'common' API object from the top-level exports.
 
-export type AccessGrant = VerifiableCredential & AccessGrantBody;
-// Alias with the explicit GConsent suffix, to be used in functions accepting both
-// gConsent-based and ODRL-based grants.
-export type AccessGrantGConsent = AccessGrant;
+export { isValidAccessGrant } from "./verify/isValidAccessGrant";

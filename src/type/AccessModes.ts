@@ -34,3 +34,15 @@ export interface AccessModes {
   write?: boolean;
   append?: boolean;
 }
+
+export const SERIALIZED_ACCESS_MODES = [
+  "read" as const,
+  "write" as const,
+  "append" as const,
+];
+
+/**
+ * Acceptable values for Access being granted.
+ */
+export type SerializedAccessModes =
+  typeof SERIALIZED_ACCESS_MODES extends Array<infer E> ? E : never;

@@ -23,3 +23,6 @@ import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { AccessRequestBody } from "./AccessVerifiableCredential";
 
 export type AccessRequest = VerifiableCredential & AccessRequestBody;
+// Alias with the explicit GConsent suffix, to be used in functions accepting both
+// gConsent-based and ODRL-based grants.
+export type AccessRequestGConsent = AccessRequest;

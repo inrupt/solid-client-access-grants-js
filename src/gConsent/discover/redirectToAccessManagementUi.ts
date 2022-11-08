@@ -22,7 +22,7 @@
 import { UrlString, WebId } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
-import { getSessionFetch } from "../util/getSessionFetch";
+import { getSessionFetch } from "../../common/util/getSessionFetch";
 import {
   getAccessManagementUi,
   getAccessManagementUiFromWellKnown,

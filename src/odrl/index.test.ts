@@ -19,10 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import type { AccessGrantBody } from "./AccessVerifiableCredential";
+import { describe, it, expect } from "@jest/globals";
+import { isCredentialAccessGrantOdrl } from "./index";
 
-export type AccessGrant = VerifiableCredential & AccessGrantBody;
-// Alias with the explicit GConsent suffix, to be used in functions accepting both
-// gConsent-based and ODRL-based grants.
-export type AccessGrantGConsent = AccessGrant;
+describe("Index exports", () => {
+  it("exposes expected things", () => {
+    expect(isCredentialAccessGrantOdrl).toBeDefined();
+  });
+});

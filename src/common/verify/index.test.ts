@@ -19,11 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/**
- * Import this module for the access API functions available to an entity
- * verifying issued credentials for access over a resource.
- * @packageDocumentation
- */
+import { describe, it, expect } from "@jest/globals";
+import { isValidAccessGrant } from "./index";
 
-// TODO: Allow verification of different types of consent & access grants
-export { isValidAccessGrant } from "./isValidAccessGrant";
+describe("Index exports", () => {
+  it("exposes expected things", () => {
+    expect(isValidAccessGrant).toBeDefined();
+  });
+});

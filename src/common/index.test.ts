@@ -19,29 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { fetch as crossFetch } from "cross-fetch";
-import { AccessBaseOptions } from "../type/AccessBaseOptions";
+import { describe, it, expect } from "@jest/globals";
+import { isValidAccessGrant } from "./index";
 
-/**
- * Dynamically import solid-client-authn-browser so that
- * this library doesn't have a hard dependency.
- *
- * @returns fetch function
- */
-export async function getSessionFetch(
-  options: AccessBaseOptions
-): Promise<typeof fetch> {
-  if (options.fetch) {
-    return options.fetch;
-  }
-  try {
-    const { fetch: fetchFn } = await import(
-      "@inrupt/solid-client-authn-browser"
-    );
-
-    return fetchFn;
-  } catch (e) {
-    /* istanbul ignore next: @inrupt/solid-client-authn-browser is a devDependency, so this path is not hit in tests: */
-    return crossFetch;
-  }
-}
+describe("Index exports", () => {
+  it("exposes expected things", () => {
+    expect(isValidAccessGrant).toBeDefined();
+  });
+});

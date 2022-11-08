@@ -17,6 +17,10 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ### New features
 
+- `AccessGrantOdrl`, `AccessGrantGConsent` and `AccessGrantAny` types: Both the
+  ODRL-based and the GConsent-based Access Grants now have an explicit associated
+  type. Functions that support both data model may use the `AccessGrantAllAny` union
+  type.
 - `gConsent` and `odrl` API objects: in order to support a new schema for Access
   Grants, new functions will be added to the API. They will not be compatible with
   the current data model, so the new API will be exported via the `odrl` object

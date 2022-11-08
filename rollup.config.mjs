@@ -56,7 +56,8 @@ export default [
       "./src/gConsent/discover/index.ts",
       "./src/gConsent/manage/index.ts",
       "./src/gConsent/request/index.ts",
-      "./src/gConsent/verify/index.ts",
+      "./src/common/verify/index.ts",
+      "./src/odrl/index.ts",
     ],
     output: {
       dir: "dist",
@@ -83,6 +84,7 @@ export default [
       "./src/gConsent/type/IssueAccessRequestParameters.ts",
       "./src/gConsent/type/Parameter.ts",
       "./src/gConsent/type/ResourceAccessMode.ts",
+      "./src/odrl/type/AccessGrant.ts",
     ],
     output: {
       dir: "dist",

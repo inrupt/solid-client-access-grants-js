@@ -23,9 +23,9 @@ import { describe, it, jest, expect } from "@jest/globals";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
 import { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
-import { getSessionFetch } from "../util/getSessionFetch";
+import { getSessionFetch } from "../../common/util/getSessionFetch";
 
-jest.mock("../util/getSessionFetch");
+jest.mock("../../common/util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {
   const vcModule = jest.requireActual("@inrupt/solid-client-vc") as any;
   return {
@@ -62,7 +62,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
   it("uses the default fetch if none is provided", async () => {
     const mockedFetch = jest.fn(fetch);
     const embeddedFetch = jest.requireMock(
-      "../util/getSessionFetch"
+      "../../common/util/getSessionFetch"
     ) as jest.Mocked<{ getSessionFetch: typeof getSessionFetch }>;
     embeddedFetch.getSessionFetch.mockResolvedValueOnce(mockedFetch);
 
