@@ -21,12 +21,12 @@
 
 import { jest, it, describe, expect } from "@jest/globals";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
+import crossFetch from "cross-fetch";
 import {
   getAccessGrantAll,
   IssueAccessRequestParameters,
 } from "./getAccessGrantAll";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
-import crossFetch from "cross-fetch";
 
 const otherFetch = jest.fn(global.fetch);
 

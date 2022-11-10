@@ -36,7 +36,7 @@ export async function getSessionFetch(
   }
   try {
     const { fetch: fetchFn } = await import(
-      // @inrupt/solid-client-authn-browser is not in this code's direct dependencies, 
+      // @inrupt/solid-client-authn-browser is not in this code's direct dependencies,
       // we dynamically check whether it is in the caller's dependencies.
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
