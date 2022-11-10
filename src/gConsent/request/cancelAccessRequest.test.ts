@@ -33,40 +33,9 @@ jest.mock("@inrupt/solid-client", () => {
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
 });
-jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
 
 describe("cancelAccessRequest", () => {
-  it("defaults to the authenticated fetch from solid-client-authn-browser", async () => {
-    const sca = jest.requireMock("@inrupt/solid-client-authn-browser") as {
-      fetch: typeof global.fetch;
-    };
-    sca.fetch = jest
-      .fn(global.fetch)
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify(
-            mockAccessGrantVc("https://some.issuer", "https://some.subject")
-          )
-        )
-      );
-    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      revokeVerifiableCredential: typeof revokeVerifiableCredential;
-    };
-    const spiedRevoke = jest.spyOn(
-      mockedVcModule,
-      "revokeVerifiableCredential"
-    );
-    await cancelAccessRequest("https://some.credential");
-    expect(spiedRevoke).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      {
-        fetch: sca.fetch,
-      }
-    );
-  });
-
   it("uses the provided fetch if any", async () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       revokeVerifiableCredential: typeof revokeVerifiableCredential;

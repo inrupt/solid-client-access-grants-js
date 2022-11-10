@@ -24,24 +24,9 @@ import { mockAccessApiEndpoint } from "../request/request.mock";
 import { mockAccessGrantVc, mockConsentRequestVc } from "../util/access.mock";
 import { getAccessGrant } from "./getAccessGrant";
 
-jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("cross-fetch");
 
 describe("getAccessGrant", () => {
-  it("defaults to the session fetch if none is provided", async () => {
-    mockAccessApiEndpoint();
-    const mockedFetch = jest
-      .fn(global.fetch)
-      .mockResolvedValueOnce(new Response(JSON.stringify(mockAccessGrantVc())));
-    const fetchModule = jest.requireMock(
-      "@inrupt/solid-client-authn-browser"
-    ) as any;
-    fetchModule.fetch = mockedFetch;
-
-    await getAccessGrant("https://some.vc.url");
-    expect(mockedFetch).toHaveBeenCalledWith("https://some.vc.url");
-  });
-
   it("uses the provided fetch if any", async () => {
     mockAccessApiEndpoint();
     const mockedFetch = jest

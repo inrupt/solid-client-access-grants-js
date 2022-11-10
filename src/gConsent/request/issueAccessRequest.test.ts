@@ -48,7 +48,6 @@ jest.mock("@inrupt/solid-client", () => {
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
 });
-jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
 jest.mock("cross-fetch");
 
@@ -141,7 +140,7 @@ describe("issueAccessRequest", () => {
         requestorInboxUrl: MOCK_REQUESTOR_INBOX,
       },
       {
-        fetch: jest.fn(),
+        fetch: jest.fn<typeof fetch>(),
       }
     );
 
@@ -181,7 +180,7 @@ describe("issueAccessRequest", () => {
           requestorInboxUrl: MOCK_REQUESTOR_INBOX,
         },
         {
-          fetch: jest.fn(),
+          fetch: jest.fn<typeof fetch>(),
         }
       )
     ).rejects.toThrow();
@@ -205,7 +204,7 @@ describe("issueAccessRequest", () => {
         requestorInboxUrl: MOCK_REQUESTOR_INBOX,
       },
       {
-        fetch: jest.fn(),
+        fetch: jest.fn<typeof fetch>(),
       }
     );
 
@@ -233,37 +232,6 @@ describe("issueAccessRequest", () => {
     );
   });
 
-  it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential"
-    );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
-    // TypeScript can't infer the type of mock modules imported via Jest;
-    // skip type checking for those:
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
-
-    await issueAccessRequest({
-      access: { read: true },
-      resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-      resources: ["https://some.pod/resource"],
-      requestorInboxUrl: MOCK_REQUESTOR_INBOX,
-    });
-
-    expect(mockedIssue).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-      {
-        fetch: scab.fetch,
-      }
-    );
-  });
-
   it("sends a proper access with consent request", async () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
@@ -285,7 +253,7 @@ describe("issueAccessRequest", () => {
         requestorInboxUrl: "https://some.pod/inbox/",
       },
       {
-        fetch: jest.fn(),
+        fetch: jest.fn<typeof fetch>(),
       }
     );
 
@@ -342,40 +310,6 @@ describe("issueAccessRequest", () => {
         type: ["SolidAccessRequest"],
       }),
       expect.anything()
-    );
-  });
-
-  it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed, when with extended options", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential"
-    );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
-    // TypeScript can't infer the type of mock modules imported via Jest;
-    // skip type checking for those:
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
-
-    await issueAccessRequest({
-      access: { read: true },
-      resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-      resources: ["https://some.pod/resource"],
-      purpose: ["https://some.vocab/purpose#save-the-world"],
-      issuanceDate: new Date(Date.UTC(1955, 5, 8, 13, 37, 42, 42)),
-      expirationDate: new Date(Date.UTC(1990, 10, 12, 13, 37, 42, 42)),
-      requestorInboxUrl: "https://some.pod/inbox/",
-    });
-
-    expect(mockedIssue).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-      {
-        fetch: scab.fetch,
-      }
     );
   });
 });

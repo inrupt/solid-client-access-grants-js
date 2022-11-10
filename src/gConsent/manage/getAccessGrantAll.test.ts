@@ -26,12 +26,9 @@ import {
   IssueAccessRequestParameters,
 } from "./getAccessGrantAll";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
+import crossFetch from "cross-fetch";
 
-const clientAuthnFetch = jest.fn(global.fetch);
 const otherFetch = jest.fn(global.fetch);
-jest.mock("@inrupt/solid-client-authn-browser", () => {
-  return { fetch: clientAuthnFetch };
-});
 
 jest.mock("@inrupt/solid-client-vc", () => {
   return {
@@ -68,7 +65,7 @@ describe("getAccessGrantAll", () => {
       "https://some.api.endpoint/derive",
       expectedDefaultVcShape,
       {
-        fetch: clientAuthnFetch,
+        fetch: crossFetch,
       }
     );
   });
@@ -179,7 +176,7 @@ describe("getAccessGrantAll", () => {
       "https://some.api.endpoint/derive",
       expect.anything(),
       {
-        fetch: clientAuthnFetch,
+        fetch: crossFetch,
         includeExpiredVc: true,
       }
     );

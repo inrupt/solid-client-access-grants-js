@@ -35,7 +35,6 @@ jest.mock("@inrupt/solid-client", () => {
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
 });
-jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
 jest.mock("cross-fetch");
 
@@ -84,20 +83,6 @@ describe("isValidAccessGrant", () => {
     });
 
     expect(mockedFetch).toHaveBeenCalled();
-  });
-
-  it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
-    jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
-      verifierService: "https://some.vc.verifier",
-    });
-
-    const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
-    try {
-      await isValidAccessGrant(MOCK_ACCESS_GRANT);
-      // eslint-disable-next-line no-empty
-    } catch (_e) {}
-    expect(scab.fetch).toHaveBeenCalled();
   });
 
   it("sends the given vc to the verify endpoint", async () => {
