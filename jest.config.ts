@@ -49,12 +49,6 @@ export default {
       displayName: "browser",
       testEnvironment: "jsdom",
       testPathIgnorePatterns: ["e2e", "node.test.ts"],
-      // // This combination of preset/transformIgnorePatterns enforces that both TS and
-      // // JS files are transformed to CJS, and that the transform also applies to the
-      // // dependencies in the node_modules, so that ESM-only dependencies are supported.
-      preset: "ts-jest/presets/js-with-ts",
-      // // deliberately set to an empty array to allow including node_modules when transforming code:
-      transformIgnorePatterns: ["/node_modules/(?!jose/dist/browser/)"], // "/node_modules/(?!jose/dist/browser/)"
     },
     {
       ...baseConfig,
