@@ -20,7 +20,7 @@
 //
 
 import { fetch as crossFetch } from "cross-fetch";
-import { base64url } from "jose";
+import base64url from "base64url";
 import type { UrlString } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UmaConfiguration } from "../type/UmaConfiguration";
