@@ -35,7 +35,7 @@
       "src/type/FetchOptions.ts",
       "src/type/UmaConfiguration.ts",
       "src/type/AccessGrant.ts",
-      "src/gConsent/type/AccessModes.ts",
+      "src/type/AccessModes.ts",
       "src/gConsent/type/AccessBaseOptions.ts",
       "src/gConsent/type/IssueAccessRequestParameters.ts",
       "src/gConsent/type/Parameter.ts",
