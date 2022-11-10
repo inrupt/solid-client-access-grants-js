@@ -22,7 +22,7 @@
 import { jest, describe, it, expect } from "@jest/globals";
 import { fetch as crossFetch, Response } from "cross-fetch";
 
-import base64url from "base64url";
+import { base64url } from "jose";
 import {
   parseUMAAuthTicket,
   parseUMAAuthIri,
