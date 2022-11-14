@@ -20,21 +20,25 @@
 //
 
 import { test, expect } from "@playwright/test";
-import { getBrowserTestingEnvironment } from "@inrupt/test-env-helpers";
+import { getBrowserTestingEnvironment } from "@inrupt/internal-test-env";
 import { essUserLogin } from "./roles";
 
 const {
   clientCredentials: {
-    resourceOwner: { login, password },
+    owner: { login, password },
   },
-} = getBrowserTestingEnvironment();
+} = getBrowserTestingEnvironment({
+  clientCredentials: {
+    owner: { login: "", password: "" },
+  },
+});
 
 test("Granting access to a resource, then revoking it", async ({ page }) => {
   // Navigate to the test page and log in.
   await page.goto("/");
   await essUserLogin(page, login, password);
 
-  // Create the resource. Note that the Promis.all prevents a race condition where
+  // Create the resource. Note that the Promise.all prevents a race condition where
   // the request would be sent before we wait on it.
   await Promise.all([
     page.click("button[data-testid=create-resource]"),

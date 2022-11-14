@@ -33,7 +33,7 @@ import {
 import * as solidClient from "@inrupt/solid-client";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
-import { getNodeTestingEnvironment } from "@inrupt/test-env-helpers";
+import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 import {
   approveAccessRequest,
   getAccessGrantAll,
@@ -48,12 +48,15 @@ import {
   getSolidDataset,
 } from "../../src/index";
 
-const {
-  idp: oidcIssuer,
-  environment,
-  clientCredentials: { requestor, resourceOwner },
-  vcProvider,
-} = getNodeTestingEnvironment();
+const env = getNodeTestingEnvironment({
+  vcProvider: "",
+  clientCredentials: {
+    owner: { id: "", secret: "" },
+    requestor: { id: "", secret: "" },
+  },
+});
+
+const { idp: oidcIssuer, environment, clientCredentials, vcProvider } = env;
 
 // For some reason, the Node jest runner throws an undefined error when
 // calling to btoa. This overrides it, while keeping the actual code
@@ -77,16 +80,16 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     // Log both sessions in.
     await requestorSession.login({
       oidcIssuer,
-      clientId: requestor.id,
-      clientSecret: requestor.secret,
+      clientId: clientCredentials?.requestor?.id,
+      clientSecret: clientCredentials?.requestor?.secret,
       // Note that currently, using a Bearer token (as opposed to a DPoP one)
       // is required for the UMA access token to be usable.
       tokenType: "Bearer",
     });
     await resourceOwnerSession.login({
       oidcIssuer,
-      clientId: resourceOwner.id,
-      clientSecret: resourceOwner.secret,
+      clientId: clientCredentials?.owner?.id,
+      clientSecret: clientCredentials?.owner?.secret,
     });
 
     // Create a file in the resource owner's Pod

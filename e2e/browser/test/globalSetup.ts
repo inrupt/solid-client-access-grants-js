@@ -22,7 +22,7 @@
 import {
   setupEnv,
   getBrowserTestingEnvironment,
-} from "@inrupt/test-env-helpers";
+} from "@inrupt/internal-test-env";
 
 async function globalSetup() {
   setupEnv();
