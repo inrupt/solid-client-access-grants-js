@@ -33,13 +33,15 @@ import {
   GC_CONSENT_STATUS_REQUESTED,
 } from "../constants";
 import { ResourceAccessMode } from "../type/ResourceAccessMode";
+import { AccessGrant } from "../type/AccessGrant";
+import { AccessRequest } from "../type/AccessRequest";
 
 export const mockAccessRequestVc = (
   options?: Partial<{
     resources: UrlString[];
     modes: ResourceAccessMode[];
   }>
-): VerifiableCredential & BaseRequestBody => {
+): AccessRequest => {
   return {
     "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
     id: "https://some.credential",
@@ -69,7 +71,7 @@ export const mockAccessRequestVc = (
 export const mockAccessGrantVc = (
   issuer = "https://some.issuer",
   subjectId = "https://some.resource.owner"
-): VerifiableCredential & BaseGrantBody => {
+): AccessGrant => {
   return {
     "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
     id: "https://some.credential",
