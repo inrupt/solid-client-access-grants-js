@@ -84,9 +84,10 @@ export function getIssuanceDate(
 
 export function getExpirationDate(
   vc: AccessGrantGConsent | AccessRequestGConsent
-): Date {
-  throw new Error("unimplemented");
+): Date | undefined {
+  return vc.expirationDate ? new Date(vc.expirationDate) : undefined;
 }
+
 export function getIssuer(
   vc: AccessGrantGConsent | AccessRequestGConsent
 ): string {

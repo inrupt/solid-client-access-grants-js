@@ -26,6 +26,7 @@ import {
 } from "../gConsent/util/access.mock";
 import {
   getAccessModes,
+  getExpirationDate,
   getId,
   getIssuanceDate,
   getRequestor,
@@ -160,13 +161,29 @@ describe("getIssuanceDate", () => {
   it("gets the gConsent access request issuance date", () => {
     const gConsentRequest = mockGConsentRequest();
     gConsentRequest.issuanceDate = new Date().toString();
-    expect(getIssuanceDate(gConsentRequest)).toBe(
+    expect(getIssuanceDate(gConsentRequest)).toStrictEqual(
       new Date(gConsentRequest.issuanceDate)
     );
   });
 });
 
-describe("getExpirationDate", () => {});
+describe("getExpirationDate", () => {
+  it("gets the gConsent access expiration date", () => {
+    const gConsentGrant = mockGConsentGrant();
+    gConsentGrant.expirationDate = new Date().toString();
+    expect(getExpirationDate(gConsentGrant)).toStrictEqual(
+      new Date(gConsentGrant.expirationDate)
+    );
+  });
+
+  it("gets the gConsent access request expiration date", () => {
+    const gConsentRequest = mockGConsentRequest();
+    gConsentRequest.expirationDate = new Date().toString();
+    expect(getExpirationDate(gConsentRequest)).toStrictEqual(
+      new Date(gConsentRequest.expirationDate)
+    );
+  });
+});
 
 describe("getIssuer", () => {});
 
