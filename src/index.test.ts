@@ -44,6 +44,16 @@ import {
   GRANT_VC_URL_PARAM_NAME,
   gConsent,
   odrl,
+  AccessGrantWrapper,
+  getAccessModes,
+  getExpirationDate,
+  getId,
+  getIssuanceDate,
+  getIssuer,
+  getRequestor,
+  getResourceOwner,
+  getResources,
+  getTypes,
 } from "./index";
 
 describe("Index exports", () => {
@@ -71,5 +81,15 @@ describe("Index exports", () => {
     expect(GRANT_VC_URL_PARAM_NAME).toBeDefined();
     expect(gConsent).toBeDefined();
     expect(odrl).toBeDefined();
+    expect(AccessGrantWrapper).toBeDefined();
+    expect(getAccessModes).toBeDefined();
+    expect(getExpirationDate).toBeDefined();
+    expect(getId).toBeDefined();
+    expect(getIssuanceDate).toBeDefined();
+    expect(getIssuer).toBeDefined();
+    expect(getRequestor).toBeDefined();
+    expect(getResourceOwner).toBeDefined();
+    expect(getResources).toBeDefined();
+    expect(getTypes).toBeDefined();
   });
 });

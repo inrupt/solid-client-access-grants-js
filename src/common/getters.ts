@@ -162,8 +162,8 @@ export function getTypes(
  */
 export function getIssuanceDate(
   vc: AccessGrantGConsent | AccessRequestGConsent
-): Date | undefined {
-  return vc.issuanceDate ? new Date(vc.issuanceDate) : undefined;
+): Date {
+  return new Date(vc.issuanceDate);
 }
 
 /**
