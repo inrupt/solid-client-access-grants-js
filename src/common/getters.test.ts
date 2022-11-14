@@ -27,6 +27,7 @@ import {
 import {
   getAccessModes,
   getId,
+  getIssuanceDate,
   getRequestor,
   getResourceOwner,
   getResources,
@@ -147,7 +148,23 @@ describe("getTypes", () => {
   });
 });
 
-describe("getIssuanceDate", () => {});
+describe("getIssuanceDate", () => {
+  it("gets the gConsent access issuance date", () => {
+    const gConsentGrant = mockGConsentGrant();
+    gConsentGrant.issuanceDate = new Date().toString();
+    expect(getIssuanceDate(gConsentGrant)).toStrictEqual(
+      new Date(gConsentGrant.issuanceDate)
+    );
+  });
+
+  it("gets the gConsent access request issuance date", () => {
+    const gConsentRequest = mockGConsentRequest();
+    gConsentRequest.issuanceDate = new Date().toString();
+    expect(getIssuanceDate(gConsentRequest)).toBe(
+      new Date(gConsentRequest.issuanceDate)
+    );
+  });
+});
 
 describe("getExpirationDate", () => {});
 
