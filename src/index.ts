@@ -77,3 +77,16 @@ export {
   saveFileInContainer,
   saveSolidDatasetAt,
 } from "./resource";
+
+export {
+  AccessGrantWrapper,
+  getAccessModes,
+  getExpirationDate,
+  getId,
+  getIssuanceDate,
+  getIssuer,
+  getRequestor,
+  getResourceOwner,
+  getResources,
+  getTypes,
+} from "./common/getters";

@@ -25,7 +25,7 @@ import {
   mockAccessRequestVc as mockGConsentRequest,
 } from "../gConsent/util/access.mock";
 import {
-  AccessGrant,
+  AccessGrantWrapper,
   getAccessModes,
   getExpirationDate,
   getId,
@@ -202,7 +202,7 @@ describe("getIssuer", () => {
 describe("AccessGrant", () => {
   it("wraps calls to the underlying functions", () => {
     const gConsentRequest = mockGConsentRequest();
-    const wrappedConsentRequest = new AccessGrant(gConsentRequest);
+    const wrappedConsentRequest = new AccessGrantWrapper(gConsentRequest);
     expect(wrappedConsentRequest.getAccessModes()).toStrictEqual(
       getAccessModes(gConsentRequest)
     );

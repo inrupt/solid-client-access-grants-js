@@ -215,7 +215,7 @@ export function getIssuer(
  * const grantOwner = grant.getResourceOwner();
  * ```
  */
-export class AccessGrant {
+export class AccessGrantWrapper {
   private vc: AccessGrantGConsent | AccessRequestGConsent;
 
   constructor(vc: AccessGrantGConsent | AccessRequestGConsent) {

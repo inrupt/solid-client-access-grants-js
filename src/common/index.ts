@@ -23,7 +23,7 @@
 
 export { isValidAccessGrant } from "./verify/isValidAccessGrant";
 export {
-  AccessGrant,
+  AccessGrantWrapper,
   getAccessModes,
   getExpirationDate,
   getId,
