@@ -24,7 +24,12 @@ import {
   mockAccessGrantVc as mockGConsentGrant,
   mockAccessRequestVc as mockGConsentRequest,
 } from "../gConsent/util/access.mock";
-import { getRequestor, getResourceOwner, getResources } from "./getter";
+import {
+  getAccessModes,
+  getRequestor,
+  getResourceOwner,
+  getResources,
+} from "./getter";
 
 describe("getResources", () => {
   describe("gConsent data model", () => {
@@ -87,7 +92,34 @@ describe("getRequestor", () => {
   });
 });
 
-describe("getAccessModes", () => {});
+describe("getAccessModes", () => {
+  it("gets the access modes of a gConsent access grant", () => {
+    const gConsentGrant = mockGConsentGrant();
+    expect(gConsentGrant.credentialSubject.providedConsent.mode).toStrictEqual([
+      "http://www.w3.org/ns/auth/acl#Read",
+    ]);
+    expect(getAccessModes(gConsentGrant)).toStrictEqual({
+      read: true,
+      append: false,
+      write: false,
+    });
+  });
+
+  it("gets the access modes from a gConsent access request", () => {
+    const gConsentRequest = mockGConsentRequest({
+      modes: [
+        "http://www.w3.org/ns/auth/acl#Append",
+        "http://www.w3.org/ns/auth/acl#Read",
+        "http://www.w3.org/ns/auth/acl#Write",
+      ],
+    });
+    expect(getAccessModes(gConsentRequest)).toStrictEqual({
+      read: true,
+      append: true,
+      write: true,
+    });
+  });
+});
 
 describe("getId", () => {});
 

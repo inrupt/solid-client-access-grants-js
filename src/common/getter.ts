@@ -20,8 +20,9 @@
 //
 import { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import { AccessRequestGConsent } from "../gConsent/type/AccessRequest";
-import { AccessModes } from "../type/AccessModes";
+import { ResourceAccessMode } from "../type/ResourceAccessMode";
 import { isAccessGrant as isGConsentAccessGrant } from "../gConsent/guard/isAccessGrant";
+import { AccessModes, resourceAccessToAccessMode } from "../type/AccessModes";
 
 export function getResources(
   vc: AccessGrantGConsent | AccessRequestGConsent
@@ -57,8 +58,14 @@ export function getRequestor(
 export function getAccessModes(
   vc: AccessGrantGConsent | AccessRequestGConsent
 ): AccessModes {
-  throw new Error("unimplemented");
+  if (isGConsentAccessGrant(vc)) {
+    return resourceAccessToAccessMode(
+      vc.credentialSubject.providedConsent.mode
+    );
+  }
+  return resourceAccessToAccessMode(vc.credentialSubject.hasConsent.mode);
 }
+
 export function getId(vc: AccessGrantGConsent | AccessRequestGConsent): string {
   throw new Error("unimplemented");
 }
