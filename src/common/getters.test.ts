@@ -26,6 +26,7 @@ import {
 } from "../gConsent/util/access.mock";
 import {
   getAccessModes,
+  getId,
   getRequestor,
   getResourceOwner,
   getResources,
@@ -121,7 +122,17 @@ describe("getAccessModes", () => {
   });
 });
 
-describe("getId", () => {});
+describe("getId", () => {
+  it("gets the gConsent access grant id", () => {
+    const gConsentGrant = mockGConsentGrant();
+    expect(getId(gConsentGrant)).toBe(gConsentGrant.id);
+  });
+
+  it("gets the gConsent access request id", () => {
+    const gConsentRequest = mockGConsentRequest();
+    expect(getId(gConsentRequest)).toBe(gConsentRequest.id);
+  });
+});
 
 describe("getTypes", () => {});
 

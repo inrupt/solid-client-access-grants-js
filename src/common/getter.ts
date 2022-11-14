@@ -67,7 +67,7 @@ export function getAccessModes(
 }
 
 export function getId(vc: AccessGrantGConsent | AccessRequestGConsent): string {
-  throw new Error("unimplemented");
+  return vc.id;
 }
 export function getTypes(
   vc: AccessGrantGConsent | AccessRequestGConsent
