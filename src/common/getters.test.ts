@@ -35,7 +35,7 @@ import {
   getResourceOwner,
   getResources,
   getTypes,
-} from "./getter";
+} from "./getters";
 
 describe("getResources", () => {
   describe("gConsent data model", () => {

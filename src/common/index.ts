@@ -22,3 +22,15 @@
 // This file is used to create a 'common' API object from the top-level exports.
 
 export { isValidAccessGrant } from "./verify/isValidAccessGrant";
+export {
+  AccessGrant,
+  getAccessModes,
+  getExpirationDate,
+  getId,
+  getIssuanceDate,
+  getIssuer,
+  getRequestor,
+  getResourceOwner,
+  getResources,
+  getTypes,
+} from "./getters";
