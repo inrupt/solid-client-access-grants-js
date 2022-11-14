@@ -26,6 +26,7 @@
       "src/index.ts",
       "src/resource/index.ts",
       "src/fetch/index.ts",
+      "src/common/getters.ts",
       "src/gConsent/index.ts",
       "src/gConsent/discover/index.ts",
       "src/gConsent/manage/index.ts",
