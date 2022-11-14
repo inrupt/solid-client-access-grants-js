@@ -24,7 +24,7 @@ import {
   mockAccessGrantVc as mockGConsentGrant,
   mockAccessRequestVc as mockGConsentRequest,
 } from "../gConsent/util/access.mock";
-import { getResourceOwner, getResources } from "./getter";
+import { getRequestor, getResourceOwner, getResources } from "./getter";
 
 describe("getResources", () => {
   describe("gConsent data model", () => {
@@ -69,7 +69,23 @@ describe("getResourceOwner", () => {
   });
 });
 
-describe("getRequestor", () => {});
+describe("getRequestor", () => {
+  describe("gConsent data model", () => {
+    it("gets the recipient of a gConsent access grant", () => {
+      const gConsentGrant = mockGConsentGrant();
+      expect(getRequestor(gConsentGrant)).toBe(
+        gConsentGrant.credentialSubject.providedConsent.isProvidedTo
+      );
+    });
+
+    it("gets the resource owner from a gConsent access request", () => {
+      const gConsentRequest = mockGConsentRequest();
+      expect(getRequestor(gConsentRequest)).toBe(
+        gConsentRequest.credentialSubject.id
+      );
+    });
+  });
+});
 
 describe("getAccessModes", () => {});
 

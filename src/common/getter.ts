@@ -48,8 +48,12 @@ export function getResourceOwner(
 export function getRequestor(
   vc: AccessGrantGConsent | AccessRequestGConsent
 ): string {
-  throw new Error("unimplemented");
+  if (isGConsentAccessGrant(vc)) {
+    return vc.credentialSubject.providedConsent.isProvidedTo;
+  }
+  return vc.credentialSubject.id;
 }
+
 export function getAccessModes(
   vc: AccessGrantGConsent | AccessRequestGConsent
 ): AccessModes {
