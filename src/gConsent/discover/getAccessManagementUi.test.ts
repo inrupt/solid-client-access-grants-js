@@ -42,27 +42,8 @@ jest.mock("@inrupt/solid-client", () => {
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
 });
-jest.mock("@inrupt/solid-client-authn-browser");
 
 describe("getAccessManagementUi", () => {
-  it("defaults to the default session fetch if no fetch is provided", async () => {
-    const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
-    const spiedGetDataset = jest
-      .spyOn(
-        jest.requireMock("@inrupt/solid-client") as {
-          getSolidDataset: typeof getSolidDataset;
-        },
-        "getSolidDataset"
-      )
-      .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid"));
-
-    await getAccessManagementUi("https://some.webid");
-
-    expect(spiedGetDataset).toHaveBeenCalledWith("https://some.webid", {
-      fetch: scab.fetch,
-    });
-  });
-
   it("uses the provided fetch if any", async () => {
     const spiedGetDataset = jest
       .spyOn(

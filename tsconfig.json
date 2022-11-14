@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     /* Basic Options */
-    "target": "es2017",
+    "target": "ES2018",
     "module": "commonjs",
-    "lib": ["es2017", "dom"],
+    "moduleResolution": "node",
+    "lib": ["es2018", "dom"],
     "declaration": true,
     "outDir": "dist",
     "rootDir": "src",
@@ -12,7 +13,9 @@
     // Prevent developers on different OSes from running into problems:
     "forceConsistentCasingInFileNames": true,
     /* Advanced Options */
-    "stripInternal": true
+    "stripInternal": true,
+    // This is required to transform native ESM from our dependencies using ts-jest.  
+    "allowJs": true
   },
   "include": ["src/index.ts"],
   "typedocOptions": {

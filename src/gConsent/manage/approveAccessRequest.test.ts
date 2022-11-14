@@ -24,6 +24,7 @@ import { jest, it, describe, expect } from "@jest/globals";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import type { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 
+import type * as SolidClient from "@inrupt/solid-client";
 import {
   mockAccessApiEndpoint,
   MOCKED_ACCESS_ISSUER,
@@ -37,21 +38,26 @@ import {
 } from "../util/access.mock";
 
 jest.mock("@inrupt/solid-client", () => {
-  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
-  solidClientModule.getSolidDataset = jest.fn(
-    solidClientModule.getSolidDataset
-  );
-  solidClientModule.getWellKnownSolid = jest.fn();
+  const solidClientModule = jest.requireActual(
+    "@inrupt/solid-client"
+  ) as typeof SolidClient;
+  solidClientModule.getSolidDataset =
+    jest.fn<typeof SolidClient["getSolidDataset"]>();
+  solidClientModule.getWellKnownSolid =
+    jest.fn<typeof SolidClient["getWellKnownSolid"]>();
   solidClientModule.acp_ess_2 = {
-    getResourceInfoWithAcr: jest.fn(),
-    hasAccessibleAcr: jest.fn(),
-    saveAcrFor: jest.fn(),
-    setVcAccess: jest.fn(),
+    ...solidClientModule.acp_ess_2,
+    getResourceInfoWithAcr:
+      jest.fn<typeof SolidClient["acp_ess_2"]["getResourceInfoWithAcr"]>(),
+    hasAccessibleAcr: jest.fn<
+      typeof SolidClient["acp_ess_2"]["hasAccessibleAcr"]
+    >() as any,
+    saveAcrFor: jest.fn<typeof SolidClient["acp_ess_2"]["saveAcrFor"]>() as any,
+    setVcAccess: jest.fn<typeof SolidClient["acp_ess_2"]["setVcAccess"]>(),
   };
   return solidClientModule;
 });
 
-jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
 jest.mock("cross-fetch");
 
@@ -79,40 +85,6 @@ const mockAcpClient = (
 };
 
 describe("approveAccessRequest", () => {
-  it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    const mockedAcpClient = mockAcpClient();
-    const crossFetchModule = jest.requireMock("cross-fetch") as {
-      fetch: typeof global.fetch;
-    };
-    crossFetchModule.fetch = mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential"
-    );
-    mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
-
-    const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
-
-    await approveAccessRequest(mockAccessRequestVc());
-
-    expect(mockedAcpClient.acp_ess_2.saveAcrFor).toHaveBeenCalledWith(
-      expect.anything(),
-      {
-        fetch: scab.fetch,
-      }
-    );
-    expect(mockedIssue).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-      {
-        fetch: scab.fetch,
-      }
-    );
-  });
-
   // FIXME: This test must run before the other tests mocking the ACP client.
   // This means that some mocked isn't cleared properly between tests.
   it("updates the target resources' ACR appropriately", async () => {
@@ -228,7 +200,7 @@ describe("approveAccessRequest", () => {
     mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
     await approveAccessRequest(mockAccessRequestVc(), undefined, {
       accessEndpoint: "https://some.consent-endpoint.override/",
-      fetch: jest.fn(),
+      fetch: jest.fn<typeof fetch>(),
     });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       "https://some.consent-endpoint.override/issue",

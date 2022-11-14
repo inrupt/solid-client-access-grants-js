@@ -28,7 +28,6 @@ import {
 
 import { getAccessApiEndpoint } from "./getAccessApiEndpoint";
 
-jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("cross-fetch");
 
 describe("getAccessApiEndpoint", () => {

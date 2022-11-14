@@ -26,8 +26,6 @@ import { getSolidDataset } from "./getSolidDataset";
 import { fetchWithVc } from "../fetch";
 
 jest.mock("../fetch");
-jest.mock("@inrupt/solid-client-authn-core");
-jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getSolidDataset = jest.fn();

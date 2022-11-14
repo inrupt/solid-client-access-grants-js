@@ -25,8 +25,6 @@ import { getFile, overwriteFile, saveFileInContainer } from "./file";
 import { fetchWithVc } from "../fetch";
 
 jest.mock("../fetch");
-jest.mock("@inrupt/solid-client-authn-core");
-jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual(
     "@inrupt/solid-client"
@@ -42,15 +40,9 @@ jest.mock("@inrupt/solid-client", () => {
 const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
 const fetchModule = jest.requireMock("../fetch") as any;
 
-const mockedFetch = jest.fn<
-  ReturnType<typeof fetch>,
-  Parameters<typeof fetch>
->();
+const mockedFetch = jest.fn<typeof fetch>();
 
-const authenticatedFetch = jest.fn<
-  ReturnType<typeof fetch>,
-  Parameters<typeof fetch>
->();
+const authenticatedFetch = jest.fn<typeof fetch>();
 
 fetchModule.fetchWithVc.mockResolvedValue(authenticatedFetch);
 

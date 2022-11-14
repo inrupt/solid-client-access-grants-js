@@ -35,35 +35,11 @@ jest.mock("@inrupt/solid-client", () => {
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
 });
-jest.mock("@inrupt/solid-client-authn-browser");
 jest.mock("@inrupt/solid-client-vc");
 jest.mock("cross-fetch");
 
 // TODO: Extract the fetch VC function and related tests
 describe("denyAccessRequest", () => {
-  it("falls back to @inrupt/solid-client-authn-browser if no fetch function was passed", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: () => unknown;
-      },
-      "issueVerifiableCredential"
-    );
-
-    const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
-
-    await denyAccessRequest(mockAccessRequestVc());
-
-    expect(mockedIssue).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-      {
-        fetch: scab.fetch,
-      }
-    );
-  });
-
   it("throws if the provided VC isn't a Solid access request", async () => {
     mockAccessApiEndpoint();
     await expect(
@@ -93,7 +69,7 @@ describe("denyAccessRequest", () => {
     );
     await denyAccessRequest(mockAccessRequestVc(), {
       accessEndpoint: "https://some.access-endpoint.override/",
-      fetch: jest.fn(),
+      fetch: jest.fn<typeof fetch>(),
     });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       "https://some.access-endpoint.override/".concat("issue"),
@@ -281,13 +257,14 @@ describe("denyAccessRequest", () => {
       "issueVerifiableCredential"
     );
 
-    const scab = jest.requireMock("@inrupt/solid-client-authn-browser") as any;
-    scab.fetch = jest
+    const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
         new Response(JSON.stringify(mockAccessRequestVc()))
       );
-    await denyAccessRequest("https://some.resource.owner", "https://some.vc");
+    await denyAccessRequest("https://some.resource.owner", "https://some.vc", {
+      fetch: mockedFetch,
+    });
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
     expect(spiedIssueRequest).toHaveBeenCalledWith(
