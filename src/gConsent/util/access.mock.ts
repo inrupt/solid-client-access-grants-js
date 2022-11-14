@@ -40,6 +40,7 @@ export const mockAccessRequestVc = (
   options?: Partial<{
     resources: UrlString[];
     modes: ResourceAccessMode[];
+    resourceOwner: string | null;
   }>
 ): AccessRequest => {
   return {
@@ -51,7 +52,10 @@ export const mockAccessRequestVc = (
         forPersonalData: options?.resources ?? ["https://some.resource"],
         hasStatus: GC_CONSENT_STATUS_REQUESTED,
         mode: options?.modes ?? ["http://www.w3.org/ns/auth/acl#Read"],
-        isConsentForDataSubject: "https://some.pod/profile#you",
+        isConsentForDataSubject:
+          options?.resourceOwner === null
+            ? undefined
+            : "https://some.pod/profile#you",
       },
       inbox: "https://some.inbox",
     },

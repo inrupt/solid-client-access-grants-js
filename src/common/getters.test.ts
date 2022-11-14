@@ -44,7 +44,30 @@ describe("getResources", () => {
   });
 });
 
-describe("getResourceOwner", () => {});
+describe("getResourceOwner", () => {
+  describe("gConsent data model", () => {
+    it("gets the resource owner from a gConsent access grant", () => {
+      const gConsentGrant = mockGConsentGrant();
+      expect(getResourceOwner(gConsentGrant)).toBe(
+        gConsentGrant.credentialSubject.id
+      );
+    });
+
+    it("gets the resource owner from a gConsent access request if present", () => {
+      const gConsentRequest = mockGConsentRequest({
+        resourceOwner: "https://example.org/some-owner",
+      });
+      expect(getResourceOwner(gConsentRequest)).toBe(
+        gConsentRequest.credentialSubject.hasConsent.isConsentForDataSubject
+      );
+    });
+
+    it("returns undefined if the resource owner is absent from a gConsent access request", () => {
+      const gConsentRequest = mockGConsentRequest({ resourceOwner: null });
+      expect(getResourceOwner(gConsentRequest)).toBeUndefined();
+    });
+  });
+});
 
 describe("getRequestor", () => {});
 

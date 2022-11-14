@@ -21,21 +21,30 @@
 import { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import { AccessRequestGConsent } from "../gConsent/type/AccessRequest";
 import { AccessModes } from "../type/AccessModes";
-import { isAccessGrant } from "../gConsent/guard/isAccessGrant";
+import { isAccessGrant as isGConsentAccessGrant } from "../gConsent/guard/isAccessGrant";
 
 export function getResources(
   vc: AccessGrantGConsent | AccessRequestGConsent
 ): string[] {
-  if (isAccessGrant(vc)) {
+  if (isGConsentAccessGrant(vc)) {
     return vc.credentialSubject.providedConsent.forPersonalData;
   }
   return vc.credentialSubject.hasConsent.forPersonalData;
 }
+
+export function getResourceOwner(vc: AccessGrantGConsent): string;
 export function getResourceOwner(
   vc: AccessGrantGConsent | AccessRequestGConsent
-): string {
-  throw new Error("unimplemented");
+): undefined;
+export function getResourceOwner(
+  vc: AccessGrantGConsent | AccessRequestGConsent
+): string | undefined {
+  if (isGConsentAccessGrant(vc)) {
+    return vc.credentialSubject.id;
+  }
+  return vc.credentialSubject.hasConsent.isConsentForDataSubject;
 }
+
 export function getRequestor(
   vc: AccessGrantGConsent | AccessRequestGConsent
 ): string {
@@ -98,7 +107,7 @@ export class AccessGrant {
     return getResourceOwner(this.vc);
   }
 
-  getRequestor(): ReturnType<typeof getResourceOwner> {
+  getRequestor(): ReturnType<typeof getRequestor> {
     return getRequestor(this.vc);
   }
 
