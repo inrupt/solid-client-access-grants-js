@@ -32,7 +32,7 @@ import {
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   GC_CONSENT_STATUS_REQUESTED,
 } from "../constants";
-import { ResourceAccessMode } from "../type/ResourceAccessMode";
+import { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import { AccessGrant } from "../type/AccessGrant";
 import { AccessRequest } from "../type/AccessRequest";
 

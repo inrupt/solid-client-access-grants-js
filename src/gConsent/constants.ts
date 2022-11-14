@@ -24,16 +24,6 @@ export const AS_ANNOUNCE = "https://www.w3.org/ns/activitystreams#Announce";
 export const AS_OBJECT = "https://www.w3.org/ns/activitystreams#object";
 export const AS_SUMMARY = "https://www.w3.org/ns/activitystreams#summary";
 
-// TODO: Check that these are actually the modes you can request.
-//       The Server API doc does refer to `acl:` as a prefix,
-//       although that is not listed in the example context.
-export const ACL_RESOURCE_ACCESS_MODE_APPEND =
-  "http://www.w3.org/ns/auth/acl#Append";
-export const ACL_RESOURCE_ACCESS_MODE_READ =
-  "http://www.w3.org/ns/auth/acl#Read";
-export const ACL_RESOURCE_ACCESS_MODE_WRITE =
-  "http://www.w3.org/ns/auth/acl#Write";
-
 export const GC_CONSENT = "https://w3id.org/GConsent#Consent";
 export const GC_FOR_PERSONAL_DATA = "https://w3id.org/GConsent#forPersonalData";
 export const GC_FOR_PURPOSE = "https://w3id.org/GConsent#forPurpose";
@@ -98,10 +88,4 @@ export const CONSENT_STATUS = new Set([
   GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   GC_CONSENT_STATUS_REQUESTED,
-] as const);
-
-export const RESOURCE_ACCESS_MODE = new Set([
-  ACL_RESOURCE_ACCESS_MODE_APPEND,
-  ACL_RESOURCE_ACCESS_MODE_READ,
-  ACL_RESOURCE_ACCESS_MODE_WRITE,
 ] as const);

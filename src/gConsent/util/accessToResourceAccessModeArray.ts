@@ -19,13 +19,13 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import { AccessModes } from "../../type/AccessModes";
 import {
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
-} from "../constants";
-import { AccessModes } from "../../type/AccessModes";
-import { ResourceAccessMode } from "../type/ResourceAccessMode";
+  ResourceAccessMode,
+} from "../../type/ResourceAccessMode";
 
 export function accessToResourceAccessModeArray(
   desiredAccess: AccessModes

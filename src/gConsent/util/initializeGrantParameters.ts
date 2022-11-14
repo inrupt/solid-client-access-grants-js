@@ -20,13 +20,13 @@
 //
 
 import { UrlString } from "@inrupt/solid-client";
+import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
+import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import {
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
-} from "../constants";
-import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
-import type { ResourceAccessMode } from "../type/ResourceAccessMode";
+} from "../../type/ResourceAccessMode";
 import { ApproveAccessRequestOverrides } from "../manage/approveAccessRequest";
 import { AccessModes } from "../../type/AccessModes";
 

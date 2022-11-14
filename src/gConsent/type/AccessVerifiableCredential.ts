@@ -26,7 +26,7 @@ import type {
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   GC_CONSENT_STATUS_REQUESTED,
 } from "../constants";
-import type { ResourceAccessMode } from "./ResourceAccessMode";
+import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import type { GConsentStatus } from "./GConsentStatus";
 import type { AccessCredentialType } from "./AccessCredentialType";
 
