@@ -25,10 +25,12 @@ import {
   mockAccessRequestVc as mockGConsentRequest,
 } from "../gConsent/util/access.mock";
 import {
+  AccessGrant,
   getAccessModes,
   getExpirationDate,
   getId,
   getIssuanceDate,
+  getIssuer,
   getRequestor,
   getResourceOwner,
   getResources,
@@ -185,6 +187,46 @@ describe("getExpirationDate", () => {
   });
 });
 
-describe("getIssuer", () => {});
+describe("getIssuer", () => {
+  it("gets the gConsent access grant issuer", () => {
+    const gConsentGrant = mockGConsentGrant();
+    expect(getIssuer(gConsentGrant)).toStrictEqual(gConsentGrant.issuer);
+  });
 
-describe("AccessGrant", () => {});
+  it("gets the gConsent access request issuer", () => {
+    const gConsentRequest = mockGConsentRequest();
+    expect(getIssuer(gConsentRequest)).toStrictEqual(gConsentRequest.issuer);
+  });
+});
+
+describe("AccessGrant", () => {
+  it("wraps calls to the underlying functions", () => {
+    const gConsentRequest = mockGConsentRequest();
+    const wrappedConsentRequest = new AccessGrant(gConsentRequest);
+    expect(wrappedConsentRequest.getAccessModes()).toStrictEqual(
+      getAccessModes(gConsentRequest)
+    );
+    expect(wrappedConsentRequest.getExpirationDate()).toStrictEqual(
+      getExpirationDate(gConsentRequest)
+    );
+    expect(wrappedConsentRequest.getId()).toStrictEqual(getId(gConsentRequest));
+    expect(wrappedConsentRequest.getIssuanceDate()).toStrictEqual(
+      getIssuanceDate(gConsentRequest)
+    );
+    expect(wrappedConsentRequest.getIssuer()).toStrictEqual(
+      getIssuer(gConsentRequest)
+    );
+    expect(wrappedConsentRequest.getRequestor()).toStrictEqual(
+      getRequestor(gConsentRequest)
+    );
+    expect(wrappedConsentRequest.getResourceOwner()).toStrictEqual(
+      getResourceOwner(gConsentRequest)
+    );
+    expect(wrappedConsentRequest.getResources()).toStrictEqual(
+      getResources(gConsentRequest)
+    );
+    expect(wrappedConsentRequest.getTypes()).toStrictEqual(
+      getTypes(gConsentRequest)
+    );
+  });
+});
