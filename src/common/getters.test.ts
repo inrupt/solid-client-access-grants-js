@@ -30,6 +30,7 @@ import {
   getRequestor,
   getResourceOwner,
   getResources,
+  getTypes,
 } from "./getter";
 
 describe("getResources", () => {
@@ -134,7 +135,17 @@ describe("getId", () => {
   });
 });
 
-describe("getTypes", () => {});
+describe("getTypes", () => {
+  it("gets the gConsent access grant types", () => {
+    const gConsentGrant = mockGConsentGrant();
+    expect(getTypes(gConsentGrant)).toBe(gConsentGrant.type);
+  });
+
+  it("gets the gConsent access request id", () => {
+    const gConsentRequest = mockGConsentRequest();
+    expect(getTypes(gConsentRequest)).toBe(gConsentRequest.type);
+  });
+});
 
 describe("getIssuanceDate", () => {});
 

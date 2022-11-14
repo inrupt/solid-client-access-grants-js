@@ -69,11 +69,13 @@ export function getAccessModes(
 export function getId(vc: AccessGrantGConsent | AccessRequestGConsent): string {
   return vc.id;
 }
+
 export function getTypes(
   vc: AccessGrantGConsent | AccessRequestGConsent
 ): string[] {
-  throw new Error("unimplemented");
+  return vc.type;
 }
+
 export function getIssuanceDate(
   vc: AccessGrantGConsent | AccessRequestGConsent
 ): Date {
