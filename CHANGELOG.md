@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 ### Minor changes
 
 - The `getters` module contains functions and a class to interact with Verifiable
-Credentials without having to hard-code the data model in your application.
+  Credentials without having to hard-code the data model in your application.
 
 ## [2.0.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.0.0) - 2022-11-03
 
