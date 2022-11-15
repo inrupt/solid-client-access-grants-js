@@ -40,8 +40,8 @@ export function getEnvironment(): Environment {
       process.env.ACCESS_MANAGEMENT_APP ??
         "https://podbrowser.inrupt.com/privacy/access/requests/"
     ),
-    clientId: process.env.CLIENT_ID ?? "",
-    clientSecret: process.env.CLIENT_SECRET ?? "",
+    clientId: process.env.E2E_TEST_REQUESTOR_CLIENT_ID ?? "",
+    clientSecret: process.env.E2E_TEST_REQUESTOR_CLIENT_SECRET ?? "",
     oidcIssuer: new URL(process.env.OIDC_ISSUER ?? "https://login.inrupt.com"),
     redirectUrl: new URL(
       process.env.FRONTENT_REDIRECT ?? new URL(RESOURCE_FETCHER_PATHNAME, url)
