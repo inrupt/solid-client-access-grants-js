@@ -20,7 +20,6 @@
 //
 import { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import { AccessRequestGConsent } from "../gConsent/type/AccessRequest";
-import { ResourceAccessMode } from "../type/ResourceAccessMode";
 import { isAccessGrant as isGConsentAccessGrant } from "../gConsent/guard/isAccessGrant";
 import { AccessModes, resourceAccessToAccessMode } from "../type/AccessModes";
 
