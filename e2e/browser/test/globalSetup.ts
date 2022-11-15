@@ -19,15 +19,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import {
-  setupEnv,
-  getBrowserTestingEnvironment,
-} from "@inrupt/internal-test-env";
+import { setupEnv } from "@inrupt/internal-test-env";
 
 async function globalSetup() {
   setupEnv();
-  // Fail fast with dotenv:
-  getBrowserTestingEnvironment();
 
   // Return the teardown function.
   return async () => {};
