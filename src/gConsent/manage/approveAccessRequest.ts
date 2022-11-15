@@ -29,12 +29,12 @@ import type { AccessModes } from "../../type/AccessModes";
 import type { AccessGrant } from "../type/AccessGrant";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
+import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
 import {
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
-  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-} from "../constants";
+} from "../../type/ResourceAccessMode";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getSessionFetch } from "../../common/util/getSessionFetch";

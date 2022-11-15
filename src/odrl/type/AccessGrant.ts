@@ -21,9 +21,9 @@
 
 import type { Iri, VerifiableCredential } from "@inrupt/solid-client-vc";
 import {
-  SerializedAccessModes,
-  SERIALIZED_ACCESS_MODES,
-} from "../../type/AccessModes";
+  ResourceAccessMode,
+  RESOURCE_ACCESS_MODE,
+} from "../../type/ResourceAccessMode";
 
 const ODRL_ACCESS = "https://www.w3.org/ns/solid/odrl/access";
 
@@ -45,7 +45,7 @@ export type OdrlConstraint = {
 
 export type OdrlPermission = {
   target: Iri;
-  action: SerializedAccessModes[];
+  action: ResourceAccessMode[];
   constraint?: OdrlConstraint[];
 };
 
@@ -91,7 +91,7 @@ function isOdrlPermission(permission: unknown): permission is OdrlPermission {
   if (
     !Array.isArray((permission as OdrlPermission).action) ||
     (permission as OdrlPermission).action.some(
-      (mode) => !SERIALIZED_ACCESS_MODES.includes(mode)
+      (mode) => !RESOURCE_ACCESS_MODE.has(mode)
     )
   ) {
     return false;

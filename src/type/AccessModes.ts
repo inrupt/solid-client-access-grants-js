@@ -19,6 +19,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import { ResourceAccessMode } from "./ResourceAccessMode";
+
 /**
  * An object with the boolean properties read, append, write, controlRead, and
  * ControlWrite, representing the respective Access Modes defined by the Web
@@ -35,14 +37,22 @@ export interface AccessModes {
   append?: boolean;
 }
 
-export const SERIALIZED_ACCESS_MODES = [
-  "read" as const,
-  "write" as const,
-  "append" as const,
-];
-
 /**
- * Acceptable values for Access being granted.
+ * @internal
  */
-export type SerializedAccessModes =
-  typeof SERIALIZED_ACCESS_MODES extends Array<infer E> ? E : never;
+export function resourceAccessToAccessMode(
+  access: ResourceAccessMode[]
+): AccessModes {
+  const result: Required<AccessModes> = {
+    read: (["http://www.w3.org/ns/auth/acl#Read", "Read"] as const).some(
+      (mode) => access.includes(mode)
+    ),
+    write: (["http://www.w3.org/ns/auth/acl#Write", "Write"] as const).some(
+      (mode) => access.includes(mode)
+    ),
+    append: (["http://www.w3.org/ns/auth/acl#Append", "Append"] as const).some(
+      (mode) => access.includes(mode)
+    ),
+  };
+  return result;
+}

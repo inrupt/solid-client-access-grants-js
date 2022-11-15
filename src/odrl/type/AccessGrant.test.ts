@@ -50,7 +50,7 @@ const mockAccessGrantOdrl: AccessGrantOdrl = {
     permission: [
       {
         target: "https://storage.inrupt.com/{UUID}/data/",
-        action: ["read", "write"],
+        action: ["Read", "Write"],
         constraint: [
           {
             leftOperand: "purpose",
@@ -68,7 +68,7 @@ const mockAccessGrantOdrl: AccessGrantOdrl = {
     prohibition: [
       {
         target: "https://storage.inrupt.com/{UUID}/data/private/",
-        action: ["read", "write"],
+        action: ["Read", "Write"],
       },
     ],
   },

@@ -45,6 +45,7 @@
     "./manage": "./dist/gConsent/manage/index.mjs",
     "./request": "./dist/gConsent/request/index.mjs",
     "./verify": "./dist/common/verify/index.mjs",
+    "./getters": "./dist/common/getters.mjs",
     "./gConsent": "./dist/gConsent/index.mjs",
     "./gConsent/discover": "./dist/gConsent/discover/index.mjs",
     "./gConsent/manage": "./dist/gConsent/manage/index.mjs",

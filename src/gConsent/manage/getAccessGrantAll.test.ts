@@ -21,7 +21,6 @@
 
 import { jest, it, describe, expect } from "@jest/globals";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
-import { fetch as crossFetch } from "cross-fetch";
 import {
   getAccessGrantAll,
   IssueAccessRequestParameters,
