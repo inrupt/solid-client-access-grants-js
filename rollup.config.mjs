@@ -74,6 +74,7 @@ export default [
       "./src/type/RecursivePartial.ts",
       "./src/type/RedirectOptions.ts",
       "./src/type/UmaConfiguration.ts",
+      "./src/type/ResourceAccessMode.ts",
       "./src/gConsent/type/AccessGrant.ts",
       "./src/gConsent/type/AccessBaseOptions.ts",
       "./src/gConsent/type/AccessCredentialType.ts",
@@ -83,7 +84,6 @@ export default [
       "./src/gConsent/type/GConsentStatus.ts",
       "./src/gConsent/type/IssueAccessRequestParameters.ts",
       "./src/gConsent/type/Parameter.ts",
-      "./src/gConsent/type/ResourceAccessMode.ts",
       "./src/odrl/type/AccessGrant.ts",
     ],
     output: {

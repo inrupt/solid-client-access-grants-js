@@ -20,10 +20,32 @@
 //
 
 import { describe, it, expect } from "@jest/globals";
-import { isValidAccessGrant } from "./index";
+import {
+  isValidAccessGrant,
+  AccessGrantWrapper,
+  getAccessModes,
+  getExpirationDate,
+  getId,
+  getIssuanceDate,
+  getIssuer,
+  getRequestor,
+  getResourceOwner,
+  getResources,
+  getTypes,
+} from "./index";
 
 describe("Index exports", () => {
   it("exposes expected things", () => {
     expect(isValidAccessGrant).toBeDefined();
+    expect(AccessGrantWrapper).toBeDefined();
+    expect(getAccessModes).toBeDefined();
+    expect(getExpirationDate).toBeDefined();
+    expect(getId).toBeDefined();
+    expect(getIssuanceDate).toBeDefined();
+    expect(getIssuer).toBeDefined();
+    expect(getRequestor).toBeDefined();
+    expect(getResourceOwner).toBeDefined();
+    expect(getResources).toBeDefined();
+    expect(getTypes).toBeDefined();
   });
 });

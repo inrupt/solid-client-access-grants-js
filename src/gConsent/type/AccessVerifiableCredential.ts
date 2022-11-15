@@ -26,7 +26,7 @@ import type {
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   GC_CONSENT_STATUS_REQUESTED,
 } from "../constants";
-import type { ResourceAccessMode } from "./ResourceAccessMode";
+import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import type { GConsentStatus } from "./GConsentStatus";
 import type { AccessCredentialType } from "./AccessCredentialType";
 
@@ -117,7 +117,9 @@ export type AccessDeniedBody = BaseGrantBody & {
 export type AccessGrantBody = BaseGrantBody & {
   credentialSubject: {
     providedConsent: {
-      hasStatus: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
+      hasStatus:
+        | typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN
+        | typeof GC_CONSENT_STATUS_DENIED;
       isProvidedTo: UrlString;
     };
   };

@@ -20,9 +20,12 @@
 //
 
 import { UrlString } from "@inrupt/solid-client";
-import { CONSENT_STATUS, RESOURCE_ACCESS_MODE } from "../constants";
+import { CONSENT_STATUS } from "../constants";
 import { GConsentRequestAttributes } from "../type/AccessVerifiableCredential";
-import { ResourceAccessMode } from "../type/ResourceAccessMode";
+import {
+  ResourceAccessMode,
+  RESOURCE_ACCESS_MODE,
+} from "../../type/ResourceAccessMode";
 import { isUnknownObject } from "./isUnknownObject";
 import { GConsentStatus } from "../type/GConsentStatus";
 
