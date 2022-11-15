@@ -32,8 +32,8 @@ jobs:
       - run: npm run test:e2e:browser
         env:
           E2E_TEST_ENVIRONMENT: ${{ matrix.environment-name }}
-          E2E_TEST_UI_LOGIN: ${{ secrets.E2E_TEST_UI_LOGIN }}
-          E2E_TEST_UI_PASSWORD: ${{ secrets.E2E_TEST_UI_PASSWORD }}
+          E2E_TEST_USER: ${{ secrets.E2E_TEST_UI_LOGIN }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_UI_PASSWORD }}
       - name: Archive browser-based end-to-end test request logs
         uses: actions/upload-artifact@v3
         if: failure()
