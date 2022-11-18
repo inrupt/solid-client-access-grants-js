@@ -57,5 +57,15 @@ export default {
       testEnvironment: "node",
       testPathIgnorePatterns: ["e2e", "browser.test.ts"],
     },
+    {
+      ...baseConfig,
+      testEnvironment: "node",
+      displayName: "e2e-node",
+      testRegex: "e2e/node/.*.test.ts",
+      setupFiles: ["<rootDir>/e2e/node/jest.setup.ts"],
+      // don't load the polyfills
+      setupFilesAfterEnv: [],
+      slowTestThreshold: 30,
+    },
   ],
 } as Config;
