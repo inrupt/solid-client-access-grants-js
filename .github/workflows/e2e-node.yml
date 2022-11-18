@@ -23,10 +23,10 @@ jobs:
         environment-name: ["ESS PodSpaces"]
         experimental: [false]
         include:
-        - environment-name: ["ESS Dev-Next"]
-          experimental: true
-          os: ubuntu-latest
-          node-version: 16.x
+          - environment-name: ["ESS Dev-Next"]
+            experimental: true
+            os: ubuntu-latest
+            node-version: 16.x
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3

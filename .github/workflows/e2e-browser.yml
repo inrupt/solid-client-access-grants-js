@@ -20,9 +20,9 @@ jobs:
         # NSS does not support static client registration, which we rely on for testing.
         environment-name: ["ESS PodSpaces"]
         experimental: [false]
-        include: 
-        - environment-name: "ESS Dev-Next"
-          experimental: true
+        include:
+          - environment-name: "ESS Dev-Next"
+            experimental: true
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
