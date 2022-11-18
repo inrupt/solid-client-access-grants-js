@@ -9,6 +9,7 @@
     "docs:install": "cd docs/api; pip install -r requirements.txt",
     "docs:build": "typedoc && cd docs/api && make html dist",
     "docs:preview": "python3 -m http.server --bind 127.0.0.1 --directory docs/dist",
+    "lint": "npm run lint:check",
     "lint:fix": "npm run lint:eslint -- --fix && npm run lint:prettier -- --write",
     "lint:check": "npm run lint:eslint && npm run lint:prettier -- --check",
     "lint:eslint": "eslint --config .eslintrc.js \"src/\" \"e2e/\" \"examples/\"",
