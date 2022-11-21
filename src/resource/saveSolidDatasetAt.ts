@@ -23,6 +23,8 @@ import {
   UrlString,
   saveSolidDatasetAt as coreSaveSolidDatasetAt,
   SolidDataset,
+  WithServerResourceInfo,
+  WithChangeLog,
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
@@ -52,7 +54,7 @@ export async function saveSolidDatasetAt<Dataset extends SolidDataset>(
   solidDataset: Dataset,
   accessGrant: VerifiableCredential,
   options?: FetchOptions
-) {
+): Promise<Dataset & WithServerResourceInfo & WithChangeLog> {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
     fetchOptions.fetch = options.fetch;
