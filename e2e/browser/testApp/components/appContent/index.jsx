@@ -19,138 +19,104 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { useSession } from "@inrupt/solid-ui-react";
-import { useState } from "react";
 import {
-  approveAccessRequest,
-  revokeAccessGrant,
-} from "@inrupt/solid-client-access-grants";
-import {
-  getPodUrlAll,
-  saveFileInContainer,
-  getSourceUrl,
-  deleteFile,
-} from "@inrupt/solid-client";
+  login,
+  logout,
+  handleIncomingRedirect,
+  getDefaultSession
+} from "@inrupt/solid-client-authn-browser";
+import { useState, useEffect } from "react";
+import AccessGrants from "../accessGrants"
 
 // This is the content of the file uploaded manually at SHARED_FILE_IRI.
-const SHARED_FILE_CONTENT = "Some content.\n";
+const DEFAULT_ISSUER = "https://login.inrupt.com/";
+const REDIRECT_URL = window.location.href;
+const APP_NAME = "Access Grants browser-based tests app";
+console.log("coucou5")
+const AccessGrantContainer = ({
+  sessionInfo
+}) => {
+  if (sessionInfo?.isLoggedIn) {
+    return <AccessGrants />;
+  } else {
+    return <></>;
+  }
+}
 
 export default function Home() {
-  const { session } = useSession();
-  const [accessGrant, setAccessGrant] = useState(undefined);
-  const [sharedResourceIri, setSharedResourceIri] = useState(undefined);
+  const [sessionInfo, setSessionInfo] = useState();
+  const [issuer, setIssuer] = useState(DEFAULT_ISSUER);
 
-  const handleCreate = (e) => {
-    // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
-    e.preventDefault();
-    if (typeof sharedResourceIri === "string") {
-      // If a resource already exist, do nothing
-      return;
-    }
-    (async () => {
-      // Create a file in the resource owner's Pod
-      const resourceOwnerPodAll = await getPodUrlAll(session.info.webId);
-      if (resourceOwnerPodAll.length === 0) {
-        throw new Error(
-          "The Resource Owner WebID Profile is missing a link to at least one Pod root."
-        );
-      }
-      const savedFile = await saveFileInContainer(
-        resourceOwnerPodAll[0],
-        Buffer.from(SHARED_FILE_CONTENT),
-        {
-          // The session ID is a random string, used here as a unique slug.
-          slug: `${session.info.sessionId}.txt`,
-          fetch: session.fetch,
-        }
-      );
-      setSharedResourceIri(getSourceUrl(savedFile));
-    })();
-  };
+  const session = getDefaultSession();
 
-  const handleDelete = (e) => {
-    // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
-    e.preventDefault();
-    (async () => {
-      await deleteFile(sharedResourceIri, {
-        fetch: session.fetch,
+  useEffect(() => {
+    console.log("useEffect")
+    handleIncomingRedirect().then(setSessionInfo);
+  }, []);
+
+  const handleLogin = async () => {
+    try {
+      // Login will redirect the user away so that they can log in the OIDC issuer,
+      // and back to the provided redirect URL (which should be controlled by your app).
+      await login({
+        redirectUrl: REDIRECT_URL,
+        oidcIssuer: issuer,
+        clientName: APP_NAME,
       });
-      setSharedResourceIri(undefined);
-    })();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleGrant = (e) => {
-    // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
-    e.preventDefault();
-    if (typeof sharedResourceIri !== "string") {
-      // If the resource does not exist, do nothing.
-      return;
-    }
-    (async () => {
-      const accessGrantRequest = await approveAccessRequest(
-        session.info.webId,
-        undefined,
-        {
-          requestor: "https://johndoe.webid",
-          access: { read: true },
-          resources: [sharedResourceIri],
-        },
-        {
-          fetch: session.fetch,
-        }
-      );
-      setAccessGrant(JSON.stringify(accessGrantRequest, null, "  "));
-    })();
+  const handleLogout = async () => {
+    await logout();
+    setSessionInfo(undefined);
   };
 
-  const handleRevoke = (e) => {
-    // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
-    e.preventDefault();
-    if (typeof accessGrant !== "string") {
-      // If the resource does not exist, do nothing.
-      return;
-    }
-    (async () => {
-      await revokeAccessGrant(JSON.parse(accessGrant), {
-        fetch: session.fetch,
-      });
-      setAccessGrant(undefined);
-    })();
-  };
+  console.log("coucou1")
 
   return (
     <div>
       <h1>
         <code>@inrupt/solid-client-access-grants</code> test browser app
       </h1>
-      {session.info.isLoggedIn && (
-        <p data-testid="logged-in-message">
-          Logged in as: {session.info.webId}
-        </p>
-      )}
-      <div>
-        <button onClick={(e) => handleCreate(e)} data-testid="create-resource">
-          Create resource
-        </button>
-        <button onClick={(e) => handleDelete(e)} data-testid="delete-resource">
-          Delete resource
-        </button>
-      </div>
-      <p>
-        Created resource:{" "}
-        <span data-testid="resource-iri">{sharedResourceIri}</span>
+      <p data-testid="logged-in-message">
+        {sessionInfo?.isLoggedIn
+          ? `Logged in as ${sessionInfo.webId}`
+          : "Not logged in yet"}
       </p>
-      <div>
-        <button onClick={(e) => handleGrant(e)} data-testid="grant-access">
-          Grant access
+      <form>
+        <input
+          data-testid="identity-provider-input"
+          type="text"
+          value={issuer}
+          onChange={(e) => {
+            setIssuer(e.target.value);
+          }}
+        />
+        <button
+          data-testid="login-button"
+          onClick={async (e) => {
+            e.preventDefault();
+            await handleLogin();
+          }}
+        >
+          Log In
         </button>
-        <button onClick={(e) => handleRevoke(e)} data-testid="revoke-access">
-          Revoke access
+        
+
+        <button
+          data-testid="logout-button"
+          onClick={async (e) => {
+            e.preventDefault();
+            await handleLogout();
+          }}
+        >
+          Log Out
         </button>
-      </div>
-      <p>
-        Granted access: <pre data-testid="access-grant">{accessGrant}</pre>
-      </p>
+      </form>
+      
+      <AccessGrantContainer sessionInfo={sessionInfo} />
     </div>
   );
 }
