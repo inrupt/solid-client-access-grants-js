@@ -21,10 +21,11 @@
 
 import dynamic from "next/dynamic";
 
-const BrowserSideApp = dynamic(() => import("../components/appContent/index"), {
+const BrowserSideApp = dynamic(() => import("../components/appContent"), {
   ssr: false,
 });
 
 export default function Home() {
+  console.log("coucou0")
   return <BrowserSideApp />;
 }

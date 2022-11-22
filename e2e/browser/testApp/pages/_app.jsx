@@ -19,26 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { useEffect } from "react";
-import AppContainer from "../components/appContainer";
-
-import "./styles.css";
-
 /* eslint react/prop-types: 0, react/jsx-props-no-spreading: 0 */
 function MyApp({ Component, pageProps }) {
-  // Remove injected serverside JSS
-  useEffect(() => {
-    const jssStyles = document.querySelector("#jss-server-side");
-
-    if (jssStyles && jssStyles.parentElement) {
-      jssStyles.parentElement.removeChild(jssStyles);
-    }
-  }, []);
 
   return (
-    <AppContainer>
       <Component {...pageProps} />
-    </AppContainer>
   );
 }
 
