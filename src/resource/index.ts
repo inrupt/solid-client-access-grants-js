@@ -22,3 +22,4 @@
 export { getFile, overwriteFile, saveFileInContainer } from "./file";
 export { getSolidDataset } from "./getSolidDataset";
 export { saveSolidDatasetAt } from "./saveSolidDatasetAt";
+export { saveSolidDatasetInContainer } from "./saveSolidDatasetInContainer";
