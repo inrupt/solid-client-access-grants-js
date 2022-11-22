@@ -35,17 +35,18 @@ import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
 import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 import {
-  approveAccessRequest,
-  getAccessGrantAll,
-  isValidAccessGrant,
-  issueAccessRequest,
-  revokeAccessGrant,
-  getFile,
   AccessGrant,
+  approveAccessRequest,
+  createContainerInContainer,
+  getAccessGrantAll,
+  getFile,
+  getSolidDataset,
+  issueAccessRequest,
+  isValidAccessGrant,
   overwriteFile,
+  revokeAccessGrant,
   saveFileInContainer,
   saveSolidDatasetAt,
-  getSolidDataset,
 } from "../../src/index";
 
 const env = getNodeTestingEnvironment({
@@ -378,10 +379,10 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     let testFileName: string;
     let testFileIri: string;
     let testContainerIri: string;
+    let testContainerIriChild: string;
 
     beforeEach(async () => {
       const containerPath = `${resourceOwnerSession.info.sessionId}-dataset-apis`;
-
       testContainerIri = new URL(`${containerPath}/`, resourceOwnerPod).href;
       testFileName = "dataset.ttl";
       testFileIri = new URL(testFileName, testContainerIri).href;
@@ -440,6 +441,10 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       });
 
       await solidClient.deleteFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      await solidClient.deleteContainer(testContainerIriChild, {
         fetch: resourceOwnerSession.fetch,
       });
 
@@ -517,6 +522,30 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       // Assert that the dataset changed:
       expect(updatedDatasetTtl).not.toBe(existingDatasetAsOwnerTtl);
       expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
+    });
+
+    it("can use the createContainerInContainer API to create a new container", async () => {
+      const containerNameSuggestion = "newTestContainer";
+      testContainerIriChild = `${testContainerIri}${containerNameSuggestion}/`;
+      await createContainerInContainer(testContainerIri, accessGrant, {
+        fetch: requestorSession.fetch,
+        slugSuggestion: containerNameSuggestion,
+      });
+      const parentContainer = await solidClient.getSolidDataset(
+        testContainerIri,
+        {
+          fetch: resourceOwnerSession.fetch,
+        }
+      );
+
+      const parentContainerContainsAll =
+        solidClient.getThingAll(parentContainer);
+
+      const match = parentContainerContainsAll.filter((thing) => {
+        return thing.url === testContainerIriChild;
+      });
+
+      expect(match).toHaveLength(1);
     });
 
     it.skip("can use the saveSolidDatasetAt API for a new dataset", async () => {
