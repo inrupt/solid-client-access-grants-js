@@ -546,7 +546,9 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       );
 
       // We cannot request the newly created dataset using our existing Access
-      // Grant because of ACR inheritance.
+      // Grant because of ACR inheritance. When we delete the file containing
+      // the dataset at the start of this testcase it also deletes the datasets'
+      // ACRs, so this test case will fail (SDK-2792).
 
       // const datasetInPodAsRequestor = await
       // getSolidDataset( testFileIri, accessGrant,
