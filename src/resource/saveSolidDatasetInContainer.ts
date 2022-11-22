@@ -21,7 +21,6 @@
 
 import {
   UrlString,
-  Url,
   saveSolidDatasetInContainer as coreSaveSolidDatasetInContainer,
   SolidDataset,
   WithResourceInfo,
