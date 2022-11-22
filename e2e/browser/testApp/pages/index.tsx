@@ -19,12 +19,13 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/* eslint react/prop-types: 0, react/jsx-props-no-spreading: 0 */
-function MyApp({ Component, pageProps }) {
+import dynamic from "next/dynamic";
+import React from "react";
 
-  return (
-      <Component {...pageProps} />
-  );
+const BrowserSideApp = dynamic(() => import("../components/appContent"), {
+  ssr: false,
+});
+
+export default function Home() {
+  return <BrowserSideApp />;
 }
-
-export default MyApp;

@@ -33,14 +33,15 @@ import {
   deleteFile,
 } from "@inrupt/solid-client";
 import { useState } from "react";
+import React from "react";
 
 
 const session = getDefaultSession();
 const SHARED_FILE_CONTENT = "Some content.\n";
 
 export default function AccessGrant() {
-  const [accessGrant, setAccessGrant] = useState(undefined);
-  const [sharedResourceIri, setSharedResourceIri] = useState(undefined);
+  const [accessGrant, setAccessGrant] = useState<string>();
+  const [sharedResourceIri, setSharedResourceIri] = useState<string>();
 
   const handleCreate = (e) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
@@ -50,6 +51,10 @@ export default function AccessGrant() {
       return;
     }
     (async () => {
+      if(typeof session.info.webId !== "string") {
+        console.error("You must be authenticated to create a resource.")
+        return;
+      }
       // Create a file in the resource owner's Pod
       const resourceOwnerPodAll = await getPodUrlAll(session.info.webId);
       if (resourceOwnerPodAll.length === 0) {
@@ -74,6 +79,10 @@ export default function AccessGrant() {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
     e.preventDefault();
     (async () => {
+      if (typeof sharedResourceIri !== "string") {
+        // If no resource exist, do nothing
+        return;
+      }
       await deleteFile(sharedResourceIri, {
         fetch: session.fetch,
       });
@@ -90,7 +99,6 @@ export default function AccessGrant() {
     }
     (async () => {
       const accessGrantRequest = await approveAccessRequest(
-        session.info.webId,
         undefined,
         {
           requestor: "https://johndoe.webid",

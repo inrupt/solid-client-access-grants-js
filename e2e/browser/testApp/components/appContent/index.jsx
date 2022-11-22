@@ -32,7 +32,6 @@ import AccessGrants from "../accessGrants"
 const DEFAULT_ISSUER = "https://login.inrupt.com/";
 const REDIRECT_URL = window.location.href;
 const APP_NAME = "Access Grants browser-based tests app";
-console.log("coucou5")
 const AccessGrantContainer = ({
   sessionInfo
 }) => {
@@ -50,7 +49,6 @@ export default function Home() {
   const session = getDefaultSession();
 
   useEffect(() => {
-    console.log("useEffect")
     handleIncomingRedirect().then(setSessionInfo);
   }, []);
 
@@ -73,7 +71,6 @@ export default function Home() {
     setSessionInfo(undefined);
   };
 
-  console.log("coucou1")
 
   return (
     <div>
