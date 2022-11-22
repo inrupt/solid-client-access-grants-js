@@ -78,8 +78,14 @@ export async function saveSolidDatasetInContainer(
     fetchOptions
   );
 
+  const containerOptions: { slugSuggestion?: string } = {};
+
+  if (options && options.slugSuggestion) {
+    containerOptions.slugSuggestion = options.slugSuggestion;
+  }
+
   return await coreSaveSolidDatasetInContainer(containerUrl, solidDataset, {
-    ...options,
+    ...containerOptions,
     fetch: authenticatedFetch,
   });
 }
