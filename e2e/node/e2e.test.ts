@@ -521,12 +521,11 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     });
 
     it("can use the saveSolidDatasetInContainer API for an existing dataset", async () => {
-      // ARANGE
+      // Need to delete file already created in test setup to start with empty container.
       await solidClient.deleteFile(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
 
-      // ACT
       const testDataset = await solidClient.createSolidDataset();
       const savedDataset = await saveSolidDatasetInContainer(
         testContainerIri,
@@ -539,7 +538,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         }
       );
 
-      // ASSERT
       const datasetInPodAsResourceOwner = await solidClient.getSolidDataset(
         testFileIri,
         {
@@ -564,7 +562,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         savedDataset
       );
       expect(savedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
-      // CLEANUP
     });
 
     it.skip("can use the saveSolidDatasetAt API for a new dataset", async () => {
