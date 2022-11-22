@@ -30,7 +30,7 @@ import { fetchWithVc } from "../fetch";
 import { FetchOptions } from "../type/FetchOptions";
 
 /**
- * Given a SolidDataset, store it in a Solid Pod in a new Resource inside a Container.
+ * Given a SolidDataset, store it in a Solid Pod as a new Resource inside a Container.
  *
  * The Container at the given URL should already exist; if it does not, you can initialise it first
  * using [[createContainerAt]], or directly save the SolidDataset at the desired location using
