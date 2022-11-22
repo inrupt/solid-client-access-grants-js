@@ -20,7 +20,7 @@
 //
 
 import { it, jest, describe, expect } from "@jest/globals";
-import { mockSolidDatasetFrom, UrlString, Url } from "@inrupt/solid-client";
+import { mockSolidDatasetFrom, UrlString } from "@inrupt/solid-client";
 import { mockAccessRequestVc } from "../gConsent/util/access.mock";
 import { saveSolidDatasetInContainer } from "./saveSolidDatasetInContainer";
 import { fetchWithVc } from "../fetch";
