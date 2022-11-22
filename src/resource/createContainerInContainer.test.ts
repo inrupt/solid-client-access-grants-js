@@ -59,6 +59,6 @@ describe("createContainerInContainer", () => {
       TEST_CONTAINER_URL,
       expect.anything()
     );
-    expect(resultDataset).toBe(mockedDataset);
+    expect(resultDataset).toStrictEqual(mockedDataset);
   });
 });

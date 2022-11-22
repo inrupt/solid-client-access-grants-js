@@ -23,6 +23,7 @@ import {
   UrlString,
   createContainerInContainer as coreCreateContainerInContainer,
   WithResourceInfo,
+  SolidDataset,
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
@@ -48,22 +49,22 @@ import { FetchOptions } from "../type/FetchOptions";
  *
  * @param containerUrl URL of the Container in which the empty Container is to be created.
  * @param options Optional parameter `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters). `options.slugSuggestion` accepts a string for your new Container's name.
- * @returns A promise that resolves to a SolidDataset if successful, and that
+ * @returns A promise that resolves to a SolidDataset with ResourceInfo if successful, and that
  * rejects otherwise.
  * @since 0.2.0
  */
 
-type SaveInContainerOptions = Partial<
-  FetchOptions & {
-    slugSuggestion: string;
-  }
->;
-export async function createContainerInContainer<SolidDataset>(
+interface SaveInContainerOptions extends FetchOptions {
+  slugSuggestion?: string;
+}
+
+export async function createContainerInContainer(
   containerUrl: UrlString,
   accessGrant: VerifiableCredential,
   options?: SaveInContainerOptions
 ): Promise<SolidDataset & WithResourceInfo> {
   const fetchOptions: FetchOptions = {};
+
   if (options && options.fetch) {
     fetchOptions.fetch = options.fetch;
   }
