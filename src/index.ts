@@ -76,6 +76,7 @@ export {
   overwriteFile,
   saveFileInContainer,
   saveSolidDatasetAt,
+  saveSolidDatasetInContainer,
 } from "./resource";
 
 export {

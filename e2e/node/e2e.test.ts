@@ -46,6 +46,7 @@ import {
   saveFileInContainer,
   saveSolidDatasetAt,
   getSolidDataset,
+  saveSolidDatasetInContainer,
 } from "../../src/index";
 
 const env = getNodeTestingEnvironment({
@@ -517,6 +518,53 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       // Assert that the dataset changed:
       expect(updatedDatasetTtl).not.toBe(existingDatasetAsOwnerTtl);
       expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
+    });
+
+    it("can use the saveSolidDatasetInContainer API for an existing dataset", async () => {
+      // ARANGE
+      await solidClient.deleteFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      // ACT
+      const testDataset = await solidClient.createSolidDataset();
+      const savedDataset = await saveSolidDatasetInContainer(
+        testContainerIri,
+        testDataset,
+        accessGrant,
+
+        {
+          fetch: requestorSession.fetch,
+          slugSuggestion: testFileName,
+        }
+      );
+
+      // ASSERT
+      const datasetInPodAsResourceOwner = await solidClient.getSolidDataset(
+        testFileIri,
+        {
+          fetch: resourceOwnerSession.fetch,
+        }
+      );
+
+      // We cannot request the newly created dataset using our existing Access
+      // Grant because of ACR inheritance.
+
+      // const datasetInPodAsRequestor = await
+      // getSolidDataset( testFileIri, accessGrant,
+      //   {
+      //     fetch: requestorSession.fetch,
+      //   }
+      // );
+
+      const updatedDatasetAsOwnerTtl = await solidClient.solidDatasetAsTurtle(
+        datasetInPodAsResourceOwner
+      );
+      const savedDatasetTtl = await solidClient.solidDatasetAsTurtle(
+        savedDataset
+      );
+      expect(savedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
+      // CLEANUP
     });
 
     it.skip("can use the saveSolidDatasetAt API for a new dataset", async () => {

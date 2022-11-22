@@ -41,6 +41,7 @@ import {
   overwriteFile,
   getSolidDataset,
   saveSolidDatasetAt,
+  saveSolidDatasetInContainer,
   GRANT_VC_URL_PARAM_NAME,
   gConsent,
   odrl,
@@ -78,6 +79,7 @@ describe("Index exports", () => {
     expect(saveFileInContainer).toBeDefined();
     expect(getSolidDataset).toBeDefined();
     expect(saveSolidDatasetAt).toBeDefined();
+    expect(saveSolidDatasetInContainer).toBeDefined();
     expect(GRANT_VC_URL_PARAM_NAME).toBeDefined();
     expect(gConsent).toBeDefined();
     expect(odrl).toBeDefined();
