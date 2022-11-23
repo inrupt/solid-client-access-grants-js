@@ -531,7 +531,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         testContainerIri,
         testDataset,
         accessGrant,
-
         {
           fetch: requestorSession.fetch,
           slugSuggestion: testFileName,
