@@ -525,7 +525,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
     it("can use the createContainerInContainer API to create a new container", async () => {
       const containerNameSuggestion = "newTestContainer";
-
       const newChildContainer = await createContainerInContainer(
         testContainerIri,
         accessGrant,
@@ -541,15 +540,12 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
           fetch: resourceOwnerSession.fetch,
         }
       );
-
-      const parentContainerContainsAll = solidClient.getUrlAll(
-        parentContainer,
-        "http://www.w3.org/ns/ldp#member"
-      );
+      const parentContainerContainsAll =
+        solidClient.getThingAll(parentContainer);
       testContainerIriChild = solidClient.getSourceUrl(newChildContainer);
 
       const match = parentContainerContainsAll.filter((thing) => {
-        return thing === testContainerIriChild;
+        return thing.url === testContainerIriChild;
       });
 
       expect(match).toHaveLength(1);
