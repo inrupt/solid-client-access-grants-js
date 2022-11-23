@@ -26,7 +26,7 @@
     "@solid/lit-prism-theme-sdk-default": "^0.13.1-alpha.2",
     "clsx": "^1.1.1",
     "jss": "^10.5.1",
-    "jss-preset-default": "^10.5.1",
+    "jss-preset-default": "^10.9.2",
     "next": "^12.1.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0"
