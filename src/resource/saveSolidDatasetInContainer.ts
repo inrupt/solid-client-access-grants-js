@@ -69,7 +69,7 @@ export async function saveSolidDatasetInContainer(
   solidDataset: SolidDataset,
   accessGrant: VerifiableCredential,
   options: SaveInContainerOptions
-): Promise<SolidDataset & WithResourceInfo> {
+) {
   const fetchOptions: FetchOptions = {};
 
   if (options && options.fetch) {
