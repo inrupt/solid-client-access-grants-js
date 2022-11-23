@@ -5,6 +5,9 @@ on:
 
 env:
   CI: true
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   e2e-node:
     # Dependabot cannot access secrets, so it doesn't have a token to authenticate to ESS.
@@ -14,12 +17,20 @@ jobs:
     runs-on: ${{ matrix.os }}
     environment:
       name: ${{ matrix.environment-name }}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
+      fail-fast: true
       matrix:
         os: [ubuntu-latest]
-        node-version: [16.x]
-        # NSS does not support static client registration, which we rely on for testing.
+        node-version: ["14.x", "16.x"]
+        # FIXME: deploy new environments:
+        # environment-name: ["ESS PodSpaces"]
         environment-name: ["ESS Dev-Next"]
+        experimental: [false]
+        # include:
+        #   - environment-name: "ESS Dev-Next"
+        #     experimental: true
+        #     node-version: 16.x
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}

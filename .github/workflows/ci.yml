@@ -2,14 +2,21 @@ name: CI
 
 on: [push]
 
-env:
-  CI: true
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
+  lint:
+    uses: inrupt/typescript-sdk-tools/.github/workflows/reusable-lint.yml@v1.4.2
+
   build:
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
+      fail-fast: true
       matrix:
         node-version: ["16", "14"]
+        experimental: [false]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
