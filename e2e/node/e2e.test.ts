@@ -521,7 +521,8 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     });
 
     it("can use the saveSolidDatasetInContainer API for an existing dataset", async () => {
-      // Need to delete file already created in test setup to start with empty container.
+      // Need to delete dataset that was already created in test setup,
+      // such that our test can create an empty dataset at `testFileIri`.
       await solidClient.deleteFile(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
