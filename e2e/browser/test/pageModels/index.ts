@@ -31,12 +31,12 @@ export class IndexPage {
 
   async startLogin() {
     const { idp } = getBrowserTestingEnvironment();
-    await this.page.fill("[data-testid=identity-provider-input]", idp);
+    await this.page.fill("[data-testid=identityProviderInput]", idp);
     await Promise.all([
       // It is important to call waitForNavigation before click to set up waiting.
       this.page.waitForNavigation(),
       // Clicking the link will indirectly cause a navigation.
-      this.page.click("[data-testid=login-button]")
+      this.page.click("[data-testid=loginButton]"),
     ]);
   }
 
@@ -48,7 +48,7 @@ export class IndexPage {
     );
     await Promise.all([
       this.page.waitForResponse((response) => response.status() === 200),
-      this.page.waitForSelector("p[data-testid=logged-in-message]"),
+      this.page.waitForSelector("p[data-testid=loggedInMessage]"),
     ]);
   }
 }

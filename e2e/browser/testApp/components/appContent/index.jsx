@@ -77,14 +77,14 @@ export default function Home() {
       <h1>
         <code>@inrupt/solid-client-access-grants</code> test browser app
       </h1>
-      <p data-testid="logged-in-message">
+      <p data-testid="loggedInMessage">
         {sessionInfo?.isLoggedIn
           ? `Logged in as ${sessionInfo.webId}`
           : "Not logged in yet"}
       </p>
       <form>
         <input
-          data-testid="identity-provider-input"
+          data-testid="identityProviderInput"
           type="text"
           value={issuer}
           onChange={(e) => {
@@ -92,7 +92,7 @@ export default function Home() {
           }}
         />
         <button
-          data-testid="login-button"
+          data-testid="loginButton"
           onClick={async (e) => {
             e.preventDefault();
             await handleLogin();
@@ -103,7 +103,7 @@ export default function Home() {
         
 
         <button
-          data-testid="logout-button"
+          data-testid="logoutButton"
           onClick={async (e) => {
             e.preventDefault();
             await handleLogout();
