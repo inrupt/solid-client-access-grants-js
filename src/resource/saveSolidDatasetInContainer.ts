@@ -57,6 +57,7 @@ interface SaveInContainerOptions extends FetchOptions {
  *
  * @param containerUrl URL of the Container in which to create a new Resource.
  * @param solidDataset The [[SolidDataset]] to save to a new Resource in the given Container.
+ * @param accessGrant The Access Grant that would allow the Agent/Application to perform this operation.
  * @param options Optional parameter `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
  * @returns A Promise resolving to a [[SolidDataset]] containing the saved data. The Promise rejects if the save failed.
  */

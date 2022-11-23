@@ -29,7 +29,6 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
-
 import * as solidClient from "@inrupt/solid-client";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
@@ -539,7 +538,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       );
 
       const datasetInPodAsResourceOwner = await solidClient.getSolidDataset(
-        testFileIri,
+        solidClient.getSourceIri(savedDataset),
         {
           fetch: resourceOwnerSession.fetch,
         }

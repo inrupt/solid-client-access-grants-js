@@ -53,7 +53,7 @@ describe("saveSolidDatasetInContainer", () => {
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(
-      expect.anything(),
+      TEST_CONTAINER_URL,
       mockAccessRequestVc(),
       { fetch: mockedFetch }
     );
