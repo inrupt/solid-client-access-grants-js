@@ -22,7 +22,7 @@
     "@inrupt/solid-client-authn-browser": "^1.12.2",
     "@inrupt/solid-ui-react": "^2.7.0",
     "@material-ui/core": "^4.12.3",
-    "@solid/lit-prism-patterns": "^0.13.1-alpha.2",
+    "@solid/lit-prism-patterns": "^0.13.9",
     "@solid/lit-prism-theme-sdk-default": "^0.13.1-alpha.2",
     "clsx": "^1.1.1",
     "jss": "^10.5.1",
