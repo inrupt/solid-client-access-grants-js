@@ -29,7 +29,6 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
-
 import * as solidClient from "@inrupt/solid-client";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
@@ -526,11 +525,16 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
     it("can use the createContainerInContainer API to create a new container", async () => {
       const containerNameSuggestion = "newTestContainer";
-      testContainerIriChild = `${testContainerIri}${containerNameSuggestion}/`;
-      await createContainerInContainer(testContainerIri, accessGrant, {
-        fetch: requestorSession.fetch,
-        slugSuggestion: containerNameSuggestion,
-      });
+
+      const newChildContainer = await createContainerInContainer(
+        testContainerIri,
+        accessGrant,
+        {
+          fetch: requestorSession.fetch,
+          slugSuggestion: containerNameSuggestion,
+        }
+      );
+
       const parentContainer = await solidClient.getSolidDataset(
         testContainerIri,
         {
@@ -538,11 +542,14 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         }
       );
 
-      const parentContainerContainsAll =
-        solidClient.getThingAll(parentContainer);
+      const parentContainerContainsAll = solidClient.getUrlAll(
+        parentContainer,
+        "http://www.w3.org/ns/ldp#member"
+      );
+      testContainerIriChild = solidClient.getSourceUrl(newChildContainer);
 
       const match = parentContainerContainsAll.filter((thing) => {
-        return thing.url === testContainerIriChild;
+        return thing === testContainerIriChild;
       });
 
       expect(match).toHaveLength(1);

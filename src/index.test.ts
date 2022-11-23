@@ -21,47 +21,46 @@
 
 import { describe, it, expect } from "@jest/globals";
 import {
-  AccessGrantWrapper,
   approveAccessRequest,
   cancelAccessRequest,
-  createContainerInContainer,
   denyAccessRequest,
-  fetchWithVc,
-  gConsent,
-  getAccessApiEndpoint,
   getAccessGrant,
   getAccessGrantAll,
+  getAccessApiEndpoint,
   getAccessGrantFromRedirectUrl,
   getAccessManagementUi,
-  getAccessModes,
   getAccessRequestFromRedirectUrl,
-  getExpirationDate,
+  isValidAccessGrant,
+  issueAccessRequest,
+  redirectToAccessManagementUi,
+  redirectToRequestor,
+  revokeAccessGrant,
+  fetchWithVc,
   getFile,
+  saveFileInContainer,
+  overwriteFile,
+  getSolidDataset,
+  createContainerInContainer,
+  saveSolidDatasetAt,
+  GRANT_VC_URL_PARAM_NAME,
+  gConsent,
+  odrl,
+  AccessGrantWrapper,
+  getAccessModes,
+  getExpirationDate,
   getId,
   getIssuanceDate,
   getIssuer,
   getRequestor,
   getResourceOwner,
   getResources,
-  getSolidDataset,
   getTypes,
-  GRANT_VC_URL_PARAM_NAME,
-  issueAccessRequest,
-  isValidAccessGrant,
-  odrl,
-  overwriteFile,
-  redirectToAccessManagementUi,
-  redirectToRequestor,
-  revokeAccessGrant,
-  saveFileInContainer,
-  saveSolidDatasetAt,
 } from "./index";
 
 describe("Index exports", () => {
   it("exposes expected things", () => {
     expect(approveAccessRequest).toBeDefined();
     expect(cancelAccessRequest).toBeDefined();
-    expect(createContainerInContainer).toBeDefined();
     expect(denyAccessRequest).toBeDefined();
     expect(getAccessGrant).toBeDefined();
     expect(getAccessGrantAll).toBeDefined();
@@ -78,6 +77,7 @@ describe("Index exports", () => {
     expect(getFile).toBeDefined();
     expect(overwriteFile).toBeDefined();
     expect(saveFileInContainer).toBeDefined();
+    expect(createContainerInContainer).toBeDefined();
     expect(getSolidDataset).toBeDefined();
     expect(saveSolidDatasetAt).toBeDefined();
     expect(GRANT_VC_URL_PARAM_NAME).toBeDefined();

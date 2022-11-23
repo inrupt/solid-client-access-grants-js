@@ -22,18 +22,20 @@
 import {
   UrlString,
   createContainerInContainer as coreCreateContainerInContainer,
-  WithResourceInfo,
-  SolidDataset,
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
 import { FetchOptions } from "../type/FetchOptions";
 
+interface SaveInContainerOptions extends FetchOptions {
+  slugSuggestion?: string;
+}
+
 /**
  * Create an empty Container inside the Container at the given URL.
  *
  * Throws an error if creating the Container failed, e.g. because the current user does not have
- * permissions to.
+ * permissions to. In particular, the Access Grant being used should at least append access to the target Container.
  *
  * The Container in which to create the new Container should itself already exist.
  *
@@ -47,22 +49,24 @@ import { FetchOptions } from "../type/FetchOptions";
  * If the user does have access to write directly to a given location, [[createContainerAt]]
  * will do the job just fine, and does not require the parent Container to exist in advance.
  *
- * @param containerUrl URL of the Container in which the empty Container is to be created.
- * @param options Optional parameter `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters). `options.slugSuggestion` accepts a string for your new Container's name.
- * @returns A promise that resolves to a SolidDataset with ResourceInfo if successful, and that
- * rejects otherwise.
- * @since 0.2.0
+ * @param containerUrl URL of the Container in which the empty Container is to
+ * be created.
+ * @param accessGrant The Access Grant that would allow the Agent/Application to
+ * perform this operation.
+ * @param options Optional parameter `options.fetch`: An alternative `fetch`
+ * function to make the HTTP request, compatible with the browser-native [fetch
+ * API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
+ * `options.slugSuggestion` accepts a string for your new Container's name.
+ * @returns A promise that resolves to a SolidDataset with ResourceInfo if
+ * successful, and that rejects otherwise.
+ * @since unreleased
  */
-
-interface SaveInContainerOptions extends FetchOptions {
-  slugSuggestion?: string;
-}
 
 export async function createContainerInContainer(
   containerUrl: UrlString,
   accessGrant: VerifiableCredential,
   options?: SaveInContainerOptions
-): Promise<SolidDataset & WithResourceInfo> {
+) {
   const fetchOptions: FetchOptions = {};
 
   if (options && options.fetch) {

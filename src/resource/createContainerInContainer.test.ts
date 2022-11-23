@@ -21,6 +21,7 @@
 
 import { it, jest, describe, expect } from "@jest/globals";
 import { mockSolidDatasetFrom, UrlString } from "@inrupt/solid-client";
+import type * as SolidClient from "@inrupt/solid-client";
 import { mockAccessRequestVc } from "../gConsent/util/access.mock";
 import { fetchWithVc } from "../fetch";
 import { createContainerInContainer } from "./createContainerInContainer";
@@ -38,27 +39,31 @@ const TEST_CONTAINER_URL: UrlString =
 
 describe("createContainerInContainer", () => {
   it("authenticates using the provided VC", async () => {
-    const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
+    const solidClientModule = jest.requireMock(
+      "@inrupt/solid-client"
+    ) as jest.Mocked<typeof SolidClient>;
     const mockedDataset = mockSolidDatasetFrom("https://some.url");
     solidClientModule.createContainerInContainer.mockResolvedValueOnce(
       MOCKED_DATASET
     );
-    const mockedFetch = jest.fn() as typeof fetch;
-    // TODO: change to mockAccessGrantVc when rebasing
+    const mockedFetch = jest.fn<typeof fetch>();
     const resultDataset = await createContainerInContainer(
+      TEST_CONTAINER_URL,
+      mockAccessRequestVc(),
+      { fetch: mockedFetch, slugSuggestion: "NewChildContainer" }
+    );
+
+    expect(fetchWithVc).toHaveBeenCalledWith(
       TEST_CONTAINER_URL,
       mockAccessRequestVc(),
       { fetch: mockedFetch }
     );
-    expect(fetchWithVc).toHaveBeenCalledWith(
-      expect.anything(),
-      mockAccessRequestVc(),
-      { fetch: mockedFetch }
-    );
+
     expect(solidClientModule.createContainerInContainer).toHaveBeenCalledWith(
       TEST_CONTAINER_URL,
       expect.anything()
     );
+
     expect(resultDataset).toStrictEqual(mockedDataset);
   });
 });
