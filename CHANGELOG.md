@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+- Added the `createContainerInContainer` method.
+
 ### Minor changes
 
 - The `getters` module contains functions and a class to interact with Verifiable
