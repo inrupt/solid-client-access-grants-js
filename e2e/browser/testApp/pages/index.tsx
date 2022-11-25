@@ -19,8 +19,13 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-/* istanbul ignore file */
-import { createTheme } from "@solid/lit-prism-patterns";
-import defaultTheme from "@solid/lit-prism-theme-sdk-default";
+import dynamic from "next/dynamic";
+import React from "react";
 
-export default createTheme(defaultTheme);
+const BrowserSideApp = dynamic(() => import("../components/appContent"), {
+  ssr: false,
+});
+
+export default function Home() {
+  return <BrowserSideApp />;
+}

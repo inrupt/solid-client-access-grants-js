@@ -19,8 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { useSession } from "@inrupt/solid-ui-react";
-import { useState } from "react";
+import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import {
   approveAccessRequest,
   revokeAccessGrant,
@@ -31,14 +30,19 @@ import {
   getSourceUrl,
   deleteFile,
 } from "@inrupt/solid-client";
+import { useState } from "react";
+import React from "react";
 
-// This is the content of the file uploaded manually at SHARED_FILE_IRI.
+const session = getDefaultSession();
 const SHARED_FILE_CONTENT = "Some content.\n";
 
-export default function Home() {
-  const { session } = useSession();
-  const [accessGrant, setAccessGrant] = useState(undefined);
-  const [sharedResourceIri, setSharedResourceIri] = useState(undefined);
+export default function AccessGrant({
+  setErrorMessage,
+}: {
+  setErrorMessage: (msg: string) => void;
+}) {
+  const [accessGrant, setAccessGrant] = useState<string>();
+  const [sharedResourceIri, setSharedResourceIri] = useState<string>();
 
   const handleCreate = (e) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
@@ -48,16 +52,20 @@ export default function Home() {
       return;
     }
     (async () => {
+      if (typeof session.info.webId !== "string") {
+        setErrorMessage("You must be authenticated to create a resource.");
+        return;
+      }
       // Create a file in the resource owner's Pod
       const resourceOwnerPodAll = await getPodUrlAll(session.info.webId);
       if (resourceOwnerPodAll.length === 0) {
-        throw new Error(
+        setErrorMessage(
           "The Resource Owner WebID Profile is missing a link to at least one Pod root."
         );
       }
       const savedFile = await saveFileInContainer(
         resourceOwnerPodAll[0],
-        Buffer.from(SHARED_FILE_CONTENT),
+        new Blob([SHARED_FILE_CONTENT], { type: "text/plain" }),
         {
           // The session ID is a random string, used here as a unique slug.
           slug: `${session.info.sessionId}.txt`,
@@ -72,6 +80,10 @@ export default function Home() {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
     e.preventDefault();
     (async () => {
+      if (typeof sharedResourceIri !== "string") {
+        // If no resource exist, do nothing
+        return;
+      }
       await deleteFile(sharedResourceIri, {
         fetch: session.fetch,
       });
@@ -88,7 +100,6 @@ export default function Home() {
     }
     (async () => {
       const accessGrantRequest = await approveAccessRequest(
-        session.info.webId,
         undefined,
         {
           requestor: "https://johndoe.webid",
@@ -117,17 +128,8 @@ export default function Home() {
       setAccessGrant(undefined);
     })();
   };
-
   return (
-    <div>
-      <h1>
-        <code>@inrupt/solid-client-access-grants</code> test browser app
-      </h1>
-      {session.info.isLoggedIn && (
-        <p data-testid="logged-in-message">
-          Logged in as: {session.info.webId}
-        </p>
-      )}
+    <>
       <div>
         <button onClick={(e) => handleCreate(e)} data-testid="create-resource">
           Create resource
@@ -151,6 +153,6 @@ export default function Home() {
       <p>
         Granted access: <pre data-testid="access-grant">{accessGrant}</pre>
       </p>
-    </div>
+    </>
   );
 }

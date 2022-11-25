@@ -19,6 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import { getBrowserTestingEnvironment } from "@inrupt/internal-test-env";
 import { Page } from "@playwright/test";
 
 export class IndexPage {
@@ -29,7 +30,14 @@ export class IndexPage {
   }
 
   async startLogin() {
-    await this.page.click("[data-testid=login-button]");
+    const { idp } = getBrowserTestingEnvironment();
+    await this.page.fill("[data-testid=identityProviderInput]", idp);
+    await Promise.all([
+      // It is important to call waitForNavigation before click to set up waiting.
+      this.page.waitForNavigation(),
+      // Clicking the link will indirectly cause a navigation.
+      this.page.click("[data-testid=loginButton]"),
+    ]);
   }
 
   async handleRedirect() {
@@ -40,7 +48,7 @@ export class IndexPage {
     );
     await Promise.all([
       this.page.waitForResponse((response) => response.status() === 200),
-      this.page.waitForSelector("p[data-testid=logged-in-message]"),
+      this.page.waitForSelector("p[data-testid=loggedInMessage]"),
     ]);
   }
 }
