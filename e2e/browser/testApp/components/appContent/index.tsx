@@ -24,6 +24,7 @@ import {
   logout,
   handleIncomingRedirect,
 } from "@inrupt/solid-client-authn-browser";
+import type { ISessionInfo } from "@inrupt/solid-client-authn-browser";
 import { useState, useEffect } from "react";
 import AccessGrants from "../accessGrants"
 
@@ -33,7 +34,7 @@ const REDIRECT_URL = window.location.href;
 const APP_NAME = "Access Grants browser-based tests app";
 const AccessGrantContainer = ({
   sessionInfo
-}) => {
+}: { sessionInfo?: ISessionInfo }) => {
   if (sessionInfo?.isLoggedIn) {
     return <AccessGrants />;
   } else {
@@ -42,8 +43,9 @@ const AccessGrantContainer = ({
 }
 
 export default function Home() {
-  const [sessionInfo, setSessionInfo] = useState();
-  const [issuer, setIssuer] = useState(DEFAULT_ISSUER);
+  const [sessionInfo, setSessionInfo] = useState<ISessionInfo>();
+  const [issuer, setIssuer] = useState<string>(DEFAULT_ISSUER);
+  const [errorStatus, setErrorStatus] = useState<string>("");
 
   useEffect(() => {
     handleIncomingRedirect().then(setSessionInfo);
