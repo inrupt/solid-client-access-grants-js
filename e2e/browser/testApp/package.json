@@ -16,9 +16,9 @@
     "start": "next start"
   },
   "dependencies": {
-    "@inrupt/solid-client": "^1.20.1",
+    "@inrupt/solid-client": "^1.23.3",
     "@inrupt/solid-client-access-grants": "file:../../../",
-    "@inrupt/solid-client-authn-browser": "^1.12.2",
+    "@inrupt/solid-client-authn-browser": "^1.12.3",
     "next": "^13.0.4",
     "react": "^18.2.0"
   },
