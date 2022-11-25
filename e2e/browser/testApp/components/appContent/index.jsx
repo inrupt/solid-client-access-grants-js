@@ -23,7 +23,6 @@ import {
   login,
   logout,
   handleIncomingRedirect,
-  getDefaultSession
 } from "@inrupt/solid-client-authn-browser";
 import { useState, useEffect } from "react";
 import AccessGrants from "../accessGrants"
@@ -45,8 +44,6 @@ const AccessGrantContainer = ({
 export default function Home() {
   const [sessionInfo, setSessionInfo] = useState();
   const [issuer, setIssuer] = useState(DEFAULT_ISSUER);
-
-  const session = getDefaultSession();
 
   useEffect(() => {
     handleIncomingRedirect().then(setSessionInfo);
