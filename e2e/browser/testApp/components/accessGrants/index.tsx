@@ -65,7 +65,7 @@ export default function AccessGrant({
       }
       const savedFile = await saveFileInContainer(
         resourceOwnerPodAll[0],
-        Buffer.from(SHARED_FILE_CONTENT),
+        new Blob([SHARED_FILE_CONTENT], { type: "text/plain" }),
         {
           // The session ID is a random string, used here as a unique slug.
           slug: `${session.info.sessionId}.txt`,
