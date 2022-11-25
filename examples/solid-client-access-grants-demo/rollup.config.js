@@ -8,17 +8,17 @@ const external = [
 ];
 
 export default {
-    input: "./src/static/main.ts",
-    output: {
-        file: "./static/javascript/main.js",
-        format: "es",
-    },
-    external,
-	plugins: [
-        nodeResolve({browser: true, preferBuiltins: false}),
-		typescript({
-            typescript: require("typescript"),
-            tsconfig: "tsconfig.static.json"
-        })
-	]
-}
+  input: "./src/static/main.ts",
+  output: {
+    file: "./static/javascript/main.js",
+    format: "es",
+  },
+  external,
+  plugins: [
+    nodeResolve({ browser: true, preferBuiltins: false }),
+    typescript({
+      typescript: require("typescript"),
+      tsconfig: "tsconfig.static.json",
+    }),
+  ],
+};

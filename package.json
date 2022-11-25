@@ -12,7 +12,7 @@
     "lint": "npm run lint:check",
     "lint:check": "npm run lint:eslint && npm run lint:prettier -- --check",
     "lint:eslint": "eslint --config .eslintrc.js \"src/\" \"e2e/\" \"examples/\"",
-    "lint:prettier": "prettier \"{src,e2e,examples}/*.{ts,tsx,js,jsx,css}\" \"**/*.{md,mdx,yml}\"",
+    "lint:prettier": "prettier \"{src,e2e,examples}/**/*.{ts,tsx,js,jsx,css}\" \"**/*.{md,mdx,yml}\"",
     "lint:fix": "npm run lint:eslint -- --fix && npm run lint:prettier -- --write",
     "test": "jest --ignoreProjects e2e-node",
     "test:unit:browser": "jest --selectProjects browser",
