@@ -19,9 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import {
-  getDefaultSession
-} from "@inrupt/solid-client-authn-browser";
+import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import {
   approveAccessRequest,
   revokeAccessGrant,
@@ -35,11 +33,14 @@ import {
 import { useState } from "react";
 import React from "react";
 
-
 const session = getDefaultSession();
 const SHARED_FILE_CONTENT = "Some content.\n";
 
-export default function AccessGrant() {
+export default function AccessGrant({
+  setErrorMessage,
+}: {
+  setErrorMessage: (msg: string) => void;
+}) {
   const [accessGrant, setAccessGrant] = useState<string>();
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
 
@@ -51,14 +52,14 @@ export default function AccessGrant() {
       return;
     }
     (async () => {
-      if(typeof session.info.webId !== "string") {
-        console.error("You must be authenticated to create a resource.")
+      if (typeof session.info.webId !== "string") {
+        setErrorMessage("You must be authenticated to create a resource.");
         return;
       }
       // Create a file in the resource owner's Pod
       const resourceOwnerPodAll = await getPodUrlAll(session.info.webId);
       if (resourceOwnerPodAll.length === 0) {
-        throw new Error(
+        setErrorMessage(
           "The Resource Owner WebID Profile is missing a link to at least one Pod root."
         );
       }
@@ -129,29 +130,29 @@ export default function AccessGrant() {
   };
   return (
     <>
-    <div>
-          <button onClick={(e) => handleCreate(e)} data-testid="create-resource">
-            Create resource
-          </button>
-          <button onClick={(e) => handleDelete(e)} data-testid="delete-resource">
-            Delete resource
-          </button>
-        </div>
-        <p>
-          Created resource:{" "}
-          <span data-testid="resource-iri">{sharedResourceIri}</span>
-        </p>
-        <div>
-          <button onClick={(e) => handleGrant(e)} data-testid="grant-access">
-            Grant access
-          </button>
-          <button onClick={(e) => handleRevoke(e)} data-testid="revoke-access">
-            Revoke access
-          </button>
-        </div>
-        <p>
-          Granted access: <pre data-testid="access-grant">{accessGrant}</pre>
-        </p>
+      <div>
+        <button onClick={(e) => handleCreate(e)} data-testid="create-resource">
+          Create resource
+        </button>
+        <button onClick={(e) => handleDelete(e)} data-testid="delete-resource">
+          Delete resource
+        </button>
+      </div>
+      <p>
+        Created resource:{" "}
+        <span data-testid="resource-iri">{sharedResourceIri}</span>
+      </p>
+      <div>
+        <button onClick={(e) => handleGrant(e)} data-testid="grant-access">
+          Grant access
+        </button>
+        <button onClick={(e) => handleRevoke(e)} data-testid="revoke-access">
+          Revoke access
+        </button>
+      </div>
+      <p>
+        Granted access: <pre data-testid="access-grant">{accessGrant}</pre>
+      </p>
     </>
-  )
+  );
 }

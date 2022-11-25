@@ -26,26 +26,30 @@ import {
 } from "@inrupt/solid-client-authn-browser";
 import type { ISessionInfo } from "@inrupt/solid-client-authn-browser";
 import { useState, useEffect } from "react";
-import AccessGrants from "../accessGrants"
+import AccessGrants from "../accessGrants";
 
 // This is the content of the file uploaded manually at SHARED_FILE_IRI.
 const DEFAULT_ISSUER = "https://login.inrupt.com/";
 const REDIRECT_URL = window.location.href;
 const APP_NAME = "Access Grants browser-based tests app";
 const AccessGrantContainer = ({
-  sessionInfo
-}: { sessionInfo?: ISessionInfo }) => {
+  sessionInfo,
+  setErrorMessage,
+}: {
+  sessionInfo?: ISessionInfo;
+  setErrorMessage: (msg: string) => void;
+}) => {
   if (sessionInfo?.isLoggedIn) {
-    return <AccessGrants />;
+    return <AccessGrants setErrorMessage={setErrorMessage} />;
   } else {
     return <></>;
   }
-}
+};
 
 export default function Home() {
   const [sessionInfo, setSessionInfo] = useState<ISessionInfo>();
   const [issuer, setIssuer] = useState<string>(DEFAULT_ISSUER);
-  const [errorStatus, setErrorStatus] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>();
 
   useEffect(() => {
     handleIncomingRedirect().then(setSessionInfo);
@@ -69,7 +73,6 @@ export default function Home() {
     await logout();
     setSessionInfo(undefined);
   };
-
 
   return (
     <div>
@@ -99,7 +102,6 @@ export default function Home() {
         >
           Log In
         </button>
-        
 
         <button
           data-testid="logoutButton"
@@ -111,8 +113,11 @@ export default function Home() {
           Log Out
         </button>
       </form>
-      
-      <AccessGrantContainer sessionInfo={sessionInfo} />
+      <p>{errorMessage}</p>
+      <AccessGrantContainer
+        sessionInfo={sessionInfo}
+        setErrorMessage={setErrorMessage}
+      />
     </div>
   );
 }
