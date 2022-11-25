@@ -113,7 +113,7 @@ export default function Home() {
           Log Out
         </button>
       </form>
-      <p>
+      <p data-testid="errorMessage">
         <strong>{errorMessage}</strong>
       </p>
       <AccessGrantContainer
