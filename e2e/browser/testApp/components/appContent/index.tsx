@@ -113,7 +113,9 @@ export default function Home() {
           Log Out
         </button>
       </form>
-      <p><strong>{errorMessage}</strong></p>
+      <p>
+        <strong>{errorMessage}</strong>
+      </p>
       <AccessGrantContainer
         sessionInfo={sessionInfo}
         setErrorMessage={setErrorMessage}
