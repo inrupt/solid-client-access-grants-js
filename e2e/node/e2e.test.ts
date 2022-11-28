@@ -29,7 +29,6 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
-
 import * as solidClient from "@inrupt/solid-client";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
@@ -46,6 +45,7 @@ import {
   saveFileInContainer,
   saveSolidDatasetAt,
   getSolidDataset,
+  saveSolidDatasetInContainer,
 } from "../../src/index";
 
 const env = getNodeTestingEnvironment({
@@ -517,6 +517,52 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       // Assert that the dataset changed:
       expect(updatedDatasetTtl).not.toBe(existingDatasetAsOwnerTtl);
       expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
+    });
+
+    it("can use the saveSolidDatasetInContainer API for an existing dataset", async () => {
+      // Need to delete dataset that was already created in test setup,
+      // such that our test can create an empty dataset at `testFileIri`.
+      await solidClient.deleteFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      const testDataset = await solidClient.createSolidDataset();
+      const savedDataset = await saveSolidDatasetInContainer(
+        testContainerIri,
+        testDataset,
+        accessGrant,
+        {
+          fetch: requestorSession.fetch,
+          slugSuggestion: testFileName,
+        }
+      );
+
+      const datasetInPodAsResourceOwner = await solidClient.getSolidDataset(
+        solidClient.getSourceIri(savedDataset),
+        {
+          fetch: resourceOwnerSession.fetch,
+        }
+      );
+
+      // We cannot request the newly created dataset using our existing Access
+      // Grant because of ACR inheritance. When we delete the file containing
+      // the dataset at the start of this testcase it also deletes the datasets'
+      // ACRs, so this test case will fail (SDK-2792).
+
+      // const datasetInPodAsRequestor = await
+      // getSolidDataset( testFileIri, accessGrant,
+      //   {
+      //     fetch: requestorSession.fetch,
+      //   }
+      // );
+
+      const updatedDatasetAsOwnerTtl = await solidClient.solidDatasetAsTurtle(
+        datasetInPodAsResourceOwner
+      );
+      const savedDatasetTtl = await solidClient.solidDatasetAsTurtle(
+        savedDataset
+      );
+      expect(savedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
     });
 
     it.skip("can use the saveSolidDatasetAt API for a new dataset", async () => {
