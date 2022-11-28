@@ -524,7 +524,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
     });
 
-  it("can use the createContainerInContainer API to create a new container", async () => {
+    it("can use the createContainerInContainer API to create a new container", async () => {
       const containerNameSuggestion = "newTestContainer";
       const newChildContainer = await createContainerInContainer(
         testContainerIri,
@@ -551,7 +551,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
       expect(match).toHaveLength(1);
     });
-    
+
     it("can use the saveSolidDatasetInContainer API for an existing dataset", async () => {
       // Need to delete dataset that was already created in test setup,
       // such that our test can create an empty dataset at `testFileIri`.
