@@ -538,7 +538,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
           parentContainer,
           sc.getSourceUrl(parentContainer)
         ) as sc.Thing,
-        "http://www.w3.org/ns/ldp#member"
+        "http://www.w3.org/ns/ldp#contains"
       );
       testContainerIriChild = sc.getSourceUrl(newChildContainer);
 
