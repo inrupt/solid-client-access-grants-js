@@ -530,18 +530,20 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         }
       );
 
-      const parentContainer = await solidClient.getSolidDataset(
-        testContainerIri,
-        {
-          fetch: resourceOwnerSession.fetch,
-        }
+      const parentContainer = await sc.getSolidDataset(testContainerIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+      const parentContainerContainsAll = sc.getUrlAll(
+        sc.getThing(
+          parentContainer,
+          sc.getSourceUrl(parentContainer)
+        ) as sc.Thing,
+        "http://www.w3.org/ns/ldp#member"
       );
-      const parentContainerContainsAll =
-        solidClient.getThingAll(parentContainer);
-      testContainerIriChild = solidClient.getSourceUrl(newChildContainer);
+      testContainerIriChild = sc.getSourceUrl(newChildContainer);
 
-      const match = parentContainerContainsAll.filter((thing) => {
-        return thing.url === testContainerIriChild;
+      const match = parentContainerContainsAll.filter((childUrl) => {
+        return childUrl === testContainerIriChild;
       });
 
       expect(match).toHaveLength(1);
