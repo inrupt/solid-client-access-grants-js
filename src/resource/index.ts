@@ -23,3 +23,4 @@ export { getFile, overwriteFile, saveFileInContainer } from "./file";
 export { createContainerInContainer } from "./createContainerInContainer";
 export { getSolidDataset } from "./getSolidDataset";
 export { saveSolidDatasetAt } from "./saveSolidDatasetAt";
+export { saveSolidDatasetInContainer } from "./saveSolidDatasetInContainer";
