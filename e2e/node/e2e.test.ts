@@ -444,9 +444,14 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         fetch: resourceOwnerSession.fetch,
       });
 
-      await solidClient.deleteContainer(testContainerIriChild, {
-        fetch: resourceOwnerSession.fetch,
-      });
+      if (testContainerIriChild !== undefined) {
+        // This resource is only created in some tests, but cleaning it up here
+        // rather than in the test ensures it is properly removed even on test
+        // failure.
+        await solidClient.deleteContainer(testContainerIriChild, {
+          fetch: resourceOwnerSession.fetch,
+        });
+      }
 
       await solidClient.deleteContainer(testContainerIri, {
         fetch: resourceOwnerSession.fetch,
