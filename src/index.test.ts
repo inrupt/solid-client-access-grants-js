@@ -40,6 +40,7 @@ import {
   saveFileInContainer,
   overwriteFile,
   getSolidDataset,
+  createContainerInContainer,
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
   GRANT_VC_URL_PARAM_NAME,
@@ -77,6 +78,7 @@ describe("Index exports", () => {
     expect(getFile).toBeDefined();
     expect(overwriteFile).toBeDefined();
     expect(saveFileInContainer).toBeDefined();
+    expect(createContainerInContainer).toBeDefined();
     expect(getSolidDataset).toBeDefined();
     expect(saveSolidDatasetAt).toBeDefined();
     expect(saveSolidDatasetInContainer).toBeDefined();

@@ -21,35 +21,36 @@
 
 import { it, jest, describe, expect } from "@jest/globals";
 import { mockSolidDatasetFrom, UrlString } from "@inrupt/solid-client";
+import type * as SolidClient from "@inrupt/solid-client";
 import { mockAccessRequestVc } from "../gConsent/util/access.mock";
-import { saveSolidDatasetInContainer } from "./saveSolidDatasetInContainer";
 import { fetchWithVc } from "../fetch";
+import { createContainerInContainer } from "./createContainerInContainer";
 
 jest.mock("../fetch");
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
-  solidClientModule.saveSolidDatasetInContainer = jest.fn();
+  solidClientModule.createContainerInContainer = jest.fn();
   return solidClientModule;
 });
 
 const MOCKED_DATASET = mockSolidDatasetFrom("https://some.url");
-const TEST_CONTAINER_URL: UrlString = "https://example.com/testContainerUrl";
+const TEST_CONTAINER_URL: UrlString =
+  "https://example.come/container/anothercontainer";
 
-describe("saveSolidDatasetInContainer", () => {
-  it("authenticates using the provided VC with a slugSuggestion", async () => {
-    const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
+describe("createContainerInContainer", () => {
+  it("authenticates using the provided VC", async () => {
+    const solidClientModule = jest.requireMock(
+      "@inrupt/solid-client"
+    ) as jest.Mocked<typeof SolidClient>;
     const mockedDataset = mockSolidDatasetFrom("https://some.url");
-    solidClientModule.saveSolidDatasetInContainer.mockResolvedValueOnce(
-      mockedDataset
+    solidClientModule.createContainerInContainer.mockResolvedValueOnce(
+      MOCKED_DATASET
     );
-    const mockedFetch = jest.fn() as typeof fetch;
-
-    // TODO: change to mockAccessGrantVc when rebasing
-    const resultDataset = await saveSolidDatasetInContainer(
+    const mockedFetch = jest.fn<typeof fetch>();
+    const resultDataset = await createContainerInContainer(
       TEST_CONTAINER_URL,
-      MOCKED_DATASET,
       mockAccessRequestVc(),
-      { fetch: mockedFetch, slugSuggestion: "test" }
+      { fetch: mockedFetch, slugSuggestion: "NewChildContainer" }
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(
@@ -58,12 +59,11 @@ describe("saveSolidDatasetInContainer", () => {
       { fetch: mockedFetch }
     );
 
-    expect(solidClientModule.saveSolidDatasetInContainer).toHaveBeenCalledWith(
+    expect(solidClientModule.createContainerInContainer).toHaveBeenCalledWith(
       TEST_CONTAINER_URL,
-      MOCKED_DATASET,
-      expect.objectContaining({ slugSuggestion: "test" })
+      expect.anything()
     );
 
-    expect(resultDataset).toStrictEqual(MOCKED_DATASET);
+    expect(resultDataset).toStrictEqual(mockedDataset);
   });
 });

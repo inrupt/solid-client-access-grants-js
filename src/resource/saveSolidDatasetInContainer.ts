@@ -23,7 +23,6 @@ import {
   UrlString,
   saveSolidDatasetInContainer as coreSaveSolidDatasetInContainer,
   SolidDataset,
-  WithResourceInfo,
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";

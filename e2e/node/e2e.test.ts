@@ -29,22 +29,25 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
-import * as solidClient from "@inrupt/solid-client";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
 import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
+// Making a named import here to avoid confusion with the wrapped functions from
+// the access grant API
+import * as sc from "@inrupt/solid-client";
 import {
-  approveAccessRequest,
-  getAccessGrantAll,
-  isValidAccessGrant,
-  issueAccessRequest,
-  revokeAccessGrant,
-  getFile,
   AccessGrant,
+  approveAccessRequest,
+  createContainerInContainer,
+  getAccessGrantAll,
+  getFile,
+  getSolidDataset,
+  issueAccessRequest,
+  isValidAccessGrant,
   overwriteFile,
+  revokeAccessGrant,
   saveFileInContainer,
   saveSolidDatasetAt,
-  getSolidDataset,
   saveSolidDatasetInContainer,
 } from "../../src/index";
 
@@ -93,7 +96,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     });
 
     // Create a file in the resource owner's Pod
-    const resourceOwnerPodAll = await solidClient.getPodUrlAll(
+    const resourceOwnerPodAll = await sc.getPodUrlAll(
       resourceOwnerSession.info.webId as string
     );
     if (resourceOwnerPodAll.length === 0) {
@@ -104,7 +107,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     // eslint-disable-next-line prefer-destructuring
     resourceOwnerPod = resourceOwnerPodAll[0];
 
-    const savedFile = await solidClient.saveFileInContainer(
+    const savedFile = await sc.saveFileInContainer(
       resourceOwnerPodAll[0],
       Buffer.from(SHARED_FILE_CONTENT),
       {
@@ -114,14 +117,14 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       }
     );
 
-    sharedFileIri = solidClient.getSourceUrl(savedFile);
+    sharedFileIri = sc.getSourceUrl(savedFile);
   });
 
   // Cleanup the shared file
   afterAll(async () => {
     if (sharedFileIri) {
       // Remove the shared file from the resource owner's Pod.
-      await solidClient.deleteFile(sharedFileIri, {
+      await sc.deleteFile(sharedFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
     }
@@ -378,32 +381,29 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     let testFileName: string;
     let testFileIri: string;
     let testContainerIri: string;
+    let testContainerIriChild: string;
 
     beforeEach(async () => {
       const containerPath = `${resourceOwnerSession.info.sessionId}-dataset-apis`;
-
       testContainerIri = new URL(`${containerPath}/`, resourceOwnerPod).href;
       testFileName = "dataset.ttl";
       testFileIri = new URL(testFileName, testContainerIri).href;
 
-      await solidClient.createContainerAt(testContainerIri, {
+      await sc.createContainerAt(testContainerIri, {
         fetch: resourceOwnerSession.fetch,
       });
 
-      const newThing = solidClient.setStringNoLocale(
-        solidClient.createThing({
+      const newThing = sc.setStringNoLocale(
+        sc.createThing({
           name: "e2e-test-thing",
         }),
         "https://arbitrary.vocab/regular-predicate",
         "initial-dataset"
       );
 
-      const dataset = solidClient.setThing(
-        solidClient.createSolidDataset(),
-        newThing
-      );
+      const dataset = sc.setThing(sc.createSolidDataset(), newThing);
 
-      await solidClient.saveSolidDatasetInContainer(testContainerIri, dataset, {
+      await sc.saveSolidDatasetInContainer(testContainerIri, dataset, {
         fetch: resourceOwnerSession.fetch,
         slugSuggestion: testFileName,
       });
@@ -439,17 +439,26 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         fetch: resourceOwnerSession.fetch,
       });
 
-      await solidClient.deleteFile(testFileIri, {
+      await sc.deleteFile(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
 
-      await solidClient.deleteContainer(testContainerIri, {
+      if (testContainerIriChild !== undefined) {
+        // This resource is only created in some tests, but cleaning it up here
+        // rather than in the test ensures it is properly removed even on test
+        // failure.
+        await sc.deleteContainer(testContainerIriChild, {
+          fetch: resourceOwnerSession.fetch,
+        });
+      }
+
+      await sc.deleteContainer(testContainerIri, {
         fetch: resourceOwnerSession.fetch,
       });
     });
 
     it("can use the getSolidDataset API to fetch an existing dataset", async () => {
-      const ownerDataset = await solidClient.getSolidDataset(testFileIri, {
+      const ownerDataset = await sc.getSolidDataset(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
 
@@ -457,10 +466,8 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         fetch: requestorSession.fetch,
       });
 
-      const ownerTtl = await solidClient.solidDatasetAsTurtle(ownerDataset);
-      const requestorTtl = await solidClient.solidDatasetAsTurtle(
-        requestorDataset
-      );
+      const ownerTtl = await sc.solidDatasetAsTurtle(ownerDataset);
+      const requestorTtl = await sc.solidDatasetAsTurtle(requestorDataset);
 
       expect(ownerTtl).toBe(requestorTtl);
     });
@@ -470,20 +477,20 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       // applications, you'd need to use an Access Grant to request the dataset
       // as the requestor, this is just to limit how much of the Access Grants
       // library we're testing in a single test case:
-      const dataset = await solidClient.getSolidDataset(testFileIri, {
+      const dataset = await sc.getSolidDataset(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
 
       // Create a thing and add it to the dataset:
-      let newThing = solidClient.createThing({
+      let newThing = sc.createThing({
         name: "e2e-test-thing",
       });
-      newThing = solidClient.setBoolean(
+      newThing = sc.setBoolean(
         newThing,
         "https://arbitrary.vocab/regular-predicate",
         true
       );
-      const datasetUpdate = solidClient.setThing(dataset, newThing);
+      const datasetUpdate = sc.setThing(dataset, newThing);
 
       // Try to update the dataset as a requestor of the Access Grant:
       const updatedDataset = await saveSolidDatasetAt(
@@ -496,21 +503,14 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       );
 
       // Fetch it back as the owner to prove the dataset was actually updated:
-      const updatedDatasetAsOwner = await solidClient.getSolidDataset(
-        testFileIri,
-        {
-          fetch: resourceOwnerSession.fetch,
-        }
-      );
+      const updatedDatasetAsOwner = await sc.getSolidDataset(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
 
       // Serialize each to turtle:
-      const updatedDatasetTtl = await solidClient.solidDatasetAsTurtle(
-        updatedDataset
-      );
-      const existingDatasetAsOwnerTtl = await solidClient.solidDatasetAsTurtle(
-        dataset
-      );
-      const updatedDatasetAsOwnerTtl = await solidClient.solidDatasetAsTurtle(
+      const updatedDatasetTtl = await sc.solidDatasetAsTurtle(updatedDataset);
+      const existingDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(dataset);
+      const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
         updatedDatasetAsOwner
       );
 
@@ -519,14 +519,44 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
     });
 
+    it("can use the createContainerInContainer API to create a new container", async () => {
+      const containerNameSuggestion = "newTestContainer";
+      const newChildContainer = await createContainerInContainer(
+        testContainerIri,
+        accessGrant,
+        {
+          fetch: requestorSession.fetch,
+          slugSuggestion: containerNameSuggestion,
+        }
+      );
+
+      const parentContainer = await sc.getSolidDataset(testContainerIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+      const parentContainerContainsAll = sc.getUrlAll(
+        sc.getThing(
+          parentContainer,
+          sc.getSourceUrl(parentContainer)
+        ) as sc.Thing,
+        "http://www.w3.org/ns/ldp#contains"
+      );
+      testContainerIriChild = sc.getSourceUrl(newChildContainer);
+
+      const match = parentContainerContainsAll.filter((childUrl) => {
+        return childUrl === testContainerIriChild;
+      });
+
+      expect(match).toHaveLength(1);
+    });
+
     it("can use the saveSolidDatasetInContainer API for an existing dataset", async () => {
       // Need to delete dataset that was already created in test setup,
       // such that our test can create an empty dataset at `testFileIri`.
-      await solidClient.deleteFile(testFileIri, {
+      await sc.deleteFile(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
 
-      const testDataset = await solidClient.createSolidDataset();
+      const testDataset = sc.createSolidDataset();
       const savedDataset = await saveSolidDatasetInContainer(
         testContainerIri,
         testDataset,
@@ -537,8 +567,8 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         }
       );
 
-      const datasetInPodAsResourceOwner = await solidClient.getSolidDataset(
-        solidClient.getSourceIri(savedDataset),
+      const datasetInPodAsResourceOwner = await sc.getSolidDataset(
+        sc.getSourceIri(savedDataset),
         {
           fetch: resourceOwnerSession.fetch,
         }
@@ -556,23 +586,21 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       //   }
       // );
 
-      const updatedDatasetAsOwnerTtl = await solidClient.solidDatasetAsTurtle(
+      const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
         datasetInPodAsResourceOwner
       );
-      const savedDatasetTtl = await solidClient.solidDatasetAsTurtle(
-        savedDataset
-      );
+      const savedDatasetTtl = await sc.solidDatasetAsTurtle(savedDataset);
       expect(savedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
     });
 
     it.skip("can use the saveSolidDatasetAt API for a new dataset", async () => {
       // FIXME: this deletes the resources' ACRs, so this test case will fail (SDK-2792)
       // Delete the dataset created in the beforeEach:
-      await solidClient.deleteFile(testFileIri, {
+      await sc.deleteFile(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
 
-      const dataset = solidClient.createSolidDataset();
+      const dataset = sc.createSolidDataset();
       const newDatasetIri = testFileIri;
 
       const updatedDataset = await saveSolidDatasetAt(
@@ -585,18 +613,13 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       );
 
       // Fetch it back as the owner to prove the dataset was actually created:
-      const updatedDatasetAsOwner = await solidClient.getSolidDataset(
-        testFileIri,
-        {
-          fetch: resourceOwnerSession.fetch,
-        }
-      );
+      const updatedDatasetAsOwner = await sc.getSolidDataset(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
 
       // Serialize each to turtle:
-      const updatedDatasetTtl = await solidClient.solidDatasetAsTurtle(
-        updatedDataset
-      );
-      const updatedDatasetAsOwnerTtl = await solidClient.solidDatasetAsTurtle(
+      const updatedDatasetTtl = await sc.solidDatasetAsTurtle(updatedDataset);
+      const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
         updatedDatasetAsOwner
       );
 
@@ -621,11 +644,11 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
       fileContents = Buffer.from("hello world", "utf-8");
 
-      await solidClient.createContainerAt(testContainerIri, {
+      await sc.createContainerAt(testContainerIri, {
         fetch: resourceOwnerSession.fetch,
       });
 
-      await solidClient.saveFileInContainer(testContainerIri, fileContents, {
+      await sc.saveFileInContainer(testContainerIri, fileContents, {
         fetch: resourceOwnerSession.fetch,
         slug: testFileName,
       });
@@ -657,18 +680,18 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         fetch: resourceOwnerSession.fetch,
       });
 
-      await solidClient.deleteFile(testFileIri, {
+      await sc.deleteFile(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
 
-      await solidClient.deleteContainer(testContainerIri, {
+      await sc.deleteContainer(testContainerIri, {
         fetch: resourceOwnerSession.fetch,
       });
     });
 
     it("can use the saveFileInContainer API to create a new file", async () => {
       // Delete the existing file as to be able to save a new file:
-      await solidClient.deleteFile(testFileIri, {
+      await sc.deleteFile(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
 
@@ -685,15 +708,12 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       );
 
       expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
-      expect(solidClient.getSourceUrl(newFile)).toBe(testFileIri);
+      expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
 
       // Verify as the resource owner that the file was actually created:
-      const fileAsResourceOwner = await solidClient.getFile(
-        solidClient.getSourceUrl(newFile),
-        {
-          fetch: resourceOwnerSession.fetch,
-        }
-      );
+      const fileAsResourceOwner = await sc.getFile(sc.getSourceUrl(newFile), {
+        fetch: resourceOwnerSession.fetch,
+      });
 
       await expect(fileAsResourceOwner.text()).resolves.toBe(
         newFileContents.toString()
@@ -706,7 +726,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         fetch: requestorSession.fetch,
       });
 
-      expect(solidClient.getSourceUrl(existingFile)).toBe(testFileIri);
+      expect(sc.getSourceUrl(existingFile)).toBe(testFileIri);
       await expect(existingFile.text()).resolves.toBe(fileContents.toString());
     });
 
@@ -723,10 +743,10 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       );
 
       expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
-      expect(solidClient.getSourceUrl(newFile)).toBe(testFileIri);
+      expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
 
       // Verify as the resource owner that the file was actually overwritten:
-      const fileAsResourceOwner = await solidClient.getFile(testFileIri, {
+      const fileAsResourceOwner = await sc.getFile(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
 
@@ -738,7 +758,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     it.skip("can use the overwriteFile API to create a new file", async () => {
       // FIXME: this deletes the resources' ACRs, so this test case will fail (SDK-2792)
       // Delete the existing file as to be able to save a new file:
-      await solidClient.deleteFile(testFileIri, {
+      await sc.deleteFile(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
 
@@ -754,10 +774,10 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       );
 
       expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
-      expect(solidClient.getSourceUrl(newFile)).toBe(testFileIri);
+      expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
 
       // Verify as the resource owner that the file was actually created:
-      const fileAsResourceOwner = await solidClient.getFile(testFileIri, {
+      const fileAsResourceOwner = await sc.getFile(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
 

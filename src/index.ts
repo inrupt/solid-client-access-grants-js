@@ -20,9 +20,9 @@
 //
 
 export type {
-  AccessGrant,
   AccessBaseOptions,
   AccessCredentialType,
+  AccessGrant,
   AccessGrantContext,
   AccessRequest,
   ApproveAccessRequestOverrides,
@@ -36,17 +36,17 @@ export type { AccessModes } from "./type/AccessModes";
 export type { AccessGrantAny } from "./type/AccessGrant";
 
 export {
-  getAccessApiEndpoint,
-  getAccessManagementUi,
-  redirectToAccessManagementUi,
-  issueAccessRequest,
-  cancelAccessRequest,
-  getAccessGrantFromRedirectUrl,
   approveAccessRequest,
+  cancelAccessRequest,
   denyAccessRequest,
+  getAccessApiEndpoint,
   getAccessGrant,
   getAccessGrantAll,
+  getAccessGrantFromRedirectUrl,
+  getAccessManagementUi,
   getAccessRequestFromRedirectUrl,
+  issueAccessRequest,
+  redirectToAccessManagementUi,
   redirectToRequestor,
   revokeAccessGrant,
   GRANT_VC_URL_PARAM_NAME,
@@ -71,8 +71,9 @@ export * as common from "./common";
 export { fetchWithVc } from "./fetch";
 
 export {
-  getSolidDataset,
+  createContainerInContainer,
   getFile,
+  getSolidDataset,
   overwriteFile,
   saveFileInContainer,
   saveSolidDatasetAt,
