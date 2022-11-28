@@ -46,6 +46,7 @@ import type { UrlString } from "@inrupt/solid-client";
  * @since 0.4.0
  */
 export interface AccessBaseOptions {
+  updateAcr?: any;
   fetch?: typeof fetch;
   /**
    * @since 0.4.0

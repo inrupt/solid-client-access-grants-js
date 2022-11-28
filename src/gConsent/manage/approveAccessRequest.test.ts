@@ -802,4 +802,177 @@ describe("approveAccessRequest", () => {
       )
     ).rejects.toThrow();
   });
+  it.only("updates the target resources' ACR if the updateACR flag is ommitted from the options", async () => {
+    const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
+    const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
+    mockAcpClient({
+      initialResource: mockedInitialResource,
+      updatedResource: mockedUpdatedResource,
+    });
+    mockAccessApiEndpoint();
+
+    const mockedClientModule = jest.requireMock("@inrupt/solid-client") as any;
+    const spiedAcrLookup = jest.spyOn(
+      mockedClientModule.acp_ess_2,
+      "getResourceInfoWithAcr"
+    );
+    const spiedAcrUpdate = jest.spyOn(
+      mockedClientModule.acp_ess_2,
+      "setVcAccess"
+    );
+    const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
+
+    await approveAccessRequest(
+      mockAccessRequestVc({
+        modes: [
+          "http://www.w3.org/ns/auth/acl#Write",
+          "http://www.w3.org/ns/auth/acl#Read",
+        ],
+        resources: ["https://some.custom.resource"],
+      }),
+      undefined,
+      {
+        fetch: jest.fn(global.fetch),
+      }
+    );
+    // The resource's IRI is picked up from the access grant.
+    expect(spiedAcrLookup).toHaveBeenCalledWith(
+      "https://some.custom.resource",
+      expect.anything()
+    );
+    // The resources' ACR is updated with the modes from the grant.
+    expect(spiedAcrUpdate).toHaveBeenCalledWith(mockedInitialResource, {
+      read: true,
+      write: true,
+      append: false,
+    });
+    // The resources' ACR is written back.
+    expect(spiedAcrSave).toHaveBeenCalledWith(
+      mockedUpdatedResource,
+      expect.anything()
+    );
+  });
+  it.only("updates the target resources' ACR if the updateACR flag is set to true", async () => {
+    const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
+    const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
+    mockAcpClient({
+      initialResource: mockedInitialResource,
+      updatedResource: mockedUpdatedResource,
+    });
+    mockAccessApiEndpoint();
+
+    const mockedClientModule = jest.requireMock("@inrupt/solid-client") as any;
+    const spiedAcrLookup = jest.spyOn(
+      mockedClientModule.acp_ess_2,
+      "getResourceInfoWithAcr"
+    );
+    const spiedAcrUpdate = jest.spyOn(
+      mockedClientModule.acp_ess_2,
+      "setVcAccess"
+    );
+    const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
+
+    await approveAccessRequest(
+      mockAccessRequestVc({
+        modes: [
+          "http://www.w3.org/ns/auth/acl#Write",
+          "http://www.w3.org/ns/auth/acl#Read",
+        ],
+        resources: ["https://some.custom.resource"],
+      }),
+      undefined,
+      {
+        fetch: jest.fn(global.fetch),
+        updateAcr: true,
+      }
+    );
+    // The resource's IRI is picked up from the access grant.
+    expect(spiedAcrLookup).toHaveBeenCalledWith(
+      "https://some.custom.resource",
+      expect.anything()
+    );
+    // The resources' ACR is updated with the modes from the grant.
+    expect(spiedAcrUpdate).toHaveBeenCalledWith(mockedInitialResource, {
+      read: true,
+      write: true,
+      append: false,
+    });
+    // The resources' ACR is written back.
+    expect(spiedAcrSave).toHaveBeenCalledWith(
+      mockedUpdatedResource,
+      expect.anything()
+    );
+  });
+  it.skip("does not update the target resources' ACR if the updateACR flag is set to false", async () => {
+    const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
+    const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
+    mockAcpClient({
+      initialResource: mockedInitialResource,
+      updatedResource: mockedUpdatedResource,
+    });
+    mockAccessApiEndpoint();
+
+    const mockedClientModule = jest.requireMock("@inrupt/solid-client") as any;
+    const spiedAcrLookup = jest.spyOn(
+      mockedClientModule.acp_ess_2,
+      "getResourceInfoWithAcr"
+    );
+    const spiedAcrUpdate = jest.spyOn(
+      mockedClientModule.acp_ess_2,
+      "setVcAccess"
+    );
+    const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
+
+    await approveAccessRequest(
+      mockAccessRequestVc({
+        modes: [
+          "http://www.w3.org/ns/auth/acl#Write",
+          "http://www.w3.org/ns/auth/acl#Read",
+        ],
+        resources: ["https://some.custom.resource"],
+      }),
+      undefined,
+      {
+        fetch: jest.fn(global.fetch),
+        updateAcr: false,
+      }
+    );
+    // The resource's IRI is picked up from the access grant.
+    expect(spiedAcrLookup).toHaveBeenCalledWith(
+      "https://some.custom.resource",
+      expect.anything()
+    );
+    // The resources' ACR is updated with the modes from the grant.
+    expect(spiedAcrUpdate).toHaveBeenCalledWith(mockedInitialResource, {
+      read: true,
+      write: true,
+      append: false,
+    });
+    // The resources' ACR is written back.
+    expect(spiedAcrSave).toHaveBeenCalledWith(
+      mockedUpdatedResource,
+      expect.anything()
+    );
+  });
 });

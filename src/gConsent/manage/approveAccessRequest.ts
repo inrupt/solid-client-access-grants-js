@@ -105,9 +105,13 @@ async function internal_approveAccessRequest(
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options: AccessBaseOptions = {}
 ): Promise<VerifiableCredential> {
+  const updateAcr = Object.keys(options).includes("updateAcr")
+    ? options.updateAcr
+    : true;
   const internalOptions = {
     ...options,
     fetch: options.fetch ?? (await getSessionFetch(options)),
+    updateAcr,
   };
   const requestCredential =
     typeof requestVc !== "undefined"
@@ -140,11 +144,14 @@ async function internal_approveAccessRequest(
   });
 
   const grantedAccess = getAccessModesFromAccessGrant(grantBody);
-  await addVcMatcher(
-    grantBody.credentialSubject.providedConsent.forPersonalData,
-    grantedAccess,
-    internalOptions
-  );
+
+  if (internalOptions.updateAcr) {
+    await addVcMatcher(
+      grantBody.credentialSubject.providedConsent.forPersonalData,
+      grantedAccess,
+      internalOptions
+    );
+  }
 
   return issueAccessVc(grantBody, internalOptions);
 }
