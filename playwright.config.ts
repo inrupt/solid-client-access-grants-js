@@ -20,8 +20,7 @@
 //
 
 import { PlaywrightTestConfig } from "@playwright/test";
-// import { TestOptions } from "@inrupt/internal-playwright-helpers"
-import { TestOptions } from "./e2e/browser/test/fixtures"
+import { TestOptions } from "@inrupt/internal-playwright-helpers"
 
 const config: PlaywrightTestConfig<TestOptions> = {
   testMatch: "e2e/browser/test/*.playwright.ts",
