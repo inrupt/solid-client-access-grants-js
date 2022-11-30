@@ -859,6 +859,7 @@ describe("approveAccessRequest", () => {
       expect.anything()
     );
   });
+
   it("updates the target resources' ACR if the updateACR flag is set to true", async () => {
     const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
     const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
@@ -917,6 +918,7 @@ describe("approveAccessRequest", () => {
       expect.anything()
     );
   });
+
   it("does not update the target resources' ACR if the updateACR flag is set to false", async () => {
     const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
     const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");

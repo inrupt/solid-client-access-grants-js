@@ -46,6 +46,20 @@ export type ApproveAccessRequestOverrides = Omit<
   "expirationDate"
 > & { expirationDate?: Date | null };
 
+/**
+ * This function approves the access grant that gets passed into it.
+ *
+ *
+ * @param request The Access Grant that will be approved.
+ * @param options Optional properties to customise the request behaviour. This
+ * includes the option `updateAcr` which will default to true. If you pass in
+ * `{updateAcr : true}` the ACR of the Resource will be updated when the access
+ * grant is approved. If you pass in `{updateAcr : false}`, the ACR of the
+ * Resource will not be updated when the access grant is approved.
+ * @returns A promise that resolves to a VerifiedCredential if successful, and
+ * that rejects otherwise.
+ * @since unreleased
+ */
 function getAccessModesFromAccessGrant(request: AccessGrantBody): AccessModes {
   const accessMode: AccessModes = {};
   const requestModes = request.credentialSubject.providedConsent.mode;

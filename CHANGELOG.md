@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 - Added the `createContainerInContainer` method.
 - Added `saveSolidDatasetInContainer` method.
+- Added the `updateAcr` to the list of options that can be included when calling the `approveAccessRequest` method. `updateAcr` will default to `true` if nothing is passed in.
 
 ### Minor changes
 
