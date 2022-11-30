@@ -22,6 +22,7 @@ import { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import { AccessRequestGConsent } from "../gConsent/type/AccessRequest";
 import { isAccessGrant as isGConsentAccessGrant } from "../gConsent/guard/isAccessGrant";
 import { AccessModes, resourceAccessToAccessMode } from "../type/AccessModes";
+import { AccessGrantOdrl, isCredentialAccessGrantOdrl } from "../odrl";
 
 /**
  * Get the resources to which an Access Grant/Request applies.
@@ -29,15 +30,20 @@ import { AccessModes, resourceAccessToAccessMode } from "../type/AccessModes";
  * @example
  *
  * ```
- * const resources = getResources(gConsentGrant);
+ * const resources = getResources(accessGrant);
  * ```
  *
  * @param vc The Access Grant/Request
- * @returns The VC IRI
+ * @returns The resources IRIs
  */
 export function getResources(
-  vc: AccessGrantGConsent | AccessRequestGConsent
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
 ): string[] {
+  if (isCredentialAccessGrantOdrl(vc)) {
+    return vc.credentialSubject.permission.map(
+      (permission) => permission.target
+    );
+  }
   if (isGConsentAccessGrant(vc)) {
     return vc.credentialSubject.providedConsent.forPersonalData;
   }
@@ -50,20 +56,22 @@ export function getResources(
  * @example
  *
  * ```
- * const ownerWebId = getResourceOwner(gConsentGrant);
+ * const ownerWebId = getResourceOwner(accessGrant);
  * ```
  *
  * @param vc The Access Grant/Request
  * @returns The resource owner WebID
  */
-export function getResourceOwner(vc: AccessGrantGConsent): string;
 export function getResourceOwner(
-  vc: AccessGrantGConsent | AccessRequestGConsent
+  vc: AccessGrantGConsent | AccessGrantOdrl
+): string;
+export function getResourceOwner(
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
 ): string | undefined;
 export function getResourceOwner(
-  vc: AccessGrantGConsent | AccessRequestGConsent
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
 ): string | undefined {
-  if (isGConsentAccessGrant(vc)) {
+  if (isCredentialAccessGrantOdrl(vc) || isGConsentAccessGrant(vc)) {
     return vc.credentialSubject.id;
   }
   return vc.credentialSubject.hasConsent.isConsentForDataSubject;
@@ -75,15 +83,18 @@ export function getResourceOwner(
  * @example
  *
  * ```
- * const requestorWebId = getRequestor(gConsentGrant);
+ * const requestorWebId = getRequestor(accessGrant);
  * ```
  *
  * @param vc The Access Grant/Request
  * @returns The requestor WebID
  */
 export function getRequestor(
-  vc: AccessGrantGConsent | AccessRequestGConsent
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
 ): string {
+  if (isCredentialAccessGrantOdrl(vc)) {
+    return vc.credentialSubject.assignee;
+  }
   if (isGConsentAccessGrant(vc)) {
     return vc.credentialSubject.providedConsent.isProvidedTo;
   }
@@ -96,15 +107,21 @@ export function getRequestor(
  * @example
  *
  * ```
- * const modes = getAccessModes(gConsentGrant);
+ * const modes = getAccessModes(accessGrant);
  * ```
  *
  * @param vc The Access Grant/Request
  * @returns The access modes the grant recipient can exercise.
  */
 export function getAccessModes(
-  vc: AccessGrantGConsent | AccessRequestGConsent
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
 ): AccessModes {
+  if (isCredentialAccessGrantOdrl(vc)) {
+    const modes = vc.credentialSubject.permission
+      .map((permission) => permission.action)
+      .flat();
+    return resourceAccessToAccessMode(modes);
+  }
   if (isGConsentAccessGrant(vc)) {
     return resourceAccessToAccessMode(
       vc.credentialSubject.providedConsent.mode
@@ -119,13 +136,15 @@ export function getAccessModes(
  * @example
  *
  * ```
- * const id = getId(gConsentGrant);
+ * const id = getId(accessGrant);
  * ```
  *
  * @param vc The Access Grant/Request
  * @returns The VC ID URL
  */
-export function getId(vc: AccessGrantGConsent | AccessRequestGConsent): string {
+export function getId(
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+): string {
   return vc.id;
 }
 
@@ -135,14 +154,14 @@ export function getId(vc: AccessGrantGConsent | AccessRequestGConsent): string {
  * @example
  *
  * ```
- * const types = getTypes(gConsentGrant);
+ * const types = getTypes(accessGrant);
  * ```
  *
  * @param vc The Access Grant/Request
  * @returns The VC types
  */
 export function getTypes(
-  vc: AccessGrantGConsent | AccessRequestGConsent
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
 ): string[] {
   return vc.type;
 }
@@ -153,14 +172,14 @@ export function getTypes(
  * @example
  *
  * ```
- * const date = getIssuanceDate(gConsentGrant);
+ * const date = getIssuanceDate(accessGrant);
  * ```
  *
  * @param vc The Access Grant/Request
  * @returns The issuance date
  */
 export function getIssuanceDate(
-  vc: AccessGrantGConsent | AccessRequestGConsent
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
 ): Date {
   return new Date(vc.issuanceDate);
 }
@@ -171,16 +190,16 @@ export function getIssuanceDate(
  * @example
  *
  * ```
- * const date = getExpirationDate(gConsentGrant);
+ * const date = getExpirationDate(accessGrant);
  * ```
  *
  * @param vc The Access Grant/Request
- * @returns The issuance date
+ * @returns The expiration date
  */
 export function getExpirationDate(
-  vc: AccessGrantGConsent | AccessRequestGConsent
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
 ): Date | undefined {
-  return vc.expirationDate ? new Date(vc.expirationDate) : undefined;
+  return vc.expirationDate ? new Date(vc.expirationDate as string) : undefined;
 }
 
 /**
@@ -189,14 +208,14 @@ export function getExpirationDate(
  * @example
  *
  * ```
- * const date = getExpirationDate(gConsentGrant);
+ * const date = getIssuer(accessGrant);
  * ```
  *
  * @param vc The Access Grant/Request
  * @returns The VC issuer
  */
 export function getIssuer(
-  vc: AccessGrantGConsent | AccessRequestGConsent
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
 ): string {
   return vc.issuer;
 }
