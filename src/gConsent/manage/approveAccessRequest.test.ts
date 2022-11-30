@@ -802,7 +802,7 @@ describe("approveAccessRequest", () => {
       )
     ).rejects.toThrow();
   });
-  it.only("updates the target resources' ACR if the updateACR flag is ommitted from the options", async () => {
+  it("updates the target resources' ACR if the updateACR flag is ommitted from the options", async () => {
     const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
     const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
     mockAcpClient({
@@ -859,7 +859,7 @@ describe("approveAccessRequest", () => {
       expect.anything()
     );
   });
-  it.only("updates the target resources' ACR if the updateACR flag is set to true", async () => {
+  it("updates the target resources' ACR if the updateACR flag is set to true", async () => {
     const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
     const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
     mockAcpClient({
@@ -917,7 +917,7 @@ describe("approveAccessRequest", () => {
       expect.anything()
     );
   });
-  it.skip("does not update the target resources' ACR if the updateACR flag is set to false", async () => {
+  it("does not update the target resources' ACR if the updateACR flag is set to false", async () => {
     const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
     const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
     mockAcpClient({
@@ -958,21 +958,8 @@ describe("approveAccessRequest", () => {
         updateAcr: false,
       }
     );
-    // The resource's IRI is picked up from the access grant.
-    expect(spiedAcrLookup).toHaveBeenCalledWith(
-      "https://some.custom.resource",
-      expect.anything()
-    );
-    // The resources' ACR is updated with the modes from the grant.
-    expect(spiedAcrUpdate).toHaveBeenCalledWith(mockedInitialResource, {
-      read: true,
-      write: true,
-      append: false,
-    });
-    // The resources' ACR is written back.
-    expect(spiedAcrSave).toHaveBeenCalledWith(
-      mockedUpdatedResource,
-      expect.anything()
-    );
+    expect(spiedAcrLookup).toHaveBeenCalledTimes(0);
+    expect(spiedAcrUpdate).toHaveBeenCalledTimes(0);
+    expect(spiedAcrSave).toHaveBeenCalledTimes(0);
   });
 });
