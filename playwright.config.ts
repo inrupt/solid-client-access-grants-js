@@ -20,8 +20,9 @@
 //
 
 import { PlaywrightTestConfig } from "@playwright/test";
+import { TestOptions } from "@inrupt/internal-playwright-helpers"
 
-const config: PlaywrightTestConfig = {
+const config: PlaywrightTestConfig<TestOptions> = {
   testMatch: "e2e/browser/test/*.playwright.ts",
   retries: 1,
   // Extends from the default 30s
@@ -29,7 +30,7 @@ const config: PlaywrightTestConfig = {
   globalSetup: require.resolve("./e2e/browser/test/globalSetup.ts"),
   use: {
     baseURL: "http://localhost:3000",
-    headless: true,
+    headless: false,
     screenshot: "only-on-failure",
     trace: "on",
     video: "on-first-retry",
@@ -48,6 +49,7 @@ const config: PlaywrightTestConfig = {
         userAgent: `Browser-based solid-client-access-grant end-to-end tests running ${
           process.env.CI === "true" ? "in CI" : "locally"
         }. Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0`,
+        loginOnStart: false
       },
     },
     {
