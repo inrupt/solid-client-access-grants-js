@@ -79,7 +79,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
   let sharedFileIri: string;
 
   // Setup the shared file
-  beforeAll(async () => {
+  beforeEach(async () => {
     // Log both sessions in.
     await requestorSession.login({
       oidcIssuer,
@@ -121,7 +121,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
   });
 
   // Cleanup the shared file
-  afterAll(async () => {
+  afterEach(async () => {
     if (sharedFileIri) {
       // Remove the shared file from the resource owner's Pod.
       await sc.deleteFile(sharedFileIri, {
@@ -250,6 +250,73 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       expect(grant.credentialSubject.providedConsent.mode).toStrictEqual([
         "http://www.w3.org/ns/auth/acl#Read",
       ]);
+    });
+
+    it("will issue an access request, grant access to a resource, but will not update the ACR if the updateAcr flag is set to false", async () => {
+      const request = await issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: resourceOwnerSession.info.webId as string,
+          resources: [sharedFileIri],
+          purpose: [
+            "https://some.purpose/not-a-nefarious-one/i-promise",
+            "https://some.other.purpose/",
+          ],
+        },
+        {
+          fetch: requestorSession.fetch,
+          accessEndpoint: vcProvider,
+        }
+      );
+      expect(isVerifiableCredential(request)).toBe(true);
+
+      const grant = await approveAccessRequest(
+        request,
+        {},
+        {
+          fetch: resourceOwnerSession.fetch,
+          accessEndpoint: vcProvider,
+          updateAcr: false,
+        }
+      );
+
+      await expect(
+        isValidAccessGrant(grant, {
+          fetch: resourceOwnerSession.fetch,
+          // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+          // It is an issue documented in the VC library e2e test, and in a ticket
+          // to be fixed.
+          verificationEndpoint: `${vcProvider}/verify`,
+        })
+      ).resolves.toMatchObject({ errors: [] });
+
+      const grantedAccess = await getAccessGrantAll(sharedFileIri, undefined, {
+        fetch: resourceOwnerSession.fetch,
+        accessEndpoint: vcProvider,
+      });
+
+      // Test that looking up the access grants for the given resource returns
+      // the access we just granted.
+      expect(grantedAccess).toContainEqual(grant);
+
+      const sharedFileWithAcr = await sc.acp_ess_2.getFileWithAcr(
+        sharedFileIri,
+        {
+          fetch: resourceOwnerSession.fetch,
+        }
+      );
+
+      if (!sc.acp_ess_2.hasAccessibleAcr(sharedFileWithAcr)) {
+        throw new Error("The resource should have an accessible ACR");
+      }
+
+      expect(sc.acp_ess_2.getVcAccess(sharedFileWithAcr)).toEqual(
+        expect.objectContaining({
+          read: false,
+          write: false,
+          append: false,
+        })
+      );
     });
   });
 

@@ -84,27 +84,25 @@ const mockAcpClient = (
   return solidClientModule;
 };
 
+const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
+const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
+const mockedClientModule = jest.requireMock("@inrupt/solid-client") as any;
+const spiedAcrLookup = jest.spyOn(
+  mockedClientModule.acp_ess_2,
+  "getResourceInfoWithAcr"
+);
+const spiedAcrUpdate = jest.spyOn(mockedClientModule.acp_ess_2, "setVcAccess");
+
 describe("approveAccessRequest", () => {
   // FIXME: This test must run before the other tests mocking the ACP client.
   // This means that some mocked isn't cleared properly between tests.
   it("updates the target resources' ACR appropriately", async () => {
-    const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
-    const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
     mockAcpClient({
       initialResource: mockedInitialResource,
       updatedResource: mockedUpdatedResource,
     });
     mockAccessApiEndpoint();
 
-    const mockedClientModule = jest.requireMock("@inrupt/solid-client") as any;
-    const spiedAcrLookup = jest.spyOn(
-      mockedClientModule.acp_ess_2,
-      "getResourceInfoWithAcr"
-    );
-    const spiedAcrUpdate = jest.spyOn(
-      mockedClientModule.acp_ess_2,
-      "setVcAccess"
-    );
     const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
@@ -138,6 +136,7 @@ describe("approveAccessRequest", () => {
       write: true,
       append: false,
     });
+
     // The resources' ACR is written back.
     expect(spiedAcrSave).toHaveBeenCalledWith(
       mockedUpdatedResource,
@@ -802,24 +801,14 @@ describe("approveAccessRequest", () => {
       )
     ).rejects.toThrow();
   });
-  it("updates the target resources' ACR if the updateACR flag is ommitted from the options", async () => {
-    const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
-    const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
+
+  it("updates the target resources' ACR if the updateAcr flag is ommitted from the options", async () => {
     mockAcpClient({
       initialResource: mockedInitialResource,
       updatedResource: mockedUpdatedResource,
     });
     mockAccessApiEndpoint();
 
-    const mockedClientModule = jest.requireMock("@inrupt/solid-client") as any;
-    const spiedAcrLookup = jest.spyOn(
-      mockedClientModule.acp_ess_2,
-      "getResourceInfoWithAcr"
-    );
-    const spiedAcrUpdate = jest.spyOn(
-      mockedClientModule.acp_ess_2,
-      "setVcAccess"
-    );
     const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
@@ -847,37 +836,23 @@ describe("approveAccessRequest", () => {
       "https://some.custom.resource",
       expect.anything()
     );
-    // The resources' ACR is updated with the modes from the grant.
+    // // The resources' ACR is updated with the modes from the grant.
     expect(spiedAcrUpdate).toHaveBeenCalledWith(mockedInitialResource, {
       read: true,
       write: true,
       append: false,
     });
     // The resources' ACR is written back.
-    expect(spiedAcrSave).toHaveBeenCalledWith(
-      mockedUpdatedResource,
-      expect.anything()
-    );
+    expect(spiedAcrSave).toHaveBeenCalled();
   });
 
   it("updates the target resources' ACR if the updateACR flag is set to true", async () => {
-    const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
-    const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
     mockAcpClient({
       initialResource: mockedInitialResource,
       updatedResource: mockedUpdatedResource,
     });
     mockAccessApiEndpoint();
 
-    const mockedClientModule = jest.requireMock("@inrupt/solid-client") as any;
-    const spiedAcrLookup = jest.spyOn(
-      mockedClientModule.acp_ess_2,
-      "getResourceInfoWithAcr"
-    );
-    const spiedAcrUpdate = jest.spyOn(
-      mockedClientModule.acp_ess_2,
-      "setVcAccess"
-    );
     const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
@@ -885,6 +860,7 @@ describe("approveAccessRequest", () => {
       },
       "issueVerifiableCredential"
     );
+
     mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
 
     await approveAccessRequest(
@@ -901,6 +877,7 @@ describe("approveAccessRequest", () => {
         updateAcr: true,
       }
     );
+
     // The resource's IRI is picked up from the access grant.
     expect(spiedAcrLookup).toHaveBeenCalledWith(
       "https://some.custom.resource",
@@ -912,31 +889,18 @@ describe("approveAccessRequest", () => {
       write: true,
       append: false,
     });
+
     // The resources' ACR is written back.
-    expect(spiedAcrSave).toHaveBeenCalledWith(
-      mockedUpdatedResource,
-      expect.anything()
-    );
+    expect(spiedAcrSave).toHaveBeenCalled();
   });
 
   it("does not update the target resources' ACR if the updateACR flag is set to false", async () => {
-    const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
-    const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
     mockAcpClient({
       initialResource: mockedInitialResource,
       updatedResource: mockedUpdatedResource,
     });
     mockAccessApiEndpoint();
 
-    const mockedClientModule = jest.requireMock("@inrupt/solid-client") as any;
-    const spiedAcrLookup = jest.spyOn(
-      mockedClientModule.acp_ess_2,
-      "getResourceInfoWithAcr"
-    );
-    const spiedAcrUpdate = jest.spyOn(
-      mockedClientModule.acp_ess_2,
-      "setVcAccess"
-    );
     const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
@@ -960,6 +924,7 @@ describe("approveAccessRequest", () => {
         updateAcr: false,
       }
     );
+
     expect(spiedAcrLookup).toHaveBeenCalledTimes(0);
     expect(spiedAcrUpdate).toHaveBeenCalledTimes(0);
     expect(spiedAcrSave).toHaveBeenCalledTimes(0);
