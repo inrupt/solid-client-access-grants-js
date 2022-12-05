@@ -25,7 +25,7 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ### New features
 
-- The `getters` module functions now support ODRL Access Grants. 
+- The `getters` module functions now support ODRL Access Grants.
 - `AccessGrantOdrl`, `AccessGrantGConsent` and `AccessGrantAny` types: Both the
   ODRL-based and the GConsent-based Access Grants now have an explicit associated
   type. Functions that support both data model may use the `AccessGrantAllAny` union
