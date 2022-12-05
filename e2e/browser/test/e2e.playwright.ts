@@ -21,7 +21,11 @@
 
 import { test, expect } from "@inrupt/internal-playwright-helpers";
 
-test("Granting access to a resource, then revoking it", async ({ page }) => {
+test("Granting access to a resource, then revoking it", async ({
+  page,
+  auth,
+}) => {
+  await auth.login();
   // Create the resource. Note that the Promise.all prevents a race condition where
   // the request would be sent before we wait on it.
   await Promise.all([
