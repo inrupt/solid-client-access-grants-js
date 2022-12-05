@@ -199,7 +199,9 @@ export function getIssuanceDate(
 export function getExpirationDate(
   vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
 ): Date | undefined {
-  return typeof vc.expirationDate === "string" ? new Date(vc.expirationDate) : undefined;
+  return typeof vc.expirationDate === "string"
+    ? new Date(vc.expirationDate)
+    : undefined;
 }
 
 /**
