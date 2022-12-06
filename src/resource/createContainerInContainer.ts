@@ -26,10 +26,7 @@ import {
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
 import { FetchOptions } from "../type/FetchOptions";
-
-interface SaveInContainerOptions extends FetchOptions {
-  slugSuggestion?: string;
-}
+import { SaveInContainerOptions } from "../type/SaveInContainerOptions";
 
 /**
  * Create an empty Container inside the Container at the given URL.
@@ -53,10 +50,7 @@ interface SaveInContainerOptions extends FetchOptions {
  * be created.
  * @param accessGrant The Access Grant that would allow the Agent/Application to
  * perform this operation.
- * @param options Optional parameter `options.fetch`: An alternative `fetch`
- * function to make the HTTP request, compatible with the browser-native [fetch
- * API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
- * SaveInContainerOptions includes `slugSuggestion` which is a string for a suggestion for your new Container's name.
+ * @param options Optional parameter `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
  * @returns A promise that resolves to a SolidDataset with ResourceInfo if
  * successful, and that rejects otherwise.
  * @since unreleased

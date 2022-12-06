@@ -27,11 +27,7 @@ import {
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
 import { FetchOptions } from "../type/FetchOptions";
-
-// TODO: This should come from @inrupt/solid-client
-interface SaveInContainerOptions extends FetchOptions {
-  slugSuggestion?: string;
-}
+import { SaveInContainerOptions } from "../type/SaveInContainerOptions";
 
 /**
  * Given a SolidDataset, store it in a Solid Pod as a new Resource inside a Container.

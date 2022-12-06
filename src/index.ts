@@ -30,10 +30,11 @@ export type {
   RedirectToAccessManagementUiOptions,
 } from "./gConsent";
 
+export type { AccessGrantAny } from "./type/AccessGrant";
+export type { AccessModes } from "./type/AccessModes";
 export type { FetchOptions } from "./type/FetchOptions";
 export type { RedirectOptions } from "./type/RedirectOptions";
-export type { AccessModes } from "./type/AccessModes";
-export type { AccessGrantAny } from "./type/AccessGrant";
+export type { SaveInContainerOptions } from "./type/SaveInContainerOptions";
 
 export {
   approveAccessRequest,
