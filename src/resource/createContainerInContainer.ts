@@ -46,7 +46,7 @@ interface SaveInContainerOptions extends FetchOptions {
  * You can pass a suggestion for the new Resource's name, but the server may decide to give it
  * another name — for example, if a Resource with that name already exists inside the given
  * Container.
- * If the user does have access to write directly to a given location, [[createContainerAt]]
+ * If the user does have access to write directly to a given location, createContainerAt
  * will do the job just fine, and does not require the parent Container to exist in advance.
  *
  * @param containerUrl URL of the Container in which the empty Container is to
@@ -56,7 +56,7 @@ interface SaveInContainerOptions extends FetchOptions {
  * @param options Optional parameter `options.fetch`: An alternative `fetch`
  * function to make the HTTP request, compatible with the browser-native [fetch
  * API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
- * `options.slugSuggestion` accepts a string for your new Container's name.
+ * SaveInContainerOptions includes `slugSuggestion` which is a string for a suggestion for your new Container's name.
  * @returns A promise that resolves to a SolidDataset with ResourceInfo if
  * successful, and that rejects otherwise.
  * @since unreleased

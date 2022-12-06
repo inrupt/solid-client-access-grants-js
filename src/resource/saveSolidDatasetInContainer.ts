@@ -37,8 +37,8 @@ interface SaveInContainerOptions extends FetchOptions {
  * Given a SolidDataset, store it in a Solid Pod as a new Resource inside a Container.
  *
  * The Container at the given URL should already exist; if it does not, you can initialise it first
- * using [[createContainerAt]], or directly save the SolidDataset at the desired location using
- * [[saveSolidDatasetAt]].
+ * using createContainerAt, or directly save the SolidDataset at the desired location using
+ * {@link resource.saveSolidDatasetAt}.
  *
  * This function is primarily useful if the current user has not been granted
  * access to change existing files in a Container, but is allowed to add new
@@ -49,7 +49,7 @@ interface SaveInContainerOptions extends FetchOptions {
  * name, but the server may decide to give it another name — for example, if a
  * Resource with that name already exists inside the given Container. If the
  * user does have access to write directly to a given location,
- * [[saveSolidDatasetAt]] will do the job just fine, and does not require the
+ * {@link resource.saveSolidDatasetAt} will do the job just fine, and does not require the
  * parent Container to exist in advance.
  *
  * @see [@inrupt/solid-client's
@@ -57,10 +57,10 @@ interface SaveInContainerOptions extends FetchOptions {
  *
  *
  * @param containerUrl URL of the Container in which to create a new Resource.
- * @param solidDataset The [[SolidDataset]] to save to a new Resource in the given Container.
+ * @param solidDataset The SolidDataset to save to a new Resource in the given Container.
  * @param accessGrant The Access Grant that would allow the Agent/Application to perform this operation.
  * @param options Optional parameter `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
- * @returns A Promise resolving to a [[SolidDataset]] containing the saved data. The Promise rejects if the save failed.
+ * @returns A Promise resolving to a SolidDataset containing the saved data. The Promise rejects if the save failed.
  * @since unreleased
  */
 
