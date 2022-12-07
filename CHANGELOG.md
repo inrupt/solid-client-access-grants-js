@@ -6,7 +6,11 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 - Added the `createContainerInContainer` method.
 - Added `saveSolidDatasetInContainer` method.
-- Added the `updateAcr` to the list of options that can be included when calling the `approveAccessRequest` method. `updateAcr` will default to `true` if nothing is passed in.
+- Added the `updateAcr` flag to the list of options that can be included when calling
+  the `approveAccessRequest` method. `updateAcr` will default to `true`. Note that
+  this is an advanced feature, and only users having a good understanding of the
+  relationship between Access Grants and ACRs should deviate from the default.
+  Additional information is available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
 
 ### Minor changes
 
