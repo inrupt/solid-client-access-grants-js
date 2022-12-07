@@ -24,7 +24,7 @@ import { jest, it, describe, expect } from "@jest/globals";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import type { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 
-import type * as SolidClient from "@inrupt/solid-client";
+import * as SolidClient from "@inrupt/solid-client";
 import {
   mockAccessApiEndpoint,
   MOCKED_ACCESS_ISSUER,
@@ -64,29 +64,45 @@ jest.mock("cross-fetch");
 const mockAcpClient = (
   options?: Partial<{
     hasAccessibleAcr: boolean;
-    initialResource: unknown;
-    updatedResource: unknown;
+    initialResource: SolidClient.WithServerResourceInfo & SolidClient.WithAcp;
+    updatedResource: SolidClient.WithAccessibleAcr;
   }>
 ) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
+  const solidClientModule = jest.requireMock(
+    "@inrupt/solid-client"
+  ) as jest.Mocked<typeof SolidClient>;
   solidClientModule.acp_ess_2.hasAccessibleAcr.mockReturnValueOnce(
     options?.hasAccessibleAcr ?? true
   );
 
-  solidClientModule.acp_ess_2.setVcAccess.mockReturnValueOnce(
-    options?.updatedResource ?? {}
-  );
-  solidClientModule.acp_ess_2.getResourceInfoWithAcr.mockResolvedValueOnce(
-    options?.initialResource ?? {}
-  );
-  solidClientModule.acp_ess_2.saveAcrFor = jest.fn();
+  if (options?.updatedResource) {
+    solidClientModule.acp_ess_2.setVcAccess.mockReturnValueOnce(
+      options?.updatedResource
+    );
+  }
+
+  if (options?.initialResource) {
+    solidClientModule.acp_ess_2.getResourceInfoWithAcr.mockResolvedValueOnce(
+      options?.initialResource
+    );
+  }
+
+  solidClientModule.acp_ess_2.saveAcrFor = jest.fn<
+    typeof SolidClient.acp_ess_2.saveAcrFor
+  >() as any;
   return solidClientModule;
 };
 
-const mockedInitialResource = mockSolidDatasetFrom("https://some.resource");
-const mockedUpdatedResource = mockSolidDatasetFrom("https://some.acr");
-const mockedClientModule = jest.requireMock("@inrupt/solid-client") as any;
+const mockedInitialResource = mockSolidDatasetFrom(
+  "https://some.resource"
+) as unknown as SolidClient.WithServerResourceInfo & SolidClient.WithAcp;
+const mockedUpdatedResource = mockSolidDatasetFrom(
+  "https://some.acr"
+) as unknown as SolidClient.WithAccessibleAcr;
+
+const mockedClientModule = jest.requireMock(
+  "@inrupt/solid-client"
+) as jest.Mocked<typeof SolidClient>;
 const spiedAcrLookup = jest.spyOn(
   mockedClientModule.acp_ess_2,
   "getResourceInfoWithAcr"
