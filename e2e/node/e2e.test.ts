@@ -282,15 +282,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         })
       ).resolves.toMatchObject({ errors: [] });
 
-      const grantedAccess = await getAccessGrantAll(sharedFileIri, undefined, {
-        fetch: resourceOwnerSession.fetch,
-        accessEndpoint: vcProvider,
-      });
-
-      // Test that looking up the access grants for the given resource returns
-      // the access we just granted.
-      expect(grantedAccess).toContainEqual(grant);
-
       const sharedFileWithAcr = await sc.acp_ess_2.getFileWithAcr(
         sharedFileIri,
         {
