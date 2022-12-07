@@ -105,13 +105,10 @@ async function internal_approveAccessRequest(
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options: AccessBaseOptions = {}
 ): Promise<VerifiableCredential> {
-  const updateAcr = Object.keys(options).includes("updateAcr")
-    ? options.updateAcr
-    : true;
   const internalOptions = {
     ...options,
     fetch: options.fetch ?? (await getSessionFetch(options)),
-    updateAcr,
+    updateAcr: options.updateAcr ?? true,
   };
   const requestCredential =
     typeof requestVc !== "undefined"
