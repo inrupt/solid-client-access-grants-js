@@ -46,20 +46,6 @@ export type ApproveAccessRequestOverrides = Omit<
   "expirationDate"
 > & { expirationDate?: Date | null };
 
-/**
- * This function approves the access grant that gets passed into it.
- *
- *
- * @param request The Access Grant that will be approved.
- * @param options Optional properties to customise the request behaviour. This
- * includes the option `updateAcr` which will default to true. If you pass in
- * `{updateAcr : true}` the ACR of the Resource will be updated when the access
- * grant is approved. If you pass in `{updateAcr : false}`, the ACR of the
- * Resource will not be updated when the access grant is approved.
- * @returns A promise that resolves to a VerifiedCredential if successful, and
- * that rejects otherwise.
- * @since unreleased
- */
 function getAccessModesFromAccessGrant(request: AccessGrantBody): AccessModes {
   const accessMode: AccessModes = {};
   const requestModes = request.credentialSubject.providedConsent.mode;
@@ -172,12 +158,19 @@ async function internal_approveAccessRequest(
 
 /**
  * Approve an access request. The content of the approved access request is provided
- * as a Verifiable Credential which properties may be overriden if necessary.
+ * as a Verifiable Credential which properties may be overridden if necessary.
  *
  * @param requestVc The Verifiable Credential representing the Access Request. If
  * not conform to an Access Request, the function will throw.
- * @param requestOverride Elements overriding information from the provided Verifiable Credential.
- * @param options Optional properties to customise the access grant behaviour.
+ * @param requestOverride Elements overriding information from the provided Verifiable
+ * Credential.
+ * @param options Optional properties to customizes the access grant behavior. Options
+ * include `updateAcr` which defaults to true. If this flag is set to true, the ACR
+ * of the Resource will be updated when the access grant is approved. If this flag is
+ * set to false, the ACR of the Resource will remain unchanged. This is an advanced
+ * feature, and only users having a good understanding of the relationship between
+ * Access Grants and ACRs should deviate from the default. Additional information is
+ * available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
  * @returns A Verifiable Credential representing the granted access.
  * @since 0.0.1.
  */
