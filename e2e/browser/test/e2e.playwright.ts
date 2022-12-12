@@ -25,7 +25,7 @@ test("Granting access to a resource, then revoking it", async ({
   page,
   auth,
 }) => {
-  await auth.login();
+  await auth.login({ allow: true });
   // Create the resource. Note that the Promise.all prevents a race condition where
   // the request would be sent before we wait on it.
   await Promise.all([
