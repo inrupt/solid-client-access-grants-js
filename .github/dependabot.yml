@@ -24,8 +24,8 @@ updates:
       interval: "daily"
   # Enable version updates for embedded demo app
   - package-ecosystem: "npm"
-    # Look for `package.json` and `package-lock.json` files in the `e2e/browser/testApp` directory.
-    directory: "/e2e/browser/testApp"
+    # Look for `package.json` and `package-lock.json` files in the `e2e/browser/test-app` directory.
+    directory: "/e2e/browser/test-app"
     # Check the npm registry for updates every day (weekdays).
     schedule:
       interval: "daily"

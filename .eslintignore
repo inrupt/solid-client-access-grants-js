@@ -6,6 +6,5 @@ rollup.config.js
 tsconfig.json
 # The only check that applies here is really the license header:
 .eslintrc.js
-e2e/browser/testApp
 examples/solid-client-access-grants-demo/static/javascript/
 **/dist/*
