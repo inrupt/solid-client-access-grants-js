@@ -25,6 +25,13 @@ import {
   handleIncomingRedirect,
 } from "@inrupt/solid-client-authn-browser";
 import type { ISessionInfo } from "@inrupt/solid-client-authn-browser";
+import {
+  TESTID_ERROR_MESSAGE,
+  TESTID_LOGIN_BUTTON,
+  TESTID_LOGOUT_BUTTON,
+  TESTID_OPENID_PROVIDER_INPUT,
+  TESTID_SESSION_STATUS,
+} from "@inrupt/internal-playwright-testids";
 import { useState, useEffect } from "react";
 import AccessGrants from "../accessGrants";
 
@@ -41,9 +48,8 @@ const AccessGrantContainer = ({
 }) => {
   if (sessionInfo?.isLoggedIn) {
     return <AccessGrants setErrorMessage={setErrorMessage} />;
-  } else {
-    return <></>;
   }
+  return <></>;
 };
 
 export default function Home() {
@@ -52,7 +58,11 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string>();
 
   useEffect(() => {
-    handleIncomingRedirect().then(setSessionInfo);
+    handleIncomingRedirect()
+      .then(setSessionInfo)
+      .catch((err) => {
+        throw new Error(err);
+      });
   }, []);
 
   const handleLogin = async () => {
@@ -79,14 +89,14 @@ export default function Home() {
       <h1>
         <code>@inrupt/solid-client-access-grants</code> test browser app
       </h1>
-      <p data-testid="loggedInMessage">
+      <p data-testid={TESTID_SESSION_STATUS}>
         {sessionInfo?.isLoggedIn
           ? `Logged in as ${sessionInfo.webId}`
           : "Not logged in yet"}
       </p>
       <form>
         <input
-          data-testid="identityProviderInput"
+          data-testid={TESTID_OPENID_PROVIDER_INPUT}
           type="text"
           value={issuer}
           onChange={(e) => {
@@ -94,7 +104,7 @@ export default function Home() {
           }}
         />
         <button
-          data-testid="loginButton"
+          data-testid={TESTID_LOGIN_BUTTON}
           onClick={async (e) => {
             e.preventDefault();
             await handleLogin();
@@ -104,7 +114,7 @@ export default function Home() {
         </button>
 
         <button
-          data-testid="logoutButton"
+          data-testid={TESTID_LOGOUT_BUTTON}
           onClick={async (e) => {
             e.preventDefault();
             await handleLogout();
@@ -113,7 +123,7 @@ export default function Home() {
           Log Out
         </button>
       </form>
-      <p data-testid="errorMessage">
+      <p data-testid={TESTID_ERROR_MESSAGE}>
         <strong>{errorMessage}</strong>
       </p>
       <AccessGrantContainer

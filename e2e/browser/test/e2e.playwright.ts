@@ -19,25 +19,13 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { test, expect } from "@playwright/test";
-import { getBrowserTestingEnvironment } from "@inrupt/internal-test-env";
-import { essUserLogin } from "./roles";
+import { test, expect } from "@inrupt/internal-playwright-helpers";
 
-const {
-  clientCredentials: {
-    owner: { login, password },
-  },
-} = getBrowserTestingEnvironment({
-  clientCredentials: {
-    owner: { login: "", password: "" },
-  },
-});
-
-test("Granting access to a resource, then revoking it", async ({ page }) => {
-  // Navigate to the test page and log in.
-  await page.goto("/");
-  await essUserLogin(page, login, password);
-
+test("Granting access to a resource, then revoking it", async ({
+  page,
+  auth,
+}) => {
+  await auth.login({ allow: true });
   // Create the resource. Note that the Promise.all prevents a race condition where
   // the request would be sent before we wait on it.
   await Promise.all([
