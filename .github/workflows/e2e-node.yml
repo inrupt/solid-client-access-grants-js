@@ -23,14 +23,12 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         node-version: ["14.x", "16.x"]
-        # FIXME: deploy new environments:
-        # environment-name: ["ESS PodSpaces"]
-        environment-name: ["ESS Dev-Next"]
+        environment-name: ["ESS PodSpaces"]
         experimental: [false]
-        # include:
-        #   - environment-name: "ESS Dev-Next"
-        #     experimental: true
-        #     node-version: 16.x
+        include:
+          - environment-name: "ESS Dev-Next"
+            experimental: true
+            node-version: 16.x
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
