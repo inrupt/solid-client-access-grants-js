@@ -30,8 +30,7 @@ import {
   getSourceUrl,
   deleteFile,
 } from "@inrupt/solid-client";
-import { useState } from "react";
-import React from "react";
+import React, { useState } from "react";
 
 const session = getDefaultSession();
 const SHARED_FILE_CONTENT = "Some content.\n";
@@ -44,97 +43,96 @@ export default function AccessGrant({
   const [accessGrant, setAccessGrant] = useState<string>();
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
 
-  const handleCreate = (e) => {
+  const handleCreate = async (e) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
     e.preventDefault();
     if (typeof sharedResourceIri === "string") {
       // If a resource already exist, do nothing
       return;
     }
-    (async () => {
-      if (typeof session.info.webId !== "string") {
-        setErrorMessage("You must be authenticated to create a resource.");
-        return;
-      }
-      // Create a file in the resource owner's Pod
-      const resourceOwnerPodAll = await getPodUrlAll(session.info.webId);
-      if (resourceOwnerPodAll.length === 0) {
-        setErrorMessage(
-          "The Resource Owner WebID Profile is missing a link to at least one Pod root."
-        );
-      }
-      const savedFile = await saveFileInContainer(
-        resourceOwnerPodAll[0],
-        new Blob([SHARED_FILE_CONTENT], { type: "text/plain" }),
-        {
-          // The session ID is a random string, used here as a unique slug.
-          slug: `${session.info.sessionId}.txt`,
-          fetch: session.fetch,
-        }
+
+    if (typeof session.info.webId !== "string") {
+      setErrorMessage("You must be authenticated to create a resource.");
+      return;
+    }
+    // Create a file in the resource owner's Pod
+    const resourceOwnerPodAll = await getPodUrlAll(session.info.webId);
+    if (resourceOwnerPodAll.length === 0) {
+      setErrorMessage(
+        "The Resource Owner WebID Profile is missing a link to at least one Pod root."
       );
-      setSharedResourceIri(getSourceUrl(savedFile));
-    })();
+    }
+    const savedFile = await saveFileInContainer(
+      resourceOwnerPodAll[0],
+      new Blob([SHARED_FILE_CONTENT], { type: "text/plain" }),
+      {
+        // The session ID is a random string, used here as a unique slug.
+        slug: `${session.info.sessionId}.txt`,
+        fetch: session.fetch,
+      }
+    );
+    setSharedResourceIri(getSourceUrl(savedFile));
   };
 
-  const handleDelete = (e) => {
+  const handleDelete = async (e) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
     e.preventDefault();
-    (async () => {
-      if (typeof sharedResourceIri !== "string") {
-        // If no resource exist, do nothing
-        return;
-      }
-      await deleteFile(sharedResourceIri, {
-        fetch: session.fetch,
-      });
-      setSharedResourceIri(undefined);
-    })();
+    if (typeof sharedResourceIri !== "string") {
+      // If no resource exist, do nothing
+      return;
+    }
+    await deleteFile(sharedResourceIri, {
+      fetch: session.fetch,
+    });
+    setSharedResourceIri(undefined);
   };
 
-  const handleGrant = (e) => {
+  const handleGrant = async (e) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
     e.preventDefault();
     if (typeof sharedResourceIri !== "string") {
       // If the resource does not exist, do nothing.
       return;
     }
-    (async () => {
-      const accessGrantRequest = await approveAccessRequest(
-        undefined,
-        {
-          requestor: "https://johndoe.webid",
-          access: { read: true },
-          resources: [sharedResourceIri],
-        },
-        {
-          fetch: session.fetch,
-        }
-      );
-      setAccessGrant(JSON.stringify(accessGrantRequest, null, "  "));
-    })();
+    const accessGrantRequest = await approveAccessRequest(
+      undefined,
+      {
+        requestor: "https://johndoe.webid",
+        access: { read: true },
+        resources: [sharedResourceIri],
+      },
+      {
+        fetch: session.fetch,
+      }
+    );
+    setAccessGrant(JSON.stringify(accessGrantRequest, null, "  "));
   };
 
-  const handleRevoke = (e) => {
+  const handleRevoke = async (e) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
     e.preventDefault();
     if (typeof accessGrant !== "string") {
       // If the resource does not exist, do nothing.
       return;
     }
-    (async () => {
-      await revokeAccessGrant(JSON.parse(accessGrant), {
-        fetch: session.fetch,
-      });
-      setAccessGrant(undefined);
-    })();
+    await revokeAccessGrant(JSON.parse(accessGrant), {
+      fetch: session.fetch,
+    });
+    setAccessGrant(undefined);
   };
   return (
     <>
       <div>
-        <button onClick={(e) => handleCreate(e)} data-testid="create-resource">
+        <button
+          onClick={async (e) => handleCreate(e)}
+          data-testid="create-resource"
+        >
           Create resource
         </button>
-        <button onClick={(e) => handleDelete(e)} data-testid="delete-resource">
+        <button
+          onClick={async (e) => handleDelete(e)}
+          data-testid="delete-resource"
+        >
           Delete resource
         </button>
       </div>
@@ -143,10 +141,16 @@ export default function AccessGrant({
         <span data-testid="resource-iri">{sharedResourceIri}</span>
       </p>
       <div>
-        <button onClick={(e) => handleGrant(e)} data-testid="grant-access">
+        <button
+          onClick={async (e) => handleGrant(e)}
+          data-testid="grant-access"
+        >
           Grant access
         </button>
-        <button onClick={(e) => handleRevoke(e)} data-testid="revoke-access">
+        <button
+          onClick={async (e) => handleRevoke(e)}
+          data-testid="revoke-access"
+        >
           Revoke access
         </button>
       </div>

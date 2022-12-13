@@ -25,7 +25,13 @@ import {
   handleIncomingRedirect,
 } from "@inrupt/solid-client-authn-browser";
 import type { ISessionInfo } from "@inrupt/solid-client-authn-browser";
-import {TESTID_ERROR_MESSAGE, TESTID_LOGIN_BUTTON, TESTID_LOGOUT_BUTTON, TESTID_OPENID_PROVIDER_INPUT, TESTID_SESSION_STATUS} from "@inrupt/internal-playwright-testids";
+import {
+  TESTID_ERROR_MESSAGE,
+  TESTID_LOGIN_BUTTON,
+  TESTID_LOGOUT_BUTTON,
+  TESTID_OPENID_PROVIDER_INPUT,
+  TESTID_SESSION_STATUS,
+} from "@inrupt/internal-playwright-testids";
 import { useState, useEffect } from "react";
 import AccessGrants from "../accessGrants";
 
@@ -42,9 +48,8 @@ const AccessGrantContainer = ({
 }) => {
   if (sessionInfo?.isLoggedIn) {
     return <AccessGrants setErrorMessage={setErrorMessage} />;
-  } else {
-    return <></>;
   }
+  return <></>;
 };
 
 export default function Home() {
@@ -53,7 +58,11 @@ export default function Home() {
   const [errorMessage, setErrorMessage] = useState<string>();
 
   useEffect(() => {
-    handleIncomingRedirect().then(setSessionInfo);
+    handleIncomingRedirect()
+      .then(setSessionInfo)
+      .catch((err) => {
+        throw new Error(err);
+      });
   }, []);
 
   const handleLogin = async () => {
