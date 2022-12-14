@@ -294,6 +294,8 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       }
 
       expect(sc.acp_ess_2.getVcAccess(sharedFileWithAcr)).toEqual(
+        // Note: All VC Access modes should be false, as we explicitly instructed the SDK to 
+        // not update the ACRs, and they default to false
         expect.objectContaining({
           read: false,
           write: false,
