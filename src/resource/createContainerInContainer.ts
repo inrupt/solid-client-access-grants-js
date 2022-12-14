@@ -50,7 +50,9 @@ import { SaveInContainerOptions } from "../type/SaveInContainerOptions";
  * be created.
  * @param accessGrant The Access Grant that would allow the Agent/Application to
  * perform this operation.
- * @param options Optional parameter `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
+ * @param options Optional parameter:
+ * - `options.fetch`: An alternative `fetch` function to make the HTTP request,
+ *   compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
  * @returns A promise that resolves to a SolidDataset with ResourceInfo if
  * successful, and that rejects otherwise.
  * @since unreleased
