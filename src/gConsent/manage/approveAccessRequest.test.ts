@@ -24,7 +24,7 @@ import { jest, it, describe, expect } from "@jest/globals";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import type { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 
-import * as SolidClient from "@inrupt/solid-client";
+import type * as SolidClient from "@inrupt/solid-client";
 import {
   mockAccessApiEndpoint,
   MOCKED_ACCESS_ISSUER,
