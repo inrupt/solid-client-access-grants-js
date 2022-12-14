@@ -142,7 +142,7 @@ async function internal_approveAccessRequest(
 
   const grantedAccess = getAccessModesFromAccessGrant(grantBody);
 
-  if (internalOptions.updateAcr) {
+  if (internalOptions.updateAcr === true) {
     await addVcMatcher(
       grantBody.credentialSubject.providedConsent.forPersonalData,
       grantedAccess,
