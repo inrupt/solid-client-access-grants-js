@@ -33,6 +33,7 @@ import { FetchOptions } from "./FetchOptions";
  *
  * @since unreleased
  */
+// TODO: This should come from @inrupt/solid-client
 export interface SaveInContainerOptions extends FetchOptions {
   slugSuggestion?: string;
 }
