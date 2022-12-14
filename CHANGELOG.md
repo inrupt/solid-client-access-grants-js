@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 - Added the `createContainerInContainer` method.
 - Added `saveSolidDatasetInContainer` method.
-- Added the `updateAcr` flag to the list of options that can be included when calling
+- Added the `updateAcr` flag to the options that can be included when calling
   the `approveAccessRequest` method. `updateAcr` will default to `true`. Note that
   this is an advanced feature, and only users having a good understanding of the
   relationship between Access Grants and ACRs should deviate from the default.
