@@ -303,6 +303,66 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         })
       );
     });
+
+    it("will issue an access request, grant access to a resource, and update the ACR if the updateAcr flag is set to true", async () => {
+      const request = await issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: resourceOwnerSession.info.webId as string,
+          resources: [sharedFileIri],
+          purpose: [
+            "https://some.purpose/not-a-nefarious-one/i-promise",
+            "https://some.other.purpose/",
+          ],
+        },
+        {
+          fetch: requestorSession.fetch,
+          accessEndpoint: vcProvider,
+        }
+      );
+      expect(isVerifiableCredential(request)).toBe(true);
+
+      const grant = await approveAccessRequest(
+        request,
+        {},
+        {
+          fetch: resourceOwnerSession.fetch,
+          accessEndpoint: vcProvider,
+          updateAcr: false,
+        }
+      );
+
+      await expect(
+        isValidAccessGrant(grant, {
+          fetch: resourceOwnerSession.fetch,
+          // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+          // It is an issue documented in the VC library e2e test, and in a ticket
+          // to be fixed.
+          verificationEndpoint: `${vcProvider}/verify`,
+        })
+      ).resolves.toMatchObject({ errors: [] });
+
+      const sharedFileWithAcr = await sc.acp_ess_2.getFileWithAcr(
+        sharedFileIri,
+        {
+          fetch: resourceOwnerSession.fetch,
+        }
+      );
+
+      if (!sc.acp_ess_2.hasAccessibleAcr(sharedFileWithAcr)) {
+        throw new Error("The resource should have an accessible ACR");
+      }
+
+      expect(sc.acp_ess_2.getVcAccess(sharedFileWithAcr)).toEqual(
+        // The ACR should have been updated, and the matcher should be aligned with
+        // the access modes set in the Access Grant.
+        expect.objectContaining({
+          read: true,
+          write: false,
+          append: false,
+        })
+      );
+    });
   });
 
   describe("resource owner interaction with VC provider", () => {
