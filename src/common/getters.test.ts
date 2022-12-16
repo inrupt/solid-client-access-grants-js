@@ -30,6 +30,7 @@ import {
   getAccessModes,
   getExpirationDate,
   getId,
+  getInherit,
   getIssuanceDate,
   getIssuer,
   getRequestor,
@@ -283,6 +284,47 @@ describe("getIssuer", () => {
     });
   });
 });
+
+describe("getInherit", () => {
+  describe("gConsent data model", () => {
+    it("gets the gConsent access grant issuer", () => {
+      const gConsentGrant = mockGConsentGrant(
+        "https://some.issuer",
+        "https://some.resource.owner",
+        false
+      );
+      expect(getIssuer(gConsentGrant)).toStrictEqual(gConsentGrant.issuer);
+    });
+
+    it("defaults the recursive nature from a gConsent access grant to true", () => {
+      const gConsentGrant = mockGConsentGrant(
+        "https://some.issuer",
+        "https://some.resource.owner",
+        undefined
+      );
+      expect(getInherit(gConsentGrant)).toBe(true);
+    });
+
+    it("gets the recursive nature from a gConsent access request", () => {
+      const gConsentRequest = mockGConsentRequest({ inherit: false });
+      expect(getInherit(gConsentRequest)).toBe(false);
+    });
+
+    it("defaults the recursive nature from a gConsent access request to true", () => {
+      const gConsentRequest = mockGConsentRequest({ inherit: undefined });
+      expect(getInherit(gConsentRequest)).toBe(true);
+    });
+  });
+
+  describe("ODRL data model", () => {
+    it("gets the recursive nature of an ODRL access grant", () => {
+      const odrlGrant = mockOdrlGrant();
+      expect(getInherit(odrlGrant)).toBe(true);
+    });
+  });
+});
+
+
 
 describe("AccessGrant", () => {
   it("wraps calls to the underlying functions", () => {
