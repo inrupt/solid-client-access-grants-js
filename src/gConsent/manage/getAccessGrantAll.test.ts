@@ -42,7 +42,9 @@ jest.mock("../discover/getAccessApiEndpoint", () => {
 });
 
 describe("getAccessGrantAll", () => {
-  const resource = new URL("https://some.resource");
+  const resource = new URL(
+    "https://pod.example/container-1/container-2/some-resource"
+  );
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right default parameters", async () => {
     const expectedDefaultVcShape = {
@@ -58,7 +60,7 @@ describe("getAccessGrantAll", () => {
 
     expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
 
-    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(1);
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       "https://some.api.endpoint/derive",
@@ -93,7 +95,7 @@ describe("getAccessGrantAll", () => {
 
     expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
 
-    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(1);
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       "https://some.api.endpoint/derive",
@@ -125,7 +127,7 @@ describe("getAccessGrantAll", () => {
 
     expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
 
-    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(1);
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       "https://some.api.endpoint/derive",
@@ -157,7 +159,7 @@ describe("getAccessGrantAll", () => {
 
     expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
 
-    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(1);
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       "https://some.api.endpoint/derive",
@@ -180,6 +182,50 @@ describe("getAccessGrantAll", () => {
         fetch: expect.anything(),
         includeExpiredVc: true,
       })
+    );
+  });
+
+  it("issues requests for recursive access grants of ancestor containers", async () => {
+    // These are all the URLs for which a recursive Access Grant would grant access
+    // to the target resource.
+    const matchingUrls = [
+      resource.href,
+      "https://pod.example/container-1/container-2/",
+      "https://pod.example/container-1/",
+      "https://pod.example/",
+    ];
+    const expectedVcShape = matchingUrls.map((url) => ({
+      credentialSubject: {
+        providedConsent: {
+          forPersonalData: [url],
+        },
+      },
+    }));
+
+    await getAccessGrantAll(resource.href);
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(4);
+
+    // A call should have been made for each level of the hierarchy.
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      expect.anything(),
+      expectedVcShape[0],
+      expect.anything()
+    );
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      expect.anything(),
+      expectedVcShape[1],
+      expect.anything()
+    );
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      expect.anything(),
+      expectedVcShape[2],
+      expect.anything()
+    );
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      expect.anything(),
+      expectedVcShape[3],
+      expect.anything()
     );
   });
 });
