@@ -328,7 +328,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         {
           fetch: resourceOwnerSession.fetch,
           accessEndpoint: vcProvider,
-          updateAcr: false,
+          updateAcr: true,
         }
       );
 
