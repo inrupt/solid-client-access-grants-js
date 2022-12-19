@@ -57,8 +57,10 @@ const getAncestorUrls = (resourceUrl: URL) => {
 };
 
 /**
- * Retrieve Access Grants issued over a resource.
- * Can be filtered by requestor, access and purpose.
+ * Retrieve Access Grants issued over a resource. The Access Grants may be filtered
+ * by requestor, access modes and purpose. In order to discover all applicable Access
+ * Grants for the target resource, including recursive Access Grants issued over
+ * an ancestor container, the resources hierarchy is walked up to the storage root.
  *
  * @param resource The URL of a resource to which access grants might have been issued.
  * @param grantShape The properties of grants to filter results.
