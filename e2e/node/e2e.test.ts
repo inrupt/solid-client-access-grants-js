@@ -20,21 +20,14 @@
 //
 
 // Globals are actually not injected, so this does not shadow anything.
-import {
-  describe,
-  it,
-  expect,
-  beforeAll,
-  afterAll,
-  beforeEach,
-  afterEach,
-} from "@jest/globals";
+import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
 import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 // Making a named import here to avoid confusion with the wrapped functions from
 // the access grant API
 import * as sc from "@inrupt/solid-client";
+import { custom } from "openid-client";
 import {
   AccessGrant,
   approveAccessRequest,
@@ -50,6 +43,11 @@ import {
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
 } from "../../src/index";
+
+// Extend the timeout because of frequent issues in CI (default is 3500)
+custom.setHttpOptionsDefaults({
+  timeout: 5000,
+});
 
 const env = getNodeTestingEnvironment({
   vcProvider: "",
@@ -79,7 +77,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
   let sharedFileIri: string;
 
   // Setup the shared file
-  beforeAll(async () => {
+  beforeEach(async () => {
     // Log both sessions in.
     await requestorSession.login({
       oidcIssuer,
@@ -121,7 +119,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
   });
 
   // Cleanup the shared file
-  afterAll(async () => {
+  afterEach(async () => {
     if (sharedFileIri) {
       // Remove the shared file from the resource owner's Pod.
       await sc.deleteFile(sharedFileIri, {
@@ -250,6 +248,126 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       expect(grant.credentialSubject.providedConsent.mode).toStrictEqual([
         "http://www.w3.org/ns/auth/acl#Read",
       ]);
+    });
+
+    it("will issue an access request, grant access to a resource, but will not update the ACR if the updateAcr flag is set to false", async () => {
+      const request = await issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: resourceOwnerSession.info.webId as string,
+          resources: [sharedFileIri],
+          purpose: [
+            "https://some.purpose/not-a-nefarious-one/i-promise",
+            "https://some.other.purpose/",
+          ],
+        },
+        {
+          fetch: requestorSession.fetch,
+          accessEndpoint: vcProvider,
+        }
+      );
+      expect(isVerifiableCredential(request)).toBe(true);
+
+      const grant = await approveAccessRequest(
+        request,
+        {},
+        {
+          fetch: resourceOwnerSession.fetch,
+          accessEndpoint: vcProvider,
+          updateAcr: false,
+        }
+      );
+
+      await expect(
+        isValidAccessGrant(grant, {
+          fetch: resourceOwnerSession.fetch,
+          // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+          // It is an issue documented in the VC library e2e test, and in a ticket
+          // to be fixed.
+          verificationEndpoint: `${vcProvider}/verify`,
+        })
+      ).resolves.toMatchObject({ errors: [] });
+
+      const sharedFileWithAcr = await sc.acp_ess_2.getFileWithAcr(
+        sharedFileIri,
+        {
+          fetch: resourceOwnerSession.fetch,
+        }
+      );
+
+      if (!sc.acp_ess_2.hasAccessibleAcr(sharedFileWithAcr)) {
+        throw new Error("The resource should have an accessible ACR");
+      }
+
+      expect(sc.acp_ess_2.getVcAccess(sharedFileWithAcr)).toEqual(
+        // Note: All VC Access modes should be false, as we explicitly instructed the SDK to
+        // not update the ACRs, and they default to false
+        expect.objectContaining({
+          read: false,
+          write: false,
+          append: false,
+        })
+      );
+    });
+
+    it("will issue an access request, grant access to a resource, and update the ACR if the updateAcr flag is set to true", async () => {
+      const request = await issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: resourceOwnerSession.info.webId as string,
+          resources: [sharedFileIri],
+          purpose: [
+            "https://some.purpose/not-a-nefarious-one/i-promise",
+            "https://some.other.purpose/",
+          ],
+        },
+        {
+          fetch: requestorSession.fetch,
+          accessEndpoint: vcProvider,
+        }
+      );
+      expect(isVerifiableCredential(request)).toBe(true);
+
+      const grant = await approveAccessRequest(
+        request,
+        {},
+        {
+          fetch: resourceOwnerSession.fetch,
+          accessEndpoint: vcProvider,
+          updateAcr: true,
+        }
+      );
+
+      await expect(
+        isValidAccessGrant(grant, {
+          fetch: resourceOwnerSession.fetch,
+          // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+          // It is an issue documented in the VC library e2e test, and in a ticket
+          // to be fixed.
+          verificationEndpoint: `${vcProvider}/verify`,
+        })
+      ).resolves.toMatchObject({ errors: [] });
+
+      const sharedFileWithAcr = await sc.acp_ess_2.getFileWithAcr(
+        sharedFileIri,
+        {
+          fetch: resourceOwnerSession.fetch,
+        }
+      );
+
+      if (!sc.acp_ess_2.hasAccessibleAcr(sharedFileWithAcr)) {
+        throw new Error("The resource should have an accessible ACR");
+      }
+
+      expect(sc.acp_ess_2.getVcAccess(sharedFileWithAcr)).toEqual(
+        // The ACR should have been updated, and the matcher should be aligned with
+        // the access modes set in the Access Grant.
+        expect.objectContaining({
+          read: true,
+          write: false,
+          append: false,
+        })
+      );
     });
   });
 

@@ -108,6 +108,7 @@ async function internal_approveAccessRequest(
   const internalOptions = {
     ...options,
     fetch: options.fetch ?? (await getSessionFetch(options)),
+    updateAcr: options.updateAcr ?? true,
   };
   const requestCredential =
     typeof requestVc !== "undefined"
@@ -140,23 +141,33 @@ async function internal_approveAccessRequest(
   });
 
   const grantedAccess = getAccessModesFromAccessGrant(grantBody);
-  await addVcMatcher(
-    grantBody.credentialSubject.providedConsent.forPersonalData,
-    grantedAccess,
-    internalOptions
-  );
+
+  if (internalOptions.updateAcr === true) {
+    await addVcMatcher(
+      grantBody.credentialSubject.providedConsent.forPersonalData,
+      grantedAccess,
+      internalOptions
+    );
+  }
 
   return issueAccessVc(grantBody, internalOptions);
 }
 
 /**
  * Approve an access request. The content of the approved access request is provided
- * as a Verifiable Credential which properties may be overriden if necessary.
+ * as a Verifiable Credential which properties may be overridden if necessary.
  *
  * @param requestVc The Verifiable Credential representing the Access Request. If
  * not conform to an Access Request, the function will throw.
- * @param requestOverride Elements overriding information from the provided Verifiable Credential.
- * @param options Optional properties to customise the access grant behaviour.
+ * @param requestOverride Elements overriding information from the provided Verifiable
+ * Credential.
+ * @param options Optional properties to customizes the access grant behavior. Options
+ * include `updateAcr` which defaults to true. If this flag is set to true, the ACR
+ * of the Resource will be updated when the access grant is approved. If this flag is
+ * set to false, the ACR of the Resource will remain unchanged. This is an advanced
+ * feature, and only users having a good understanding of the relationship between
+ * Access Grants and ACRs should deviate from the default. Additional information is
+ * available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
  * @returns A Verifiable Credential representing the granted access.
  * @since 0.0.1.
  */
