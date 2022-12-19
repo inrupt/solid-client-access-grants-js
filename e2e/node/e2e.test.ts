@@ -27,6 +27,7 @@ import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 // Making a named import here to avoid confusion with the wrapped functions from
 // the access grant API
 import * as sc from "@inrupt/solid-client";
+import { custom } from "openid-client";
 import {
   AccessGrant,
   approveAccessRequest,
@@ -42,6 +43,11 @@ import {
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
 } from "../../src/index";
+
+// Extend the timeout because of frequent issues in CI (default is 3500)
+custom.setHttpOptionsDefaults({
+  timeout: 5000,
+});
 
 const env = getNodeTestingEnvironment({
   vcProvider: "",
