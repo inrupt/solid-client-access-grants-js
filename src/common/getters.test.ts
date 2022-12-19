@@ -288,20 +288,12 @@ describe("getIssuer", () => {
 describe("getInherit", () => {
   describe("gConsent data model", () => {
     it("gets the gConsent access grant issuer", () => {
-      const gConsentGrant = mockGConsentGrant(
-        "https://some.issuer",
-        "https://some.resource.owner",
-        false
-      );
+      const gConsentGrant = mockGConsentGrant({ inherit: false });
       expect(getIssuer(gConsentGrant)).toStrictEqual(gConsentGrant.issuer);
     });
 
     it("defaults the recursive nature from a gConsent access grant to true", () => {
-      const gConsentGrant = mockGConsentGrant(
-        "https://some.issuer",
-        "https://some.resource.owner",
-        undefined
-      );
+      const gConsentGrant = mockGConsentGrant({ inherit: undefined });
       expect(getInherit(gConsentGrant)).toBe(true);
     });
 
@@ -323,8 +315,6 @@ describe("getInherit", () => {
     });
   });
 });
-
-
 
 describe("AccessGrant", () => {
   it("wraps calls to the underlying functions", () => {
