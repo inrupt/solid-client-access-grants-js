@@ -32,6 +32,29 @@ import type { IssueAccessRequestParameters } from "../type/IssueAccessRequestPar
 import { accessToResourceAccessModeArray } from "../util/accessToResourceAccessModeArray";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { BaseGrantBody } from "../type/AccessVerifiableCredential";
+import { isAccessGrant } from "../guard/isAccessGrant";
+import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
+import { AccessGrant } from "../type/AccessGrant";
+import { getInherit, getResources } from "../../common/getters";
+
+// Iteratively build the list of ancestor containers from the breakdown of the
+// resource path: for resource https://pod.example/foo/bar/baz, we'll want the result
+// to be ["https://pod.example/", "https://pod.example/foo/", "https://pod.example/foo/bar/", https://pod.example/foo/bar/baz].
+const getAncestorUrls = (resourceUrl: URL) => {
+  // Splitting on / will result in the first element being empty (since the path
+  // starts with /) and in the last element being the target resource name.
+  const ancestorNames = resourceUrl.pathname.split("/").slice(1, -1);
+  return ancestorNames.reduce(
+    (ancestors, curName) => {
+      // Add each intermediary container to ancestorPaths
+      const currentPath = `${ancestors[0]}${curName}/`;
+      return [new URL(currentPath, resourceUrl.origin), ...ancestors];
+    },
+    // The storage origin may be the storage root (it happens not to be the case in ESS).
+    // The target resource should also be included.
+    [new URL("/", resourceUrl.origin), resourceUrl]
+  );
+};
 
 /**
  * Retrieve Access Grants issued over a resource.
@@ -65,31 +88,58 @@ async function getAccessGrantAll(
     await getAccessApiEndpoint(resource, options)
   );
 
-  const vcShape: RecursivePartial<BaseGrantBody & VerifiableCredential> = {
-    credentialSubject: {
-      providedConsent: {
-        hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-        forPersonalData: [resource.toString()],
-        forPurpose: params.purpose,
-        isProvidedTo: params.requestor,
-      },
-    },
-  };
+  const ancestorUrls = getAncestorUrls(
+    typeof resource === "string" ? new URL(resource) : resource
+  );
 
   const specifiedModes = accessToResourceAccessModeArray(params.access ?? {});
-  if (specifiedModes.length > 0) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    vcShape.credentialSubject!.providedConsent!.mode = specifiedModes;
-  }
+
+  const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
+    ancestorUrls.map((url) => ({
+      credentialSubject: {
+        providedConsent: {
+          hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+          forPersonalData: [url.href],
+          forPurpose: params.purpose,
+          isProvidedTo: params.requestor,
+          mode: specifiedModes.length > 0 ? specifiedModes : undefined,
+        },
+      },
+    }));
 
   // TODO: Fix up the type of accepted arguments (this function should allow deep partial)
-  return getVerifiableCredentialAllFromShape(
-    holderEndpoint.href,
-    vcShape as Partial<VerifiableCredential>,
-    {
-      fetch: sessionFetch,
-      includeExpiredVc: options.includeExpired,
-    }
+  const result = (
+    await Promise.all(
+      vcShapes.map((vcShape) =>
+        getVerifiableCredentialAllFromShape(
+          holderEndpoint.href,
+          vcShape as Partial<VerifiableCredential>,
+          {
+            fetch: sessionFetch,
+            includeExpiredVc: options.includeExpired,
+          }
+        )
+      )
+    )
+  )
+    // getVerifiableCredentialAllFromShape returns a list, so the previous map
+    // should be flattened to have all the candidate grants in a non-nested list.
+    .flat();
+
+  return (
+    result
+      .filter(
+        (vc) => isBaseAccessGrantVerifiableCredential(vc) && isAccessGrant(vc)
+      )
+      // FIXME why isn't the previous filter enough?
+      .map((vc) => vc as AccessGrant)
+      .filter(
+        (grant) =>
+          // Explicitly non-recursive grants are filtered out, except if they apply
+          // directly to the target resource.
+          getInherit(grant) !== false ||
+          getResources(grant).includes(resource.toString())
+      )
   );
 }
 

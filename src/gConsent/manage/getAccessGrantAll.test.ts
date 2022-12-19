@@ -21,19 +21,17 @@
 
 import { jest, it, describe, expect } from "@jest/globals";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
+import type * as VcModule from "@inrupt/solid-client-vc";
 import {
   getAccessGrantAll,
   IssueAccessRequestParameters,
 } from "./getAccessGrantAll";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
+import { mockAccessGrantVc } from "../util/access.mock";
 
 const otherFetch = jest.fn(global.fetch);
 
-jest.mock("@inrupt/solid-client-vc", () => {
-  return {
-    getVerifiableCredentialAllFromShape: jest.fn(() => ""),
-  };
-});
+jest.mock("@inrupt/solid-client-vc");
 
 jest.mock("../discover/getAccessApiEndpoint", () => {
   return {
@@ -45,6 +43,11 @@ describe("getAccessGrantAll", () => {
   const resource = new URL(
     "https://pod.example/container-1/container-2/some-resource"
   );
+  const resourceAncestors = [
+    "https://pod.example/container-1/container-2/",
+    "https://pod.example/container-1/",
+    "https://pod.example/",
+  ];
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right default parameters", async () => {
     const expectedDefaultVcShape = {
@@ -188,16 +191,12 @@ describe("getAccessGrantAll", () => {
   it("issues requests for recursive access grants of ancestor containers", async () => {
     // These are all the URLs for which a recursive Access Grant would grant access
     // to the target resource.
-    const matchingUrls = [
-      resource.href,
-      "https://pod.example/container-1/container-2/",
-      "https://pod.example/container-1/",
-      "https://pod.example/",
-    ];
+    const matchingUrls = [resource.href, ...resourceAncestors];
     const expectedVcShape = matchingUrls.map((url) => ({
       credentialSubject: {
         providedConsent: {
           forPersonalData: [url],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
         },
       },
     }));
@@ -209,23 +208,53 @@ describe("getAccessGrantAll", () => {
     // A call should have been made for each level of the hierarchy.
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       expect.anything(),
-      expectedVcShape[0],
+      expect.objectContaining(expectedVcShape[0]),
       expect.anything()
     );
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       expect.anything(),
-      expectedVcShape[1],
+      expect.objectContaining(expectedVcShape[1]),
       expect.anything()
     );
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       expect.anything(),
-      expectedVcShape[2],
+      expect.objectContaining(expectedVcShape[2]),
       expect.anything()
     );
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       expect.anything(),
-      expectedVcShape[3],
+      expect.objectContaining(expectedVcShape[3]),
       expect.anything()
     );
+  });
+
+  it("filters out non-recursive grants for ancestors", async () => {
+    const mockedVcResponse = jest.requireMock(
+      "@inrupt/solid-client-vc"
+    ) as jest.Mocked<typeof VcModule>;
+    const mockedGrant = mockAccessGrantVc({
+      inherit: false,
+      resources: [resourceAncestors[0]],
+    });
+    mockedVcResponse.getVerifiableCredentialAllFromShape.mockResolvedValueOnce([
+      mockedGrant,
+    ]);
+    await expect(getAccessGrantAll(resource.href)).resolves.toStrictEqual([]);
+  });
+
+  it("accepts explicitly non-recursive grants for target resource", async () => {
+    const mockedVcResponse = jest.requireMock(
+      "@inrupt/solid-client-vc"
+    ) as jest.Mocked<typeof VcModule>;
+    const mockedGrant = mockAccessGrantVc({
+      inherit: false,
+      resources: [resource.href],
+    });
+    mockedVcResponse.getVerifiableCredentialAllFromShape.mockResolvedValueOnce([
+      mockedGrant,
+    ]);
+    await expect(getAccessGrantAll(resource.href)).resolves.toStrictEqual([
+      mockedGrant,
+    ]);
   });
 });
