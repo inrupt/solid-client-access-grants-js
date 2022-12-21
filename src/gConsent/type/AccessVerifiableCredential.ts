@@ -35,6 +35,7 @@ export type GConsentAttributes = {
   hasStatus: GConsentStatus;
   forPersonalData: UrlString[];
   forPurpose?: UrlString[];
+  inherit?: boolean;
 };
 
 export type GConsentGrantAttributes = GConsentAttributes & {
@@ -77,7 +78,6 @@ export type BaseAccessVcBody = {
     | Omit<GrantCredentialSubject, "id">;
   issuanceDate?: string;
   expirationDate?: string;
-  inherit?: boolean;
 };
 
 export type BaseRequestBody = BaseAccessVcBody & {

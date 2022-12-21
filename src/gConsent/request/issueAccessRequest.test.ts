@@ -112,13 +112,13 @@ describe("getRequestBody", () => {
             "http://www.w3.org/ns/auth/acl#Write",
           ],
           isConsentForDataSubject: "https://some.pod/profile#you",
+          inherit: false,
         },
         inbox: "https://some.pod/inbox/",
       },
       expirationDate: "1990-11-12T13:37:42.042Z",
       issuanceDate: "1955-06-08T13:37:42.042Z",
       type: ["SolidAccessRequest"],
-      inherit: false,
     });
   });
 });
@@ -315,7 +315,7 @@ describe("issueAccessRequest", () => {
     );
   });
 
-  it("sends a proper access request when inherit is set to false", async () => {
+  it("includes the inherit flag if set to false", async () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
@@ -323,7 +323,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential"
     );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc({ inherit: false }));
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
 
     await issueAccessRequest(
       {
@@ -338,22 +338,41 @@ describe("issueAccessRequest", () => {
       }
     );
 
-    expect(mockedIssue).toHaveBeenCalledWith(
-      `${MOCKED_ACCESS_ISSUER}/issue`,
-      expect.objectContaining({
-        hasConsent: {
-          mode: ["http://www.w3.org/ns/auth/acl#Read"],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-          forPersonalData: ["https://some.pod/resource"],
-          isConsentForDataSubject: "https://some.pod/profile#you",
-        },
-      }),
-      expect.objectContaining({
-        type: ["SolidAccessRequest"],
+    expect(mockedIssue.mock.lastCall?.[1]).toMatchObject({
+      hasConsent: {
         inherit: false,
-      }),
-      expect.anything()
+      },
+    });
+  });
+
+  it("includes the inherit flag if set to true", async () => {
+    mockAccessApiEndpoint();
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
     );
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+
+    await issueAccessRequest(
+      {
+        access: { read: true },
+        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+        resources: ["https://some.pod/resource"],
+        requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+        inherit: true,
+      },
+      {
+        fetch: jest.fn<typeof fetch>(),
+      }
+    );
+
+    expect(mockedIssue.mock.lastCall?.[1]).toMatchObject({
+      hasConsent: {
+        inherit: true,
+      },
+    });
   });
 });
 

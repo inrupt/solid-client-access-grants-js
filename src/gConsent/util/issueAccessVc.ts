@@ -72,6 +72,9 @@ function getGConsentAttributes(
   if (params.purpose !== undefined) {
     consentAttributes.forPurpose = params.purpose;
   }
+  if (params.inherit !== undefined) {
+    consentAttributes.inherit = params.inherit;
+  }
 
   if (type === "BaseGrantBody") {
     return {
@@ -108,9 +111,6 @@ function getBaseBody(
       inbox: params.requestorInboxUrl,
     },
   };
-  if (params.inherit !== undefined) {
-    (body as BaseAccessVcBody).inherit = params.inherit;
-  }
   if (params.issuanceDate !== undefined) {
     (body as BaseAccessVcBody).issuanceDate = params.issuanceDate.toISOString();
   }
@@ -178,7 +178,6 @@ export async function issueAccessVc(
         accessIssuerEndpoint.hostname
       ),
       ...vcBody.credentialSubject,
-      inherit: options.recursive,
     },
     {
       // All the required context is provided by instanciateEssAccessGrantContext,
@@ -188,7 +187,6 @@ export async function issueAccessVc(
       type: vcBody.type,
       issuanceDate: vcBody.issuanceDate,
       expirationDate: vcBody.expirationDate,
-      inherit: options.recursive,
     },
     {
       fetch: fetcher,

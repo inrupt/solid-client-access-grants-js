@@ -57,9 +57,7 @@ async function issueAccessRequest(
     ...params,
     status: GC_CONSENT_STATUS_REQUESTED,
   });
-
   const accessRequest = await issueAccessVc(requestBody, options);
-
   if (!isAccessRequest(accessRequest)) {
     throw new Error(
       `${JSON.stringify(accessRequest)} is not an Access Request`
