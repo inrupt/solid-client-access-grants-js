@@ -46,7 +46,7 @@ import {
 
 // Extend the timeout because of frequent issues in CI (default is 3500)
 custom.setHttpOptionsDefaults({
-  timeout: 5000,
+  timeout: 10000,
 });
 
 const env = getNodeTestingEnvironment({
@@ -248,6 +248,39 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       expect(grant.credentialSubject.providedConsent.mode).toStrictEqual([
         "http://www.w3.org/ns/auth/acl#Read",
       ]);
+    });
+
+    // The following test is disabled until ESS adds support for recursive Access Grants.
+    // eslint-disable-next-line jest/no-disabled-tests
+    it.skip("can issue a non-recursive access grant", async () => {
+      const grant = await approveAccessRequest(
+        undefined,
+        {
+          access: { read: true, append: true },
+          requestor: requestorSession.info.webId as string,
+          resources: [sharedFileIri],
+          purpose: [
+            "https://some.purpose/not-a-nefarious-one/i-promise",
+            "https://some.other.purpose/",
+          ],
+          inherit: false,
+        },
+        {
+          fetch: resourceOwnerSession.fetch,
+          accessEndpoint: vcProvider,
+        }
+      );
+
+      await expect(
+        isValidAccessGrant(grant, {
+          fetch: resourceOwnerSession.fetch,
+          // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+          // It is an issue documented in the VC library e2e test, and in a ticket
+          // to be fixed.
+          verificationEndpoint: `${vcProvider}/verify`,
+        })
+      ).resolves.toMatchObject({ errors: [] });
+      expect(grant.credentialSubject.providedConsent.inherit).toBe(false);
     });
 
     it("will issue an access request, grant access to a resource, but will not update the ACR if the updateAcr flag is set to false", async () => {
