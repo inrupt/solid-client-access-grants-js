@@ -55,6 +55,7 @@ export interface AccessBaseOptions {
    * @since 0.4.0
    */
   accessEndpoint?: URL | UrlString;
+  recursive?: boolean;
 
   // TODO: Verify whether we need to support the podHost parameter and implement
   //

@@ -41,6 +41,7 @@ export const mockAccessRequestVc = (
     resources: UrlString[];
     modes: ResourceAccessMode[];
     resourceOwner: string | null;
+    inherit?: boolean;
   }>
 ): AccessRequest => {
   return {
@@ -69,6 +70,7 @@ export const mockAccessRequestVc = (
       verificationMethod: "some method",
     },
     type: [CREDENTIAL_TYPE_ACCESS_REQUEST],
+    inherit: options?.inherit,
   };
 };
 

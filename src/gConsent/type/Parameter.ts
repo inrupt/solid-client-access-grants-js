@@ -38,6 +38,7 @@ export interface BaseRequestParameters {
   purpose?: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;
+  inherit?: boolean;
 }
 
 export interface InputAccessRequestParameters extends BaseRequestParameters {

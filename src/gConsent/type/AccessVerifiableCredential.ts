@@ -77,6 +77,7 @@ export type BaseAccessVcBody = {
     | Omit<GrantCredentialSubject, "id">;
   issuanceDate?: string;
   expirationDate?: string;
+  inherit?: boolean;
 };
 
 export type BaseRequestBody = BaseAccessVcBody & {

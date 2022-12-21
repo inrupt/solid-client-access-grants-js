@@ -93,6 +93,7 @@ describe("getRequestBody", () => {
       requestorInboxUrl: "https://some.pod/inbox/",
       status: "https://w3id.org/GConsent#ConsentStatusRequested",
       resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+      inherit: false,
     });
 
     expect(requestBody).toStrictEqual({
@@ -117,6 +118,7 @@ describe("getRequestBody", () => {
       expirationDate: "1990-11-12T13:37:42.042Z",
       issuanceDate: "1955-06-08T13:37:42.042Z",
       type: ["SolidAccessRequest"],
+      inherit: false,
     });
   });
 });
@@ -308,6 +310,47 @@ describe("issueAccessRequest", () => {
       }),
       expect.objectContaining({
         type: ["SolidAccessRequest"],
+      }),
+      expect.anything()
+    );
+  });
+
+  it("sends a proper access request when inherit is set to false", async () => {
+    mockAccessApiEndpoint();
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc({ inherit: false }));
+
+    await issueAccessRequest(
+      {
+        access: { read: true },
+        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+        resources: ["https://some.pod/resource"],
+        requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+        inherit: false,
+      },
+      {
+        fetch: jest.fn<typeof fetch>(),
+      }
+    );
+
+    expect(mockedIssue).toHaveBeenCalledWith(
+      `${MOCKED_ACCESS_ISSUER}/issue`,
+      expect.objectContaining({
+        hasConsent: {
+          mode: ["http://www.w3.org/ns/auth/acl#Read"],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+          forPersonalData: ["https://some.pod/resource"],
+          isConsentForDataSubject: "https://some.pod/profile#you",
+        },
+      }),
+      expect.objectContaining({
+        type: ["SolidAccessRequest"],
+        inherit: false,
       }),
       expect.anything()
     );
