@@ -34,7 +34,7 @@ import { isAccessRequest } from "../guard/isAccessRequest";
  * Request access to a given Resource.
  *
  * @param params Access to request.
- * @param options Optional properties to customise the access request behaviour.
+ * @param options Optional properties to customize the access request behavior.
  * @returns A signed Verifiable Credential representing the access request.
  * @since 0.4.0
  */
