@@ -36,6 +36,7 @@ import {
 } from "./request.mock";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import { ACCESS_GRANT_CONTEXT_DEFAULT } from "../constants";
+import { AccessRequestBody } from "../type/AccessVerifiableCredential";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -373,6 +374,37 @@ describe("issueAccessRequest", () => {
         inherit: true,
       },
     });
+  });
+
+  it("defaults the inherit flag to undefined", async () => {
+    mockAccessApiEndpoint();
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+
+    await issueAccessRequest(
+      {
+        access: { read: true },
+        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+        resources: ["https://some.pod/resource"],
+        requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+        // Note that "inherit" is not specified.
+      },
+      {
+        fetch: jest.fn<typeof fetch>(),
+      }
+    );
+
+    expect(
+      (
+        mockedIssue.mock
+          .lastCall?.[1] as unknown as AccessRequestBody["credentialSubject"]
+      ).hasConsent.inherit
+    ).toBeUndefined();
   });
 });
 
