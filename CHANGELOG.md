@@ -15,7 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
   Additional information is available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
 - Added the `inherit` flag to `issueAccessRequest` and `approveAccessRequest` to
   allow controlling whether the issued Access Grant should apply recursively to
-  the target container's contained resources.
+  the target containers' contained resources.
 
 ### Minor changes
 
