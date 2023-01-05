@@ -36,6 +36,7 @@ import {
 } from "./request.mock";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import { ACCESS_GRANT_CONTEXT_DEFAULT } from "../constants";
+import { AccessRequestBody } from "../type/AccessVerifiableCredential";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -93,6 +94,7 @@ describe("getRequestBody", () => {
       requestorInboxUrl: "https://some.pod/inbox/",
       status: "https://w3id.org/GConsent#ConsentStatusRequested",
       resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+      inherit: false,
     });
 
     expect(requestBody).toStrictEqual({
@@ -111,6 +113,7 @@ describe("getRequestBody", () => {
             "http://www.w3.org/ns/auth/acl#Write",
           ],
           isConsentForDataSubject: "https://some.pod/profile#you",
+          inherit: false,
         },
         inbox: "https://some.pod/inbox/",
       },
@@ -311,6 +314,97 @@ describe("issueAccessRequest", () => {
       }),
       expect.anything()
     );
+  });
+
+  it("includes the inherit flag if set to false", async () => {
+    mockAccessApiEndpoint();
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+
+    await issueAccessRequest(
+      {
+        access: { read: true },
+        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+        resources: ["https://some.pod/resource"],
+        requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+        inherit: false,
+      },
+      {
+        fetch: jest.fn<typeof fetch>(),
+      }
+    );
+
+    expect(mockedIssue.mock.lastCall?.[1]).toMatchObject({
+      hasConsent: {
+        inherit: false,
+      },
+    });
+  });
+
+  it("includes the inherit flag if set to true", async () => {
+    mockAccessApiEndpoint();
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+
+    await issueAccessRequest(
+      {
+        access: { read: true },
+        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+        resources: ["https://some.pod/resource"],
+        requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+        inherit: true,
+      },
+      {
+        fetch: jest.fn<typeof fetch>(),
+      }
+    );
+
+    expect(mockedIssue.mock.lastCall?.[1]).toMatchObject({
+      hasConsent: {
+        inherit: true,
+      },
+    });
+  });
+
+  it("defaults the inherit flag to undefined", async () => {
+    mockAccessApiEndpoint();
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+
+    await issueAccessRequest(
+      {
+        access: { read: true },
+        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+        resources: ["https://some.pod/resource"],
+        requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+        // Note that "inherit" is not specified.
+      },
+      {
+        fetch: jest.fn<typeof fetch>(),
+      }
+    );
+
+    expect(
+      (
+        mockedIssue.mock
+          .lastCall?.[1] as unknown as AccessRequestBody["credentialSubject"]
+      ).hasConsent.inherit
+    ).toBeUndefined();
   });
 });
 

@@ -38,6 +38,9 @@ import { InputAccessRequestParameters } from "./Parameter";
  * - `purpose`: (Optional.) URL representing what the requested access will be used for.
  * - `issuanceDate`: (Optional, set to the current time if left out.) Point in time from which the access should be granted.
  * - `expirationDate`: (Optional.) Point in time until when the access is needed.
+ * - `inherit`: (Optional.) If Access is targeted at a container, it will **not** apply
+ *              recursively to contained resources if this is set to false. Defaults to
+ *              `true`.
  *
  * @since 0.4.0
  */

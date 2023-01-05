@@ -80,6 +80,12 @@ function getExpirationFromRequest(
     : undefined;
 }
 
+function getInheritFromRequest(
+  requestVc: AccessRequestBody
+): boolean | undefined {
+  return requestVc.credentialSubject.hasConsent.inherit;
+}
+
 export function initializeGrantParameters(
   requestVc: (AccessRequestBody & { issuanceDate: string }) | undefined,
   requestOverride?: Partial<ApproveAccessRequestOverrides>
@@ -104,6 +110,7 @@ export function initializeGrantParameters(
           expirationDate:
             requestOverride?.expirationDate ??
             getExpirationFromRequest(requestVc),
+          inherit: requestOverride?.inherit ?? getInheritFromRequest(requestVc),
         };
   if (requestOverride?.expirationDate === null) {
     resultGrant.expirationDate = undefined;

@@ -72,6 +72,9 @@ function getGConsentAttributes(
   if (params.purpose !== undefined) {
     consentAttributes.forPurpose = params.purpose;
   }
+  if (params.inherit !== undefined) {
+    consentAttributes.inherit = params.inherit;
+  }
 
   if (type === "BaseGrantBody") {
     return {

@@ -35,6 +35,7 @@ export type GConsentAttributes = {
   hasStatus: GConsentStatus;
   forPersonalData: UrlString[];
   forPurpose?: UrlString[];
+  inherit?: boolean;
 };
 
 export type GConsentGrantAttributes = GConsentAttributes & {

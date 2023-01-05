@@ -138,6 +138,7 @@ async function internal_approveAccessRequest(
     issuanceDate: internalGrantOptions.issuanceDate,
     expirationDate: internalGrantOptions.expirationDate ?? undefined,
     status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+    inherit: internalGrantOptions.inherit,
   });
 
   const grantedAccess = getAccessModesFromAccessGrant(grantBody);

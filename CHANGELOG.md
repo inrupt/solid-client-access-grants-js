@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+### New Features
+
 - Added the `createContainerInContainer` method.
 - Added `saveSolidDatasetInContainer` method.
 - Added the `updateAcr` flag to the options that can be included when calling
@@ -11,6 +13,9 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
   this is an advanced feature, and only users having a good understanding of the
   relationship between Access Grants and ACRs should deviate from the default.
   Additional information is available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
+- Added the `inherit` flag to `issueAccessRequest` and `approveAccessRequest` to
+  allow controlling whether the issued Access Grant should apply recursively to
+  the target containers' contained resources.
 
 ### Minor changes
 
