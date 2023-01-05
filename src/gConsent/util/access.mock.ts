@@ -41,7 +41,7 @@ export const mockAccessRequestVc = (
     resources: UrlString[];
     modes: ResourceAccessMode[];
     resourceOwner: string | null;
-    inherit?: boolean;
+    inherit: boolean;
   }>
 ): AccessRequest => {
   return {
@@ -57,6 +57,7 @@ export const mockAccessRequestVc = (
           options?.resourceOwner === null
             ? undefined
             : "https://some.pod/profile#you",
+        inherit: options?.inherit,
       },
       inbox: "https://some.inbox",
     },
@@ -75,24 +76,29 @@ export const mockAccessRequestVc = (
 };
 
 export const mockAccessGrantVc = (
-  issuer = "https://some.issuer",
-  subjectId = "https://some.resource.owner"
+  options?: Partial<{
+    issuer: string;
+    subjectId: string;
+    inherit: boolean;
+    resources: string[];
+  }>
 ): AccessGrant => {
   return {
     "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
     id: "https://some.credential",
     credentialSubject: {
-      id: subjectId,
+      id: options?.subjectId ?? "https://some.resource.owner",
       providedConsent: {
-        forPersonalData: ["https://some.resource"],
+        forPersonalData: options?.resources ?? ["https://some.resource"],
         hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
         mode: ["http://www.w3.org/ns/auth/acl#Read"],
         isProvidedTo: "https://some.requestor",
+        inherit: options?.inherit ?? true,
       },
       inbox: "https://some.inbox",
     },
     issuanceDate: "1965-08-28",
-    issuer,
+    issuer: options?.issuer ?? "https://some.issuer",
     proof: {
       created: "2021-10-05",
       proofPurpose: "some proof purpose",

@@ -16,6 +16,8 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 - Added the `inherit` flag to `issueAccessRequest` and `approveAccessRequest` to
   allow controlling whether the issued Access Grant should apply recursively to
   the target containers' contained resources.
+- The `getAccessGrantAll` method now allows discovering recursive Access Grants
+  issued for an ancestor container.
 
 ### Minor changes
 

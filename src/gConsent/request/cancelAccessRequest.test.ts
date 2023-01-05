@@ -46,13 +46,7 @@ describe("cancelAccessRequest", () => {
     );
     const mockedFetch = jest
       .fn(global.fetch)
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify(
-            mockAccessGrantVc("https://some.issuer", "https://some.subject")
-          )
-        )
-      );
+      .mockResolvedValueOnce(new Response(JSON.stringify(mockAccessGrantVc())));
     await cancelAccessRequest("https://some.credential", {
       fetch: mockedFetch,
     });
@@ -73,13 +67,9 @@ describe("cancelAccessRequest", () => {
       mockedVcModule,
       "revokeVerifiableCredential"
     );
-    const mockedVc = mockAccessGrantVc(
-      "https://some.issuer",
-      "https://some.subject"
-    );
     const mockedFetch = jest
       .fn(global.fetch)
-      .mockResolvedValue(new Response(JSON.stringify(mockedVc)));
+      .mockResolvedValue(new Response(JSON.stringify(mockAccessGrantVc())));
     await cancelAccessRequest(MOCKED_CREDENTIAL_ID, {
       fetch: mockedFetch,
     });
@@ -113,7 +103,7 @@ describe("cancelAccessRequest", () => {
     );
     const mockedFetch = jest.fn(global.fetch);
     await cancelAccessRequest(
-      mockAccessGrantVc("https://some.issuer", "https://some.subject"),
+      mockAccessGrantVc({ issuer: "https://some.issuer" }),
       {
         fetch: mockedFetch,
       }

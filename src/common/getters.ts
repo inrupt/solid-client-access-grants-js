@@ -223,6 +223,31 @@ export function getIssuer(
 }
 
 /**
+ * Check whether a given Access Grant applies recursively to child resources or not.
+ *
+ * @example
+ *
+ * ```
+ * const isInherited = getInherit(accessGrant);
+ * ```
+ *
+ * @param vc The Access Grant/Request
+ * @returns true if the Grant applies to contained resources, false otherwise.
+ */
+export function getInherit(
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+): boolean {
+  if (isCredentialAccessGrantOdrl(vc)) {
+    return true;
+  }
+  if (isGConsentAccessGrant(vc)) {
+    // Inherit defaults to true.
+    return vc.credentialSubject.providedConsent.inherit ?? true;
+  }
+  return vc.credentialSubject.hasConsent.inherit ?? true;
+}
+
+/**
  * This class wraps all the accessor functions on a raw Access Grant JSON object.
  * It wraps all the supported Access Grants data models, namely GConsent and
  * ODRL.
@@ -276,5 +301,9 @@ export class AccessGrantWrapper {
 
   getIssuer(): ReturnType<typeof getIssuer> {
     return getIssuer(this.vc);
+  }
+
+  getInherit(): ReturnType<typeof getInherit> {
+    return getInherit(this.vc);
   }
 }
