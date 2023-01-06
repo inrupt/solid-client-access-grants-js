@@ -30,6 +30,11 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 - The `getters` module contains functions and a class to interact with Verifiable
   Credentials without having to hard-code the data model in your application.
 
+### Bugfixes
+
+- The Access Grants and Access Requests status is now accepted in its abbreviated
+form, and not only as a fully qualified IRI, as allowed by the JSON-LD context.
+
 ## [2.0.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.0.0) - 2022-11-03
 
 ### Breaking change
