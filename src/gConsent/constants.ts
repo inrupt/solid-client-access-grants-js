@@ -37,6 +37,10 @@ export const GC_CONSENT_STATUS_EXPLICITLY_GIVEN =
 export const GC_CONSENT_STATUS_REQUESTED =
   "https://w3id.org/GConsent#ConsentStatusRequested";
 
+export const GC_CONSENT_STATUS_DENIED_ABBREV = "ConsentStatusDenied";
+export const GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV = "ConsentStatusExplicitlyGiven";
+export const GC_CONSENT_STATUS_REQUESTED_ABBREV = "ConsentStatusRequested";
+
 export const SOLID_VC_ISSUER = "http://www.w3.org/ns/solid/terms#vcIssuer";
 
 // TODO: Add dependency on generated vocabulary.
@@ -88,4 +92,7 @@ export const CONSENT_STATUS = new Set([
   GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   GC_CONSENT_STATUS_REQUESTED,
+  GC_CONSENT_STATUS_DENIED_ABBREV,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV,
+  GC_CONSENT_STATUS_REQUESTED_ABBREV,
 ] as const);
