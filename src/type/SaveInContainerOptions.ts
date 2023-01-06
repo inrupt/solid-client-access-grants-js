@@ -31,7 +31,7 @@ import { FetchOptions } from "./FetchOptions";
  *   does not already have a resource/container in it with that name, it will
  *   use the slug suggestion as the name.
  *
- * @since unreleased
+ * @since 2.1.0
  */
 // TODO: This should come from @inrupt/solid-client
 export interface SaveInContainerOptions extends FetchOptions {
