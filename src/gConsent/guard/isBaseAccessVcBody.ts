@@ -25,6 +25,7 @@ import { isAccessGrantContext } from "./isAccessGrantContext";
 import { isUnknownObject } from "./isUnknownObject";
 
 export function isBaseAccessVcBody(x: unknown): x is BaseAccessVcBody {
+  console.log("coucou1");
   return (
     isUnknownObject(x) &&
     isAccessGrantContext(x["@context"]) &&

@@ -20,7 +20,7 @@
 //
 
 import { UrlString } from "@inrupt/solid-client";
-import { CONSENT_STATUS } from "../constants";
+import { ACCESS_STATUS } from "../constants";
 import { GConsentRequestAttributes } from "../type/AccessVerifiableCredential";
 import {
   ResourceAccessMode,
@@ -34,7 +34,7 @@ function isResourceAccessModeArray(x: unknown): x is Array<ResourceAccessMode> {
 }
 
 function isGConsentStatus(x: unknown): x is GConsentStatus {
-  return typeof x === "string" && (CONSENT_STATUS as Set<string>).has(x);
+  return typeof x === "string" && (ACCESS_STATUS as Set<string>).has(x);
 }
 
 // TODO: Discuss a strongly typed UrlString guard (as a team).
@@ -45,6 +45,7 @@ function isStringArray(x: unknown): x is Array<UrlString> {
 export function isGConsentAttributes(
   x: unknown
 ): x is GConsentRequestAttributes {
+  console.log("coucou3");
   return (
     isUnknownObject(x) &&
     isResourceAccessModeArray(x.mode) &&
