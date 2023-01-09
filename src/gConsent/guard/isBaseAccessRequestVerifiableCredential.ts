@@ -36,7 +36,6 @@ function isRequestCredentialSubject(
     | GrantCredentialSubjectPayload
     | RequestCredentialSubjectPayload
 ): x is RequestCredentialSubject {
-  console.log("coucou2");
   return (x as RequestCredentialSubject).hasConsent !== undefined;
 }
 
