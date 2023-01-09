@@ -138,9 +138,11 @@ function isOdrlPermission(permission: unknown): permission is OdrlPermission {
  * });
  * ```
  *
+ * @hidden This function is still experimental, and could be subject to breaking
+ * changes in non-major releases.
  * @param vc A Verifiable Credential
  * @returns true if the VC is a valid ODRL-based Access Grant
- * @since unreleased
+ * @since 2.1.0
  */
 export function isCredentialAccessGrantOdrl(
   vc: VerifiableCredential

@@ -6,6 +6,12 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ### New Features
 
+-
+
+## [2.1.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.1.0) - 2023-01-06
+
+### New Features
+
 - Added the `createContainerInContainer` method.
 - Added `saveSolidDatasetInContainer` method.
 - Added the `updateAcr` flag to the options that can be included when calling

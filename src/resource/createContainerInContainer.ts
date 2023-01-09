@@ -55,7 +55,7 @@ import { SaveInContainerOptions } from "../type/SaveInContainerOptions";
  *   compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
  * @returns A promise that resolves to a SolidDataset with ResourceInfo if
  * successful, and that rejects otherwise.
- * @since unreleased
+ * @since 2.1.0
  */
 
 export async function createContainerInContainer(
