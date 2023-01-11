@@ -35,7 +35,6 @@ import {
   mockConsentGrantVc,
   mockConsentRequestVc,
 } from "../util/access.mock";
-import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV } from "../constants";
 
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual(
@@ -322,7 +321,7 @@ describe("approveAccessRequest", () => {
     const mockedIssue = jest.spyOn(mockedVcModule, "issueVerifiableCredential");
     const mockedVc = mockAccessGrantVc();
     mockedVc.credentialSubject.providedConsent.hasStatus =
-      GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV;
+      "ConsentStatusExplicitlyGiven";
     mockedIssue.mockResolvedValueOnce(mockedVc);
     await expect(
       approveAccessRequest(mockAccessRequestVc(), undefined, {
