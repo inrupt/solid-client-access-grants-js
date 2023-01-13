@@ -28,9 +28,7 @@ export function isAccessRequest(
 ): x is AccessRequestBody & { issuanceDate: string } {
   return (
     isBaseAccessRequestVerifiableCredential(x) &&
-    (ACCESS_REQUEST_STATUS as Set<string>).has(
-      x.credentialSubject.hasConsent.hasStatus
-    ) &&
+    ACCESS_REQUEST_STATUS.has(x.credentialSubject.hasConsent.hasStatus) &&
     x.credentialSubject.hasConsent.isConsentForDataSubject !== undefined &&
     typeof x.issuanceDate === "string"
   );

@@ -34,7 +34,7 @@ function isResourceAccessModeArray(x: unknown): x is Array<ResourceAccessMode> {
 }
 
 function isGConsentStatus(x: unknown): x is GConsentStatus {
-  return typeof x === "string" && (ACCESS_STATUS as Set<string>).has(x);
+  return typeof x === "string" && ACCESS_STATUS.has(x);
 }
 
 // TODO: Discuss a strongly typed UrlString guard (as a team).
