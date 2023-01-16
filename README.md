@@ -19,14 +19,30 @@ designed to support developers building Solid applications.
 
 This experimental feature is currently only available in ESS.
 
+# Supported environment
+
+Our JavaScript Client Libraries use relatively modern JavaScript, aligned with
+the [ES2018](https://262.ecma-international.org/9.0/) Specification features, we
+ship both [ESM](https://nodejs.org/docs/latest-v16.x/api/esm.html) and
+[CommonJS](https://nodejs.org/docs/latest-v16.x/api/modules.html), with type
+definitions for TypeScript alongside.
+
+This mean that we only support environments (browsers or runtimes) that were
+released after mid-2018 out of the box, if you wish to target these
+environments, then you will need to cross-compile our SDKs via the use of
+[Babel](https://babeljs.io), [webpack](https://webpack.js.org/),
+[SWC](https://swc.rs/), or similar.
+
+Additionally, when using this package in an environment other than Node.js, you
+will need [a polyfill for Node's `buffer`
+module](https://www.npmjs.com/package/buffer).
+
 # Browser support
 
-Our JavaScript Client Libraries use relatively modern JavaScript features that
-will work in all commonly-used browsers, except Internet Explorer. If you need
-support for Internet Explorer, it is recommended to pass them through a tool
-like [Babel](https://babeljs.io), and to add polyfills for e.g. `Map`, `Set`,
-`Promise`, `Headers`, `Array.prototype.includes`, `Object.entries` and
-`String.prototype.endsWith`.
+If you need support for Internet Explorer, it is recommended to pass them
+through a tool like [Babel](https://babeljs.io), and to add polyfills for e.g.
+`Map`, `Set`, `Promise`, `Headers`, `Array.prototype.includes`, `Object.entries`
+and `String.prototype.endsWith`.
 
 # Node support
 
