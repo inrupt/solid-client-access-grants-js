@@ -35,7 +35,10 @@ import {
   MOCK_RESOURCE_OWNER_IRI,
 } from "./request.mock";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
-import { ACCESS_GRANT_CONTEXT_DEFAULT } from "../constants";
+import {
+  ACCESS_GRANT_CONTEXT_DEFAULT,
+  GC_CONSENT_STATUS_REQUESTED_ABBREV,
+} from "../constants";
 import { AccessRequestBody } from "../type/AccessVerifiableCredential";
 
 jest.mock("@inrupt/solid-client", () => {
@@ -162,6 +165,34 @@ describe("issueAccessRequest", () => {
       }),
       expect.anything()
     );
+  });
+
+  it("Supports abbreviated status values", async () => {
+    mockAccessApiEndpoint();
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    const mockedVc = mockAccessRequestVc();
+    mockedVc.credentialSubject.hasConsent.hasStatus =
+      GC_CONSENT_STATUS_REQUESTED_ABBREV;
+    mockedIssue.mockResolvedValueOnce(mockedVc);
+
+    await expect(
+      issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+          resources: ["https://some.pod/resource"],
+          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+        },
+        {
+          fetch: jest.fn<typeof fetch>(),
+        }
+      )
+    ).resolves.not.toThrow();
   });
 
   it("throws if the VC returned is not an Access Request", async () => {

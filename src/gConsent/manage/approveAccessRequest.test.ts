@@ -313,6 +313,24 @@ describe("approveAccessRequest", () => {
     );
   });
 
+  it("accepts the returned VC using the abbreviated status instead of the fully qualified IRI", async () => {
+    mockAccessApiEndpoint();
+    const mockedVcModule = jest.requireMock(
+      "@inrupt/solid-client-vc"
+    ) as typeof VcClient;
+    const mockedIssue = jest.spyOn(mockedVcModule, "issueVerifiableCredential");
+    const mockedVc = mockAccessGrantVc();
+    mockedVc.credentialSubject.providedConsent.hasStatus =
+      "ConsentStatusExplicitlyGiven";
+    mockedIssue.mockResolvedValueOnce(mockedVc);
+    await expect(
+      approveAccessRequest(mockAccessRequestVc(), undefined, {
+        fetch: jest.fn(global.fetch),
+        updateAcr: false,
+      })
+    ).resolves.not.toThrow();
+  });
+
   it("Throws if the returned VC is not an access grant from a VC IRI", async () => {
     mockAcpClient();
     mockAccessApiEndpoint();

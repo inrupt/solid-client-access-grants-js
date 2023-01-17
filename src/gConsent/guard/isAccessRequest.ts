@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { GC_CONSENT_STATUS_REQUESTED } from "../constants";
+import { ACCESS_REQUEST_STATUS } from "../constants";
 import { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import { isBaseAccessRequestVerifiableCredential } from "./isBaseAccessRequestVerifiableCredential";
 
@@ -28,7 +28,7 @@ export function isAccessRequest(
 ): x is AccessRequestBody & { issuanceDate: string } {
   return (
     isBaseAccessRequestVerifiableCredential(x) &&
-    x.credentialSubject.hasConsent.hasStatus === GC_CONSENT_STATUS_REQUESTED &&
+    ACCESS_REQUEST_STATUS.has(x.credentialSubject.hasConsent.hasStatus) &&
     x.credentialSubject.hasConsent.isConsentForDataSubject !== undefined &&
     typeof x.issuanceDate === "string"
   );

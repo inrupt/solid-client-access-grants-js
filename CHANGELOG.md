@@ -4,9 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
-### New Features
+### Bugfixes
 
--
+- The Access Grants and Access Requests status is now accepted in its abbreviated
+  form, and not only as a fully qualified IRI, as allowed by the JSON-LD context.
+  This is a stopgap solution: a proper fix would be to do full JSON-LD parsing,
+  but we aren't doing it for the moment because of issues between existing libraries
+  and our build setup.
 
 ## [2.1.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.1.0) - 2023-01-06
 

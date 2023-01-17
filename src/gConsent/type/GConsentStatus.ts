@@ -19,8 +19,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { CONSENT_STATUS } from "../constants";
+import type { ACCESS_STATUS } from "../constants";
 
-export type GConsentStatus = typeof CONSENT_STATUS extends Set<infer T>
+export type GConsentStatus = typeof ACCESS_STATUS extends Set<infer T>
   ? T
   : never;

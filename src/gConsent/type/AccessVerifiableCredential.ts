@@ -23,8 +23,11 @@ import type { UrlString } from "@inrupt/solid-client";
 import type {
   ACCESS_GRANT_CONTEXT_DEFAULT,
   GC_CONSENT_STATUS_DENIED,
+  GC_CONSENT_STATUS_DENIED_ABBREV,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV,
   GC_CONSENT_STATUS_REQUESTED,
+  GC_CONSENT_STATUS_REQUESTED_ABBREV,
 } from "../constants";
 import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import type { GConsentStatus } from "./GConsentStatus";
@@ -102,7 +105,11 @@ export type BaseGrantPayload = BaseAccessVcBody & {
 export type AccessRequestBody = BaseRequestBody & {
   credentialSubject: {
     hasConsent: {
-      hasStatus: typeof GC_CONSENT_STATUS_REQUESTED;
+      hasStatus:
+        | typeof GC_CONSENT_STATUS_REQUESTED
+        // FIXME: This is a stopgap solution, but proper JSON-LD parsing should
+        // be implemented to fix this long-term.
+        | typeof GC_CONSENT_STATUS_REQUESTED_ABBREV;
     };
   };
 };
@@ -120,7 +127,11 @@ export type AccessGrantBody = BaseGrantBody & {
     providedConsent: {
       hasStatus:
         | typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN
-        | typeof GC_CONSENT_STATUS_DENIED;
+        | typeof GC_CONSENT_STATUS_DENIED
+        // FIXME: This is a stopgap solution, but proper JSON-LD parsing should
+        // be implemented to fix this long-term.
+        | typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV
+        | typeof GC_CONSENT_STATUS_DENIED_ABBREV;
       isProvidedTo: UrlString;
     };
   };
