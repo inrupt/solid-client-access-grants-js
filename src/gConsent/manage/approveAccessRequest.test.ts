@@ -41,18 +41,20 @@ jest.mock("@inrupt/solid-client", () => {
     "@inrupt/solid-client"
   ) as typeof SolidClient;
   solidClientModule.getSolidDataset =
-    jest.fn<typeof SolidClient["getSolidDataset"]>();
+    jest.fn<(typeof SolidClient)["getSolidDataset"]>();
   solidClientModule.getWellKnownSolid =
-    jest.fn<typeof SolidClient["getWellKnownSolid"]>();
+    jest.fn<(typeof SolidClient)["getWellKnownSolid"]>();
   solidClientModule.acp_ess_2 = {
     ...solidClientModule.acp_ess_2,
     getResourceInfoWithAcr:
-      jest.fn<typeof SolidClient["acp_ess_2"]["getResourceInfoWithAcr"]>(),
+      jest.fn<(typeof SolidClient)["acp_ess_2"]["getResourceInfoWithAcr"]>(),
     hasAccessibleAcr: jest.fn<
-      typeof SolidClient["acp_ess_2"]["hasAccessibleAcr"]
+      (typeof SolidClient)["acp_ess_2"]["hasAccessibleAcr"]
     >() as any,
-    saveAcrFor: jest.fn<typeof SolidClient["acp_ess_2"]["saveAcrFor"]>() as any,
-    setVcAccess: jest.fn<typeof SolidClient["acp_ess_2"]["setVcAccess"]>(),
+    saveAcrFor: jest.fn<
+      (typeof SolidClient)["acp_ess_2"]["saveAcrFor"]
+    >() as any,
+    setVcAccess: jest.fn<(typeof SolidClient)["acp_ess_2"]["setVcAccess"]>(),
   };
   return solidClientModule;
 });
