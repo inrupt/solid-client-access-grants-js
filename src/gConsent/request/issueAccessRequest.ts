@@ -30,6 +30,25 @@ import type {
 import type { AccessRequest } from "../type/AccessRequest";
 import { isAccessRequest } from "../guard/isAccessRequest";
 
+function normalizeAccessRequest<T extends VerifiableCredential>(
+  accessRequest: T
+): T {
+  // Proper type checking is performed after normalization, so casting here is fine.
+  const normalized = { ...accessRequest } as unknown as AccessRequest;
+  if (!Array.isArray(normalized.credentialSubject.hasConsent.mode)) {
+    normalized.credentialSubject.hasConsent.mode = [
+      normalized.credentialSubject.hasConsent.mode,
+    ];
+  }
+  if (!Array.isArray(normalized.credentialSubject.hasConsent.forPersonalData)) {
+    normalized.credentialSubject.hasConsent.forPersonalData = [
+      normalized.credentialSubject.hasConsent.forPersonalData,
+    ];
+  }
+  // Cast back to the original type
+  return normalized as unknown as T;
+}
+
 /**
  * Request access to a given Resource.
  *
@@ -57,7 +76,9 @@ async function issueAccessRequest(
     ...params,
     status: GC_CONSENT_STATUS_REQUESTED,
   });
-  const accessRequest = await issueAccessVc(requestBody, options);
+  const accessRequest = normalizeAccessRequest(
+    await issueAccessVc(requestBody, options)
+  );
   if (!isAccessRequest(accessRequest)) {
     throw new Error(
       `${JSON.stringify(accessRequest)} is not an Access Request`
