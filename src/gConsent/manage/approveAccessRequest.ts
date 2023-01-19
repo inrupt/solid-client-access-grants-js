@@ -46,7 +46,18 @@ export type ApproveAccessRequestOverrides = Omit<
   "expirationDate"
 > & { expirationDate?: Date | null };
 
-function normalizeAccessGrant<T extends VerifiableCredential>(
+/**
+ * Internal function. This is a stopgap until we have proper JSON-LD parsing.
+ * It enforces the shape of the JSON returned by the issuer service, which may
+ * vary while still serializing the same data.
+ *
+ * In particular, this transforms some literals into a one-value array.
+ *
+ * @hidden
+ * @param accessGrant The grant returned by the VC issuer
+ * @returns An equivalent JSON-LD document framed according to our typing.
+ */
+export function normalizeAccessGrant<T extends VerifiableCredential>(
   accessGrant: T
 ): T {
   // Proper type checking is performed after normalization, so casting here is fine.

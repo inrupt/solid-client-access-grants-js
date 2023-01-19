@@ -36,6 +36,7 @@ import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 import { AccessGrant } from "../type/AccessGrant";
 import { getInherit, getResources } from "../../common/getters";
+import { normalizeAccessGrant } from "./approveAccessRequest";
 
 // Iteratively build the list of ancestor containers from the breakdown of the
 // resource path: for resource https://pod.example/foo/bar/baz, we'll want the result
@@ -126,7 +127,8 @@ async function getAccessGrantAll(
   )
     // getVerifiableCredentialAllFromShape returns a list, so the previous map
     // should be flattened to have all the candidate grants in a non-nested list.
-    .flat();
+    .flat()
+    .map(normalizeAccessGrant);
 
   return (
     result
