@@ -178,7 +178,13 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
       // Test that looking up the access grants for the given resource returns
       // the access we just granted.
-      expect(grantedAccess).toContainEqual(grant);
+      // The issuer and query service return the grants with a slight difference
+      // in the value order in arrays, so we can't use deep comparison to verify
+      // if the issued grant is part of the query result set. Matching on the proofs
+      // is sufficient, as proofs are generated on canonicalized datasets.
+      expect(
+        grantedAccess.map((matchingGrant) => matchingGrant.proof)
+      ).toContainEqual(grant.proof);
 
       const sharedFile = await getFile(sharedFileIri, grant, {
         fetch: requestorSession.fetch,
