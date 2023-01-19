@@ -30,6 +30,17 @@ import type {
 import type { AccessRequest } from "../type/AccessRequest";
 import { isAccessRequest } from "../guard/isAccessRequest";
 
+/**
+ * Internal function. This is a stopgap until we have proper JSON-LD parsing.
+ * It enforces the shape of the JSON returned by the issuer service, which may
+ * vary while still serializing the same data.
+ *
+ * In particular, this transforms some literals into a one-value array.
+ *
+ * @hidden
+ * @param accessRequest The grant returned by the VC issuer
+ * @returns An equivalent JSON-LD document framed according to our typing.
+ */
 function normalizeAccessRequest<T extends VerifiableCredential>(
   accessRequest: T
 ): T {
