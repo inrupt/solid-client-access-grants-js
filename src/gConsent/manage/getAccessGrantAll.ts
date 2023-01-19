@@ -24,7 +24,13 @@ import {
   getVerifiableCredentialAllFromShape,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
+import {
+  CREDENTIAL_TYPE_ACCESS_GRANT,
+  CREDENTIAL_TYPE_BASE,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV,
+  instanciateEssAccessGrantContext,
+} from "../constants";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { RecursivePartial } from "../../type/RecursivePartial";
@@ -84,12 +90,9 @@ async function getAccessGrantAll(
   options: AccessBaseOptions & { includeExpired?: boolean } = {}
 ): Promise<Array<VerifiableCredential>> {
   const sessionFetch = await getSessionFetch(options);
-
+  const vcServiceBase = await getAccessApiEndpoint(resource, options);
   // TODO: Fix access API endpoint retrieval (should include all the different API endpoints)
-  const holderEndpoint = new URL(
-    "derive",
-    await getAccessApiEndpoint(resource, options)
-  );
+  const holderEndpoint = new URL("derive", vcServiceBase);
 
   const ancestorUrls = getAncestorUrls(
     typeof resource === "string" ? new URL(resource) : resource
@@ -99,6 +102,8 @@ async function getAccessGrantAll(
 
   const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
     ancestorUrls.map((url) => ({
+      "@context": instanciateEssAccessGrantContext(vcServiceBase),
+      type: [CREDENTIAL_TYPE_ACCESS_GRANT, CREDENTIAL_TYPE_BASE],
       credentialSubject: {
         providedConsent: {
           hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,

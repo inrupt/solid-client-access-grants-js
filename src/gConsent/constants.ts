@@ -52,22 +52,34 @@ export const PREFERRED_CONSENT_MANAGEMENT_UI =
   "http://inrupt.com/ns/ess#ConsentManagementUI";
 
 export const CONTEXT_VC_W3C = "https://www.w3.org/2018/credentials/v1" as const;
+// This static context is used from the 2.1 version, instead of having a context
+// specific to the deployment.
+export const DEFAULT_ESS_CONTEXT =
+  "https://schema.inrupt.com/credentials/v1.jsonld" as const;
 
 // According to the [ESS documentation](https://docs.inrupt.com/ess/latest/services/service-vc/#ess-vc-service-endpoints),
 // the JSON-LD context for ESS-issued VCs will match the following template.
 const instanciateContextVcEssTemplate = (essVcDomain: string): string =>
   `https://${essVcDomain}/credentials/v1`;
 
-// When issuing a VC using a given service, be sure to set the context using the following.
-export const instanciateEssAccessGrantContext = (
-  essVcDomain: string
-): string[] => [CONTEXT_VC_W3C, instanciateContextVcEssTemplate(essVcDomain)];
-
 // A default context value is provided for mocking purpose accross the codebase.
 export const ACCESS_GRANT_CONTEXT_DEFAULT = [
   CONTEXT_VC_W3C,
+  DEFAULT_ESS_CONTEXT,
   instanciateContextVcEssTemplate("vc.inrupt.com"),
 ] as const;
+
+// When issuing a VC using a given service,"https://schema.inrupt.com/credentials/v1.jsonld" be sure to set the context using the following.
+export const instanciateEssAccessGrantContext = (
+  essVcDomain: string
+): typeof ACCESS_GRANT_CONTEXT_DEFAULT =>
+  [
+    CONTEXT_VC_W3C,
+    DEFAULT_ESS_CONTEXT,
+    instanciateContextVcEssTemplate(essVcDomain),
+  ] as const;
+
+
 
 export const WELL_KNOWN_SOLID = ".well-known/solid";
 
@@ -81,6 +93,7 @@ export const CREDENTIAL_TYPE_ACCESS_REQUEST = "SolidAccessRequest";
 export const CREDENTIAL_TYPE_ACCESS_GRANT = "SolidAccessGrant";
 export const CREDENTIAL_TYPE_ACCESS_DENIAL = "SolidAccessDenial";
 export const CREDENTIAL_TYPE_LEGACY_CONSENT_REQUEST = "SolidConsentRequest";
+export const CREDENTIAL_TYPE_BASE = "VerifiableCredential";
 
 export const ACCESS_CREDENTIAL_TYPE = new Set([
   CREDENTIAL_TYPE_ACCESS_REQUEST,
