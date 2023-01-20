@@ -68,6 +68,7 @@ describe("getRequestBody", () => {
     expect(requestBody).toStrictEqual({
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
+        "https://schema.inrupt.com/credentials/v1.jsonld",
         "https://vc.inrupt.com/credentials/v1",
       ],
       credentialSubject: {
@@ -103,6 +104,7 @@ describe("getRequestBody", () => {
     expect(requestBody).toStrictEqual({
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
+        "https://schema.inrupt.com/credentials/v1.jsonld",
         "https://vc.inrupt.com/credentials/v1",
       ],
       credentialSubject: {
