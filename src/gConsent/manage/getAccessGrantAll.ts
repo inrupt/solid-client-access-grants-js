@@ -92,9 +92,11 @@ async function getAccessGrantAll(
   options: AccessBaseOptions & { includeExpired?: boolean } = {}
 ): Promise<Array<VerifiableCredential>> {
   const sessionFetch = await getSessionFetch(options);
-  const vcServiceBase = await getAccessApiEndpoint(resource, options);
   // TODO: Fix access API endpoint retrieval (should include all the different API endpoints)
-  const holderEndpoint = new URL("derive", vcServiceBase);
+  const holderEndpoint = new URL(
+    "derive",
+    await getAccessApiEndpoint(resource, options)
+  );
 
   const ancestorUrls = getAncestorUrls(
     typeof resource === "string" ? new URL(resource) : resource
