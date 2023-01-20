@@ -257,6 +257,8 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       );
     });
 
+    // The following test is disabled until ESS adds support for recursive Access Grants.
+    // eslint-disable-next-line jest/no-disabled-tests
     it.skip("can issue a non-recursive access grant", async () => {
       const grant = await approveAccessRequest(
         undefined,
@@ -275,7 +277,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
           accessEndpoint: vcProvider,
         }
       );
-
       await expect(
         isValidAccessGrant(grant, {
           fetch: resourceOwnerSession.fetch,
@@ -963,10 +964,9 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       await sc.createContainerAt(testContainerIri, {
         fetch: resourceOwnerSession.fetch,
       });
-
       await sc.saveFileInContainer(
         testContainerIri,
-        new Blob([testFileContent]),
+        Buffer.from(testFileContent),
         {
           fetch: resourceOwnerSession.fetch,
           slug: testFileName,
@@ -1024,7 +1024,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
           accessEndpoint: vcProvider,
         }
       );
-
       const requestorFile = await getFile(testFileIri, accessGrant, {
         fetch: requestorSession.fetch,
       });
