@@ -25,6 +25,8 @@ import {
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import {
+  CONTEXT_ESS_DEFAULT,
+  CONTEXT_VC_W3C,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_BASE,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
@@ -102,7 +104,7 @@ async function getAccessGrantAll(
 
   const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
     ancestorUrls.map((url) => ({
-      "@context": instanciateEssAccessGrantContext(vcServiceBase),
+      "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
       type: [CREDENTIAL_TYPE_ACCESS_GRANT, CREDENTIAL_TYPE_BASE],
       credentialSubject: {
         providedConsent: {
