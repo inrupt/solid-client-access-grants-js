@@ -30,8 +30,6 @@ import {
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_BASE,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-  GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV,
-  instanciateEssAccessGrantContext,
 } from "../constants";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
