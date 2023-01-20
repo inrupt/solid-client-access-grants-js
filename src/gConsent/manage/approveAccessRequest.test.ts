@@ -786,6 +786,38 @@ describe("approveAccessRequest", () => {
     ).rejects.toThrow();
   });
 
+  it("normalizes equivalent JSON-LD VCs", async () => {
+    mockAcpClient();
+    mockAccessApiEndpoint();
+    const mockedVcModule = jest.requireMock(
+      "@inrupt/solid-client-vc"
+    ) as typeof VcClient;
+    const spiedIssueRequest = jest.spyOn(
+      mockedVcModule,
+      "issueVerifiableCredential"
+    );
+    const normalizedAccessGrant = mockAccessGrantVc();
+    spiedIssueRequest.mockResolvedValueOnce({
+      ...normalizedAccessGrant,
+      credentialSubject: {
+        ...normalizedAccessGrant.credentialSubject,
+        providedConsent: {
+          ...normalizedAccessGrant.credentialSubject.providedConsent,
+          // The 1-value array is replaced by the literal value.
+          forPersonalData:
+            normalizedAccessGrant.credentialSubject.providedConsent
+              .forPersonalData[0],
+          mode: normalizedAccessGrant.credentialSubject.providedConsent.mode[0],
+        },
+      },
+    });
+    await expect(
+      approveAccessRequest(mockAccessRequestVc(), undefined, {
+        fetch: jest.fn(global.fetch),
+      })
+    ).resolves.toStrictEqual(normalizedAccessGrant);
+  });
+
   it("updates the target resources' ACR if the updateAcr flag is ommitted from the options", async () => {
     mockAcpClient({
       initialResource: mockedInitialResource,
