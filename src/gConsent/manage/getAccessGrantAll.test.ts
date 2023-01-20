@@ -32,6 +32,12 @@ import { mockAccessGrantVc } from "../util/access.mock";
 const otherFetch = jest.fn(global.fetch);
 
 jest.mock("@inrupt/solid-client-vc");
+const mockedVcModule = jest.requireMock(
+  "@inrupt/solid-client-vc"
+) as jest.Mocked<typeof VcModule>;
+mockedVcModule.getVerifiableCredentialAllFromShape.mockResolvedValue([
+  mockAccessGrantVc(),
+]);
 
 jest.mock("../discover/getAccessApiEndpoint", () => {
   return {
@@ -67,7 +73,7 @@ describe("getAccessGrantAll", () => {
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       "https://some.api.endpoint/derive",
-      expectedDefaultVcShape,
+      expect.objectContaining(expectedDefaultVcShape),
       expect.objectContaining({
         // FIXME: expecting fetch to match crossFetch fails in node.
         fetch: expect.anything(),
@@ -102,7 +108,7 @@ describe("getAccessGrantAll", () => {
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       "https://some.api.endpoint/derive",
-      expectedVcShape,
+      expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
       }
@@ -134,7 +140,7 @@ describe("getAccessGrantAll", () => {
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       "https://some.api.endpoint/derive",
-      expectedVcShape,
+      expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
       }
@@ -166,7 +172,7 @@ describe("getAccessGrantAll", () => {
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       "https://some.api.endpoint/derive",
-      expectedVcShape,
+      expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
       }
@@ -229,30 +235,30 @@ describe("getAccessGrantAll", () => {
   });
 
   it("filters out non-recursive grants for ancestors", async () => {
-    const mockedVcResponse = jest.requireMock(
-      "@inrupt/solid-client-vc"
-    ) as jest.Mocked<typeof VcModule>;
     const mockedGrant = mockAccessGrantVc({
       inherit: false,
       resources: [resourceAncestors[0]],
     });
-    mockedVcResponse.getVerifiableCredentialAllFromShape.mockResolvedValueOnce([
+    mockedVcModule.getVerifiableCredentialAllFromShape.mockResolvedValue([
       mockedGrant,
     ]);
     await expect(getAccessGrantAll(resource.href)).resolves.toStrictEqual([]);
   });
 
   it("accepts explicitly non-recursive grants for target resource", async () => {
-    const mockedVcResponse = jest.requireMock(
-      "@inrupt/solid-client-vc"
-    ) as jest.Mocked<typeof VcModule>;
     const mockedGrant = mockAccessGrantVc({
       inherit: false,
       resources: [resource.href],
     });
-    mockedVcResponse.getVerifiableCredentialAllFromShape.mockResolvedValueOnce([
-      mockedGrant,
-    ]);
+    mockedVcModule.getVerifiableCredentialAllFromShape
+      .mockResolvedValueOnce([mockedGrant])
+      // Override the default mock to an unapplicable non-recursive grant.
+      .mockResolvedValue([
+        mockAccessGrantVc({
+          inherit: false,
+          resources: [resourceAncestors[0]],
+        }),
+      ]);
     await expect(getAccessGrantAll(resource.href)).resolves.toStrictEqual([
       mockedGrant,
     ]);
