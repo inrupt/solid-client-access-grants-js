@@ -79,8 +79,6 @@ export const instanciateEssAccessGrantContext = (
     instanciateContextVcEssTemplate(essVcDomain),
   ] as const;
 
-
-
 export const WELL_KNOWN_SOLID = ".well-known/solid";
 
 export const INRUPT_CONSENT_SERVICE_LEGACY =

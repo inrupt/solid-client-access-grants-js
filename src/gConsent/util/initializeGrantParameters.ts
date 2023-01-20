@@ -53,17 +53,17 @@ function modesToAccess(modes: ResourceAccessMode[]): AccessModes {
     ].includes(mode)
   );
   accessMode.read = modes.some((mode) =>
-  [
-    ACL_RESOURCE_ACCESS_MODE_READ,
-    ACL_RESOURCE_ACCESS_MODE_READ_ABBREV,
-  ].includes(mode)
-);
+    [
+      ACL_RESOURCE_ACCESS_MODE_READ,
+      ACL_RESOURCE_ACCESS_MODE_READ_ABBREV,
+    ].includes(mode)
+  );
   accessMode.write = modes.some((mode) =>
-  [
-    ACL_RESOURCE_ACCESS_MODE_WRITE,
-    ACL_RESOURCE_ACCESS_MODE_WRITE_ABBREV,
-  ].includes(mode)
-);
+    [
+      ACL_RESOURCE_ACCESS_MODE_WRITE,
+      ACL_RESOURCE_ACCESS_MODE_WRITE_ABBREV,
+    ].includes(mode)
+  );
 
   return accessMode;
 }
