@@ -439,6 +439,45 @@ describe("issueAccessRequest", () => {
       ).hasConsent.inherit
     ).toBeUndefined();
   });
+
+  it("normalizes equivalent JSON-LD VCs", async () => {
+    mockAccessApiEndpoint();
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    const normalizedAccessRequest = mockAccessRequestVc();
+    mockedIssue.mockResolvedValueOnce({
+      ...normalizedAccessRequest,
+      credentialSubject: {
+        ...normalizedAccessRequest.credentialSubject,
+        hasConsent: {
+          ...normalizedAccessRequest.credentialSubject.hasConsent,
+          // The 1-value array is replaced by the literal value.
+          forPersonalData:
+            normalizedAccessRequest.credentialSubject.hasConsent
+              .forPersonalData[0],
+          mode: normalizedAccessRequest.credentialSubject.hasConsent.mode[0],
+        },
+      },
+    });
+    await expect(
+      issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+          resources: ["https://some.pod/resource"],
+          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          // Note that "inherit" is not specified.
+        },
+        {
+          fetch: jest.fn<typeof fetch>(),
+        }
+      )
+    ).resolves.toStrictEqual(normalizedAccessRequest);
+  });
 });
 
 const mockCredentialProof = (): VerifiableCredential["proof"] => {
