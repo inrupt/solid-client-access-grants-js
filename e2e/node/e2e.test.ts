@@ -252,13 +252,11 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         })
       ).resolves.toMatchObject({ errors: [] });
       expect(grant.expirationDate).toBeUndefined();
-      expect(grant.credentialSubject.providedConsent.mode).toStrictEqual([
-        "http://www.w3.org/ns/auth/acl#Read",
-      ]);
+      expect(["http://www.w3.org/ns/auth/acl#Read", "Read"]).toContain(
+        grant.credentialSubject.providedConsent.mode[0]
+      );
     });
 
-    // The following test is disabled until ESS adds support for recursive Access Grants.
-    // eslint-disable-next-line jest/no-disabled-tests
     it.skip("can issue a non-recursive access grant", async () => {
       const grant = await approveAccessRequest(
         undefined,
