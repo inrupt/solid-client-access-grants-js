@@ -460,6 +460,7 @@ describe("issueAccessRequest", () => {
             normalizedAccessRequest.credentialSubject.hasConsent
               .forPersonalData[0],
           mode: normalizedAccessRequest.credentialSubject.hasConsent.mode[0],
+          inherit: "true",
         },
       },
     });

@@ -797,6 +797,7 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential"
     );
     const normalizedAccessGrant = mockAccessGrantVc();
+    // The server returns an equivalent JSON-LD with a different frame:
     spiedIssueRequest.mockResolvedValueOnce({
       ...normalizedAccessGrant,
       credentialSubject: {
@@ -808,6 +809,7 @@ describe("approveAccessRequest", () => {
             normalizedAccessGrant.credentialSubject.providedConsent
               .forPersonalData[0],
           mode: normalizedAccessGrant.credentialSubject.providedConsent.mode[0],
+          inherit: "true",
         },
       },
     });
