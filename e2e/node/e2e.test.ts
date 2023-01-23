@@ -58,7 +58,13 @@ const env = getNodeTestingEnvironment({
   },
 });
 
-const { idp: oidcIssuer, environment, clientCredentials, vcProvider } = env;
+const {
+  idp: oidcIssuer,
+  environment,
+  clientCredentials,
+  vcProvider,
+  features: environmentFeatures,
+} = env;
 
 // For some reason, the Node jest runner throws an undefined error when
 // calling to btoa. This overrides it, while keeping the actual code
@@ -257,8 +263,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       );
     });
 
-    // The following test is disabled until ESS adds support for recursive Access Grants.
-    // eslint-disable-next-line jest/no-disabled-tests
     it("can issue a non-recursive access grant", async () => {
       const grant = await approveAccessRequest(
         undefined,
@@ -944,8 +948,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     });
   });
 
-  // This is skipped until ESS supports recursive Access Grants
-  // eslint-disable-next-line jest/no-disabled-tests
   describe("access grants can be recursive or only apply to the target resource", () => {
     let accessRequest: AccessRequest;
     let accessGrant: AccessGrant;
@@ -1014,54 +1016,65 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       });
     });
 
-    it("can access a contained resource with a recursive Access Grant", async () => {
-      accessGrant = await approveAccessRequest(
-        accessRequest,
-        // Access is granted to the target container and all contained resources.
-        { inherit: true },
-        {
-          fetch: resourceOwnerSession.fetch,
-          accessEndpoint: vcProvider,
-        }
-      );
-      const requestorFile = await getFile(testFileIri, accessGrant, {
-        fetch: requestorSession.fetch,
-      });
+    const testIf = (condition: boolean) => (condition ? it : it.skip);
+    // Conditional tests confuse eslint.
+    /* eslint-disable jest/no-standalone-expect */
 
-      await expect(requestorFile.text()).resolves.toBe(testFileContent);
-
-      // Lookup grants for the target resource, while it has been issued for the container.
-      const grants = await getAccessGrantAll(testFileIri, undefined, {
-        fetch: resourceOwnerSession.fetch,
-      });
-      expect(grants.map((grant) => grant.proof)).toContainEqual(
-        accessGrant.proof
-      );
-    });
-
-    it("cannot access a contained resource with a non-recursive Access Grant", async () => {
-      accessGrant = await approveAccessRequest(
-        accessRequest,
-        // Access is granted to the target container only.
-        { inherit: false },
-        {
-          fetch: resourceOwnerSession.fetch,
-          accessEndpoint: vcProvider,
-        }
-      );
-
-      await expect(
-        getFile(testFileIri, accessGrant, {
+    // Only enable this test in environments supporting recursive access grants
+    testIf(environmentFeatures?.RECURSIVE_ACCESS_GRANTS === "true")(
+      "can access a contained resource with a recursive Access Grant",
+      async () => {
+        accessGrant = await approveAccessRequest(
+          accessRequest,
+          // Access is granted to the target container and all contained resources.
+          { inherit: true },
+          {
+            fetch: resourceOwnerSession.fetch,
+            accessEndpoint: vcProvider,
+          }
+        );
+        const requestorFile = await getFile(testFileIri, accessGrant, {
           fetch: requestorSession.fetch,
-        })
-      ).rejects.toThrow();
+        });
 
-      // Lookup grants for the target resource, while it has been issued for the container.
-      // There should be no matching grant, because the issued grant is not recursive.
-      const grants = await getAccessGrantAll(testFileIri, undefined, {
-        fetch: resourceOwnerSession.fetch,
-      });
-      expect(grants).toHaveLength(0);
-    });
+        await expect(requestorFile.text()).resolves.toBe(testFileContent);
+
+        // Lookup grants for the target resource, while it has been issued for the container.
+        const grants = await getAccessGrantAll(testFileIri, undefined, {
+          fetch: resourceOwnerSession.fetch,
+        });
+        expect(grants.map((grant) => grant.proof)).toContainEqual(
+          accessGrant.proof
+        );
+      }
+    );
+
+    testIf(environmentFeatures?.RECURSIVE_ACCESS_GRANTS === "true")(
+      "cannot access a contained resource with a non-recursive Access Grant",
+      async () => {
+        accessGrant = await approveAccessRequest(
+          accessRequest,
+          // Access is granted to the target container only.
+          { inherit: false },
+          {
+            fetch: resourceOwnerSession.fetch,
+            accessEndpoint: vcProvider,
+          }
+        );
+
+        await expect(
+          getFile(testFileIri, accessGrant, {
+            fetch: requestorSession.fetch,
+          })
+        ).rejects.toThrow();
+
+        // Lookup grants for the target resource, while it has been issued for the container.
+        // There should be no matching grant, because the issued grant is not recursive.
+        const grants = await getAccessGrantAll(testFileIri, undefined, {
+          fetch: resourceOwnerSession.fetch,
+        });
+        expect(grants).toHaveLength(0);
+      }
+    );
   });
 });
