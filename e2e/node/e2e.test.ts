@@ -259,7 +259,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
     // The following test is disabled until ESS adds support for recursive Access Grants.
     // eslint-disable-next-line jest/no-disabled-tests
-    it.skip("can issue a non-recursive access grant", async () => {
+    it("can issue a non-recursive access grant", async () => {
       const grant = await approveAccessRequest(
         undefined,
         {
@@ -946,7 +946,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
   // This is skipped until ESS supports recursive Access Grants
   // eslint-disable-next-line jest/no-disabled-tests
-  describe.skip("access grants can be recursive or only apply to the target resource", () => {
+  describe("access grants can be recursive or only apply to the target resource", () => {
     let accessRequest: AccessRequest;
     let accessGrant: AccessGrant;
     let testFileName: string;
@@ -1031,10 +1031,12 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       await expect(requestorFile.text()).resolves.toBe(testFileContent);
 
       // Lookup grants for the target resource, while it has been issued for the container.
-      const grants = getAccessGrantAll(testFileIri, undefined, {
+      const grants = await getAccessGrantAll(testFileIri, undefined, {
         fetch: resourceOwnerSession.fetch,
       });
-      expect(grants).toContainEqual(accessGrant);
+      expect(grants.map((grant) => grant.proof)).toContainEqual(
+        accessGrant.proof
+      );
     });
 
     it("cannot access a contained resource with a non-recursive Access Grant", async () => {
@@ -1056,7 +1058,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
       // Lookup grants for the target resource, while it has been issued for the container.
       // There should be no matching grant, because the issued grant is not recursive.
-      const grants = getAccessGrantAll(testFileIri, undefined, {
+      const grants = await getAccessGrantAll(testFileIri, undefined, {
         fetch: resourceOwnerSession.fetch,
       });
       expect(grants).toHaveLength(0);
