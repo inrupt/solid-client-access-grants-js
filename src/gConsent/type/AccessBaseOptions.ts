@@ -48,7 +48,8 @@ import type { UrlString } from "@inrupt/solid-client";
  *   Depending on the Access Control Policy structure of the target storage, this
  *   could result in the Access Grant being ineffective, and subsequent fetch operations
  *   using this Access Grant for authorization would fail with a 403 Unauthorized
- *   response from the server.
+ *   response from the server. To manually update the ACR and enable Access Grant-based
+ *   access to the target resource, one can use [`acp_ess_2.setVcAccess`, from `@inrupt/solid-client`](https://docs.inrupt.com/developer-tools/api/javascript/solid-client/modules/acp_ess_2.html#setvcaccess).
  *
  *   For more information about the Access Control Policy
  *   structured supported by ESS, please refer to [the documentation](https://docs.inrupt.com/ess/latest/security/acp/#access-control-policy-acp).
