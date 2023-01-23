@@ -178,7 +178,13 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
       // Test that looking up the access grants for the given resource returns
       // the access we just granted.
-      expect(grantedAccess).toContainEqual(grant);
+      // The issuer and query service return the grants with a slight difference
+      // in the value order in arrays, so we can't use deep comparison to verify
+      // if the issued grant is part of the query result set. Matching on the proofs
+      // is sufficient, as proofs are generated on canonicalized datasets.
+      expect(
+        grantedAccess.map((matchingGrant) => matchingGrant.proof)
+      ).toContainEqual(grant.proof);
 
       const sharedFile = await getFile(sharedFileIri, grant, {
         fetch: requestorSession.fetch,
@@ -246,9 +252,9 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         })
       ).resolves.toMatchObject({ errors: [] });
       expect(grant.expirationDate).toBeUndefined();
-      expect(grant.credentialSubject.providedConsent.mode).toStrictEqual([
-        "http://www.w3.org/ns/auth/acl#Read",
-      ]);
+      expect(["http://www.w3.org/ns/auth/acl#Read", "Read"]).toContain(
+        grant.credentialSubject.providedConsent.mode[0]
+      );
     });
 
     // The following test is disabled until ESS adds support for recursive Access Grants.
@@ -271,7 +277,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
           accessEndpoint: vcProvider,
         }
       );
-
       await expect(
         isValidAccessGrant(grant, {
           fetch: resourceOwnerSession.fetch,
@@ -959,10 +964,9 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       await sc.createContainerAt(testContainerIri, {
         fetch: resourceOwnerSession.fetch,
       });
-
       await sc.saveFileInContainer(
         testContainerIri,
-        new Blob([testFileContent]),
+        Buffer.from(testFileContent),
         {
           fetch: resourceOwnerSession.fetch,
           slug: testFileName,
@@ -1020,7 +1024,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
           accessEndpoint: vcProvider,
         }
       );
-
       const requestorFile = await getFile(testFileIri, accessGrant, {
         fetch: requestorSession.fetch,
       });

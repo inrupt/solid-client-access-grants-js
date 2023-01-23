@@ -31,6 +31,36 @@ import type { AccessRequest } from "../type/AccessRequest";
 import { isAccessRequest } from "../guard/isAccessRequest";
 
 /**
+ * Internal function. This is a stopgap until we have proper JSON-LD parsing.
+ * It enforces the shape of the JSON returned by the issuer service, which may
+ * vary while still serializing the same data.
+ *
+ * In particular, this transforms some literals into a one-value array.
+ *
+ * @hidden
+ * @param accessRequest The grant returned by the VC issuer
+ * @returns An equivalent JSON-LD document framed according to our typing.
+ */
+function normalizeAccessRequest<T extends VerifiableCredential>(
+  accessRequest: T
+): T {
+  // Proper type checking is performed after normalization, so casting here is fine.
+  const normalized = { ...accessRequest } as unknown as AccessRequest;
+  if (!Array.isArray(normalized.credentialSubject.hasConsent.mode)) {
+    normalized.credentialSubject.hasConsent.mode = [
+      normalized.credentialSubject.hasConsent.mode,
+    ];
+  }
+  if (!Array.isArray(normalized.credentialSubject.hasConsent.forPersonalData)) {
+    normalized.credentialSubject.hasConsent.forPersonalData = [
+      normalized.credentialSubject.hasConsent.forPersonalData,
+    ];
+  }
+  // Cast back to the original type
+  return normalized as unknown as T;
+}
+
+/**
  * Request access to a given Resource.
  *
  * @param params Access to request.
@@ -57,7 +87,9 @@ async function issueAccessRequest(
     ...params,
     status: GC_CONSENT_STATUS_REQUESTED,
   });
-  const accessRequest = await issueAccessVc(requestBody, options);
+  const accessRequest = normalizeAccessRequest(
+    await issueAccessVc(requestBody, options)
+  );
   if (!isAccessRequest(accessRequest)) {
     throw new Error(
       `${JSON.stringify(accessRequest)} is not an Access Request`

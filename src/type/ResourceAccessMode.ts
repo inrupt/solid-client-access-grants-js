@@ -26,15 +26,19 @@ export const ACL_RESOURCE_ACCESS_MODE_READ =
 export const ACL_RESOURCE_ACCESS_MODE_WRITE =
   "http://www.w3.org/ns/auth/acl#Write";
 
+export const ACL_RESOURCE_ACCESS_MODE_APPEND_ABBREV = "Append";
+export const ACL_RESOURCE_ACCESS_MODE_READ_ABBREV = "Read";
+export const ACL_RESOURCE_ACCESS_MODE_WRITE_ABBREV = "Write";
+
 export const RESOURCE_ACCESS_MODE = new Set([
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
   // The following are linked to the previous through our JSON-LD context.
-  "Read",
-  "Write",
-  "Append",
-] as const);
+  ACL_RESOURCE_ACCESS_MODE_READ_ABBREV,
+  ACL_RESOURCE_ACCESS_MODE_WRITE_ABBREV,
+  ACL_RESOURCE_ACCESS_MODE_APPEND_ABBREV,
+]);
 
 export type ResourceAccessMode = typeof RESOURCE_ACCESS_MODE extends Set<
   infer T

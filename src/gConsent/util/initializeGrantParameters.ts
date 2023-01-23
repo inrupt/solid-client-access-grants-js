@@ -21,11 +21,14 @@
 
 import { UrlString } from "@inrupt/solid-client";
 import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
-import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import {
+  ACL_RESOURCE_ACCESS_MODE_APPEND_ABBREV,
+  ResourceAccessMode,
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
+  ACL_RESOURCE_ACCESS_MODE_READ_ABBREV,
+  ACL_RESOURCE_ACCESS_MODE_WRITE_ABBREV,
 } from "../../type/ResourceAccessMode";
 import { ApproveAccessRequestOverrides } from "../manage/approveAccessRequest";
 import { AccessModes } from "../../type/AccessModes";
@@ -43,9 +46,24 @@ function getModesFromRequest(
 function modesToAccess(modes: ResourceAccessMode[]): AccessModes {
   const accessMode: AccessModes = {};
 
-  accessMode.append = modes.includes(ACL_RESOURCE_ACCESS_MODE_APPEND);
-  accessMode.read = modes.includes(ACL_RESOURCE_ACCESS_MODE_READ);
-  accessMode.write = modes.includes(ACL_RESOURCE_ACCESS_MODE_WRITE);
+  accessMode.append = modes.some((mode) =>
+    [
+      ACL_RESOURCE_ACCESS_MODE_APPEND,
+      ACL_RESOURCE_ACCESS_MODE_APPEND_ABBREV,
+    ].includes(mode)
+  );
+  accessMode.read = modes.some((mode) =>
+    [
+      ACL_RESOURCE_ACCESS_MODE_READ,
+      ACL_RESOURCE_ACCESS_MODE_READ_ABBREV,
+    ].includes(mode)
+  );
+  accessMode.write = modes.some((mode) =>
+    [
+      ACL_RESOURCE_ACCESS_MODE_WRITE,
+      ACL_RESOURCE_ACCESS_MODE_WRITE_ABBREV,
+    ].includes(mode)
+  );
 
   return accessMode;
 }

@@ -161,7 +161,14 @@ describe("exchangeTicketForAccessToken", () => {
       },
       body: new URLSearchParams({
         claim_token: base64url.encode(
-          JSON.stringify({ verifiableCredential: [MOCK_VC] })
+          JSON.stringify({
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1",
+              "https://schema.inrupt.com/credentials/v1.jsonld",
+            ],
+            type: ["VerifiablePresentation"],
+            verifiableCredential: [MOCK_VC],
+          })
         ),
         claim_token_format: "https://www.w3.org/TR/vc-data-model/#json-ld",
         grant_type: "urn:ietf:params:oauth:grant-type:uma-ticket",

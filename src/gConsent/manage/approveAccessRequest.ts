@@ -46,6 +46,38 @@ export type ApproveAccessRequestOverrides = Omit<
   "expirationDate"
 > & { expirationDate?: Date | null };
 
+/**
+ * Internal function. This is a stopgap until we have proper JSON-LD parsing.
+ * It enforces the shape of the JSON returned by the issuer service, which may
+ * vary while still serializing the same data.
+ *
+ * In particular, this transforms some literals into a one-value array.
+ *
+ * @hidden
+ * @param accessGrant The grant returned by the VC issuer
+ * @returns An equivalent JSON-LD document framed according to our typing.
+ */
+export function normalizeAccessGrant<T extends VerifiableCredential>(
+  accessGrant: T
+): T {
+  // Proper type checking is performed after normalization, so casting here is fine.
+  const normalized = { ...accessGrant } as unknown as AccessGrant;
+  if (!Array.isArray(normalized.credentialSubject.providedConsent.mode)) {
+    normalized.credentialSubject.providedConsent.mode = [
+      normalized.credentialSubject.providedConsent.mode,
+    ];
+  }
+  if (
+    !Array.isArray(normalized.credentialSubject.providedConsent.forPersonalData)
+  ) {
+    normalized.credentialSubject.providedConsent.forPersonalData = [
+      normalized.credentialSubject.providedConsent.forPersonalData,
+    ];
+  }
+  // Cast back to the original type
+  return normalized as unknown as T;
+}
+
 function getAccessModesFromAccessGrant(request: AccessGrantBody): AccessModes {
   const accessMode: AccessModes = {};
   const requestModes = request.credentialSubject.providedConsent.mode;
@@ -238,10 +270,12 @@ export async function approveAccessRequest(
 ): Promise<AccessGrant> {
   if (typeof options === "object") {
     // The deprecated signature is being used, so ignore the first parameter.
-    const accessGrant = await internal_approveAccessRequest(
-      requestVcOrOverride as VerifiableCredential | URL | UrlString,
-      requestOverrideOrOptions as Partial<ApproveAccessRequestOverrides>,
-      options
+    const accessGrant = normalizeAccessGrant(
+      await internal_approveAccessRequest(
+        requestVcOrOverride as VerifiableCredential | URL | UrlString,
+        requestOverrideOrOptions as Partial<ApproveAccessRequestOverrides>,
+        options
+      )
     );
 
     if (
@@ -258,10 +292,12 @@ export async function approveAccessRequest(
     return accessGrant;
   }
 
-  const accessGrant = await internal_approveAccessRequest(
-    resourceOwnerOrRequestVc as VerifiableCredential | URL | UrlString,
-    requestVcOrOverride as Partial<ApproveAccessRequestOverrides>,
-    requestOverrideOrOptions as AccessBaseOptions
+  const accessGrant = normalizeAccessGrant(
+    await internal_approveAccessRequest(
+      resourceOwnerOrRequestVc as VerifiableCredential | URL | UrlString,
+      requestVcOrOverride as Partial<ApproveAccessRequestOverrides>,
+      requestOverrideOrOptions as AccessBaseOptions
+    )
   );
 
   if (

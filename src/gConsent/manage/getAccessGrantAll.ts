@@ -24,7 +24,13 @@ import {
   getVerifiableCredentialAllFromShape,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
+import {
+  CONTEXT_ESS_DEFAULT,
+  CONTEXT_VC_W3C,
+  CREDENTIAL_TYPE_ACCESS_GRANT,
+  CREDENTIAL_TYPE_BASE,
+  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+} from "../constants";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { RecursivePartial } from "../../type/RecursivePartial";
@@ -36,6 +42,7 @@ import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 import { AccessGrant } from "../type/AccessGrant";
 import { getInherit, getResources } from "../../common/getters";
+import { normalizeAccessGrant } from "./approveAccessRequest";
 
 // Iteratively build the list of ancestor containers from the breakdown of the
 // resource path: for resource https://pod.example/foo/bar/baz, we'll want the result
@@ -83,7 +90,6 @@ async function getAccessGrantAll(
   options: AccessBaseOptions & { includeExpired?: boolean } = {}
 ): Promise<Array<VerifiableCredential>> {
   const sessionFetch = await getSessionFetch(options);
-
   // TODO: Fix access API endpoint retrieval (should include all the different API endpoints)
   const holderEndpoint = new URL(
     "derive",
@@ -98,6 +104,8 @@ async function getAccessGrantAll(
 
   const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
     ancestorUrls.map((url) => ({
+      "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
+      type: [CREDENTIAL_TYPE_ACCESS_GRANT, CREDENTIAL_TYPE_BASE],
       credentialSubject: {
         providedConsent: {
           hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
@@ -126,7 +134,8 @@ async function getAccessGrantAll(
   )
     // getVerifiableCredentialAllFromShape returns a list, so the previous map
     // should be flattened to have all the candidate grants in a non-nested list.
-    .flat();
+    .flat()
+    .map(normalizeAccessGrant);
 
   return (
     result
