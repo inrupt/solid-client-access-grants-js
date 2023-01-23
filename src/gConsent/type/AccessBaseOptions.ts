@@ -42,17 +42,20 @@ import type { UrlString } from "@inrupt/solid-client";
  *   `.well-known/solid` file for an Access API entry.
  *
  * - `updateAcr`: A boolean flag. If true, the Access Control Resource of the
- * resource for which an Access Grant is issued will be updated so that the
- * Access Grant is effective. If `updateAcr` is false, the Access Control Resource
- * attached to the resource targeted by the Access Grant will be left unchanged.
- * Depending on the Access Control Policy structure of the target storage, this
- * could result in the Access Grant being ineffective, and subsequent fetch operations
- * using this Access Grant for authorization would fail with a 403 Unauthorized
- * response from the server. For more information about the Access Control Policy
- * structured supported by ESS, please refer to [the documentation](https://docs.inrupt.com/ess/latest/security/acp/#access-control-policy-acp).
- * The default value of this flag is `true`, and users should have a good understanding
- * of the interaction between Access Grants and Access Control Policy before changing
- * the default value.
+ *   resource for which an Access Grant is issued will be updated so that the
+ *   Access Grant is effective. If `updateAcr` is false, the Access Control Resource
+ *   attached to the resource targeted by the Access Grant will be left unchanged.
+ *   Depending on the Access Control Policy structure of the target storage, this
+ *   could result in the Access Grant being ineffective, and subsequent fetch operations
+ *   using this Access Grant for authorization would fail with a 403 Unauthorized
+ *   response from the server.
+ *
+ *   For more information about the Access Control Policy
+ *   structured supported by ESS, please refer to [the documentation](https://docs.inrupt.com/ess/latest/security/acp/#access-control-policy-acp).
+ *
+ *   The default value of this flag is `true`, and users should have a good understanding
+ *   of the interaction between Access Grants and Access Control Policy before changing
+ *   the default value.
  *
  * [scab]: https://npmjs.com/package/@inrupt/solid-client-authn-browser
  *
