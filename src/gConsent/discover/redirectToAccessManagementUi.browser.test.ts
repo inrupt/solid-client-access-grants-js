@@ -115,8 +115,9 @@ describe("redirectToAccessManagementUi", () => {
         }
       );
       // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
       await new Promise((resolve) => {
-        setImmediate(resolve);
+        setTimeout(resolve, 0);
       });
       const targetIri = window.location.href;
       expect(targetIri).toContain("https://some.app");
@@ -134,8 +135,9 @@ describe("redirectToAccessManagementUi", () => {
         }
       );
       // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
       await new Promise((resolve) => {
-        setImmediate(resolve);
+        setTimeout(resolve, 0);
       });
       const targetIri = window.location.href;
       expect(targetIri).toContain("https://some.app");
@@ -153,8 +155,9 @@ describe("redirectToAccessManagementUi", () => {
         }
       );
       // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
       await new Promise((resolve) => {
-        setImmediate(resolve);
+        setTimeout(resolve, 0);
       });
       const targetIri = window.location.href;
       expect(targetIri).toContain("https://some.app");
@@ -170,8 +173,9 @@ describe("redirectToAccessManagementUi", () => {
         "https://some.redirect.iri"
       );
       // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
       await new Promise((resolve) => {
-        setImmediate(resolve);
+        setTimeout(resolve, 0);
       });
       expect(window.location.href).toContain("https://some.access.ui");
     });
@@ -186,8 +190,9 @@ describe("redirectToAccessManagementUi", () => {
         "https://some.redirect.iri"
       );
       // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
       await new Promise((resolve) => {
-        setImmediate(resolve);
+        setTimeout(resolve, 0);
       });
       const targetIri = new URL(window.location.href);
       const encodedVc = targetIri.searchParams.get("requestVcUrl") as string;
@@ -215,8 +220,9 @@ describe("redirectToAccessManagementUi", () => {
         }
       );
       // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
       await new Promise((resolve) => {
-        setImmediate(resolve);
+        setTimeout(resolve, 0);
       });
       const targetIri = new URL(window.location.href);
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
@@ -234,8 +240,9 @@ describe("redirectToAccessManagementUi", () => {
         new URL("https://some.redirect.iri")
       );
       // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
       await new Promise((resolve) => {
-        setImmediate(resolve);
+        setTimeout(resolve, 0);
       });
       const targetIri = new URL(window.location.href);
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
@@ -257,8 +264,9 @@ describe("redirectToAccessManagementUi", () => {
         }
       );
       // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
       await new Promise((resolve) => {
-        setImmediate(resolve);
+        setTimeout(resolve, 0);
       });
       const redirectIri = new URL(redirectCallback.mock.calls[0][0] as string);
       expect(redirectIri.origin).toBe("https://some.access.ui");
