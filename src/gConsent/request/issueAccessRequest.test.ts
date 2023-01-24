@@ -25,7 +25,6 @@ import {
   JsonLd,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { Response } from "cross-fetch";
 import type * as CrossFetch from "cross-fetch";
 
 import { issueAccessRequest } from "./issueAccessRequest";
@@ -460,7 +459,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential"
     );
-    const normalizedAccessRequest = mockAccessRequestVc();
+    const normalizedAccessRequest = mockAccessRequestVc({ inherit: true });
     mockedIssue.mockResolvedValueOnce({
       ...normalizedAccessRequest,
       credentialSubject: {
