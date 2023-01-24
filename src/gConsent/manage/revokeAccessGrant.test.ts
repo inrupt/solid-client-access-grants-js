@@ -21,6 +21,8 @@
 
 import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { jest, describe, it, expect } from "@jest/globals";
+import { Response } from "cross-fetch";
+
 import { revokeAccessGrant } from "./revokeAccessGrant";
 import { MOCKED_CREDENTIAL_ID } from "../request/request.mock";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";

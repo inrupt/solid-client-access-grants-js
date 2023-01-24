@@ -20,15 +20,26 @@
 //
 
 import { jest, describe, it, expect } from "@jest/globals";
+import { Response } from "cross-fetch";
+import type * as CrossFetch from "cross-fetch";
+
 import {
   MOCKED_ACCESS_ISSUER,
   MOCK_RESOURCE_OWNER_IRI,
   mockAccessApiEndpoint,
 } from "../request/request.mock";
-
 import { getAccessApiEndpoint } from "./getAccessApiEndpoint";
 
-jest.mock("cross-fetch");
+jest.mock("cross-fetch", () => {
+  const crossFetch = jest.requireActual("cross-fetch") as jest.Mocked<
+    typeof CrossFetch
+  >;
+  return {
+    // Do no mock the globals such as Response.
+    ...crossFetch,
+    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
+  };
+});
 
 describe("getAccessApiEndpoint", () => {
   it("can find the access endpoint for a given resource", async () => {

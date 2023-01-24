@@ -28,6 +28,8 @@ import {
   UrlString,
   WithServerResourceInfo,
 } from "@inrupt/solid-client";
+// eslint-disable-next-line no-shadow
+import { Response } from "cross-fetch";
 
 import { PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 

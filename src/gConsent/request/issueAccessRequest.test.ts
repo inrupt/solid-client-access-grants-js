@@ -25,6 +25,9 @@ import {
   JsonLd,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
+import { Response } from "cross-fetch";
+import type * as CrossFetch from "cross-fetch";
+
 import { issueAccessRequest } from "./issueAccessRequest";
 import { getRequestBody } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
@@ -53,7 +56,16 @@ jest.mock("@inrupt/solid-client", () => {
   return solidClientModule;
 });
 jest.mock("@inrupt/solid-client-vc");
-jest.mock("cross-fetch");
+jest.mock("cross-fetch", () => {
+  const crossFetch = jest.requireActual("cross-fetch") as jest.Mocked<
+    typeof CrossFetch
+  >;
+  return {
+    // Do no mock the globals such as Response.
+    ...crossFetch,
+    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
+  };
+});
 
 describe("getRequestBody", () => {
   it("can generate a minimal request body", () => {

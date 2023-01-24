@@ -27,6 +27,7 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
+import { Response } from "cross-fetch";
 import { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 import {
   getAccessManagementUiFromWellKnown,

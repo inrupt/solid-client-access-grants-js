@@ -21,6 +21,7 @@
 
 import { describe, it, jest, expect } from "@jest/globals";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
+import { fetch } from "cross-fetch";
 import { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import { getSessionFetch } from "../../common/util/getSessionFetch";

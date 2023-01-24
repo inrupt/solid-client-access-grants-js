@@ -20,6 +20,9 @@
 //
 
 import { jest, it, describe, expect } from "@jest/globals";
+import { Response } from "cross-fetch";
+import type * as CrossFetch from "cross-fetch";
+
 import { denyAccessRequest } from "./denyAccessRequest";
 import { mockAccessRequestVc } from "../util/access.mock";
 import {
@@ -36,7 +39,16 @@ jest.mock("@inrupt/solid-client", () => {
   return solidClientModule;
 });
 jest.mock("@inrupt/solid-client-vc");
-jest.mock("cross-fetch");
+jest.mock("cross-fetch", () => {
+  const crossFetch = jest.requireActual("cross-fetch") as jest.Mocked<
+    typeof CrossFetch
+  >;
+  return {
+    // Do no mock the globals such as Response.
+    ...crossFetch,
+    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
+  };
+});
 
 // TODO: Extract the fetch VC function and related tests
 describe("denyAccessRequest", () => {
