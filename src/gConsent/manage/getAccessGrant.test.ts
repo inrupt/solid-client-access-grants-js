@@ -34,7 +34,6 @@ jest.mock("cross-fetch", () => {
   return {
     // Do no mock the globals such as Response.
     ...crossFetch,
-    Response: crossFetch.Response,
     fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
   };
 });
