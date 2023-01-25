@@ -956,7 +956,9 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     });
 
     // Only enable this test in environments supporting recursive access grants
-    testIf(environmentFeatures?.RECURSIVE_ACCESS_GRANTS === "true")(
+    testIf(
+      environmentFeatures?.E2E_TEST_FEATURE_RECURSIVE_ACCESS_GRANTS === "true"
+    )(
       "can access a contained resource with a recursive Access Grant",
       async () => {
         accessGrant = await approveAccessRequest(
@@ -984,7 +986,9 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       }
     );
 
-    testIf(environmentFeatures?.RECURSIVE_ACCESS_GRANTS === "true")(
+    testIf(
+      environmentFeatures?.E2E_TEST_FEATURE_RECURSIVE_ACCESS_GRANTS === "true"
+    )(
       "cannot access a contained resource with a non-recursive Access Grant",
       async () => {
         accessGrant = await approveAccessRequest(
@@ -1012,83 +1016,81 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       }
     );
 
-    testIf(environmentFeatures?.RECURSIVE_ACCESS_GRANTS === "true")(
-      "can use the overwriteFile API to create a new file",
-      async () => {
-        // Delete the existing file as to be able to save a new file:
-        await sc.deleteFile(testFileIri, {
+    testIf(
+      environmentFeatures?.E2E_TEST_FEATURE_RECURSIVE_ACCESS_GRANTS === "true"
+    )("can use the overwriteFile API to create a new file", async () => {
+      // Delete the existing file as to be able to save a new file:
+      await sc.deleteFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      accessGrant = await approveAccessRequest(
+        accessRequest,
+        // Access is granted to the target container and all contained resources.
+        { inherit: true },
+        {
           fetch: resourceOwnerSession.fetch,
-        });
+          accessEndpoint: vcProvider,
+        }
+      );
 
-        accessGrant = await approveAccessRequest(
-          accessRequest,
-          // Access is granted to the target container and all contained resources.
-          { inherit: true },
-          {
-            fetch: resourceOwnerSession.fetch,
-            accessEndpoint: vcProvider,
-          }
-        );
+      const newFileContents = Buffer.from("overwritten contents", "utf-8");
 
-        const newFileContents = Buffer.from("overwritten contents", "utf-8");
+      const newFile = await overwriteFile(
+        testFileIri,
+        newFileContents,
+        accessGrant,
+        {
+          fetch: requestorSession.fetch,
+        }
+      );
 
-        const newFile = await overwriteFile(
-          testFileIri,
-          newFileContents,
-          accessGrant,
-          {
-            fetch: requestorSession.fetch,
-          }
-        );
+      expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
+      expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
 
-        expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
-        expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
+      // Verify as the resource owner that the file was actually created:
+      const fileAsResourceOwner = await sc.getFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
 
-        // Verify as the resource owner that the file was actually created:
-        const fileAsResourceOwner = await sc.getFile(testFileIri, {
-          fetch: resourceOwnerSession.fetch,
-        });
+      await expect(fileAsResourceOwner.text()).resolves.toBe(
+        newFileContents.toString()
+      );
+    });
 
-        await expect(fileAsResourceOwner.text()).resolves.toBe(
-          newFileContents.toString()
-        );
-      }
-    );
+    testIf(
+      environmentFeatures?.E2E_TEST_FEATURE_RECURSIVE_ACCESS_GRANTS === "true"
+    )("can use the saveSolidDatasetAt API for a new dataset", async () => {
+      // Delete the dataset created in the beforeEach:
+      await sc.deleteFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
 
-    testIf(environmentFeatures?.RECURSIVE_ACCESS_GRANTS === "true")(
-      "can use the saveSolidDatasetAt API for a new dataset",
-      async () => {
-        // Delete the dataset created in the beforeEach:
-        await sc.deleteFile(testFileIri, {
-          fetch: resourceOwnerSession.fetch,
-        });
+      const dataset = sc.createSolidDataset();
+      const newDatasetIri = testFileIri;
 
-        const dataset = sc.createSolidDataset();
-        const newDatasetIri = testFileIri;
+      const updatedDataset = await saveSolidDatasetAt(
+        newDatasetIri,
+        dataset,
+        accessGrant,
+        {
+          fetch: requestorSession.fetch,
+        }
+      );
 
-        const updatedDataset = await saveSolidDatasetAt(
-          newDatasetIri,
-          dataset,
-          accessGrant,
-          {
-            fetch: requestorSession.fetch,
-          }
-        );
+      // Fetch it back as the owner to prove the dataset was actually created:
+      const updatedDatasetAsOwner = await sc.getSolidDataset(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
 
-        // Fetch it back as the owner to prove the dataset was actually created:
-        const updatedDatasetAsOwner = await sc.getSolidDataset(testFileIri, {
-          fetch: resourceOwnerSession.fetch,
-        });
+      // Serialize each to turtle:
+      const updatedDatasetTtl = await sc.solidDatasetAsTurtle(updatedDataset);
+      const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
+        updatedDatasetAsOwner
+      );
 
-        // Serialize each to turtle:
-        const updatedDatasetTtl = await sc.solidDatasetAsTurtle(updatedDataset);
-        const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
-          updatedDatasetAsOwner
-        );
-
-        // Assert that the dataset was created correctly:
-        expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
-      }
-    );
+      // Assert that the dataset was created correctly:
+      expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
+    });
   });
 });
