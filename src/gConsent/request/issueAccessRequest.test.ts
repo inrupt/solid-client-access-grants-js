@@ -482,7 +482,6 @@ describe("issueAccessRequest", () => {
           resourceOwner: MOCK_RESOURCE_OWNER_IRI,
           resources: ["https://some.pod/resource"],
           requestorInboxUrl: MOCK_REQUESTOR_INBOX,
-          // Note that "inherit" is not specified.
         },
         {
           fetch: jest.fn<typeof fetch>(),
