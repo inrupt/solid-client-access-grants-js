@@ -74,6 +74,14 @@ export function normalizeAccessGrant<T extends VerifiableCredential>(
       normalized.credentialSubject.providedConsent.forPersonalData,
     ];
   }
+  if (
+    typeof normalized.credentialSubject.providedConsent.inherit === "string"
+  ) {
+    // Literals are also interpreted based on the JSON-LD context, so a "true" value
+    // could map to a "true"^^xsd:boolean, which is a boolean.
+    normalized.credentialSubject.providedConsent.inherit =
+      normalized.credentialSubject.providedConsent.inherit === "true";
+  }
   // Cast back to the original type
   return normalized as unknown as T;
 }
@@ -92,7 +100,7 @@ function getAccessModesFromAccessGrant(request: AccessGrantBody): AccessModes {
 async function addVcMatcher(
   targetResources: Array<UrlString>,
   accessMode: AccessModes,
-  options?: { fetch?: typeof global.fetch }
+  options?: { fetch?: typeof global.fetch; inherit?: boolean }
 ) {
   return Promise.all(
     targetResources.map(async (targetResource) => {
@@ -108,7 +116,9 @@ async function addVcMatcher(
         );
       }
       // eslint-disable-next-line camelcase
-      const updatedResource = acp_ess_2.setVcAccess(resourceInfo, accessMode);
+      const updatedResource = acp_ess_2.setVcAccess(resourceInfo, accessMode, {
+        inherit: options?.inherit ?? true,
+      });
       // eslint-disable-next-line camelcase
       return acp_ess_2.saveAcrFor(updatedResource, options);
     })

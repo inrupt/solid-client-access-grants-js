@@ -58,7 +58,17 @@ const env = getNodeTestingEnvironment({
   },
 });
 
-const { idp: oidcIssuer, environment, clientCredentials, vcProvider } = env;
+const {
+  idp: oidcIssuer,
+  environment,
+  clientCredentials,
+  vcProvider,
+  features: environmentFeatures,
+} = env;
+
+const testIf = (condition: boolean) => (condition ? it : it.skip);
+// Conditional tests confuse eslint.
+/* eslint-disable jest/no-standalone-expect */
 
 // For some reason, the Node jest runner throws an undefined error when
 // calling to btoa. This overrides it, while keeping the actual code
@@ -257,9 +267,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       );
     });
 
-    // The following test is disabled until ESS adds support for recursive Access Grants.
-    // eslint-disable-next-line jest/no-disabled-tests
-    it.skip("can issue a non-recursive access grant", async () => {
+    it("can issue a non-recursive access grant", async () => {
       const grant = await approveAccessRequest(
         undefined,
         {
@@ -749,40 +757,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       const savedDatasetTtl = await sc.solidDatasetAsTurtle(savedDataset);
       expect(savedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
     });
-
-    it.skip("can use the saveSolidDatasetAt API for a new dataset", async () => {
-      // FIXME: this deletes the resources' ACRs, so this test case will fail (SDK-2792)
-      // Delete the dataset created in the beforeEach:
-      await sc.deleteFile(testFileIri, {
-        fetch: resourceOwnerSession.fetch,
-      });
-
-      const dataset = sc.createSolidDataset();
-      const newDatasetIri = testFileIri;
-
-      const updatedDataset = await saveSolidDatasetAt(
-        newDatasetIri,
-        dataset,
-        accessGrant,
-        {
-          fetch: requestorSession.fetch,
-        }
-      );
-
-      // Fetch it back as the owner to prove the dataset was actually created:
-      const updatedDatasetAsOwner = await sc.getSolidDataset(testFileIri, {
-        fetch: resourceOwnerSession.fetch,
-      });
-
-      // Serialize each to turtle:
-      const updatedDatasetTtl = await sc.solidDatasetAsTurtle(updatedDataset);
-      const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
-        updatedDatasetAsOwner
-      );
-
-      // Assert that the dataset was created correctly:
-      expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
-    });
   });
 
   describe("requestor can use the resource File APIs to interact with resources", () => {
@@ -911,42 +885,9 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         newFileContents.toString()
       );
     });
-
-    it.skip("can use the overwriteFile API to create a new file", async () => {
-      // FIXME: this deletes the resources' ACRs, so this test case will fail (SDK-2792)
-      // Delete the existing file as to be able to save a new file:
-      await sc.deleteFile(testFileIri, {
-        fetch: resourceOwnerSession.fetch,
-      });
-
-      const newFileContents = Buffer.from("overwritten contents", "utf-8");
-
-      const newFile = await overwriteFile(
-        testFileIri,
-        newFileContents,
-        accessGrant,
-        {
-          fetch: requestorSession.fetch,
-        }
-      );
-
-      expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
-      expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
-
-      // Verify as the resource owner that the file was actually created:
-      const fileAsResourceOwner = await sc.getFile(testFileIri, {
-        fetch: resourceOwnerSession.fetch,
-      });
-
-      await expect(fileAsResourceOwner.text()).resolves.toBe(
-        newFileContents.toString()
-      );
-    });
   });
 
-  // This is skipped until ESS supports recursive Access Grants
-  // eslint-disable-next-line jest/no-disabled-tests
-  describe.skip("access grants can be recursive or only apply to the target resource", () => {
+  describe("recursive access grants support", () => {
     let accessRequest: AccessRequest;
     let accessGrant: AccessGrant;
     let testFileName: string;
@@ -1014,7 +955,75 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       });
     });
 
-    it("can access a contained resource with a recursive Access Grant", async () => {
+    // Only enable this test in environments supporting recursive access grants
+    testIf(
+      environmentFeatures?.E2E_TEST_FEATURE_RECURSIVE_ACCESS_GRANTS === "true"
+    )(
+      "can access a contained resource with a recursive Access Grant",
+      async () => {
+        accessGrant = await approveAccessRequest(
+          accessRequest,
+          // Access is granted to the target container and all contained resources.
+          { inherit: true },
+          {
+            fetch: resourceOwnerSession.fetch,
+            accessEndpoint: vcProvider,
+          }
+        );
+        const requestorFile = await getFile(testFileIri, accessGrant, {
+          fetch: requestorSession.fetch,
+        });
+
+        await expect(requestorFile.text()).resolves.toBe(testFileContent);
+
+        // Lookup grants for the target resource, while it has been issued for the container.
+        const grants = await getAccessGrantAll(testFileIri, undefined, {
+          fetch: resourceOwnerSession.fetch,
+        });
+        expect(grants.map((grant) => grant.proof)).toContainEqual(
+          accessGrant.proof
+        );
+      }
+    );
+
+    testIf(
+      environmentFeatures?.E2E_TEST_FEATURE_RECURSIVE_ACCESS_GRANTS === "true"
+    )(
+      "cannot access a contained resource with a non-recursive Access Grant",
+      async () => {
+        accessGrant = await approveAccessRequest(
+          accessRequest,
+          // Access is granted to the target container only.
+          { inherit: false },
+          {
+            fetch: resourceOwnerSession.fetch,
+            accessEndpoint: vcProvider,
+          }
+        );
+
+        await expect(
+          getFile(testFileIri, accessGrant, {
+            fetch: requestorSession.fetch,
+          })
+        ).rejects.toThrow();
+
+        // Lookup grants for the target resource, while it has been issued for the container.
+        // There should be no matching grant, because the issued grant is not recursive.
+        const grants = await getAccessGrantAll(testFileIri, undefined, {
+          fetch: resourceOwnerSession.fetch,
+        });
+        expect(grants).toHaveLength(0);
+      }
+    );
+
+    testIf(
+      environmentFeatures?.E2E_TEST_FEATURE_RECURSIVE_ACCESS_GRANTS === "true"
+    )("can use the overwriteFile API to create a new file", async () => {
+      // Delete the existing file as to be able to save a new file:
+      await sc.deleteFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
       accessGrant = await approveAccessRequest(
         accessRequest,
         // Access is granted to the target container and all contained resources.
@@ -1024,42 +1033,64 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
           accessEndpoint: vcProvider,
         }
       );
-      const requestorFile = await getFile(testFileIri, accessGrant, {
-        fetch: requestorSession.fetch,
-      });
 
-      await expect(requestorFile.text()).resolves.toBe(testFileContent);
+      const newFileContents = Buffer.from("overwritten contents", "utf-8");
 
-      // Lookup grants for the target resource, while it has been issued for the container.
-      const grants = getAccessGrantAll(testFileIri, undefined, {
-        fetch: resourceOwnerSession.fetch,
-      });
-      expect(grants).toContainEqual(accessGrant);
-    });
-
-    it("cannot access a contained resource with a non-recursive Access Grant", async () => {
-      accessGrant = await approveAccessRequest(
-        accessRequest,
-        // Access is granted to the target container only.
-        { inherit: false },
+      const newFile = await overwriteFile(
+        testFileIri,
+        newFileContents,
+        accessGrant,
         {
-          fetch: resourceOwnerSession.fetch,
-          accessEndpoint: vcProvider,
+          fetch: requestorSession.fetch,
         }
       );
 
-      await expect(
-        getFile(testFileIri, accessGrant, {
-          fetch: requestorSession.fetch,
-        })
-      ).rejects.toThrow();
+      expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
+      expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
 
-      // Lookup grants for the target resource, while it has been issued for the container.
-      // There should be no matching grant, because the issued grant is not recursive.
-      const grants = getAccessGrantAll(testFileIri, undefined, {
+      // Verify as the resource owner that the file was actually created:
+      const fileAsResourceOwner = await sc.getFile(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
-      expect(grants).toHaveLength(0);
+
+      await expect(fileAsResourceOwner.text()).resolves.toBe(
+        newFileContents.toString()
+      );
+    });
+
+    testIf(
+      environmentFeatures?.E2E_TEST_FEATURE_RECURSIVE_ACCESS_GRANTS === "true"
+    )("can use the saveSolidDatasetAt API for a new dataset", async () => {
+      // Delete the dataset created in the beforeEach:
+      await sc.deleteFile(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      const dataset = sc.createSolidDataset();
+      const newDatasetIri = testFileIri;
+
+      const updatedDataset = await saveSolidDatasetAt(
+        newDatasetIri,
+        dataset,
+        accessGrant,
+        {
+          fetch: requestorSession.fetch,
+        }
+      );
+
+      // Fetch it back as the owner to prove the dataset was actually created:
+      const updatedDatasetAsOwner = await sc.getSolidDataset(testFileIri, {
+        fetch: resourceOwnerSession.fetch,
+      });
+
+      // Serialize each to turtle:
+      const updatedDatasetTtl = await sc.solidDatasetAsTurtle(updatedDataset);
+      const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
+        updatedDatasetAsOwner
+      );
+
+      // Assert that the dataset was created correctly:
+      expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
     });
   });
 });

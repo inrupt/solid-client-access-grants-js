@@ -20,6 +20,8 @@
 //
 
 import { jest, it, describe, expect } from "@jest/globals";
+import { Response } from "cross-fetch";
+import type * as CrossFetch from "cross-fetch";
 
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import type * as VcClient from "@inrupt/solid-client-vc";
@@ -60,7 +62,16 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc");
-jest.mock("cross-fetch");
+jest.mock("cross-fetch", () => {
+  const crossFetch = jest.requireActual("cross-fetch") as jest.Mocked<
+    typeof CrossFetch
+  >;
+  return {
+    // Do no mock the globals such as Response.
+    ...crossFetch,
+    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
+  };
+});
 
 const mockAcpClient = (
   options?: Partial<{
@@ -146,11 +157,15 @@ describe("approveAccessRequest", () => {
       expect.anything()
     );
     // The resources' ACR is updated with the modes from the grant.
-    expect(spiedAcrUpdate).toHaveBeenCalledWith(mockedInitialResource, {
-      read: true,
-      write: true,
-      append: false,
-    });
+    expect(spiedAcrUpdate).toHaveBeenCalledWith(
+      mockedInitialResource,
+      {
+        read: true,
+        write: true,
+        append: false,
+      },
+      { inherit: true }
+    );
 
     // The resources' ACR is written back.
     expect(spiedAcrSave).toHaveBeenCalledWith(
@@ -797,6 +812,7 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential"
     );
     const normalizedAccessGrant = mockAccessGrantVc();
+    // The server returns an equivalent JSON-LD with a different frame:
     spiedIssueRequest.mockResolvedValueOnce({
       ...normalizedAccessGrant,
       credentialSubject: {
@@ -808,6 +824,7 @@ describe("approveAccessRequest", () => {
             normalizedAccessGrant.credentialSubject.providedConsent
               .forPersonalData[0],
           mode: normalizedAccessGrant.credentialSubject.providedConsent.mode[0],
+          inherit: "true",
         },
       },
     });
@@ -851,11 +868,15 @@ describe("approveAccessRequest", () => {
       expect.anything()
     );
     // // The resources' ACR is updated with the modes from the grant.
-    expect(spiedAcrUpdate).toHaveBeenCalledWith(mockedInitialResource, {
-      read: true,
-      write: true,
-      append: false,
-    });
+    expect(spiedAcrUpdate).toHaveBeenCalledWith(
+      mockedInitialResource,
+      {
+        read: true,
+        write: true,
+        append: false,
+      },
+      { inherit: true }
+    );
     // The resources' ACR is written back.
     expect(spiedAcrSave).toHaveBeenCalled();
   });
@@ -896,11 +917,15 @@ describe("approveAccessRequest", () => {
       expect.anything()
     );
     // The resources' ACR is updated with the modes from the grant.
-    expect(spiedAcrUpdate).toHaveBeenCalledWith(mockedInitialResource, {
-      read: true,
-      write: true,
-      append: false,
-    });
+    expect(spiedAcrUpdate).toHaveBeenCalledWith(
+      mockedInitialResource,
+      {
+        read: true,
+        write: true,
+        append: false,
+      },
+      { inherit: true }
+    );
 
     // The resources' ACR is written back.
     expect(spiedAcrSave).toHaveBeenCalled();

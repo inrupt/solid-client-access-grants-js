@@ -20,17 +20,29 @@
 //
 
 import { jest, it, describe, expect } from "@jest/globals";
+import { Response } from "cross-fetch";
+import type * as CrossFetch from "cross-fetch";
+
 import { mockAccessApiEndpoint } from "../request/request.mock";
 import { mockAccessGrantVc, mockConsentRequestVc } from "../util/access.mock";
 import { getAccessGrant } from "./getAccessGrant";
 
-jest.mock("cross-fetch");
+jest.mock("cross-fetch", () => {
+  const crossFetch = jest.requireActual("cross-fetch") as jest.Mocked<
+    typeof CrossFetch
+  >;
+  return {
+    // Do no mock the globals such as Response.
+    ...crossFetch,
+    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
+  };
+});
 
 describe("getAccessGrant", () => {
   it("uses the provided fetch if any", async () => {
     mockAccessApiEndpoint();
     const mockedFetch = jest
-      .fn(global.fetch)
+      .fn<typeof fetch>()
       .mockResolvedValueOnce(new Response(JSON.stringify(mockAccessGrantVc())));
 
     await getAccessGrant("https://some.vc.url", {

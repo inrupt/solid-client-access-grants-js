@@ -25,6 +25,8 @@ import {
   JsonLd,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
+import type * as CrossFetch from "cross-fetch";
+
 import { issueAccessRequest } from "./issueAccessRequest";
 import { getRequestBody } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
@@ -40,6 +42,7 @@ import {
   GC_CONSENT_STATUS_REQUESTED_ABBREV,
 } from "../constants";
 import { AccessRequestBody } from "../type/AccessVerifiableCredential";
+import { AccessRequest } from "../type/AccessRequest";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -53,7 +56,16 @@ jest.mock("@inrupt/solid-client", () => {
   return solidClientModule;
 });
 jest.mock("@inrupt/solid-client-vc");
-jest.mock("cross-fetch");
+jest.mock("cross-fetch", () => {
+  const crossFetch = jest.requireActual("cross-fetch") as jest.Mocked<
+    typeof CrossFetch
+  >;
+  return {
+    // Do no mock the globals such as Response.
+    ...crossFetch,
+    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
+  };
+});
 
 describe("getRequestBody", () => {
   it("can generate a minimal request body", () => {
@@ -440,7 +452,25 @@ describe("issueAccessRequest", () => {
     ).toBeUndefined();
   });
 
-  it("normalizes equivalent JSON-LD VCs", async () => {
+  const jsonLdEquivalent = (
+    request: AccessRequest,
+    options: { inherit?: "true" | "false" }
+  ) => ({
+    ...request,
+    credentialSubject: {
+      ...request.credentialSubject,
+      hasConsent: {
+        ...request.credentialSubject.hasConsent,
+        // The 1-value array is replaced by the literal value.
+        forPersonalData:
+          request.credentialSubject.hasConsent.forPersonalData[0],
+        mode: request.credentialSubject.hasConsent.mode[0],
+        inherit: options.inherit,
+      },
+    },
+  });
+
+  it("normalizes equivalent JSON-LD VCs including 'true' booleans", async () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
@@ -448,21 +478,10 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential"
     );
-    const normalizedAccessRequest = mockAccessRequestVc();
-    mockedIssue.mockResolvedValueOnce({
-      ...normalizedAccessRequest,
-      credentialSubject: {
-        ...normalizedAccessRequest.credentialSubject,
-        hasConsent: {
-          ...normalizedAccessRequest.credentialSubject.hasConsent,
-          // The 1-value array is replaced by the literal value.
-          forPersonalData:
-            normalizedAccessRequest.credentialSubject.hasConsent
-              .forPersonalData[0],
-          mode: normalizedAccessRequest.credentialSubject.hasConsent.mode[0],
-        },
-      },
-    });
+    const normalizedAccessRequest = mockAccessRequestVc({ inherit: true });
+    mockedIssue.mockResolvedValueOnce(
+      jsonLdEquivalent(normalizedAccessRequest, { inherit: "true" })
+    );
     await expect(
       issueAccessRequest(
         {
@@ -470,7 +489,6 @@ describe("issueAccessRequest", () => {
           resourceOwner: MOCK_RESOURCE_OWNER_IRI,
           resources: ["https://some.pod/resource"],
           requestorInboxUrl: MOCK_REQUESTOR_INBOX,
-          // Note that "inherit" is not specified.
         },
         {
           fetch: jest.fn<typeof fetch>(),
@@ -478,189 +496,217 @@ describe("issueAccessRequest", () => {
       )
     ).resolves.toStrictEqual(normalizedAccessRequest);
   });
-});
 
-const mockCredentialProof = (): VerifiableCredential["proof"] => {
-  return {
-    created: "some date",
-    proofPurpose: "some purpose",
-    proofValue: "some value",
-    type: "some type",
-    verificationMethod: "some method",
+  it("normalizes equivalent JSON-LD VCs including 'false' booleans", async () => {
+    mockAccessApiEndpoint();
+    const mockedIssue = jest.spyOn(
+      jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: typeof issueVerifiableCredential;
+      },
+      "issueVerifiableCredential"
+    );
+    // Test for a different "inherit" value
+    const normalizedAccessRequest = mockAccessRequestVc({ inherit: false });
+    mockedIssue.mockResolvedValueOnce(
+      jsonLdEquivalent(normalizedAccessRequest, { inherit: "false" })
+    );
+    await expect(
+      issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+          resources: ["https://some.pod/resource"],
+          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+        },
+        {
+          fetch: jest.fn<typeof fetch>(),
+        }
+      )
+    ).resolves.toStrictEqual(normalizedAccessRequest);
+  });
+
+  const mockCredentialProof = (): VerifiableCredential["proof"] => {
+    return {
+      created: "some date",
+      proofPurpose: "some purpose",
+      proofValue: "some value",
+      type: "some type",
+      verificationMethod: "some method",
+    };
   };
-};
 
-describe("isAccessRequest", () => {
-  it("returns false if the credential subject is missing 'hasConsent'", () => {
-    expect(
-      isAccessRequest({
-        "@context": "https://some.context",
-        credentialSubject: {
-          id: "https://some.id",
-          inbox: "https://some.inbox",
-        },
-        id: "https://some.credential",
-        proof: mockCredentialProof(),
-        issuer: "https://some.issuer",
-        issuanceDate: "some date",
-        type: ["SolidAccessRequest"],
-      })
-    ).toBe(false);
-  });
-
-  it("returns false if the credential subject 'hasConsent' is missing 'mode'", () => {
-    expect(
-      isAccessRequest({
-        "@context": "https://some.context",
-        credentialSubject: {
-          id: "https://some.id",
-          inbox: "https://some.inbox",
-          hasConsent: {
-            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-            forPersonalData: ["https://some.resource"],
-            isConsentForDataSubject: "https://some.pod/profile#you",
+  describe("isAccessRequest", () => {
+    it("returns false if the credential subject is missing 'hasConsent'", () => {
+      expect(
+        isAccessRequest({
+          "@context": "https://some.context",
+          credentialSubject: {
+            id: "https://some.id",
+            inbox: "https://some.inbox",
           },
-        },
-        id: "https://some.credential",
-        proof: mockCredentialProof(),
-        issuer: "https://some.issuer",
-        issuanceDate: "some date",
-        type: ["SolidAccessRequest"],
-      })
-    ).toBe(false);
-  });
+          id: "https://some.credential",
+          proof: mockCredentialProof(),
+          issuer: "https://some.issuer",
+          issuanceDate: "some date",
+          type: ["SolidAccessRequest"],
+        })
+      ).toBe(false);
+    });
 
-  it("returns false if the credential subject 'hasConsent' is missing 'status'", () => {
-    expect(
-      isAccessRequest({
-        "@context": "https://some.context",
-        credentialSubject: {
-          id: "https://some.id",
-          inbox: "https://some.inbox",
-          hasConsent: {
-            mode: ["some mode"],
-            forPersonalData: ["https://some.resource"],
-            isConsentForDataSubject: "https://some.pod/profile#you",
+    it("returns false if the credential subject 'hasConsent' is missing 'mode'", () => {
+      expect(
+        isAccessRequest({
+          "@context": "https://some.context",
+          credentialSubject: {
+            id: "https://some.id",
+            inbox: "https://some.inbox",
+            hasConsent: {
+              hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+              forPersonalData: ["https://some.resource"],
+              isConsentForDataSubject: "https://some.pod/profile#you",
+            },
           },
-        },
-        id: "https://some.credential",
-        proof: mockCredentialProof(),
-        issuer: "https://some.issuer",
-        issuanceDate: "some date",
-        type: ["SolidAccessRequest"],
-      })
-    ).toBe(false);
-  });
+          id: "https://some.credential",
+          proof: mockCredentialProof(),
+          issuer: "https://some.issuer",
+          issuanceDate: "some date",
+          type: ["SolidAccessRequest"],
+        })
+      ).toBe(false);
+    });
 
-  it("returns false if the credential subject 'hasConsent' is missing 'forPersonalData'", () => {
-    expect(
-      isAccessRequest({
-        "@context": "https://some.context",
-        credentialSubject: {
-          id: "https://some.id",
-          inbox: "https://some.inbox",
-          hasConsent: {
-            mode: ["some mode"],
-            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-            isConsentForDataSubject: "https://some.pod/profile#you",
+    it("returns false if the credential subject 'hasConsent' is missing 'status'", () => {
+      expect(
+        isAccessRequest({
+          "@context": "https://some.context",
+          credentialSubject: {
+            id: "https://some.id",
+            inbox: "https://some.inbox",
+            hasConsent: {
+              mode: ["some mode"],
+              forPersonalData: ["https://some.resource"],
+              isConsentForDataSubject: "https://some.pod/profile#you",
+            },
           },
-        },
-        id: "https://some.credential",
-        proof: mockCredentialProof(),
-        issuer: "https://some.issuer",
-        issuanceDate: "some date",
-        type: ["SolidAccessRequest"],
-      })
-    ).toBe(false);
-  });
+          id: "https://some.credential",
+          proof: mockCredentialProof(),
+          issuer: "https://some.issuer",
+          issuanceDate: "some date",
+          type: ["SolidAccessRequest"],
+        })
+      ).toBe(false);
+    });
 
-  it("returns false if the credential subject 'hasConsent' is missing 'isConsentForDataSubject'", () => {
-    expect(
-      isAccessRequest({
-        "@context": "https://some.context",
-        credentialSubject: {
-          id: "https://some.id",
-          inbox: "https://some.inbox",
-          hasConsent: {
-            mode: ["some mode"],
-            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-            forPersonalData: ["https://some.resource"],
+    it("returns false if the credential subject 'hasConsent' is missing 'forPersonalData'", () => {
+      expect(
+        isAccessRequest({
+          "@context": "https://some.context",
+          credentialSubject: {
+            id: "https://some.id",
+            inbox: "https://some.inbox",
+            hasConsent: {
+              mode: ["some mode"],
+              hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+              isConsentForDataSubject: "https://some.pod/profile#you",
+            },
           },
-        },
-        id: "https://some.credential",
-        proof: mockCredentialProof(),
-        issuer: "https://some.issuer",
-        issuanceDate: "some date",
-        type: ["SolidAccessRequest"],
-      })
-    ).toBe(false);
-  });
+          id: "https://some.credential",
+          proof: mockCredentialProof(),
+          issuer: "https://some.issuer",
+          issuanceDate: "some date",
+          type: ["SolidAccessRequest"],
+        })
+      ).toBe(false);
+    });
 
-  it("returns false if the credential subject is missing an inbox", () => {
-    expect(
-      isAccessRequest({
-        "@context": "https://some.context",
-        credentialSubject: {
-          id: "https://some.id",
-          hasConsent: {
-            mode: ["some mode"],
-            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-            forPersonalData: ["https://some.resource"],
-            isConsentForDataSubject: "https://some.pod/profile#you",
+    it("returns false if the credential subject 'hasConsent' is missing 'isConsentForDataSubject'", () => {
+      expect(
+        isAccessRequest({
+          "@context": "https://some.context",
+          credentialSubject: {
+            id: "https://some.id",
+            inbox: "https://some.inbox",
+            hasConsent: {
+              mode: ["some mode"],
+              hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+              forPersonalData: ["https://some.resource"],
+            },
           },
-        },
-        id: "https://some.credential",
-        proof: mockCredentialProof(),
-        issuer: "https://some.issuer",
-        issuanceDate: "some date",
-        type: ["SolidAccessRequest"],
-      })
-    ).toBe(false);
-  });
+          id: "https://some.credential",
+          proof: mockCredentialProof(),
+          issuer: "https://some.issuer",
+          issuanceDate: "some date",
+          type: ["SolidAccessRequest"],
+        })
+      ).toBe(false);
+    });
 
-  it("returns false if the credential type does not include 'SolidAccessRequest'", () => {
-    expect(
-      isAccessRequest({
-        "@context": "https://some.context",
-        credentialSubject: {
-          id: "https://some.id",
-          inbox: "https://some.inbox",
-          hasConsent: {
-            mode: ["some mode"],
-            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-            forPersonalData: ["https://some.resource"],
-            isConsentForDataSubject: "https://some.pod/profile#you",
+    it("returns false if the credential subject is missing an inbox", () => {
+      expect(
+        isAccessRequest({
+          "@context": "https://some.context",
+          credentialSubject: {
+            id: "https://some.id",
+            hasConsent: {
+              mode: ["some mode"],
+              hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+              forPersonalData: ["https://some.resource"],
+              isConsentForDataSubject: "https://some.pod/profile#you",
+            },
           },
-        },
-        id: "https://some.credential",
-        proof: mockCredentialProof(),
-        issuer: "https://some.issuer",
-        issuanceDate: "some date",
-        type: ["Some other type"],
-      })
-    ).toBe(false);
-  });
+          id: "https://some.credential",
+          proof: mockCredentialProof(),
+          issuer: "https://some.issuer",
+          issuanceDate: "some date",
+          type: ["SolidAccessRequest"],
+        })
+      ).toBe(false);
+    });
 
-  it("returns true if the credential matches the expected shape", () => {
-    expect(
-      isAccessRequest({
-        "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
-        credentialSubject: {
-          id: "https://some.id",
-          inbox: "https://some.inbox",
-          hasConsent: {
-            mode: ["http://www.w3.org/ns/auth/acl#Read"],
-            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-            forPersonalData: ["https://some.resource"],
-            isConsentForDataSubject: "https://some.pod/profile#you",
+    it("returns false if the credential type does not include 'SolidAccessRequest'", () => {
+      expect(
+        isAccessRequest({
+          "@context": "https://some.context",
+          credentialSubject: {
+            id: "https://some.id",
+            inbox: "https://some.inbox",
+            hasConsent: {
+              mode: ["some mode"],
+              hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+              forPersonalData: ["https://some.resource"],
+              isConsentForDataSubject: "https://some.pod/profile#you",
+            },
           },
-        },
-        id: "https://some.credential",
-        proof: mockCredentialProof(),
-        issuer: "https://some.issuer",
-        issuanceDate: "some date",
-        type: ["SolidAccessRequest"],
-      })
-    ).toBe(true);
+          id: "https://some.credential",
+          proof: mockCredentialProof(),
+          issuer: "https://some.issuer",
+          issuanceDate: "some date",
+          type: ["Some other type"],
+        })
+      ).toBe(false);
+    });
+
+    it("returns true if the credential matches the expected shape", () => {
+      expect(
+        isAccessRequest({
+          "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
+          credentialSubject: {
+            id: "https://some.id",
+            inbox: "https://some.inbox",
+            hasConsent: {
+              mode: ["http://www.w3.org/ns/auth/acl#Read"],
+              hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+              forPersonalData: ["https://some.resource"],
+              isConsentForDataSubject: "https://some.pod/profile#you",
+            },
+          },
+          id: "https://some.credential",
+          proof: mockCredentialProof(),
+          issuer: "https://some.issuer",
+          issuanceDate: "some date",
+          type: ["SolidAccessRequest"],
+        })
+      ).toBe(true);
+    });
   });
 });

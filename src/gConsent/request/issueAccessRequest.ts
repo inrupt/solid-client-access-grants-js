@@ -56,6 +56,12 @@ function normalizeAccessRequest<T extends VerifiableCredential>(
       normalized.credentialSubject.hasConsent.forPersonalData,
     ];
   }
+  if (typeof normalized.credentialSubject.hasConsent.inherit === "string") {
+    // Literals are also interpreted based on the JSON-LD context, so a "true" value
+    // could map to a "true"^^xsd:boolean, which is a boolean.
+    normalized.credentialSubject.hasConsent.inherit =
+      normalized.credentialSubject.hasConsent.inherit === "true";
+  }
   // Cast back to the original type
   return normalized as unknown as T;
 }
