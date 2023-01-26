@@ -28,6 +28,7 @@ import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 // the access grant API
 import * as sc from "@inrupt/solid-client";
 import { custom } from "openid-client";
+import { session } from "rdf-namespaces/dist/link";
 import {
   AccessGrant,
   AccessRequest,
@@ -1061,7 +1062,16 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     testIf(
       environmentFeatures?.E2E_TEST_FEATURE_RECURSIVE_ACCESS_GRANTS === "true"
     )("can use the saveSolidDatasetAt API for a new dataset", async () => {
-      // Delete the dataset created in the beforeEach:
+      accessGrant = await approveAccessRequest(
+        accessRequest,
+        // Access is granted to the target container and all contained resources.
+        { inherit: true },
+        {
+          fetch: resourceOwnerSession.fetch,
+          accessEndpoint: vcProvider,
+        }
+      );
+
       await sc.deleteFile(testFileIri, {
         fetch: resourceOwnerSession.fetch,
       });
