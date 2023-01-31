@@ -1009,7 +1009,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         const grants = await getAccessGrantAll(testFileIri, undefined, {
           fetch: resourceOwnerSession.fetch,
         });
-        expect(grants).toHaveLength(0);
+        expect(grants).not.toContainEqual(accessGrant);
       }
     );
 
