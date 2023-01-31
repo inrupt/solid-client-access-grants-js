@@ -28,7 +28,6 @@ import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 // the access grant API
 import * as sc from "@inrupt/solid-client";
 import { custom } from "openid-client";
-import { session } from "rdf-namespaces/dist/link";
 import {
   AccessGrant,
   AccessRequest,
