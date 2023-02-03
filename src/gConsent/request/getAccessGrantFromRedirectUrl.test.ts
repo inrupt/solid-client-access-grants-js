@@ -120,6 +120,39 @@ describe("getAccessGrantFromRedirectUrl", () => {
     expect(fetchedVc).toStrictEqual(mockAccessGrantVc());
   });
 
+  it("normalizes equivalent JSON-LD VCs", async () => {
+    const vcModule = jest.requireMock(
+      "@inrupt/solid-client-vc"
+    ) as jest.Mocked<{
+      getVerifiableCredential: typeof getVerifiableCredential;
+    }>;
+    const normalizedAccessGrant = mockAccessGrantVc();
+    // The server returns an equivalent JSON-LD with a different frame:
+    vcModule.getVerifiableCredential.mockResolvedValueOnce({
+      ...normalizedAccessGrant,
+      credentialSubject: {
+        ...normalizedAccessGrant.credentialSubject,
+        providedConsent: {
+          ...normalizedAccessGrant.credentialSubject.providedConsent,
+          // The 1-value array is replaced by the literal value.
+          forPersonalData:
+            normalizedAccessGrant.credentialSubject.providedConsent
+              .forPersonalData[0],
+          mode: normalizedAccessGrant.credentialSubject.providedConsent.mode[0],
+        },
+      },
+    });
+
+    const redirectUrl = new URL("https://redirect.url");
+    redirectUrl.searchParams.set(
+      "accessGrantUrl",
+      encodeURI("https://some.vc")
+    );
+
+    const fetchedVc = await getAccessGrantFromRedirectUrl(redirectUrl);
+    expect(fetchedVc).toStrictEqual(mockAccessGrantVc());
+  });
+
   it("throws if the fetched VC is not an Access Grant", async () => {
     const vcModule = jest.requireMock(
       "@inrupt/solid-client-vc"

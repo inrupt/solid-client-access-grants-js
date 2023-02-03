@@ -22,6 +22,7 @@
 import { jest, it, describe, expect } from "@jest/globals";
 import { Response } from "cross-fetch";
 import type * as CrossFetch from "cross-fetch";
+import type * as VcClient from "@inrupt/solid-client-vc";
 
 import { mockAccessApiEndpoint } from "../request/request.mock";
 import { mockAccessGrantVc, mockConsentRequestVc } from "../util/access.mock";
@@ -126,6 +127,37 @@ describe("getAccessGrant", () => {
       fetch: mockedFetch,
     });
     expect(accessGrant).toEqual(mockedAccessGrant);
+  });
+
+  it("normalizes equivalent JSON-LD VCs", async () => {
+    mockAccessApiEndpoint();
+    const normalizedAccessGrant = mockAccessGrantVc();
+    // The server returns an equivalent JSON-LD with a different frame:
+    const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          ...normalizedAccessGrant,
+          credentialSubject: {
+            ...normalizedAccessGrant.credentialSubject,
+            providedConsent: {
+              ...normalizedAccessGrant.credentialSubject.providedConsent,
+              // The 1-value array is replaced by the literal value.
+              forPersonalData:
+                normalizedAccessGrant.credentialSubject.providedConsent
+                  .forPersonalData[0],
+              mode: normalizedAccessGrant.credentialSubject.providedConsent
+                .mode[0],
+              inherit: "true",
+            },
+          },
+        })
+      )
+    );
+    await expect(
+      getAccessGrant("https://some.vc.url", {
+        fetch: mockedFetch,
+      })
+    ).resolves.toStrictEqual(normalizedAccessGrant);
   });
 
   it("returns the access grant with the given URL object", async () => {
