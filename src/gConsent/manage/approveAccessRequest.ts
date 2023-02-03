@@ -64,9 +64,7 @@ export function normalizeAccessGrant<T extends VerifiableCredential>(
   const normalized = { ...accessGrant } as unknown as AccessGrant;
   if (normalized.credentialSubject.providedConsent === undefined) {
     throw new Error(
-      `${JSON.stringify(
-        normalized
-      )} is not an Access Grant: missing field "credentialSubject.providedConsent".`
+      `[${normalized.id}] is not an Access Grant: missing field "credentialSubject.providedConsent".`
     );
   }
   if (!Array.isArray(normalized.credentialSubject.providedConsent.mode)) {

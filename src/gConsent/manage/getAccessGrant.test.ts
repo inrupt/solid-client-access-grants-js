@@ -96,9 +96,7 @@ describe("getAccessGrant", () => {
       getAccessGrant("https://some.vc.url", {
         fetch: mockedFetch,
       })
-    ).rejects.toThrow(
-      /Unexpected response.*\[https:\/\/some.vc.url\].*not an Access Grant/
-    );
+    ).rejects.toThrow(/not an Access Grant/);
   });
 
   it("supports denied access grants with a given IRI", async () => {

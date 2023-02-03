@@ -55,12 +55,13 @@ export async function getAccessGrant(
   const responseErrorClone = response.clone();
   let data;
   try {
-    data = normalizeAccessGrant(await response.json());
+    data = await response.json();
   } catch (e) {
     throw new Error(
       `Unexpected response when resolving [${vcUrl}], the result is not a Verifiable Credential: ${await responseErrorClone.text()}`
     );
   }
+  data = normalizeAccessGrant(data);
   if (
     !isVerifiableCredential(data) ||
     !isBaseAccessGrantVerifiableCredential(data) ||
