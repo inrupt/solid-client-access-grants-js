@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+## [2.1.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.1.1) - 2023-02-01
+
 ### Bugfixes
 
 - JSON-LD/JSON alignment: We are processing Verifiable Credentials as plain JSON,
