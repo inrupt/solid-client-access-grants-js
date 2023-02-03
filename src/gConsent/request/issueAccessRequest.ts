@@ -41,7 +41,7 @@ import { isAccessRequest } from "../guard/isAccessRequest";
  * @param accessRequest The grant returned by the VC issuer
  * @returns An equivalent JSON-LD document framed according to our typing.
  */
-function normalizeAccessRequest<T extends VerifiableCredential>(
+export function normalizeAccessRequest<T extends VerifiableCredential>(
   accessRequest: T
 ): T {
   // Proper type checking is performed after normalization, so casting here is fine.

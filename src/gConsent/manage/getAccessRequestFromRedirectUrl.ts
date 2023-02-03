@@ -28,6 +28,7 @@ import {
 import { isAccessRequest } from "../guard/isAccessRequest";
 import type { AccessRequest } from "../type/AccessRequest";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
+import { normalizeAccessRequest } from "../request/issueAccessRequest";
 
 /**
  * Get the Access Request out of the incoming redirect from the Access Management app.
@@ -73,9 +74,11 @@ export async function getAccessRequestFromRedirectUrl(
     );
   }
 
-  const accessRequest = await getVerifiableCredential(accessRequestIri, {
-    fetch: authFetch,
-  });
+  const accessRequest = normalizeAccessRequest(
+    await getVerifiableCredential(accessRequestIri, {
+      fetch: authFetch,
+    })
+  );
 
   if (!isAccessRequest(accessRequest)) {
     throw new Error(
