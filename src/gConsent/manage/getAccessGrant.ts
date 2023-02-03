@@ -26,6 +26,8 @@ import type { AccessGrant } from "../type/AccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
+import { normalizeAccessGrant } from "./approveAccessRequest";
+import { BaseGrantBody } from "../type/AccessVerifiableCredential";
 
 /**
  * Retrieve the Access Grant associated to the given URL.
@@ -53,7 +55,7 @@ export async function getAccessGrant(
   const responseErrorClone = response.clone();
   let data;
   try {
-    data = await response.json();
+    data = normalizeAccessGrant(await response.json());
   } catch (e) {
     throw new Error(
       `Unexpected response when resolving [${vcUrl}], the result is not a Verifiable Credential: ${await responseErrorClone.text()}`
