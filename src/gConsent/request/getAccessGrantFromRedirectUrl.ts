@@ -26,6 +26,7 @@ import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessVcBody } from "../guard/isBaseAccessVcBody";
 import { GRANT_VC_URL_PARAM_NAME } from "../manage/redirectToRequestor";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
+import { normalizeAccessGrant } from "../manage/approveAccessRequest";
 
 /**
  * Get the Access Grant out of the incoming redirect from the Access Management app.
@@ -55,9 +56,11 @@ export async function getAccessGrantFromRedirectUrl(
     );
   }
 
-  const accessGrant = await getVerifiableCredential(accessGrantIri, {
-    fetch: authFetch,
-  });
+  const accessGrant = normalizeAccessGrant(
+    await getVerifiableCredential(accessGrantIri, {
+      fetch: authFetch,
+    })
+  );
 
   if (!isBaseAccessVcBody(accessGrant) || !isAccessGrant(accessGrant)) {
     throw new Error(`${JSON.stringify(accessGrant)} is not an Access Grant`);

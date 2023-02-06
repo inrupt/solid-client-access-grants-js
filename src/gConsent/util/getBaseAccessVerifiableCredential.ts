@@ -29,6 +29,7 @@ import type {
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { isBaseAccessRequestVerifiableCredential } from "../guard/isBaseAccessRequestVerifiableCredential";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
+import { normalizeAccessRequest } from "../request/issueAccessRequest";
 
 async function getVerifiableCredential(
   vc: URL | UrlString,
@@ -66,10 +67,11 @@ export async function getBaseAccessRequestVerifiableCredential(
   vc: VerifiableCredential | URL | UrlString,
   options: AccessBaseOptions
 ): Promise<AccessRequestBody & VerifiableCredential> {
-  const fetchedVerifiableCredential =
+  const fetchedVerifiableCredential = normalizeAccessRequest(
     typeof vc === "string" || vc instanceof URL
       ? await getVerifiableCredential(vc, options)
-      : vc;
+      : vc
+  );
   if (!isBaseAccessRequestVerifiableCredential(fetchedVerifiableCredential)) {
     throw new Error(
       `An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.`

@@ -193,4 +193,41 @@ describe("getAccessRequestFromRedirectUrl", () => {
       getAccessRequestFromRedirectUrl(redirectedToUrl.href)
     ).rejects.toThrow();
   });
+
+  it("normalizes equivalent JSON-LD VCs", async () => {
+    const vcModule = jest.requireMock(
+      "@inrupt/solid-client-vc"
+    ) as jest.Mocked<{
+      getVerifiableCredential: typeof getVerifiableCredential;
+    }>;
+    const normalizedAccessRequest = mockAccessRequestVc();
+    // The server returns an equivalent JSON-LD with a different frame:
+    vcModule.getVerifiableCredential.mockResolvedValueOnce({
+      ...normalizedAccessRequest,
+      credentialSubject: {
+        ...normalizedAccessRequest.credentialSubject,
+        hasConsent: {
+          ...normalizedAccessRequest.credentialSubject.hasConsent,
+          // The 1-value array is replaced by the literal value.
+          forPersonalData:
+            normalizedAccessRequest.credentialSubject.hasConsent
+              .forPersonalData[0],
+          mode: normalizedAccessRequest.credentialSubject.hasConsent.mode[0],
+        },
+      },
+    });
+    const redirectedToUrl = new URL("https://redirect.url");
+    redirectedToUrl.searchParams.append(
+      "requestVcUrl",
+      encodeURI("https://some.vc")
+    );
+    redirectedToUrl.searchParams.append(
+      "redirectUrl",
+      encodeURI("https://requestor.redirect.url")
+    );
+    const { accessRequest } = await getAccessRequestFromRedirectUrl(
+      redirectedToUrl
+    );
+    expect(accessRequest).toStrictEqual(mockAccessRequestVc());
+  });
 });
