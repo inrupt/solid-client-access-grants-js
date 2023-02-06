@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+## [2.1.2](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.1.2) - 2023-02-06
+
 # Bugfixes
 
 - The JSON-LD/JSON normalization is now applied not only when issuing an Access Request
