@@ -7,6 +7,15 @@ updates:
     # Check the npm registry for updates every day (weekdays).
     schedule:
       interval: "daily"
+    allow: 
+      - dependency-type: production
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    allow: 
+      - dependency-type: development
   # Enable version updates for the website tooling.
   - package-ecosystem: "pip"
     # Look for `package.json` and `lock` files in the `root` directory.
