@@ -45,6 +45,11 @@ import {
   saveSolidDatasetInContainer,
 } from "../../src/index";
 
+if (process.env.CI === "true") {
+  // Tests running in the CI runners tend to be more flaky.
+  jest.retryTimes(3, { logErrorsBeforeRetry: true });
+}
+
 // Extend the timeout because of frequent issues in CI (default is 3500)
 custom.setHttpOptionsDefaults({
   timeout: 10000,
