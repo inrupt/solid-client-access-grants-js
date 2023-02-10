@@ -20,7 +20,14 @@
 //
 
 // Globals are actually not injected, so this does not shadow anything.
-import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
+import {
+  jest,
+  describe,
+  it,
+  expect,
+  beforeEach,
+  afterEach,
+} from "@jest/globals";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
 import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
