@@ -836,9 +836,16 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     });
 
     afterEach(async () => {
-      await revokeAccessGrant(accessGrant, {
-        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-      });
+      try {
+        await revokeAccessGrant(accessGrant, {
+          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+        });
+      } catch (e) {
+        // Allow console statement as this is useful to capture, either
+        // running tests locally or in CI.
+        // eslint-disable-next-line no-console
+        console.error(`Revoking the Access Grant failed: ${e.toString()}`);
+      }
 
       await sc.deleteFile(testFileIri, {
         fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
