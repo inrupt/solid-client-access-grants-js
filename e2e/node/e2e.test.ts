@@ -51,6 +51,7 @@ import {
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
 } from "../../src/index";
+import { getSourceIri } from "@inrupt/solid-client";
 
 if (process.env.CI === "true") {
   // Tests running in the CI runners tend to be more flaky.
@@ -796,22 +797,28 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     let fileContents: Buffer;
 
     beforeEach(async () => {
-      const containerPath = `${resourceOwnerSession.info.sessionId}-file-apis`;
+      const fileApisContainer = await sc.createContainerInContainer(
+        resourceOwnerPod,
+        {
+          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          slugSuggestion: "file-apis",
+        }
+      );
+      testContainerIri = getSourceIri(fileApisContainer);
 
-      testContainerIri = new URL(`${containerPath}/`, resourceOwnerPod).href;
       testFileName = `upload-${Date.now()}.txt`;
-      testFileIri = new URL(testFileName, testContainerIri).href;
-
       fileContents = Buffer.from("hello world", "utf-8");
 
-      await sc.createContainerAt(testContainerIri, {
-        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-      });
+      const uploadedFile = await sc.saveFileInContainer(
+        testContainerIri,
+        fileContents,
+        {
+          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          slug: testFileName,
+        }
+      );
 
-      await sc.saveFileInContainer(testContainerIri, fileContents, {
-        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-        slug: testFileName,
-      });
+      testFileIri = getSourceIri(uploadedFile);
 
       const request = await issueAccessRequest(
         {
