@@ -51,7 +51,6 @@ import {
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
 } from "../../src/index";
-import { getSourceIri } from "@inrupt/solid-client";
 
 if (process.env.CI === "true") {
   // Tests running in the CI runners tend to be more flaky.
@@ -804,7 +803,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
           slugSuggestion: "file-apis",
         }
       );
-      testContainerIri = getSourceIri(fileApisContainer);
+      testContainerIri = sc.getSourceIri(fileApisContainer);
 
       testFileName = `upload-${Date.now()}.txt`;
       fileContents = Buffer.from("hello world", "utf-8");
@@ -818,7 +817,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         }
       );
 
-      testFileIri = getSourceIri(uploadedFile);
+      testFileIri = sc.getSourceIri(uploadedFile);
 
       const request = await issueAccessRequest(
         {
@@ -851,7 +850,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         // Allow console statement as this is useful to capture, either
         // running tests locally or in CI.
         // eslint-disable-next-line no-console
-        console.error(`Revoking the Access Grant failed: ${e.toString()}`);
+        console.error(`Revoking the Access Grant failed: ${e}`);
       }
 
       await sc.deleteFile(testFileIri, {
