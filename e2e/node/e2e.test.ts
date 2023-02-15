@@ -27,8 +27,6 @@ import {
   expect,
   beforeEach,
   afterEach,
-  beforeAll,
-  afterAll,
 } from "@jest/globals";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
@@ -449,7 +447,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
   describe("resource owner interaction with VC provider", () => {
     let accessGrant: AccessGrant;
-    beforeAll(async () => {
+    beforeEach(async () => {
       const request = await issueAccessRequest(
         {
           access: { read: true, write: true, append: true },
@@ -476,7 +474,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       );
     });
 
-    afterAll(async () => {
+    afterEach(async () => {
       await revokeAccessGrant(accessGrant, {
         fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
       });
