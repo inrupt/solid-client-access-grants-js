@@ -143,8 +143,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       resourceOwnerPodAll[0],
       Buffer.from(SHARED_FILE_CONTENT),
       {
-        // The session ID is a random string, used here as a unique slug.
-        slug: `${resourceOwnerSession.info.sessionId}.txt`,
         fetch: addUserAgent(
           addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
           TEST_USER_AGENT
@@ -599,7 +597,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
       await sc.saveSolidDatasetInContainer(testContainerIri, dataset, {
         fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-        slugSuggestion: testFileName,
       });
 
       const request = await issueAccessRequest(
@@ -714,13 +711,11 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
     });
 
     it("can use the createContainerInContainer API to create a new container", async () => {
-      const containerNameSuggestion = "newTestContainer";
       const newChildContainer = await createContainerInContainer(
         testContainerIri,
         accessGrant,
         {
           fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-          slugSuggestion: containerNameSuggestion,
         }
       );
 
@@ -757,7 +752,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         accessGrant,
         {
           fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-          slugSuggestion: testFileName,
         }
       );
 
@@ -800,7 +794,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         resourceOwnerPod,
         {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          slugSuggestion: "file-apis",
         }
       );
       testContainerIri = sc.getSourceIri(fileApisContainer);
@@ -813,7 +806,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         fileContents,
         {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          slug: testFileName,
         }
       );
 
@@ -876,7 +868,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         accessGrant,
         {
           fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-          slug: testFileName,
         }
       );
 
@@ -952,7 +943,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         Buffer.from(testFileContent),
         {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          slug: testFileName,
         }
       );
 
