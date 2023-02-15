@@ -27,6 +27,8 @@ import {
   expect,
   beforeEach,
   afterEach,
+  beforeAll,
+  afterAll,
 } from "@jest/globals";
 import { Session } from "@inrupt/solid-client-authn-node";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
@@ -447,7 +449,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
   describe("resource owner interaction with VC provider", () => {
     let accessGrant: AccessGrant;
-    beforeEach(async () => {
+    beforeAll(async () => {
       const request = await issueAccessRequest(
         {
           access: { read: true, write: true, append: true },
@@ -474,7 +476,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       );
     });
 
-    afterEach(async () => {
+    afterAll(async () => {
       await revokeAccessGrant(accessGrant, {
         fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
       });
@@ -965,28 +967,28 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
   describe("recursive access grants support", () => {
     let accessRequest: AccessRequest;
     let accessGrant: AccessGrant;
-    let testFileName: string;
     let testFileIri: string;
     let testContainerIri: string;
     let testContainerIriChild: string;
     const testFileContent = "This is a test.";
 
     beforeEach(async () => {
-      const containerPath = `${resourceOwnerSession.info.sessionId}-recursive-grants`;
-      testContainerIri = new URL(`${containerPath}/`, resourceOwnerPod).href;
-      testFileName = "some-file.txt";
-      testFileIri = new URL(testFileName, testContainerIri).href;
+      const testContainer = await sc.createContainerInContainer(
+        resourceOwnerPod,
+        {
+          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+        }
+      );
+      testContainerIri = sc.getSourceUrl(testContainer);
 
-      await sc.createContainerAt(testContainerIri, {
-        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-      });
-      await sc.saveFileInContainer(
+      const testFile = await sc.saveFileInContainer(
         testContainerIri,
         Buffer.from(testFileContent),
         {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
         }
       );
+      testFileIri = sc.getSourceUrl(testFile);
 
       accessRequest = await issueAccessRequest(
         {
