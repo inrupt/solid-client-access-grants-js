@@ -446,6 +446,40 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
   });
 
   describe("resource owner interaction with VC provider", () => {
+    let accessGrant: AccessGrant;
+    beforeEach(async () => {
+      const request = await issueAccessRequest(
+        {
+          access: { read: true, write: true, append: true },
+          resourceOwner: resourceOwnerSession.info.webId as string,
+          resources: [sharedFileIri],
+          purpose: [
+            "https://some.purpose/not-a-nefarious-one/i-promise",
+            "https://some.other.purpose/",
+          ],
+        },
+        {
+          fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+          accessEndpoint: vcProvider,
+        }
+      );
+
+      accessGrant = await approveAccessRequest(
+        request,
+        {},
+        {
+          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          accessEndpoint: vcProvider,
+        }
+      );
+    });
+
+    afterEach(async () => {
+      await revokeAccessGrant(accessGrant, {
+        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+      });
+    });
+
     it("can filter VCs held by the service based on requestor", async () => {
       await expect(
         getAccessGrantAll(
