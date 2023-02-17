@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { fetch as crossFetch } from "cross-fetch";
+import { fetch as crossFetch } from "@inrupt/universal-fetch";
 import { AccessBaseOptions } from "../../gConsent/type/AccessBaseOptions";
 
 /**

@@ -20,7 +20,7 @@
 //
 
 import { UrlString } from "@inrupt/solid-client";
-import { fetch as crossFetch } from "cross-fetch";
+import { fetch as crossFetch } from "@inrupt/universal-fetch";
 import { parse } from "auth-header";
 import { AccessBaseOptions } from "../type/AccessBaseOptions";
 
