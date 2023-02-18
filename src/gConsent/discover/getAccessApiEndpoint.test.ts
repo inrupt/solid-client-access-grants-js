@@ -57,7 +57,7 @@ describe("getAccessApiEndpoint", () => {
   });
 
   it("throws an error if the unauthenticated fetch does not fail", async () => {
-    const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValueOnce(
       new Response("", {
         status: 200,
         statusText: "Ok",
