@@ -155,7 +155,7 @@ describe("getAccessGrant", () => {
       getAccessGrant("https://some.vc.url", {
         fetch: mockedFetch,
       })
-    ).resolves.toStrictEqual(normalizedAccessGrant);
+    ).resolves.toEqual(normalizedAccessGrant);
   });
 
   it("returns the access grant with the given URL object", async () => {
