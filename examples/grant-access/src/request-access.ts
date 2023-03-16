@@ -22,7 +22,7 @@
 /* eslint-disable no-console */
 
 import { Session } from "@inrupt/solid-client-authn-node";
-import { fetch as crossFetch } from "cross-fetch";
+import { fetch as crossFetch } from "@inrupt/universal-fetch";
 import express from "express";
 import {
   issueAccessRequest,

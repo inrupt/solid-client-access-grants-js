@@ -20,8 +20,8 @@
 //
 
 import { jest, describe, it, expect } from "@jest/globals";
-import { Response } from "cross-fetch";
-import type * as CrossFetch from "cross-fetch";
+import { Response } from "@inrupt/universal-fetch";
+import type * as CrossFetch from "@inrupt/universal-fetch";
 
 import {
   MOCKED_ACCESS_ISSUER,
@@ -30,10 +30,10 @@ import {
 } from "../request/request.mock";
 import { getAccessApiEndpoint } from "./getAccessApiEndpoint";
 
-jest.mock("cross-fetch", () => {
-  const crossFetch = jest.requireActual("cross-fetch") as jest.Mocked<
-    typeof CrossFetch
-  >;
+jest.mock("@inrupt/universal-fetch", () => {
+  const crossFetch = jest.requireActual(
+    "@inrupt/universal-fetch"
+  ) as jest.Mocked<typeof CrossFetch>;
   return {
     // Do no mock the globals such as Response.
     ...crossFetch,
@@ -57,13 +57,13 @@ describe("getAccessApiEndpoint", () => {
   });
 
   it("throws an error if the unauthenticated fetch does not fail", async () => {
-    const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValueOnce(
       new Response("", {
         status: 200,
         statusText: "Ok",
       })
     );
-    const crossFetchModule = jest.requireMock("cross-fetch") as {
+    const crossFetchModule = jest.requireMock("@inrupt/universal-fetch") as {
       fetch: typeof global.fetch;
     };
     crossFetchModule.fetch = mockedFetch;
@@ -81,7 +81,7 @@ describe("getAccessApiEndpoint", () => {
         },
       })
     );
-    const crossFetchModule = jest.requireMock("cross-fetch") as {
+    const crossFetchModule = jest.requireMock("@inrupt/universal-fetch") as {
       fetch: typeof global.fetch;
     };
     crossFetchModule.fetch = mockedFetch;
@@ -108,7 +108,7 @@ describe("getAccessApiEndpoint", () => {
           })
         )
       );
-    const crossFetchModule = jest.requireMock("cross-fetch") as {
+    const crossFetchModule = jest.requireMock("@inrupt/universal-fetch") as {
       fetch: typeof global.fetch;
     };
     crossFetchModule.fetch = mockedFetch;
