@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { fetch as crossFetch } from "cross-fetch";
+import { fetch as crossFetch } from "@inrupt/universal-fetch";
 import base64url from "base64url";
 import type { UrlString } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";

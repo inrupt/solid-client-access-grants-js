@@ -29,7 +29,7 @@ import {
   WithServerResourceInfo,
 } from "@inrupt/solid-client";
 // eslint-disable-next-line no-shadow
-import { Response } from "cross-fetch";
+import { Response } from "@inrupt/universal-fetch";
 
 import { PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
@@ -97,7 +97,7 @@ export const mockAccessApiEndpoint = (withCredentialIssuer = true) => {
         )
       )
     );
-  const crossFetchModule = jest.requireMock("cross-fetch") as {
+  const crossFetchModule = jest.requireMock("@inrupt/universal-fetch") as {
     fetch: typeof global.fetch;
   };
   crossFetchModule.fetch = mockedFetch;

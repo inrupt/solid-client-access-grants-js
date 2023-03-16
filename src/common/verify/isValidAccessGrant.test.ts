@@ -20,8 +20,8 @@
 //
 
 import { jest, describe, it, expect } from "@jest/globals";
-import { Response } from "cross-fetch";
-import type * as CrossFetch from "cross-fetch";
+import { Response } from "@inrupt/universal-fetch";
+import type * as CrossFetch from "@inrupt/universal-fetch";
 import {
   isVerifiableCredential,
   getVerifiableCredentialApiConfiguration,
@@ -38,10 +38,10 @@ jest.mock("@inrupt/solid-client", () => {
   return solidClientModule;
 });
 jest.mock("@inrupt/solid-client-vc");
-jest.mock("cross-fetch", () => {
-  const crossFetch = jest.requireActual("cross-fetch") as jest.Mocked<
-    typeof CrossFetch
-  >;
+jest.mock("@inrupt/universal-fetch", () => {
+  const crossFetch = jest.requireActual(
+    "@inrupt/universal-fetch"
+  ) as jest.Mocked<typeof CrossFetch>;
   return {
     // Do no mock the globals such as Response.
     ...crossFetch,
