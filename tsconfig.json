@@ -14,7 +14,7 @@
     "forceConsistentCasingInFileNames": true,
     /* Advanced Options */
     "stripInternal": true,
-    // This is required to transform native ESM from our dependencies using ts-jest.  
+    // This is required to transform native ESM from our dependencies using ts-jest.
     "allowJs": true
   },
   "include": ["src/index.ts"],
@@ -32,7 +32,6 @@
       "src/gConsent/manage/index.ts",
       "src/gConsent/request/index.ts",
       "src/gConsent/verify/index.ts",
-      "src/odrl/index.ts",
       // These types are reused across files, so give them a specific page for
       // them to be documented on:
       "src/type/RedirectOptions.ts",
@@ -42,8 +41,7 @@
       "src/type/AccessModes.ts",
       "src/gConsent/type/AccessBaseOptions.ts",
       "src/gConsent/type/IssueAccessRequestParameters.ts",
-      "src/gConsent/type/Parameter.ts",
-      "src/odrl/type/AccessGrant.ts"
+      "src/gConsent/type/Parameter.ts"
     ],
     "exclude": [
       "node_modules/**",
