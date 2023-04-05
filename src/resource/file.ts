@@ -21,6 +21,7 @@
 
 import {
   UrlString,
+  WithResourceInfo,
   getFile as coreGetFile,
   overwriteFile as coreOverwriteFile,
   saveFileInContainer as coreSaveFileInContainer,
@@ -88,10 +89,32 @@ export async function getFile(
  */
 export async function overwriteFile(
   resourceUrl: UrlString,
+  file: File,
+  accessGrant: VerifiableCredential,
+  options?: FetchOptions & { contentType?: string }
+): Promise<File & WithResourceInfo>
+/**
+ * 
+ * @param resourceUrl 
+ * @param file 
+ * @param accessGrant 
+ * @param options 
+ */
+export async function overwriteFile(
+  resourceUrl: UrlString,
   file: File | Buffer,
   accessGrant: VerifiableCredential,
   options?: FetchOptions & { contentType?: string }
-) {
+): Promise<(File | Buffer) & WithResourceInfo>
+/**
+ * @deprecated `overwriteFile` should only have `Blob` input
+ */
+export async function overwriteFile(
+  resourceUrl: UrlString,
+  file: File | Buffer,
+  accessGrant: VerifiableCredential,
+  options?: FetchOptions & { contentType?: string }
+): Promise<(File | Buffer) & WithResourceInfo> {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
     fetchOptions.fetch = options.fetch;
@@ -132,10 +155,25 @@ export async function overwriteFile(
 
 export async function saveFileInContainer(
   containerUrl: UrlString,
+  file: File,
+  accessGrant: VerifiableCredential,
+  options?: FetchOptions & { contentType?: string; slug?: string }
+): Promise<File & WithResourceInfo>
+/**
+ * @deprecated `saveFileInContainer` should only have `Blob` input
+ */
+export async function saveFileInContainer(
+  containerUrl: UrlString,
   file: File | Buffer,
   accessGrant: VerifiableCredential,
   options?: FetchOptions & { contentType?: string; slug?: string }
-) {
+): Promise<(File | Buffer) & WithResourceInfo>
+export async function saveFileInContainer(
+  containerUrl: UrlString,
+  file: File | Buffer,
+  accessGrant: VerifiableCredential,
+  options?: FetchOptions & { contentType?: string; slug?: string }
+): Promise<(File | Buffer) & WithResourceInfo> {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
     fetchOptions.fetch = options.fetch;
