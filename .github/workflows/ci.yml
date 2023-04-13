@@ -9,7 +9,7 @@ jobs:
   lint:
     uses: inrupt/typescript-sdk-tools/.github/workflows/reusable-lint.yml@v1.5.5
 
-  unit-test:
+  unit-tests:
     continue-on-error: ${{ matrix.experimental }}
     runs-on: ${{ matrix.os }}
     strategy:
