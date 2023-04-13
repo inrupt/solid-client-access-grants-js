@@ -4,9 +4,15 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+## [2.2.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.2.0) - 2023-04-14
+
+### New feature
+
+- Node 18 support
+
 ## [2.1.2](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.1.2) - 2023-02-06
 
-# Bugfixes
+### Bugfixes
 
 - The JSON-LD/JSON normalization is now applied not only when issuing an Access Request
   or an Access Grant, but also when dereferencing one.
