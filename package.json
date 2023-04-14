@@ -103,7 +103,7 @@
     "@inrupt/eslint-config-lib": "^1.0.0",
     "@inrupt/internal-playwright-helpers": "^1.5.3",
     "@inrupt/internal-test-env": "^1.5.4",
-    "@inrupt/jest-jsdom-polyfills": "^1.6.0",
+    "@inrupt/jest-jsdom-polyfills": "^1.6.1",
     "@inrupt/solid-client-authn-browser": "^1.12.2",
     "@inrupt/solid-client-authn-node": "^1.12.1",
     "@playwright/test": "^1.28.1",
@@ -136,7 +136,7 @@
     "rdf-namespaces": "^1.9.2"
   },
   "engines": {
-    "node": "^14.17.0 || ^16.0.0"
+    "node": "^14.17.0 || ^16.0.0 || ^18.0.0"
   },
   "publishConfig": {
     "access": "public"
