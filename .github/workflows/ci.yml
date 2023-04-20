@@ -17,7 +17,7 @@ jobs:
       matrix:
         # Available OS's: https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: ["18.x", "16.x", "14.x"]
+        node-version: ["20.x", "18.x", "16.x", "14.x"]
         experimental: [false]
     steps:
       - uses: actions/checkout@v3
@@ -30,7 +30,7 @@ jobs:
       - run: npm run test
       # Upload coverage for sonarcube (only matching OS and one node version required)
       - uses: actions/upload-artifact@v3
-        if: ${{ matrix.os == 'ubuntu-latest' && matrix.node-version == '18.x' }}
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.node-version == '20.x' }}
         with:
           name: code-coverage-${{matrix.os}}-${{matrix.node-version}}
           path: coverage/
@@ -47,7 +47,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/download-artifact@v3
         with:
-          name: code-coverage-ubuntu-latest-18.x
+          name: code-coverage-ubuntu-latest-20.x
           path: coverage/
       - uses: SonarSource/sonarcloud-github-action@v1.9
         env:
