@@ -4,11 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+## [2.3.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.3.0) - 2023-05-09
+
 ### New feature
 
 - Node 20 support
 
-## [2.2.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.2.0) - 2024-04-14
+## [2.2.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.2.0) - 2023-04-14
 
 ### New feature
 
