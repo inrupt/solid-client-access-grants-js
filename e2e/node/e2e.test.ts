@@ -485,10 +485,6 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         }
       );
 
-      console.log("request", request);
-
-      // TODO: Investigate deprecation - almost certain this is
-      // wrong at the moment
       const grant = await denyAccessRequest(
         resourceOwnerSession.info.webId as string,
         request,
