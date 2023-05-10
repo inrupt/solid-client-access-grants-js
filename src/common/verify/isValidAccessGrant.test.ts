@@ -217,12 +217,10 @@ describe("isValidAccessGrant", () => {
   });
 
   it("throws if no verification endpoint is discovered", async () => {
-    jest
-      .mocked(getVerifiableCredentialApiConfiguration)
-      .mockResolvedValueOnce({
-        specCompliant: {},
-        legacy: {},
-      });
+    jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+      specCompliant: {},
+      legacy: {},
+    });
     jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
     const mockedFetch = jest
       .fn(global.fetch)
