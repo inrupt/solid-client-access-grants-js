@@ -82,8 +82,8 @@ const TEST_USER_AGENT = `Node-based solid-client-access-grant end-to-end tests r
   process.env.CI === "true" ? "in CI" : "locally"
 }`;
 const addUserAgent =
-  (myFetch: typeof fetch, agent: string): typeof fetch =>
-  (input: Parameters<typeof fetch>[0], init: Parameters<typeof fetch>[1]) =>
+  (myFetch: typeof fetch, agent: string) =>
+  (input: RequestInfo | URL, init?: RequestInit | undefined) =>
     myFetch(input, {
       ...init,
       headers: { ...init?.headers, "User-Agent": agent },
