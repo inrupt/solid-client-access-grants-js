@@ -29,7 +29,10 @@ import {
   afterEach,
 } from "@jest/globals";
 import { Session } from "@inrupt/solid-client-authn-node";
-import { isVerifiableCredential, VerifiableCredential } from "@inrupt/solid-client-vc";
+import {
+  isVerifiableCredential,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 // Making a named import here to avoid confusion with the wrapped functions from
 // the access grant API
@@ -247,11 +250,14 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       });
 
       // After revocation getFile should throw errors
-      await expect(filePromise).rejects.toThrowError();
+      await expect(filePromise).rejects.toThrow();
 
       // In particular the error should be a 403
-      const fileResponse = await addUserAgent(requestorSession.fetch, TEST_USER_AGENT)(sharedFileIri);
-      expect(fileResponse.status).toEqual(403);
+      const fileResponse = await addUserAgent(
+        requestorSession.fetch,
+        TEST_USER_AGENT
+      )(sharedFileIri);
+      expect(fileResponse.status).toBe(403);
     });
 
     it("can issue an access grant overriding an access request", async () => {
@@ -479,7 +485,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         }
       );
 
-      console.log('request', request)
+      console.log("request", request);
 
       // TODO: Investigate deprecation - almost certain this is
       // wrong at the moment
@@ -489,7 +495,8 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
         {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
           accessEndpoint: vcProvider,
-        });
+        }
+      );
 
       await expect(
         isValidAccessGrant(grant, {
@@ -507,13 +514,16 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       });
 
       // After revocation getFile should throw errors
-      await expect(filePromise).rejects.toThrowError();
+      await expect(filePromise).rejects.toThrow();
 
       // In particular the error should be a 403
-      const fileResponse = await addUserAgent(requestorSession.fetch, TEST_USER_AGENT)(sharedFileIri);
-      expect(fileResponse.status).toEqual(403);
+      const fileResponse = await addUserAgent(
+        requestorSession.fetch,
+        TEST_USER_AGENT
+      )(sharedFileIri);
+      expect(fileResponse.status).toBe(403);
     });
-  })
+  });
 
   describe("resource owner interaction with VC provider", () => {
     let accessGrant: AccessGrant;
