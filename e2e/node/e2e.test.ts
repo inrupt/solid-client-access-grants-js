@@ -29,7 +29,10 @@ import {
   afterEach,
 } from "@jest/globals";
 import { Session } from "@inrupt/solid-client-authn-node";
-import { isVerifiableCredential } from "@inrupt/solid-client-vc";
+import {
+  isVerifiableCredential,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 // Making a named import here to avoid confusion with the wrapped functions from
 // the access grant API
@@ -40,6 +43,7 @@ import {
   AccessRequest,
   approveAccessRequest,
   createContainerInContainer,
+  denyAccessRequest,
   getAccessGrantAll,
   getFile,
   getSolidDataset,
@@ -240,6 +244,20 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
           })
         ).errors
       ).toHaveLength(1);
+
+      const filePromise = getFile(sharedFileIri, grant, {
+        fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+      });
+
+      // After revocation getFile should throw errors
+      await expect(filePromise).rejects.toThrow();
+
+      // In particular the error should be a 403
+      const fileResponse = await addUserAgent(
+        requestorSession.fetch,
+        TEST_USER_AGENT
+      )(sharedFileIri);
+      expect(fileResponse.status).toBe(403);
     });
 
     it("can issue an access grant overriding an access request", async () => {
@@ -442,6 +460,64 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
           append: false,
         })
       );
+    });
+  });
+
+  describe("access request, deny flow", () => {
+    it("can issue an access grant denying an access request", async () => {
+      const expirationDate = new Date();
+      // Request a 3-month grant
+      expirationDate.setMonth((expirationDate.getMonth() + 3) % 12);
+      const request: VerifiableCredential = await issueAccessRequest(
+        {
+          access: { read: true, append: true },
+          resourceOwner: resourceOwnerSession.info.webId as string,
+          resources: [sharedFileIri],
+          purpose: [
+            "https://some.purpose/not-a-nefarious-one/i-promise",
+            "https://some.other.purpose/",
+          ],
+          expirationDate,
+        },
+        {
+          fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+          accessEndpoint: vcProvider,
+        }
+      );
+
+      const grant = await denyAccessRequest(
+        resourceOwnerSession.info.webId as string,
+        request,
+        {
+          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          accessEndpoint: vcProvider,
+        }
+      );
+
+      await expect(
+        isValidAccessGrant(grant, {
+          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
+          // It is an issue documented in the VC library e2e test, and in a ticket
+          // to be fixed.
+          verificationEndpoint: `${vcProvider}/verify`,
+        })
+      ).resolves.toMatchObject({ errors: [] });
+      expect(grant.expirationDate).toBeUndefined();
+
+      const filePromise = getFile(sharedFileIri, grant, {
+        fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+      });
+
+      // After revocation getFile should throw errors
+      await expect(filePromise).rejects.toThrow();
+
+      // In particular the error should be a 403
+      const fileResponse = await addUserAgent(
+        requestorSession.fetch,
+        TEST_USER_AGENT
+      )(sharedFileIri);
+      expect(fileResponse.status).toBe(403);
     });
   });
 
