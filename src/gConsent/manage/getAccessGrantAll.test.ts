@@ -22,6 +22,7 @@
 import { jest, it, describe, expect } from "@jest/globals";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import type * as VcModule from "@inrupt/solid-client-vc";
+import { fetch } from "@inrupt/universal-fetch";
 import {
   getAccessGrantAll,
   IssueAccessRequestParameters,
@@ -75,7 +76,9 @@ describe("getAccessGrantAll", () => {
       "https://some.api.endpoint/derive",
       expect.objectContaining(expectedDefaultVcShape),
       expect.objectContaining({
-        // FIXME: expecting fetch to match crossFetch fails in node.
+        // Expecting fetch to match universal-fetch fails in node because the
+        // getSessionFetch function returns the default @inrupt/solid-client-authn-browser
+        // fetch instead.
         fetch: expect.anything(),
       })
     );
@@ -180,15 +183,17 @@ describe("getAccessGrantAll", () => {
   });
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the expiration filter if specified", async () => {
+    const mockedFetch = jest.fn<typeof fetch>();
     await getAccessGrantAll(resource.href, undefined, {
       includeExpired: true,
+      fetch: mockedFetch,
     });
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       "https://some.api.endpoint/derive",
       expect.anything(),
       expect.objectContaining({
         // FIXME: expecting fetch to match crossFetch fails in node.
-        fetch: expect.anything(),
+        fetch: mockedFetch,
         includeExpiredVc: true,
       })
     );

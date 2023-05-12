@@ -20,7 +20,7 @@
 //
 
 import { jest, describe, it, expect } from "@jest/globals";
-import { fetch as crossFetch, Response } from "cross-fetch";
+import { fetch as crossFetch, Response } from "@inrupt/universal-fetch";
 
 import base64url from "base64url";
 import {
@@ -32,8 +32,8 @@ import {
   fetchWithVc,
 } from "./index";
 
-jest.mock("cross-fetch", () => {
-  const crossFetchModule = jest.requireActual("cross-fetch") as any;
+jest.mock("@inrupt/universal-fetch", () => {
+  const crossFetchModule = jest.requireActual("@inrupt/universal-fetch") as any;
   return {
     ...crossFetchModule,
     fetch: jest.fn(),
@@ -365,7 +365,7 @@ describe("fetchWithVc", () => {
     const resourceIri = "https://fake.url/some-resource";
     const mockHeader =
       'UMA realm="test" as_uri="https://fake.url" ticket="some_value"';
-    // Cross-fetch is necessarily called for unauthenticated calls.
+    // @inrupt/universal-fetch is necessarily called for unauthenticated calls.
     (crossFetch as jest.MockedFunction<typeof crossFetch>)
       // first request is for headers
       .mockResolvedValueOnce(
