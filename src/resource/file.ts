@@ -27,7 +27,7 @@ import {
   saveFileInContainer as coreSaveFileInContainer,
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import type { Buffer } from 'buffer';
+import type { Buffer as NodeBuffer } from "buffer";
 import { fetchWithVc } from "../fetch";
 import { FetchOptions } from "../type/FetchOptions";
 
@@ -101,7 +101,7 @@ export async function overwriteFile<T extends File>(
  * @param accessGrant
  * @param options
  */
-export async function overwriteFile<T extends File | Buffer>(
+export async function overwriteFile<T extends File | NodeBuffer>(
   resourceUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential,
@@ -110,7 +110,7 @@ export async function overwriteFile<T extends File | Buffer>(
 /**
  * @deprecated `overwriteFile` should only have `Blob` input
  */
-export async function overwriteFile<T extends File | Buffer>(
+export async function overwriteFile<T extends File | NodeBuffer>(
   resourceUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential,
@@ -163,13 +163,13 @@ export async function saveFileInContainer<T extends File>(
 /**
  * @deprecated `saveFileInContainer` should only have `File` input; not `Buffer`
  */
-export async function saveFileInContainer<T extends File | Buffer>(
+export async function saveFileInContainer<T extends File | NodeBuffer>(
   containerUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential,
   options?: FetchOptions & { contentType?: string; slug?: string }
 ): Promise<T & WithResourceInfo>;
-export async function saveFileInContainer<T extends File | Buffer>(
+export async function saveFileInContainer<T extends File | NodeBuffer>(
   containerUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential,
