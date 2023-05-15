@@ -95,11 +95,7 @@ export async function overwriteFile<T extends File>(
   options?: FetchOptions & { contentType?: string }
 ): Promise<T & WithResourceInfo>;
 /**
- *
- * @param resourceUrl
- * @param file
- * @param accessGrant
- * @param options
+ * @deprecated `overwriteFile` should only have `File` input
  */
 export async function overwriteFile<T extends File | NodeBuffer>(
   resourceUrl: UrlString,
@@ -107,9 +103,6 @@ export async function overwriteFile<T extends File | NodeBuffer>(
   accessGrant: VerifiableCredential,
   options?: FetchOptions & { contentType?: string }
 ): Promise<T & WithResourceInfo>;
-/**
- * @deprecated `overwriteFile` should only have `Blob` input
- */
 export async function overwriteFile<T extends File | NodeBuffer>(
   resourceUrl: UrlString,
   file: T,
