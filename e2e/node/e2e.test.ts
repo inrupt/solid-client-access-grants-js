@@ -145,9 +145,7 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
     const savedFile = await sc.saveFileInContainer(
       resourceOwnerPodAll[0],
-      new Blob([
-        Buffer.from(SHARED_FILE_CONTENT, 'utf-8'),
-      ], {
+      new Blob([Buffer.from(SHARED_FILE_CONTENT, "utf-8")], {
         type: "text/plain",
       }),
       {

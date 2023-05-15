@@ -27,6 +27,7 @@ import {
   saveFileInContainer as coreSaveFileInContainer,
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { Buffer } from 'buffer';
 import { fetchWithVc } from "../fetch";
 import { FetchOptions } from "../type/FetchOptions";
 
@@ -87,34 +88,34 @@ export async function getFile(
  * otherwise.
  * @since 1.1.0
  */
-export async function overwriteFile(
+export async function overwriteFile<T extends File>(
   resourceUrl: UrlString,
-  file: File,
+  file: T,
   accessGrant: VerifiableCredential,
   options?: FetchOptions & { contentType?: string }
-): Promise<File & WithResourceInfo>
+): Promise<T & WithResourceInfo>;
 /**
- * 
- * @param resourceUrl 
- * @param file 
- * @param accessGrant 
- * @param options 
+ *
+ * @param resourceUrl
+ * @param file
+ * @param accessGrant
+ * @param options
  */
-export async function overwriteFile(
+export async function overwriteFile<T extends File | Buffer>(
   resourceUrl: UrlString,
-  file: File | Buffer,
+  file: T,
   accessGrant: VerifiableCredential,
   options?: FetchOptions & { contentType?: string }
-): Promise<(File | Buffer) & WithResourceInfo>
+): Promise<T & WithResourceInfo>;
 /**
  * @deprecated `overwriteFile` should only have `Blob` input
  */
-export async function overwriteFile(
+export async function overwriteFile<T extends File | Buffer>(
   resourceUrl: UrlString,
-  file: File | Buffer,
+  file: T,
   accessGrant: VerifiableCredential,
   options?: FetchOptions & { contentType?: string }
-): Promise<(File | Buffer) & WithResourceInfo> {
+): Promise<T & WithResourceInfo> {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
     fetchOptions.fetch = options.fetch;
@@ -131,7 +132,7 @@ export async function overwriteFile(
     overwriteFileOptions.contentType = options.contentType;
   }
 
-  return await coreOverwriteFile(resourceUrl, file, {
+  return await coreOverwriteFile<T>(resourceUrl, file, {
     ...overwriteFileOptions,
     fetch: authenticatedFetch,
   });
@@ -153,27 +154,27 @@ export async function overwriteFile(
  * @since 1.1.0
  */
 
-export async function saveFileInContainer(
+export async function saveFileInContainer<T extends File>(
   containerUrl: UrlString,
-  file: File,
+  file: T,
   accessGrant: VerifiableCredential,
   options?: FetchOptions & { contentType?: string; slug?: string }
-): Promise<File & WithResourceInfo>
+): Promise<T & WithResourceInfo>;
 /**
- * @deprecated `saveFileInContainer` should only have `Blob` input
+ * @deprecated `saveFileInContainer` should only have `File` input; not `Buffer`
  */
-export async function saveFileInContainer(
+export async function saveFileInContainer<T extends File | Buffer>(
   containerUrl: UrlString,
-  file: File | Buffer,
+  file: T,
   accessGrant: VerifiableCredential,
   options?: FetchOptions & { contentType?: string; slug?: string }
-): Promise<(File | Buffer) & WithResourceInfo>
-export async function saveFileInContainer(
+): Promise<T & WithResourceInfo>;
+export async function saveFileInContainer<T extends File | Buffer>(
   containerUrl: UrlString,
-  file: File | Buffer,
+  file: T,
   accessGrant: VerifiableCredential,
   options?: FetchOptions & { contentType?: string; slug?: string }
-): Promise<(File | Buffer) & WithResourceInfo> {
+): Promise<T & WithResourceInfo> {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
     fetchOptions.fetch = options.fetch;
@@ -193,7 +194,7 @@ export async function saveFileInContainer(
     fileOptions.slug = options.slug;
   }
 
-  return await coreSaveFileInContainer(containerUrl, file, {
+  return await coreSaveFileInContainer<T>(containerUrl, file, {
     ...fileOptions,
     fetch: authenticatedFetch,
   });

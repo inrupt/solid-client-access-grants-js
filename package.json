@@ -127,12 +127,13 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@inrupt/solid-client": "^1.25.1",
+    "@inrupt/solid-client": "^1.28.1",
     "@inrupt/solid-client-vc": "^0.6.0",
     "@inrupt/universal-fetch": "^1.0.1",
     "@types/rdfjs__dataset": "^1.0.5",
     "auth-header": "^1.0.0",
     "base64url": "^3.0.1",
+    "buffer": "^6.0.3",
     "rdf-namespaces": "^1.9.2"
   },
   "engines": {
