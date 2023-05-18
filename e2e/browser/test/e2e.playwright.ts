@@ -21,7 +21,7 @@
 
 import { test, expect } from "@inrupt/internal-playwright-helpers";
 
-test("Granting access to a resource, then revoking it", async ({
+test("Granting access to a resource, then revoking the access grant", async ({
   page,
   auth,
 }) => {
