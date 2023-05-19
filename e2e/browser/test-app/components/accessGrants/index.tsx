@@ -23,6 +23,9 @@ import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import {
   approveAccessRequest,
   revokeAccessGrant,
+  redirectToAccessManagementUi,
+  issueAccessRequest,
+  GRANT_VC_URL_PARAM_NAME,
 } from "@inrupt/solid-client-access-grants";
 import {
   getPodUrlAll,
@@ -34,6 +37,12 @@ import React, { useState } from "react";
 
 const session = getDefaultSession();
 const SHARED_FILE_CONTENT = "Some content.\n";
+// This is the endpoint our NodeJS demo app listens on to receive incoming login
+// const redirectUrl = new URL("/redirect", process.env.APP_URL);
+// const REDIRECT_URL = redirectUrl.href;
+const expirationDate = new Date(Date.now() + 180 * 6000);
+
+const REACT_APP_BACKEND_PORT = 3001;
 
 export default function AccessGrant({
   setErrorMessage,
@@ -120,6 +129,51 @@ export default function AccessGrant({
     });
     setAccessGrant(undefined);
   };
+
+  const handleAccessRequest = () => {
+    // const { webId } = session.info;
+    const webId = "https://id.inrupt.com/cpinkafly1";
+    console.log(webId);
+    const urlResource =
+      "https://storage.inrupt.com/a008ce30-b7c5-4e5b-a15d-f95903aacfa4/628f6a59-96e3-4f9c-ad50-7dfaea3a1ea8.txt";
+    console.log(sharedResourceIri);
+    console.log(
+      JSON.stringify({
+        resource: urlResource,
+        owner: webId,
+        expirationDate,
+      })
+    );
+    return fetch(`/api/request`, {
+      method: "POST",
+      headers: {
+        Accept: "application.json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        resource: urlResource,
+        owner: webId,
+        expirationDate,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("got here");
+        console.log(data);
+        redirectToAccessManagementUi(
+          data.accessRequest,
+          `http://localhost:3000/home`,
+          {
+            redirectCallback: (url: any) => {
+              console.log(`redirecting to PB ${url}`);
+              window.location.replace(url);
+            },
+            fallbackAccessManagementUi: `https://podbrowser.inrupt.com/privacy/access/requests/`,
+          }
+        );
+      });
+  };
+
   return (
     <>
       <div>
@@ -152,6 +206,9 @@ export default function AccessGrant({
           data-testid="revoke-access"
         >
           Revoke access
+        </button>
+        <button onClick={handleAccessRequest} data-testid="redirect-for-access">
+          Redirect to PodBrowser to Grant Access
         </button>
       </div>
       <p>

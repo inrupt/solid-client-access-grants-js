@@ -21,6 +21,35 @@
 
 import { test, expect } from "@inrupt/internal-playwright-helpers";
 
+test("Redirect to Podbrowser to accept Access Request", async ({
+  page,
+  auth,
+}) => {
+  await auth.login({ allow: true });
+  // Create the resource. Note that the Promise.all prevents a race condition where
+  // the request would be sent before we wait on it.
+  await Promise.all([
+    page.click("button[data-testid=create-resource]"),
+    page.waitForRequest((request) => request.method() === "POST"),
+    page.waitForResponse((response) => response.status() === 201),
+  ]);
+  await expect(
+    page.innerText("span[data-testid=resource-iri]")
+  ).resolves.toMatch(/https:\/\/.*\.txt/);
+
+  // TODO:
+  // The test issues an access request on behalf of a requestor,
+  await Promise.all([
+    page.click("button[data-testid=redirect-for-access]"),
+    page.waitForRequest((request) => request.method() === "POST"),
+  ]);
+  // The test user is redirected to Podbrowser, and presented with the request
+  // The test user grants access
+  // The test user is redirected back to the test app
+  // The test app collects the access grant based on the IRI in the query parameters
+  // The test app sends an authenticated request to get the resource it has been granted access to
+});
+
 test("Granting access to a resource, then revoking the access grant", async ({
   page,
   auth,
