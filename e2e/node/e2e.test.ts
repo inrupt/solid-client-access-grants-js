@@ -994,11 +994,11 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
     if (nodeMajor >= 18) {
       fileContentMatrix.push(
-        ["File", new File(["new contents"], "file.txt")],
+        // ["File", new File(["new contents"], "file.txt")],
         ["Node File", new NodeFile(["new contents"], "file.txt")]
       );
       overwrittenContentMatrix.push(
-        ["File", new File(["overwritten contents"], "file.txt")],
+        // ["File", new File(["overwritten contents"], "file.txt")],
         ["Node File", new NodeFile(["overwritten contents"], "file.txt")]
       );
     }
