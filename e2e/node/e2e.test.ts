@@ -38,6 +38,7 @@ import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 // the access grant API
 import * as sc from "@inrupt/solid-client";
 import { custom } from "openid-client";
+import { File as NodeFile } from "buffer";
 import {
   AccessGrant,
   AccessRequest,
@@ -145,7 +146,9 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
 
     const savedFile = await sc.saveFileInContainer(
       resourceOwnerPodAll[0],
-      Buffer.from(SHARED_FILE_CONTENT),
+      new NodeFile([Buffer.from(SHARED_FILE_CONTENT, "utf-8")], "text.ttl", {
+        type: "text/plain",
+      }),
       {
         fetch: addUserAgent(
           addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -978,28 +981,50 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       });
     });
 
-    it("can use the saveFileInContainer API to create a new file", async () => {
-      const newFileContents = Buffer.from("new contents", "utf-8");
+    const fileContentMatrix: [string, Buffer | File | NodeFile][] = [
+      ["Buffer", Buffer.from("new contents", "utf-8")],
+    ];
 
-      const newFile = await saveFileInContainer(
-        testContainerIri,
-        newFileContents,
-        accessGrant,
-        {
-          fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-        }
+    const overwrittenContentMatrix: [string, Buffer | File | NodeFile][] = [
+      ["Buffer", Buffer.from("overwritten contents", "utf-8")],
+    ];
+
+    const nodeVersion = process.versions.node.split(".");
+    const nodeMajor = Number(nodeVersion[0]);
+
+    if (nodeMajor >= 18) {
+      fileContentMatrix.push(
+        ["File", new File(["new contents"], "file.txt")],
+        ["Node File", new NodeFile(["new contents"], "file.txt")]
       );
+      overwrittenContentMatrix.push(
+        ["File", new File(["overwritten contents"], "file.txt")],
+        ["Node File", new NodeFile(["overwritten contents"], "file.txt")]
+      );
+    }
 
-      expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
+    describe.each(fileContentMatrix)(`Using %s`, (_, newFileContents) => {
+      it("can use the saveFileInContainer API to create a new file", async () => {
+        const newFile = await saveFileInContainer(
+          testContainerIri,
+          newFileContents,
+          accessGrant,
+          {
+            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+          }
+        );
 
-      // Verify as the resource owner that the file was actually created:
-      const fileAsResourceOwner = await sc.getFile(sc.getSourceUrl(newFile), {
-        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+        expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
+
+        // Verify as the resource owner that the file was actually created:
+        const fileAsResourceOwner = await sc.getFile(sc.getSourceUrl(newFile), {
+          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+        });
+
+        await expect(fileAsResourceOwner.text()).resolves.toBe(
+          newFileContents.toString()
+        );
       });
-
-      await expect(fileAsResourceOwner.text()).resolves.toBe(
-        newFileContents.toString()
-      );
     });
 
     it("can use the getFile API to get an existing file", async () => {
@@ -1012,30 +1037,33 @@ describe(`End-to-end access grant tests for environment [${environment}}]`, () =
       await expect(existingFile.text()).resolves.toBe(fileContents.toString());
     });
 
-    it("can use the overwriteFile API to replace an existing file", async () => {
-      const newFileContents = Buffer.from("overwritten contents", "utf-8");
+    describe.each(overwrittenContentMatrix)(
+      `Using %s`,
+      (_, newFileContents) => {
+        it("can use the overwriteFile API to replace an existing file", async () => {
+          const newFile = await overwriteFile(
+            testFileIri,
+            newFileContents,
+            accessGrant,
+            {
+              fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+            }
+          );
 
-      const newFile = await overwriteFile(
-        testFileIri,
-        newFileContents,
-        accessGrant,
-        {
-          fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-        }
-      );
+          expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
+          expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
 
-      expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
-      expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
+          // Verify as the resource owner that the file was actually overwritten:
+          const fileAsResourceOwner = await sc.getFile(testFileIri, {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          });
 
-      // Verify as the resource owner that the file was actually overwritten:
-      const fileAsResourceOwner = await sc.getFile(testFileIri, {
-        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-      });
-
-      await expect(fileAsResourceOwner.text()).resolves.toBe(
-        newFileContents.toString()
-      );
-    });
+          await expect(fileAsResourceOwner.text()).resolves.toBe(
+            newFileContents.toString()
+          );
+        });
+      }
+    );
   });
 
   describe("recursive access grants support", () => {
