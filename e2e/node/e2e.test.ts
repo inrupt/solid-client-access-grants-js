@@ -124,6 +124,12 @@ if (nodeMajor >= 18) {
   ]);
 }
 
+async function toString(input: File | NodeFile | Buffer): Promise<string> {
+  if (input instanceof Buffer) return input.toString("utf-8");
+
+  return input.text();
+}
+
 describe.each(contentArr)(
   `End-to-end access grant tests for environment [${environment}}] initialized with %s`,
   (_, content) => {
@@ -1036,7 +1042,7 @@ describe.each(contentArr)(
             }
           );
 
-          expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
+          expect(await toString(newFile)).toBe(await toString(newFileContents));
 
           // Verify as the resource owner that the file was actually created:
           const fileAsResourceOwner = await sc.getFile(
@@ -1047,7 +1053,7 @@ describe.each(contentArr)(
           );
 
           await expect(fileAsResourceOwner.text()).resolves.toBe(
-            newFileContents.toString()
+            await toString(newFileContents)
           );
         });
       });
@@ -1060,7 +1066,7 @@ describe.each(contentArr)(
 
         expect(sc.getSourceUrl(existingFile)).toBe(testFileIri);
         await expect(existingFile.text()).resolves.toBe(
-          fileContents.toString()
+          await toString(fileContents)
         );
       });
 
@@ -1077,7 +1083,9 @@ describe.each(contentArr)(
               }
             );
 
-            expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
+            expect(await toString(newFile)).toBe(
+              await toString(newFileContents)
+            );
             expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
 
             // Verify as the resource owner that the file was actually overwritten:
@@ -1086,7 +1094,7 @@ describe.each(contentArr)(
             });
 
             await expect(fileAsResourceOwner.text()).resolves.toBe(
-              newFileContents.toString()
+              await toString(newFileContents)
             );
           });
         }
@@ -1246,7 +1254,7 @@ describe.each(contentArr)(
             }
           );
 
-          expect(newFile.toString("utf-8")).toBe(newFileContents.toString());
+          expect(await toString(newFile)).toBe(await toString(newFileContents));
           expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
 
           // Verify as the resource owner that the file was actually created:
@@ -1255,7 +1263,7 @@ describe.each(contentArr)(
           });
 
           await expect(fileAsResourceOwner.text()).resolves.toBe(
-            newFileContents.toString()
+            await toString(newFileContents)
           );
         }
       );
