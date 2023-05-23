@@ -52,8 +52,8 @@ async function internal_denyAccessRequest(
     resources: internalOptions.resources,
     requestorInboxUrl: internalOptions.requestorInboxUrl,
     status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  }) as any; // FIXME
+    purpose: internalOptions.purpose,
+  });
   denialBody.type = [CREDENTIAL_TYPE_ACCESS_DENIAL];
   denialBody.credentialSubject.providedConsent.hasStatus =
     GC_CONSENT_STATUS_DENIED;
