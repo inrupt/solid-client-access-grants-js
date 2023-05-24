@@ -8,6 +8,10 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 - Buffer API marked as deprecated for `saveFileInContainer` and `overwriteFileInContainer`.
 
+### Bugfixes
+
+- Denied Access Grants now preserve the purpose set in the original Access Request.
+
 ## [2.3.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.3.0) - 2023-05-09
 
 ### New feature

@@ -42,6 +42,7 @@ export const mockAccessRequestVc = (
     modes: ResourceAccessMode[];
     resourceOwner: string | null;
     inherit: boolean;
+    purpose: UrlString[];
   }>
 ): AccessRequest => {
   return {
@@ -58,6 +59,7 @@ export const mockAccessRequestVc = (
             ? undefined
             : "https://some.pod/profile#you",
         inherit: options?.inherit,
+        forPurpose: options?.purpose,
       },
       inbox: "https://some.inbox",
     },
