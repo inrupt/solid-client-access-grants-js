@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+### Documentation
+
+- Buffer API marked as deprecated for `saveFileInContainer` and `overwriteFileInContainer`.
+
 ### Bugfixes
 
 - Denied Access Grants now preserve the purpose set in the original Access Request.

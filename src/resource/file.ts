@@ -21,11 +21,13 @@
 
 import {
   UrlString,
+  WithResourceInfo,
   getFile as coreGetFile,
   overwriteFile as coreOverwriteFile,
   saveFileInContainer as coreSaveFileInContainer,
 } from "@inrupt/solid-client";
 import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { Buffer as NodeBuffer, File as NodeFile } from "buffer";
 import { fetchWithVc } from "../fetch";
 import { FetchOptions } from "../type/FetchOptions";
 
@@ -86,12 +88,27 @@ export async function getFile(
  * otherwise.
  * @since 1.1.0
  */
-export async function overwriteFile(
+export async function overwriteFile<T extends File | NodeFile>(
   resourceUrl: UrlString,
-  file: File | Buffer,
+  file: T,
   accessGrant: VerifiableCredential,
   options?: FetchOptions & { contentType?: string }
-) {
+): Promise<T & WithResourceInfo>;
+/**
+ * @deprecated `overwriteFile` should only have `File` input
+ */
+export async function overwriteFile<T extends File | NodeFile | NodeBuffer>(
+  resourceUrl: UrlString,
+  file: T,
+  accessGrant: VerifiableCredential,
+  options?: FetchOptions & { contentType?: string }
+): Promise<T & WithResourceInfo>;
+export async function overwriteFile<T extends File | NodeFile | NodeBuffer>(
+  resourceUrl: UrlString,
+  file: T,
+  accessGrant: VerifiableCredential,
+  options?: FetchOptions & { contentType?: string }
+): Promise<T & WithResourceInfo> {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
     fetchOptions.fetch = options.fetch;
@@ -130,12 +147,31 @@ export async function overwriteFile(
  * @since 1.1.0
  */
 
-export async function saveFileInContainer(
+export async function saveFileInContainer<T extends File | NodeFile>(
   containerUrl: UrlString,
-  file: File | Buffer,
+  file: T,
   accessGrant: VerifiableCredential,
   options?: FetchOptions & { contentType?: string; slug?: string }
-) {
+): Promise<T & WithResourceInfo>;
+/**
+ * @deprecated `saveFileInContainer` should only have `File` input; not `Buffer`
+ */
+export async function saveFileInContainer<
+  T extends File | NodeFile | NodeBuffer
+>(
+  containerUrl: UrlString,
+  file: T,
+  accessGrant: VerifiableCredential,
+  options?: FetchOptions & { contentType?: string; slug?: string }
+): Promise<T & WithResourceInfo>;
+export async function saveFileInContainer<
+  T extends File | NodeFile | NodeBuffer
+>(
+  containerUrl: UrlString,
+  file: T,
+  accessGrant: VerifiableCredential,
+  options?: FetchOptions & { contentType?: string; slug?: string }
+): Promise<T & WithResourceInfo> {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
     fetchOptions.fetch = options.fetch;
