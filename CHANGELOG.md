@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+## [2.3.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.3.0) - 2023-05-24
+
 ### Documentation
 
 - Buffer API marked as deprecated for `saveFileInContainer` and `overwriteFileInContainer`.
