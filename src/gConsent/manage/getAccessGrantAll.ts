@@ -63,6 +63,8 @@ const getAncestorUrls = (resourceUrl: URL) => {
   );
 };
 
+// The following temporary internal function can be merged into
+// `getAccessGrantAll` once the deprecated signature is removed.
 // eslint-disable-next-line camelcase
 async function internal_getAccessGrantAll(
   params: Partial<
