@@ -81,7 +81,7 @@ async function internal_getAccessGrantAll(
   const sessionFetch = await getSessionFetch(options);
   // TODO: Fix access API endpoint retrieval (should include all the different API endpoints)
   const queryEndpoint = options.accessEndpoint
-    ? new URL(options.accessEndpoint)
+    ? new URL("derive", options.accessEndpoint)
     : params.resource &&
       new URL("derive", await getAccessApiEndpoint(params.resource, options));
 
