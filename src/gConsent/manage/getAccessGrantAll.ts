@@ -44,6 +44,13 @@ import { AccessGrant } from "../type/AccessGrant";
 import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 
+export type AccessParameters = Partial<
+  Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
+    requestor: string;
+    resource: URL | UrlString;
+  }
+>;
+
 // Iteratively build the list of ancestor containers from the breakdown of the
 // resource path: for resource https://pod.example/foo/bar/baz, we'll want the result
 // to be ["https://pod.example/", "https://pod.example/foo/", "https://pod.example/foo/bar/", https://pod.example/foo/bar/baz].
@@ -67,12 +74,7 @@ const getAncestorUrls = (resourceUrl: URL) => {
 // `getAccessGrantAll` once the deprecated signature is removed.
 // eslint-disable-next-line camelcase
 async function internal_getAccessGrantAll(
-  params: Partial<
-    Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
-      requestor: string;
-      resource: string | URL;
-    }
-  > = {},
+  params: AccessParameters = {},
   options: AccessBaseOptions & { includeExpired?: boolean } = {}
 ): Promise<Array<VerifiableCredential>> {
   if (!params.resource && !options.accessEndpoint) {
@@ -192,12 +194,7 @@ async function internal_getAccessGrantAll(
 
 async function getAccessGrantAll(
   resource: URL | UrlString,
-  params: Partial<
-    Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
-      requestor: string;
-      resource: URL | UrlString;
-    }
-  >,
+  params: AccessParameters,
   options?: AccessBaseOptions & { includeExpired?: boolean }
 ): Promise<Array<VerifiableCredential>>;
 
@@ -219,30 +216,14 @@ async function getAccessGrantAll(
  */
 
 async function getAccessGrantAll(
-  params: Partial<
-    Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
-      requestor: string;
-      resource: URL | UrlString;
-    }
-  >,
+  params: AccessParameters,
   options?: AccessBaseOptions & { includeExpired?: boolean }
 ): Promise<Array<VerifiableCredential>>;
 
 async function getAccessGrantAll(
-  resourceOrParams:
-    | URL
-    | UrlString
-    | Partial<
-        Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
-          requestor: string;
-        }
-      >,
+  resourceOrParams: URL | UrlString | AccessParameters,
   paramsOrOptions:
-    | Partial<
-        Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
-          requestor: string;
-        }
-      >
+    | AccessParameters
     | undefined
     | (AccessBaseOptions & { includeExpired?: boolean }),
   options: AccessBaseOptions & { includeExpired?: boolean } = {}
@@ -262,19 +243,8 @@ async function getAccessGrantAll(
       options
     );
   }
-  if (typeof resourceOrParams === "object") {
-    return internal_getAccessGrantAll(
-      resourceOrParams as Partial<
-        Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
-          requestor: string;
-          resource: string | URL;
-        }
-      >,
-      paramsOrOptions as AccessBaseOptions & { includeExpired?: boolean }
-    );
-  }
   return internal_getAccessGrantAll(
-    resourceOrParams,
+    resourceOrParams as AccessParameters,
     paramsOrOptions as AccessBaseOptions & { includeExpired?: boolean }
   );
 }
