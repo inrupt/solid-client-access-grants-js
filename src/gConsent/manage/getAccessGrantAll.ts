@@ -224,7 +224,7 @@ async function getAccessGrantAll(
 ): Promise<Array<VerifiableCredential>> {
   if (
     typeof resourceOrParams === "string" ||
-    (resourceOrParams as URL).href !== undefined
+    typeof (resourceOrParams as URL).href === "string"
   ) {
     return internal_getAccessGrantAll(
       {
