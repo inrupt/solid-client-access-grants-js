@@ -186,6 +186,10 @@ async function internal_getAccessGrantAll(
  * @since 0.4.0
  */
 
+/**
+ * @deprecated Please remove `resource` parameter.
+ */
+
 async function getAccessGrantAll(
   resource: URL | UrlString,
   params: Partial<
@@ -196,6 +200,24 @@ async function getAccessGrantAll(
   >,
   options?: AccessBaseOptions & { includeExpired?: boolean }
 ): Promise<Array<VerifiableCredential>>;
+
+/**
+ * Retrieve Access Grants issued over a resource. The Access Grants may be filtered
+ * by requestor, access modes and purpose. In order to discover all applicable Access
+ * Grants for the target resource, including recursive Access Grants issued over
+ * an ancestor container, the resources hierarchy is walked up to the storage root.
+ *
+ * @param grantShape The properties of grants to filter results.
+ * @param options Optional parameter:
+ * - `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
+ * This can be typically used for authentication. Note that if it is omitted, and
+ * `@inrupt/solid-client-authn-browser` is in your dependencies, the default session
+ * is picked up.
+ * - `options.includeExpiredGrants`: include expired grants in the result set.
+ * @returns A void promise.
+ * @since 0.4.0
+ */
+
 async function getAccessGrantAll(
   params: Partial<
     Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
@@ -205,6 +227,7 @@ async function getAccessGrantAll(
   >,
   options?: AccessBaseOptions & { includeExpired?: boolean }
 ): Promise<Array<VerifiableCredential>>;
+
 async function getAccessGrantAll(
   resourceOrParams:
     | URL
