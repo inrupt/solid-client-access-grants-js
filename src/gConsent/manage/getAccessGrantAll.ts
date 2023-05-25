@@ -78,13 +78,13 @@ async function internal_getAccessGrantAll(
   }
   const sessionFetch = await getSessionFetch(options);
   // TODO: Fix access API endpoint retrieval (should include all the different API endpoints)
-  const holderEndpoint = options.accessEndpoint
+  const queryEndpoint = options.accessEndpoint
     ? new URL(options.accessEndpoint)
     : params.resource &&
       new URL("derive", await getAccessApiEndpoint(params.resource, options));
 
-  if (!holderEndpoint) {
-    throw new Error("no holder endpoint available");
+  if (!queryEndpoint) {
+    throw new Error("No query endpoint available");
   }
   const ancestorUrls =
     params.resource &&
@@ -133,7 +133,7 @@ async function internal_getAccessGrantAll(
     await Promise.all(
       vcShapes.map((vcShape) =>
         getVerifiableCredentialAllFromShape(
-          holderEndpoint.href,
+          queryEndpoint.href,
           vcShape as Partial<VerifiableCredential>,
           {
             fetch: sessionFetch,
