@@ -66,7 +66,7 @@ describe("getAccessGrantAll", () => {
       },
     };
 
-    await getAccessGrantAll({ resource });
+    await getAccessGrantAll({ resource: resource.href });
 
     expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
 
@@ -324,7 +324,9 @@ describe("getAccessGrantAll", () => {
     mockedVcModule.getVerifiableCredentialAllFromShape.mockResolvedValue([
       mockedGrant,
     ]);
-    await expect(getAccessGrantAll({ resource })).resolves.toStrictEqual([]);
+    await expect(
+      getAccessGrantAll({ resource: resource.href })
+    ).resolves.toStrictEqual([]);
   });
 
   it("accepts explicitly non-recursive grants for target resource", async () => {
@@ -341,8 +343,8 @@ describe("getAccessGrantAll", () => {
           resources: [resourceAncestors[0]],
         }),
       ]);
-    await expect(getAccessGrantAll({ resource })).resolves.toStrictEqual([
-      mockedGrant,
-    ]);
+    await expect(
+      getAccessGrantAll({ resource: resource.href })
+    ).resolves.toStrictEqual([mockedGrant]);
   });
 });
