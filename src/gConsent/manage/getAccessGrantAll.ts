@@ -169,9 +169,6 @@ async function internal_getAccessGrantAll(
  * - `options.includeExpiredGrants`: include expired grants in the result set.
  * @returns A void promise.
  * @since 0.4.0
- */
-
-/**
  * @deprecated Please remove `resource` parameter.
  */
 
