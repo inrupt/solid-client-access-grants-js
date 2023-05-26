@@ -347,4 +347,9 @@ describe("getAccessGrantAll", () => {
       getAccessGrantAll({ resource: resource.href })
     ).resolves.toStrictEqual([mockedGrant]);
   });
+  it("throws if both resource and accessEndpoint are undefined", async () => {
+    await expect(getAccessGrantAll({})).rejects.toThrow(
+      "resource and accessEndpoint cannot both be undefined"
+    );
+  });
 });

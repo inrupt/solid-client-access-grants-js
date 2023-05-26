@@ -84,12 +84,11 @@ async function internal_getAccessGrantAll(
   // TODO: Fix access API endpoint retrieval (should include all the different API endpoints)
   const queryEndpoint = options.accessEndpoint
     ? new URL("derive", options.accessEndpoint)
-    : params.resource &&
-      new URL("derive", await getAccessApiEndpoint(params.resource, options));
+    : new URL(
+        "derive",
+        await getAccessApiEndpoint(params.resource as string, options)
+      );
 
-  if (!queryEndpoint) {
-    throw new Error("No query endpoint available");
-  }
   const ancestorUrls = params.resource
     ? getAncestorUrls(
         typeof params.resource === "string"
