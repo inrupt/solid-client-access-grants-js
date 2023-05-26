@@ -173,7 +173,7 @@ async function internal_getAccessGrantAll(
 
 async function getAccessGrantAll(
   resource: URL | UrlString,
-  params: AccessParameters,
+  params?: AccessParameters,
   options?: AccessBaseOptions & { includeExpired?: boolean }
 ): Promise<Array<VerifiableCredential>>;
 
