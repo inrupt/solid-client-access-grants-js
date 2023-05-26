@@ -90,47 +90,30 @@ async function internal_getAccessGrantAll(
   if (!queryEndpoint) {
     throw new Error("No query endpoint available");
   }
-  const ancestorUrls =
-    params.resource &&
-    getAncestorUrls(
-      typeof params.resource === "string"
-        ? new URL(params.resource)
-        : params.resource
-    );
+  const ancestorUrls = params.resource
+    ? getAncestorUrls(
+        typeof params.resource === "string"
+          ? new URL(params.resource)
+          : params.resource
+      )
+    : [undefined];
 
   const specifiedModes = accessToResourceAccessModeArray(params.access ?? {});
 
-  let vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[];
-  if (ancestorUrls) {
-    vcShapes = ancestorUrls.map((url) => ({
+  const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
+    ancestorUrls.map((url) => ({
       "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
       type: [CREDENTIAL_TYPE_ACCESS_GRANT, CREDENTIAL_TYPE_BASE],
       credentialSubject: {
         providedConsent: {
           hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-          forPersonalData: [url.href],
+          forPersonalData: url ? [url?.href] : undefined,
           forPurpose: params.purpose,
           isProvidedTo: params.requestor,
           mode: specifiedModes.length > 0 ? specifiedModes : undefined,
         },
       },
     }));
-  } else {
-    vcShapes = [
-      {
-        "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
-        type: [CREDENTIAL_TYPE_ACCESS_GRANT, CREDENTIAL_TYPE_BASE],
-        credentialSubject: {
-          providedConsent: {
-            hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-            forPurpose: params.purpose,
-            isProvidedTo: params.requestor,
-            mode: specifiedModes.length > 0 ? specifiedModes : undefined,
-          },
-        },
-      },
-    ];
-  }
 
   // TODO: Fix up the type of accepted arguments (this function should allow deep partial)
   const result = (
