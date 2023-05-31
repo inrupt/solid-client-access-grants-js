@@ -106,7 +106,7 @@ async function internal_getAccessGrantAll(
       credentialSubject: {
         providedConsent: {
           hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-          forPersonalData: url ? [url?.href] : undefined,
+          forPersonalData: url ? [url.href] : undefined,
           forPurpose: params.purpose,
           isProvidedTo: params.requestor,
           mode: specifiedModes.length > 0 ? specifiedModes : undefined,
