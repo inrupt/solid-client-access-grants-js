@@ -24,14 +24,7 @@
 
 import { test as base } from "@inrupt/internal-playwright-helpers";
 
-import type {
-  TestingEnvironmentBrowser,
-  TestingEnvironmentNode,
-} from "@inrupt/internal-test-env";
-import {
-  getNodeTestingEnvironment,
-  getBrowserTestingEnvironment,
-} from "@inrupt/internal-test-env";
+import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 import {
   getSourceUrl,
   saveFileInContainer,
@@ -55,17 +48,10 @@ const saveTextFile = async (options: {
 }): Promise<string> => {
   const data = Buffer.from(options.contents, "utf-8");
 
-  const file = await saveFileInContainer(
-    options.containerUrl,
-    new File(["This is a plain piece of text"], "myFile", {
-      type: "plain/text",
-    }),
-    {
-      slug: options.name,
-      contentType: "text/plain",
-      fetch: options.session.fetch,
-    }
-  );
+  const file = await saveFileInContainer(options.containerUrl, data, {
+    contentType: "application/json",
+    fetch: options.session.fetch,
+  });
 
   const url = getSourceUrl(file);
 
@@ -105,7 +91,7 @@ const createAccessRequest = async (
         accessEndpoint: vc_provider,
       }
     );
-    console.log(JSON.stringify(accessRequest, null, 2));
+    // console.log(JSON.stringify(accessRequest, null, 2));
     return accessRequest;
   } catch (error) {
     console.log(error);
@@ -113,16 +99,6 @@ const createAccessRequest = async (
   }
 };
 
-// This is the deployed client application that we'll be using to exercise
-// various authentication scenarios. We expect the system environment value to
-// point at a deployed instance (e.g. an automated Vercel deployment), but I
-// don't think it makes sense to default to a hard-coded Vercel instance.
-// Instead, for running locally, it seems helpful to default to 'localhost'
-// instance.
-const clientApplicationUrl =
-  process.env.E2E_DEMO_CLIENT_APP_URL ?? "http://localhost:3000/";
-
-// Extend basic test by providing a "defaultItem" option and a "todoPage" fixture.
 export const test = base.extend<Fixtures>({
   // playwright expects the first argument to be a destructuring pattern.
   // eslint-disable-next-line no-empty-pattern
@@ -169,12 +145,11 @@ export const test = base.extend<Fixtures>({
       session: ownerSession,
     });
 
-    const ENV = getNodeTestingEnvironment();
     const accessRequest = await createAccessRequest(
-      ENV.clientCredentials.requestor?.id,
-      ENV.clientCredentials.requestor?.secret,
-      ENV.idp,
-      ENV.vcProvider,
+      setupEnvironment.clientCredentials.requestor?.id,
+      setupEnvironment.clientCredentials.requestor?.secret,
+      setupEnvironment.idp,
+      setupEnvironment.vcProvider,
       ownerSession.info.webId,
       publicFileUrl
     );

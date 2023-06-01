@@ -24,8 +24,7 @@ import {
   approveAccessRequest,
   revokeAccessGrant,
   redirectToAccessManagementUi,
-  issueAccessRequest,
-  GRANT_VC_URL_PARAM_NAME,
+  getAccessGrant,
 } from "@inrupt/solid-client-access-grants";
 import {
   getPodUrlAll,
@@ -34,12 +33,11 @@ import {
   deleteFile,
 } from "@inrupt/solid-client";
 import React, { useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 const session = getDefaultSession();
-
 const SHARED_FILE_CONTENT = "Some content.\n";
-
-const expirationDate = new Date(Date.now() + 180 * 6000);
 
 export default function AccessGrant({
   setErrorMessage,
@@ -49,6 +47,16 @@ export default function AccessGrant({
   const [accessGrant, setAccessGrant] = useState<string>();
   const [accessRequest, setAccessRequest] = useState<string>();
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
+  const router = useRouter();
+
+  // TODO: figure out why app is logged on on redirect back to app from PodBrowser
+
+  console.log(`queryString: ${router.query.accessGrantUrl}`);
+  useEffect(() => {
+    if (router.query.accessGrantUrl != "") {
+      setAccessGrant(router.query.accessGrantUrl as string);
+    }
+  });
 
   const handleCreate = async (e) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
@@ -129,15 +137,14 @@ export default function AccessGrant({
     setAccessGrant(undefined);
   };
 
-  const handleAccessRequest = async () => {
-    const { webId } = session.info;
-    console.log("request");
-    console.log(webId);
-    console.log(accessRequest);
+  const handleCallAuthedGrant = async () => {
+    await getAccessGrant(accessGrant as string, { fetch: session.fetch });
+  };
 
+  const handleAccessRequest = async () => {
     await redirectToAccessManagementUi(
       accessRequest as string,
-      `http://localhost:3000/home`,
+      `http://localhost:3000/`,
       {
         redirectCallback: (url: any) => {
           console.log(`redirecting to PB ${url}`);
@@ -205,6 +212,13 @@ export default function AccessGrant({
       <p>
         Granted access: <pre data-testid="access-grant">{accessGrant}</pre>
       </p>
+
+      <button
+        onClick={async () => handleCallAuthedGrant()}
+        data-testid="get-authed-grant"
+      >
+        Authenticated Fetch of Grant
+      </button>
     </>
   );
 }

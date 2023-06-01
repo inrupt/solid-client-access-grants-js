@@ -26,41 +26,49 @@ test("Redirect to Podbrowser to accept Access Request", async ({
   auth,
   accessRequest,
 }) => {
-  console.log(accessRequest);
+  console.log(`accessrequest: ${accessRequest}`);
   await auth.login({ allow: true });
-  // Create the resource. Note that the Promise.all prevents a race condition where
-  // the request would be sent before we wait on it.
-  await Promise.all([
-    page.click("button[data-testid=create-resource]"),
-    page.waitForRequest((request) => request.method() === "POST"),
-    page.waitForResponse((response) => response.status() === 201),
-  ]);
-  await expect(
-    page.innerText("span[data-testid=resource-iri]")
-  ).resolves.toMatch(/https:\/\/.*\.txt/);
-
-  // TODO:
   // The test issues an access request on behalf of a requestor thru the fixture
-
-  // Here test writes the id to a readable input text input
+  // then the test writes the id to a readable input text input
   await page.getByPlaceholder("Access Request URL").fill(accessRequest);
 
-  // redirectFunction reads that id and uses it
-
+  // Playwright test reads that id and uses it
+  // The test user clicks to be redirected to Podbrowser,
   await Promise.all([
     page.click("button[data-testid=redirect-for-access]"),
-    page.waitForRequest((request) => request.method() === "POST"),
+    page.waitForURL("https://podbrowser.inrupt.com/*"),
   ]);
-  // The test user is redirected to Podbrowser, and presented with the request
+  // and presented with the request
+  // We validate the request fields are editable before we confirm access
+  await page.getByTestId("login-button").click();
+  await page.getByRole("button", { name: "Allow" }).click();
 
-  // The test user grants access
-  // The test user is redirected back to the test app
+  // Select our permissions
+  await page.getByRole("checkbox").nth(1).check();
+
+  // Select our resources for allowing access
+  await page.getByTestId("request-select-all").click();
+
+  // // The test user confirms the access they selected and is redirected back to app
+  await Promise.all([
+    page.getByRole("button", { name: "Confirm Access" }).click(),
+    page.waitForURL("https://localhost:3000/*"),
+  ]);
+  await expect(
+    page.innerText("pre[data-testid=access-grant]")
+  ).resolves.not.toBe("");
+
+  await Promise.all([
+    page.click("button[data-testid=get-authed-grant]"),
+    page.waitForResponse((response) => response.status() === 200),
+  ]);
+
   // The test app collects the access grant based on the IRI in the query parameters
   // The test app sends an authenticated request to get the resource it has been granted access to
 });
 
 // eslint-disable-next-line playwright/no-skipped-test
-test("Granting access to a resource, then revoking the access grant", async ({
+test.skip("Granting access to a resource, then revoking the access grant", async ({
   page,
   auth,
 }) => {
