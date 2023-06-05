@@ -54,17 +54,23 @@ test("Redirect to Podbrowser to accept Access Request", async ({
     page.getByRole("button", { name: "Confirm Access" }).click(),
     page.waitForURL("http://localhost:3000/?accessGrantUrl=*"),
   ]);
+
+  // Reapprove app grant to test-application
+  await Promise.all([
+    page.getByTestId("loginButton").click(),
+    page.getByRole("button", { name: "Allow" }).click(),
+  ]);
+
+  // The test app collects the access grant based on the IRI in the query parameters
   await expect(
-    page.innerText("pre[data-testid=grant-access]")
+    page.innerText("pre[data-testid=access-grant]")
   ).resolves.not.toBe("");
 
+  // The test app sends an authenticated request to get the resource it has been granted access to
   await Promise.all([
     page.click("button[data-testid=get-authed-grant]"),
     page.waitForResponse((response) => response.status() === 200),
   ]);
-
-  // The test app collects the access grant based on the IRI in the query parameters
-  // The test app sends an authenticated request to get the resource it has been granted access to
 });
 
 // eslint-disable-next-line playwright/no-skipped-test

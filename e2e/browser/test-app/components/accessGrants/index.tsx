@@ -28,9 +28,7 @@ export default function AccessGrant({
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
   const router = useRouter();
 
-  // TODO: figure out why app is logged on on redirect back to app from PodBrowser
-
-  console.log(`queryString: ${router.query.accessGrantUrl}`);
+  // TODO: figure out why app is logged out on redirect back to app from PodBrowser
   useEffect(() => {
     if (router.query.accessGrantUrl != "") {
       setAccessGrant(router.query.accessGrantUrl as string);

@@ -64,7 +64,6 @@ const createAccessRequest = async (
   resource
 ) => {
   const session = new Session();
-  console.log("creating an access request");
 
   await session.login({
     clientId: id,
@@ -88,7 +87,6 @@ const createAccessRequest = async (
         accessEndpoint: vc_provider,
       }
     );
-    // console.log(JSON.stringify(accessRequest, null, 2));
     return accessRequest;
   } catch (error) {
     console.log(error);
