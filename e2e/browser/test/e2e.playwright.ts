@@ -52,10 +52,10 @@ test("Redirect to Podbrowser to accept Access Request", async ({
   // // The test user confirms the access they selected and is redirected back to app
   await Promise.all([
     page.getByRole("button", { name: "Confirm Access" }).click(),
-    page.waitForURL("https://localhost:3000/*"),
+    page.waitForURL("http://localhost:3000/?accessGrantUrl=*"),
   ]);
   await expect(
-    page.innerText("pre[data-testid=access-grant]")
+    page.innerText("pre[data-testid=grant-access]")
   ).resolves.not.toBe("");
 
   await Promise.all([

@@ -19,9 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// This file includes experimental API objects, which are camel cased.
-/* eslint-disable camelcase */
-
 import { test as base } from "@inrupt/internal-playwright-helpers";
 
 import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
