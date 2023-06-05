@@ -66,7 +66,7 @@ describe("getAccessGrantAll", () => {
       },
     };
 
-    await getAccessGrantAll(resource.href);
+    await getAccessGrantAll({ resource: resource.href });
 
     expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
 
@@ -84,11 +84,75 @@ describe("getAccessGrantAll", () => {
     );
   });
 
+  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right parameters when using deprecated function signature", async () => {
+    const requestor = "https://some.requestor";
+    const expectedDefaultVcShape = {
+      credentialSubject: {
+        providedConsent: {
+          forPersonalData: [resource.href],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          isProvidedTo: requestor,
+        },
+      },
+    };
+
+    await getAccessGrantAll(resource, { requestor });
+
+    expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      "https://some.api.endpoint/derive",
+      expect.objectContaining(expectedDefaultVcShape),
+      expect.objectContaining({
+        // Expecting fetch to match universal-fetch fails in node because the
+        // getSessionFetch function returns the default @inrupt/solid-client-authn-browser
+        // fetch instead.
+        fetch: expect.anything(),
+      })
+    );
+  });
+
+  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right parameters if resource is not available", async () => {
+    const requestor = "https://some.requestor";
+    const expectedDefaultVcShape = {
+      credentialSubject: {
+        providedConsent: {
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          isProvidedTo: requestor,
+        },
+      },
+    };
+
+    await getAccessGrantAll(
+      { requestor },
+      { accessEndpoint: "https://some.api.endpoint/derive" }
+    );
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      "https://some.api.endpoint/derive",
+      expect.objectContaining(expectedDefaultVcShape),
+      expect.objectContaining({
+        // Expecting fetch to match universal-fetch fails in node because the
+        // getSessionFetch function returns the default @inrupt/solid-client-authn-browser
+        // fetch instead.
+        fetch: expect.anything(),
+      })
+    );
+  });
+
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the appropriate requestor", async () => {
     const paramsInput: Partial<
-      IssueAccessRequestParameters & { requestor: string }
+      IssueAccessRequestParameters & {
+        requestor: string;
+        resource: string | URL;
+      }
     > = {
       requestor: "https://some.requestor",
+      resource,
     };
 
     const expectedVcShape = {
@@ -101,7 +165,7 @@ describe("getAccessGrantAll", () => {
       },
     };
 
-    await getAccessGrantAll(resource, paramsInput, {
+    await getAccessGrantAll(paramsInput, {
       fetch: otherFetch,
     });
 
@@ -119,8 +183,13 @@ describe("getAccessGrantAll", () => {
   });
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape appropriate purpose", async () => {
-    const paramsInput: Partial<IssueAccessRequestParameters> = {
+    const paramsInput: Partial<
+      IssueAccessRequestParameters & {
+        resource: string | URL;
+      }
+    > = {
       purpose: ["https://some.purpose"],
+      resource,
     };
 
     const expectedVcShape = {
@@ -133,7 +202,7 @@ describe("getAccessGrantAll", () => {
       },
     };
 
-    await getAccessGrantAll(resource, paramsInput, {
+    await getAccessGrantAll(paramsInput, {
       fetch: otherFetch,
     });
 
@@ -151,8 +220,13 @@ describe("getAccessGrantAll", () => {
   });
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the appropriate mode", async () => {
-    const paramsInput: Partial<IssueAccessRequestParameters> = {
+    const paramsInput: Partial<
+      IssueAccessRequestParameters & {
+        resource: string | URL;
+      }
+    > = {
       access: { read: true },
+      resource,
     };
 
     const expectedVcShape = {
@@ -165,7 +239,7 @@ describe("getAccessGrantAll", () => {
       },
     };
 
-    await getAccessGrantAll(resource, paramsInput, {
+    await getAccessGrantAll(paramsInput, {
       fetch: otherFetch,
     });
 
@@ -184,10 +258,13 @@ describe("getAccessGrantAll", () => {
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the expiration filter if specified", async () => {
     const mockedFetch = jest.fn<typeof fetch>();
-    await getAccessGrantAll(resource.href, undefined, {
-      includeExpired: true,
-      fetch: mockedFetch,
-    });
+    await getAccessGrantAll(
+      { resource },
+      {
+        includeExpired: true,
+        fetch: mockedFetch,
+      }
+    );
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       "https://some.api.endpoint/derive",
       expect.anything(),
@@ -212,7 +289,7 @@ describe("getAccessGrantAll", () => {
       },
     }));
 
-    await getAccessGrantAll(resource.href);
+    await getAccessGrantAll({ resource: resource.href });
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(4);
 
@@ -247,7 +324,9 @@ describe("getAccessGrantAll", () => {
     mockedVcModule.getVerifiableCredentialAllFromShape.mockResolvedValue([
       mockedGrant,
     ]);
-    await expect(getAccessGrantAll(resource.href)).resolves.toStrictEqual([]);
+    await expect(
+      getAccessGrantAll({ resource: resource.href })
+    ).resolves.toStrictEqual([]);
   });
 
   it("accepts explicitly non-recursive grants for target resource", async () => {
@@ -264,8 +343,13 @@ describe("getAccessGrantAll", () => {
           resources: [resourceAncestors[0]],
         }),
       ]);
-    await expect(getAccessGrantAll(resource.href)).resolves.toStrictEqual([
-      mockedGrant,
-    ]);
+    await expect(
+      getAccessGrantAll({ resource: resource.href })
+    ).resolves.toStrictEqual([mockedGrant]);
+  });
+  it("throws if both resource and accessEndpoint are undefined", async () => {
+    await expect(getAccessGrantAll({})).rejects.toThrow(
+      "resource and accessEndpoint cannot both be undefined"
+    );
   });
 });
