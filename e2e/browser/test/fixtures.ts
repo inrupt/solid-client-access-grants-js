@@ -59,7 +59,7 @@ const createAccessRequest = async (
   id,
   secret,
   issuer,
-  vc_provider,
+  vcProvider,
   owner,
   resource
 ) => {
@@ -84,7 +84,7 @@ const createAccessRequest = async (
       },
       {
         fetch: session.fetch,
-        accessEndpoint: vc_provider,
+        accessEndpoint: vcProvider,
       }
     );
     return accessRequest;
