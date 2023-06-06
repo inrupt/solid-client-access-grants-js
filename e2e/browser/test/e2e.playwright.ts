@@ -73,8 +73,7 @@ test("Redirect to Podbrowser to accept Access Request", async ({
   ]);
 });
 
-// eslint-disable-next-line playwright/no-skipped-test
-test.skip("Granting access to a resource, then revoking the access grant", async ({
+test("Granting access to a resource, then revoking the access grant", async ({
   page,
   auth,
 }) => {
