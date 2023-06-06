@@ -30,7 +30,7 @@ test("Redirect to Podbrowser to accept Access Request", async ({
   await auth.login({ allow: true });
   // The test issues an access request on behalf of a requestor thru the fixture
   // then the test writes the id to a readable input text input
-  await page.getByPlaceholder("Access Request URL").fill(accessRequest);
+  await page.getByTestId("access-request-id").fill(accessRequest);
 
   // Playwright test reads that id and uses it
   // The test user clicks to be redirected to Podbrowser,

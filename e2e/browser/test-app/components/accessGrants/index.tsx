@@ -28,12 +28,6 @@ export default function AccessGrant({
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
   const router = useRouter();
 
-  const handleGrantResponse = async () => {
-    if (router.query.accessGrantUrl != "") {
-      setAccessGrant(router.query.accessGrantUrl as string);
-    }
-  };
-
   const handleCreate = async (e) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
     e.preventDefault();
@@ -132,6 +126,12 @@ export default function AccessGrant({
     );
   };
 
+  const handleGrantResponse = async () => {
+    if (router.query.accessGrantUrl !== "") {
+      setAccessGrant(router.query.accessGrantUrl as string);
+    }
+  };
+
   return (
     <>
       <div>
@@ -156,7 +156,7 @@ export default function AccessGrant({
         Access Request to Approve:{" "}
         <input
           id="request-id"
-          data-testid="request-id"
+          data-testid="access-request-id"
           placeholder="Access Request URL"
           onChange={(e) => {
             setAccessRequest(e.currentTarget.value);
