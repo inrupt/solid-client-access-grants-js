@@ -28,12 +28,11 @@ export default function AccessGrant({
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
   const router = useRouter();
 
-  // TODO: figure out why app is logged out on redirect back to app from PodBrowser
-  useEffect(() => {
+  const handleGrantResponse = async () => {
     if (router.query.accessGrantUrl != "") {
       setAccessGrant(router.query.accessGrantUrl as string);
     }
-  });
+  };
 
   const handleCreate = async (e) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
@@ -195,6 +194,12 @@ export default function AccessGrant({
         data-testid="get-authed-grant"
       >
         Authenticated Fetch of Grant
+      </button>
+      <button
+        onClick={async () => handleGrantResponse()}
+        data-testid="handle-grant-response"
+      >
+        Handle Grant Response
       </button>
     </>
   );

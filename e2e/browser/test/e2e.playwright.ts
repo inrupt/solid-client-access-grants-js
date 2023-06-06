@@ -61,6 +61,9 @@ test("Redirect to Podbrowser to accept Access Request", async ({
     page.getByRole("button", { name: "Allow" }).click(),
   ]);
 
+  // Select our resources for allowing access
+  await page.getByTestId("handle-grant-response").click();
+
   // The test app collects the access grant based on the IRI in the query parameters
   await expect(
     page.innerText("pre[data-testid=access-grant]")
