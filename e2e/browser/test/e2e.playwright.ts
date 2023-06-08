@@ -27,27 +27,25 @@ test("Redirect to Podbrowser to accept Access Request", async ({
   accessRequest,
   idp,
 }) => {
-  console.log(`accessrequest: ${accessRequest}`);
-
-  // Intial login
+  // Initial login
   await auth.login({ allow: true });
   // The test issues an access request on behalf of a requestor thru the fixture
   // then the test writes the id to a readable input text input
   await page.getByTestId("access-request-id").fill(accessRequest);
 
-  // Playwright test reads that id and uses it
-  // The test user clicks to be redirected to Podbrowser,
+  // Playwright test reads that access grant id
+  // The test user clicks to be redirected to Podbrowser
   await Promise.all([
     page.click("button[data-testid=redirect-for-access]"),
     page.waitForURL("https://podbrowser.inrupt.com/*"),
   ]);
 
+  // PodBrowser requires you to select which IDP session to use as we proceed
   await page.getByTestId("other-providers-button").click();
   await page.getByTestId("login-field").fill(idp);
   await page.getByTestId("go-button").click();
   await page.getByRole("button", { name: "Allow" }).click();
 
-  // and is presented with the request
   // We validate the request fields are editable before we confirm access
   // Select our permissions
   await page.getByRole("checkbox").nth(1).check();
@@ -55,23 +53,23 @@ test("Redirect to Podbrowser to accept Access Request", async ({
   // Select our resources for allowing access
   await page.getByTestId("request-select-all").click();
 
-  // // The test user confirms the access they selected and is redirected back to app
+  // The test user confirms the access they selected and is redirected back to app
   await Promise.all([
     page.getByRole("button", { name: "Confirm Access" }).click(),
     page.waitForURL("http://localhost:3000/?accessGrantUrl=*"),
   ]);
 
-  // Reauthenticate into application
+  // Reauthenticate into test application
   await Promise.all([
     await page.getByTestId("identityProviderInput").fill(idp),
     page.getByTestId("loginButton").click(),
     page.getByRole("button", { name: "Allow" }).click(),
   ]);
 
-  // Select our resources for allowing access
+  // Parse the accessGrantUrl from the query params
   await page.getByTestId("handle-grant-response").click();
 
-  // The test app collects the access grant based on the IRI in the query parameters
+  // Confirm we received an accessGrantURL
   await expect(
     page.innerText("pre[data-testid=access-grant]")
   ).resolves.not.toBe("");
