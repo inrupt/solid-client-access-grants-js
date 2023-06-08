@@ -25,8 +25,11 @@ test("Redirect to Podbrowser to accept Access Request", async ({
   page,
   auth,
   accessRequest,
+  idp,
 }) => {
   console.log(`accessrequest: ${accessRequest}`);
+
+  // Intial login
   await auth.login({ allow: true });
   // The test issues an access request on behalf of a requestor thru the fixture
   // then the test writes the id to a readable input text input
@@ -38,11 +41,14 @@ test("Redirect to Podbrowser to accept Access Request", async ({
     page.click("button[data-testid=redirect-for-access]"),
     page.waitForURL("https://podbrowser.inrupt.com/*"),
   ]);
-  // and presented with the request
-  // We validate the request fields are editable before we confirm access
-  await page.getByTestId("login-button").click();
+
+  await page.getByTestId("other-providers-button").click();
+  await page.getByTestId("login-field").fill(idp);
+  await page.getByTestId("go-button").click();
   await page.getByRole("button", { name: "Allow" }).click();
 
+  // and is presented with the request
+  // We validate the request fields are editable before we confirm access
   // Select our permissions
   await page.getByRole("checkbox").nth(1).check();
 
@@ -55,8 +61,9 @@ test("Redirect to Podbrowser to accept Access Request", async ({
     page.waitForURL("http://localhost:3000/?accessGrantUrl=*"),
   ]);
 
-  // Reapprove app grant to test-application
+  // Reauthenticate into application
   await Promise.all([
+    await page.getByTestId("identityProviderInput").fill(idp),
     page.getByTestId("loginButton").click(),
     page.getByRole("button", { name: "Allow" }).click(),
   ]);

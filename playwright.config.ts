@@ -25,7 +25,7 @@ const config: PlaywrightTestConfig = {
   testMatch: "e2e/browser/test/*.playwright.ts",
   retries: 1,
   // Extends from the default 30s
-  timeout: 120000,
+  timeout: 60000,
   globalSetup: require.resolve("./e2e/browser/test/globalSetup.ts"),
   use: {
     baseURL: "http://localhost:3000",

@@ -36,6 +36,7 @@ export { expect } from "@inrupt/internal-playwright-helpers";
 
 export type Fixtures = {
   accessRequest: string;
+  idp: string;
 };
 const saveTextFile = async (options: {
   name: string;
@@ -149,5 +150,9 @@ export const test = base.extend<Fixtures>({
       publicFileUrl
     );
     await use(accessRequest.id);
+  },
+  idp: async ({}, use) => {
+    const setupEnvironment = getNodeTestingEnvironment();
+    await use(setupEnvironment.idp);
   },
 });
