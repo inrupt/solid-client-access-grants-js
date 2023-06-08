@@ -137,8 +137,7 @@ export default function AccessGrant({
       accessRequest as string,
       `http://localhost:3000/`,
       {
-        redirectCallback: (url: any) => {
-          console.log(`redirecting to PB ${url}`);
+        redirectCallback: (url: string) => {
           window.location.replace(url);
         },
         fallbackAccessManagementUi: `https://podbrowser.inrupt.com/privacy/access/requests/`,
