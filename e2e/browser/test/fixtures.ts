@@ -151,6 +151,7 @@ export const test = base.extend<Fixtures>({
     );
     await use(accessRequest.id);
   },
+  // eslint-disable-next-line no-empty-pattern
   idp: async ({}, use) => {
     const setupEnvironment = getNodeTestingEnvironment();
     await use(setupEnvironment.idp);
