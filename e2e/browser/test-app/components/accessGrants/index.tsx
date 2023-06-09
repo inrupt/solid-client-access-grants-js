@@ -134,7 +134,7 @@ export default function AccessGrant({
 
   const handleAccessRequest = async () => {
     await redirectToAccessManagementUi(
-      accessRequest as string,
+      accessRequest!,
       `http://localhost:3000/`,
       {
         redirectCallback: (url: string) => {
