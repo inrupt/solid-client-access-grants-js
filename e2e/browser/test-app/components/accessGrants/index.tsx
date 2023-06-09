@@ -147,8 +147,8 @@ export default function AccessGrant({
   };
 
   const handleGrantResponse = async () => {
-    if (router.query.accessGrantUrl !== "") {
-      setAccessGrant(router.query.accessGrantUrl as string);
+    if (router.query.accessGrantUrl !== "" && typeof router.query.accessGrantUrl === "string") {
+      setAccessGrant(router.query.accessGrantUrl);
     }
   };
 
