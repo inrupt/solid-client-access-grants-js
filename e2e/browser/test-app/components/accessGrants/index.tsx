@@ -20,7 +20,6 @@
 //
 
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
-
 import {
   approveAccessRequest,
   revokeAccessGrant,
