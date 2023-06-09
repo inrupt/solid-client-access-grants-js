@@ -1,5 +1,5 @@
 //
-// Copyright 2023 Inrupt Inc.
+// Copyright 2022 Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -21,7 +21,10 @@
 
 import { test as base } from "@inrupt/internal-playwright-helpers";
 
-import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
+import {
+  getAuthenticatedSession,
+  getNodeTestingEnvironment,
+} from "@inrupt/internal-test-env";
 import {
   getSourceUrl,
   saveFileInContainer,
@@ -99,17 +102,10 @@ export const test = base.extend<Fixtures>({
   // playwright expects the first argument to be a destructuring pattern.
   // eslint-disable-next-line no-empty-pattern
   accessRequest: async ({}, use) => {
-    const ownerSession = new Session();
+    let ownerSession: Session;
     const setupEnvironment = getNodeTestingEnvironment();
     try {
-      await ownerSession.login({
-        oidcIssuer: setupEnvironment.idp,
-        clientId: setupEnvironment.clientCredentials.owner.id,
-        clientSecret: setupEnvironment.clientCredentials.owner.secret,
-        // DPoP is the default, but prints a warning on node.js that pollutes
-        // the test output; we can do what we need with Bearer tokens.
-        tokenType: "Bearer",
-      });
+      ownerSession = await getAuthenticatedSession(setupEnvironment);
     } catch (err) {
       throw new Error(`Failed to login: ${(err as Error).message}`);
     }
