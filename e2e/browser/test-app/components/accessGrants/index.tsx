@@ -129,7 +129,7 @@ export default function AccessGrant({
   };
 
   const handleCallAuthedGrant = async () => {
-    await getAccessGrant(accessGrant as string, { fetch: session.fetch });
+    await getAccessGrant(accessGrant!, { fetch: session.fetch });
   };
 
   const handleAccessRequest = async () => {
