@@ -23,6 +23,8 @@ import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
 import {
   approveAccessRequest,
   revokeAccessGrant,
+  redirectToAccessManagementUi,
+  getAccessGrant,
 } from "@inrupt/solid-client-access-grants";
 import {
   getPodUrlAll,
@@ -31,6 +33,7 @@ import {
   deleteFile,
 } from "@inrupt/solid-client";
 import React, { useState } from "react";
+import { useRouter } from "next/router";
 
 const session = getDefaultSession();
 const SHARED_FILE_CONTENT = "Some content.\n";
@@ -41,7 +44,9 @@ export default function AccessGrant({
   setErrorMessage: (msg: string) => void;
 }) {
   const [accessGrant, setAccessGrant] = useState<string>();
+  const [accessRequest, setAccessRequest] = useState<string>();
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
+  const router = useRouter();
 
   const handleCreate = async (e) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
@@ -62,9 +67,10 @@ export default function AccessGrant({
         "The Resource Owner WebID Profile is missing a link to at least one Pod root."
       );
     }
+
     const savedFile = await saveFileInContainer(
       resourceOwnerPodAll[0],
-      new Blob([SHARED_FILE_CONTENT], { type: "text/plain" }),
+      new File([SHARED_FILE_CONTENT], "fileForGrant", { type: "text/plain" }),
       {
         // The session ID is a random string, used here as a unique slug.
         slug: `${session.info.sessionId}.txt`,
@@ -120,6 +126,34 @@ export default function AccessGrant({
     });
     setAccessGrant(undefined);
   };
+
+  const handleCallAuthedGrant = async () => {
+    await getAccessGrant(accessGrant!, { fetch: session.fetch });
+  };
+
+  const handleAccessRequest = async () => {
+    await redirectToAccessManagementUi(
+      accessRequest!,
+      `http://localhost:3000/`,
+      {
+        redirectCallback: (url: string) => {
+          window.location.replace(url);
+        },
+        fallbackAccessManagementUi: `https://podbrowser.inrupt.com/privacy/access/requests/`,
+        fetch: session.fetch,
+      }
+    );
+  };
+
+  const handleGrantResponse = async () => {
+    if (
+      router.query.accessGrantUrl !== "" &&
+      typeof router.query.accessGrantUrl === "string"
+    ) {
+      setAccessGrant(router.query.accessGrantUrl);
+    }
+  };
+
   return (
     <>
       <div>
@@ -140,6 +174,19 @@ export default function AccessGrant({
         Created resource:{" "}
         <span data-testid="resource-iri">{sharedResourceIri}</span>
       </p>
+      <p>
+        Access Request to Approve:{" "}
+        <input
+          id="request-id"
+          data-testid="access-request-id"
+          placeholder="Access Request URL"
+          onChange={(e) => {
+            setAccessRequest(e.currentTarget.value);
+          }}
+        >
+          {}
+        </input>
+      </p>
       <div>
         <button
           onClick={async (e) => handleGrant(e)}
@@ -153,10 +200,29 @@ export default function AccessGrant({
         >
           Revoke access
         </button>
+        <button
+          onClick={async () => handleAccessRequest()}
+          data-testid="redirect-for-access"
+        >
+          Redirect to PodBrowser to Grant Access
+        </button>
       </div>
       <p>
         Granted access: <pre data-testid="access-grant">{accessGrant}</pre>
       </p>
+
+      <button
+        onClick={async () => handleCallAuthedGrant()}
+        data-testid="get-authed-grant"
+      >
+        Authenticated Fetch of Grant
+      </button>
+      <button
+        onClick={async () => handleGrantResponse()}
+        data-testid="handle-grant-response"
+      >
+        Handle Grant Response
+      </button>
     </>
   );
 }

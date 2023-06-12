@@ -16,10 +16,11 @@
     "start": "next start"
   },
   "dependencies": {
+    "@inrupt/internal-playwright-testids": "^1.8.0",
     "@inrupt/solid-client": "^1.23.3",
     "@inrupt/solid-client-access-grants": "file:../../../",
     "@inrupt/solid-client-authn-browser": "^1.12.3",
-    "@inrupt/internal-playwright-testids": "file:../../../../typescript-sdk-tools/packages/internal-playwright-testids",
+    "@inrupt/solid-client-authn-node": "^1.16.0",
     "next": "^13.0.5",
     "react": "^18.2.0"
   },
