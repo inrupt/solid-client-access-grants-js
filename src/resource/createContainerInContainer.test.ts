@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -20,7 +20,7 @@
 //
 
 import { it, jest, describe, expect } from "@jest/globals";
-import { mockSolidDatasetFrom, UrlString } from "@inrupt/solid-client";
+import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import type * as SolidClient from "@inrupt/solid-client";
 import { mockAccessRequestVc } from "../gConsent/util/access.mock";
 import { fetchWithVc } from "../fetch";
@@ -28,13 +28,16 @@ import { createContainerInContainer } from "./createContainerInContainer";
 
 jest.mock("../fetch");
 jest.mock("@inrupt/solid-client", () => {
-  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
-  solidClientModule.createContainerInContainer = jest.fn();
+  const solidClientModule = jest.requireActual(
+    "@inrupt/solid-client"
+  ) as typeof SolidClient;
+  solidClientModule.createContainerInContainer =
+    jest.fn<(typeof SolidClient)["createContainerInContainer"]>();
   return solidClientModule;
 });
 
 const MOCKED_DATASET = mockSolidDatasetFrom("https://some.url");
-const TEST_CONTAINER_URL: UrlString =
+const TEST_CONTAINER_URL: SolidClient.UrlString =
   "https://example.come/container/anothercontainer";
 
 describe("createContainerInContainer", () => {

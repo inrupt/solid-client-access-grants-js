@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,11 +19,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { UrlString } from "@inrupt/solid-client";
-import {
-  getVerifiableCredentialAllFromShape,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
+import type { UrlString } from "@inrupt/solid-client";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
   CONTEXT_ESS_DEFAULT,
   CONTEXT_VC_W3C,
@@ -40,7 +38,7 @@ import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { BaseGrantBody } from "../type/AccessVerifiableCredential";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
-import { AccessGrant } from "../type/AccessGrant";
+import type { AccessGrant } from "../type/AccessGrant";
 import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 

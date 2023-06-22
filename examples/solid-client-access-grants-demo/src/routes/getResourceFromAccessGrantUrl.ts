@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -23,6 +23,7 @@
 import type { Request, Response } from "express";
 
 import { Session } from "@inrupt/solid-client-authn-node";
+// eslint-disable-next-line import/no-unresolved
 import { getAccessGrant, getFile } from "@inrupt/solid-client-access-grants";
 import { getEnvironment } from "../utils/getEnvironment";
 

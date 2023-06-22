@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,15 +19,13 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { UrlString } from "@inrupt/solid-client";
+import type { UrlString } from "@inrupt/solid-client";
 import { ACCESS_STATUS } from "../constants";
-import { GConsentRequestAttributes } from "../type/AccessVerifiableCredential";
-import {
-  ResourceAccessMode,
-  RESOURCE_ACCESS_MODE,
-} from "../../type/ResourceAccessMode";
+import type { GConsentRequestAttributes } from "../type/AccessVerifiableCredential";
+import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
+import { RESOURCE_ACCESS_MODE } from "../../type/ResourceAccessMode";
 import { isUnknownObject } from "./isUnknownObject";
-import { GConsentStatus } from "../type/GConsentStatus";
+import type { GConsentStatus } from "../type/GConsentStatus";
 
 function isResourceAccessModeArray(x: unknown): x is Array<ResourceAccessMode> {
   return Array.isArray(x) && x.every((y) => RESOURCE_ACCESS_MODE.has(y));

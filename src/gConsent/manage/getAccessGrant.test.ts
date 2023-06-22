@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -22,7 +22,6 @@
 import { jest, it, describe, expect } from "@jest/globals";
 import { Response } from "@inrupt/universal-fetch";
 import type * as CrossFetch from "@inrupt/universal-fetch";
-import type * as VcClient from "@inrupt/solid-client-vc";
 
 import { mockAccessApiEndpoint } from "../request/request.mock";
 import { mockAccessGrantVc, mockConsentRequestVc } from "../util/access.mock";

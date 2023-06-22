@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,16 +19,16 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import type { UrlString } from "@inrupt/solid-client";
 import {
   getIri,
   getSolidDataset,
   getThing,
   getThingAll,
   getWellKnownSolid,
-  UrlString,
 } from "@inrupt/solid-client";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
-import { AccessBaseOptions } from "../type/AccessBaseOptions";
+import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { PIM_STORAGE, PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
 interface AccessManagementUiFromProfile {

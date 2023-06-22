@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,9 +19,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { UrlString } from "@inrupt/solid-client";
+import type { UrlString } from "@inrupt/solid-client";
 import { redirectWithParameters } from "../util/redirect";
-import { RedirectOptions } from "../../type/RedirectOptions";
+import type { RedirectOptions } from "../../type/RedirectOptions";
 
 export const GRANT_VC_URL_PARAM_NAME = "accessGrantUrl";
 // The following is deprecated: passing VCs should only be done by IRI.

@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -20,7 +20,7 @@
 //
 
 import { CONTEXT_VC_W3C } from "../constants";
-import { AccessGrantContext } from "../type/AccessGrantContext";
+import type { AccessGrantContext } from "../type/AccessGrantContext";
 
 export function isAccessGrantContext(x: unknown): x is AccessGrantContext {
   return Array.isArray(x) && x.includes(CONTEXT_VC_W3C);

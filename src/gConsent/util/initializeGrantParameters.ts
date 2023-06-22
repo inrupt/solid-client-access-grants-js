@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,19 +19,19 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { UrlString } from "@inrupt/solid-client";
+import type { UrlString } from "@inrupt/solid-client";
 import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
+import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import {
   ACL_RESOURCE_ACCESS_MODE_APPEND_ABBREV,
-  ResourceAccessMode,
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
   ACL_RESOURCE_ACCESS_MODE_READ_ABBREV,
   ACL_RESOURCE_ACCESS_MODE_WRITE_ABBREV,
 } from "../../type/ResourceAccessMode";
-import { ApproveAccessRequestOverrides } from "../manage/approveAccessRequest";
-import { AccessModes } from "../../type/AccessModes";
+import type { ApproveAccessRequestOverrides } from "../manage/approveAccessRequest";
+import type { AccessModes } from "../../type/AccessModes";
 
 function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
   return requestVc.credentialSubject.id;

@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -29,19 +29,16 @@ import {
   afterEach,
 } from "@jest/globals";
 import { Session } from "@inrupt/solid-client-authn-node";
-import {
-  isVerifiableCredential,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { isVerifiableCredential } from "@inrupt/solid-client-vc";
 import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 // Making a named import here to avoid confusion with the wrapped functions from
 // the access grant API
 import * as sc from "@inrupt/solid-client";
 import { custom } from "openid-client";
 import { File as NodeFile } from "buffer";
+import type { AccessGrant, AccessRequest } from "../../src/index";
 import {
-  AccessGrant,
-  AccessRequest,
   approveAccessRequest,
   createContainerInContainer,
   denyAccessRequest,
@@ -1031,7 +1028,7 @@ describe.each(contentArr)(
         );
       }
 
-      describe.each(fileContentMatrix)(`Using %s`, (_, newFileContents) => {
+      describe.each(fileContentMatrix)(`Using %s`, (__, newFileContents) => {
         it("can use the saveFileInContainer API to create a new file", async () => {
           const newFile = await saveFileInContainer(
             testContainerIri,
@@ -1072,7 +1069,7 @@ describe.each(contentArr)(
 
       describe.each(overwrittenContentMatrix)(
         `Using %s`,
-        (_, newFileContents) => {
+        (__, newFileContents) => {
           it("can use the overwriteFile API to replace an existing file", async () => {
             const newFile = await overwriteFile(
               testFileIri,
