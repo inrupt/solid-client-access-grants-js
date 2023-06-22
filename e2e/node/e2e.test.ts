@@ -31,7 +31,7 @@ import {
 import { Session } from "@inrupt/solid-client-authn-node";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
-import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
+import { getNodeTestingEnvironment, getAuthenticatedSession } from "@inrupt/internal-test-env";
 // Making a named import here to avoid confusion with the wrapped functions from
 // the access grant API
 import * as sc from "@inrupt/solid-client";
@@ -131,7 +131,7 @@ describe.each(contentArr)(
   `End-to-end access grant tests for environment [${environment}}] initialized with %s`,
   (_, content) => {
     const requestorSession = new Session();
-    const resourceOwnerSession = new Session();
+    let resourceOwnerSession: Session;
 
     let resourceOwnerPod: string;
     let sharedFileIri: string;
@@ -147,11 +147,7 @@ describe.each(contentArr)(
         // is required for the UMA access token to be usable.
         tokenType: "Bearer",
       });
-      await resourceOwnerSession.login({
-        oidcIssuer,
-        clientId: clientCredentials?.owner?.id,
-        clientSecret: clientCredentials?.owner?.secret,
-      });
+      resourceOwnerSession = await getAuthenticatedSession(env);
 
       // Create a file in the resource owner's Pod
       const resourceOwnerPodAll = await sc.getPodUrlAll(
