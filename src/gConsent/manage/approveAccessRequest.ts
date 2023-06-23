@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,9 +19,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import type { UrlString, WebId } from "@inrupt/solid-client";
 // eslint-disable-next-line camelcase
-import { UrlString, WebId, acp_ess_2 } from "@inrupt/solid-client";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { acp_ess_2 } from "@inrupt/solid-client";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
 import type { AccessGrantParameters } from "../type/Parameter";

@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,8 +19,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { UrlString, WebId } from "@inrupt/solid-client";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { UrlString, WebId } from "@inrupt/solid-client";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import {
@@ -28,8 +28,8 @@ import {
   getAccessManagementUiFromWellKnown,
 } from "./getAccessManagementUi";
 import { redirectWithParameters } from "../util/redirect";
-import { FetchOptions } from "../../type/FetchOptions";
-import { RedirectOptions } from "../../type/RedirectOptions";
+import type { FetchOptions } from "../../type/FetchOptions";
+import type { RedirectOptions } from "../../type/RedirectOptions";
 
 // DEPRECATED: the VC should be sent by IRI, and not by value.
 export const REQUEST_VC_PARAM_NAME = "requestVc";

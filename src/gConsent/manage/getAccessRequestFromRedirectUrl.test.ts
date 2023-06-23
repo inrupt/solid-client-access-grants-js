@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -20,11 +20,11 @@
 //
 
 import { describe, it, jest, expect } from "@jest/globals";
-import { getVerifiableCredential } from "@inrupt/solid-client-vc";
+import type { getVerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetch } from "@inrupt/universal-fetch";
 import { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
-import { getSessionFetch } from "../../common/util/getSessionFetch";
+import type { getSessionFetch } from "../../common/util/getSessionFetch";
 
 jest.mock("../../common/util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {

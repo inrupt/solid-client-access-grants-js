@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -128,11 +128,13 @@ export default function AccessGrant({
   };
 
   const handleCallAuthedGrant = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     await getAccessGrant(accessGrant!, { fetch: session.fetch });
   };
 
   const handleAccessRequest = async () => {
     await redirectToAccessManagementUi(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       accessRequest!,
       `http://localhost:3000/`,
       {

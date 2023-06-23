@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -24,7 +24,7 @@
  */
 
 import type { WebId } from "@inrupt/solid-client";
-import { InputAccessRequestParameters } from "./Parameter";
+import type { InputAccessRequestParameters } from "./Parameter";
 
 /**
  * Required parameters to request access to one or more Resources.

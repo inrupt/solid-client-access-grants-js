@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,17 +19,16 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import type { UrlString, WithResourceInfo } from "@inrupt/solid-client";
 import {
-  UrlString,
-  WithResourceInfo,
   getFile as coreGetFile,
   overwriteFile as coreOverwriteFile,
   saveFileInContainer as coreSaveFileInContainer,
 } from "@inrupt/solid-client";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { Buffer as NodeBuffer, File as NodeFile } from "buffer";
 import { fetchWithVc } from "../fetch";
-import { FetchOptions } from "../type/FetchOptions";
+import type { FetchOptions } from "../type/FetchOptions";
 
 /**
  * Retrieve a File from a Solid Pod using an Access Grant to prove the caller is

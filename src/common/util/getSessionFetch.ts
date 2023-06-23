@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -20,7 +20,7 @@
 //
 
 import { fetch as crossFetch } from "@inrupt/universal-fetch";
-import { AccessBaseOptions } from "../../gConsent/type/AccessBaseOptions";
+import type { AccessBaseOptions } from "../../gConsent/type/AccessBaseOptions";
 
 /**
  * Dynamically import solid-client-authn-browser so that

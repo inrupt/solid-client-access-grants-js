@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -20,12 +20,12 @@
 //
 
 import { it, describe, expect } from "@jest/globals";
-import {
+import type {
   AccessGrantOdrl,
-  isCredentialAccessGrantOdrl,
   OdrlConstraint,
   OdrlPermission,
 } from "./AccessGrant";
+import { isCredentialAccessGrantOdrl } from "./AccessGrant";
 
 const mockAccessGrantOdrl: AccessGrantOdrl = {
   "@context": [

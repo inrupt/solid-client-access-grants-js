@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,10 +19,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import {
-  issueVerifiableCredential,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   ACCESS_GRANT_CONTEXT_DEFAULT,
   CREDENTIAL_TYPE_ACCESS_GRANT,
