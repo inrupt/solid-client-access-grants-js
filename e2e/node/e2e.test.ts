@@ -31,7 +31,10 @@ import {
 import { Session } from "@inrupt/solid-client-authn-node";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
-import { getNodeTestingEnvironment, getAuthenticatedSession } from "@inrupt/internal-test-env";
+import {
+  getNodeTestingEnvironment,
+  getAuthenticatedSession,
+} from "@inrupt/internal-test-env";
 // Making a named import here to avoid confusion with the wrapped functions from
 // the access grant API
 import * as sc from "@inrupt/solid-client";
