@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -20,9 +20,9 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   isVerifiableCredential,
-  VerifiableCredential,
   getVerifiableCredentialApiConfiguration,
 } from "@inrupt/solid-client-vc";
 import { getSessionFetch } from "../util/getSessionFetch";

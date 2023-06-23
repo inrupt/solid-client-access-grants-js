@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -20,7 +20,7 @@
 //
 
 import { ACCESS_REQUEST_STATUS } from "../constants";
-import { AccessRequestBody } from "../type/AccessVerifiableCredential";
+import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import { isBaseAccessRequestVerifiableCredential } from "./isBaseAccessRequestVerifiableCredential";
 
 export function isAccessRequest(

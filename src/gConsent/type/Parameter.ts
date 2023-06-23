@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -29,7 +29,7 @@ import type {
   GC_CONSENT_STATUS_REQUESTED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
-import { AccessModes } from "../../type/AccessModes";
+import type { AccessModes } from "../../type/AccessModes";
 
 export interface BaseRequestParameters {
   access: AccessModes;

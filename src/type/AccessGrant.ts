@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,12 +19,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import {
-  AccessGrantOdrl,
-  isCredentialAccessGrantOdrl,
-} from "../odrl/type/AccessGrant";
-import { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { AccessGrantOdrl } from "../odrl/type/AccessGrant";
+import { isCredentialAccessGrantOdrl } from "../odrl/type/AccessGrant";
+import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import { CredentialIsAccessGrantGConsent } from "../gConsent/guard/isAccessGrant";
 import { isBaseAccessVcBody } from "../gConsent/guard/isBaseAccessVcBody";
 

@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -20,7 +20,7 @@
 //
 
 import { jest, describe, it, expect } from "@jest/globals";
-import {
+import type {
   issueVerifiableCredential,
   JsonLd,
   VerifiableCredential,
@@ -41,8 +41,8 @@ import {
   ACCESS_GRANT_CONTEXT_DEFAULT,
   GC_CONSENT_STATUS_REQUESTED_ABBREV,
 } from "../constants";
-import { AccessRequestBody } from "../type/AccessVerifiableCredential";
-import { AccessRequest } from "../type/AccessRequest";
+import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
+import type { AccessRequest } from "../type/AccessRequest";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;

@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,9 +19,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { UrlString } from "@inrupt/solid-client";
-import {
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { UrlString } from "@inrupt/solid-client";
+import type {
   BaseGrantBody,
   BaseRequestBody,
 } from "../type/AccessVerifiableCredential";
@@ -32,9 +32,9 @@ import {
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   GC_CONSENT_STATUS_REQUESTED,
 } from "../constants";
-import { ResourceAccessMode } from "../../type/ResourceAccessMode";
-import { AccessGrant } from "../type/AccessGrant";
-import { AccessRequest } from "../type/AccessRequest";
+import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
+import type { AccessGrant } from "../type/AccessGrant";
+import type { AccessRequest } from "../type/AccessRequest";
 
 export const mockAccessRequestVc = (
   options?: Partial<{
@@ -42,6 +42,7 @@ export const mockAccessRequestVc = (
     modes: ResourceAccessMode[];
     resourceOwner: string | null;
     inherit: boolean;
+    purpose: UrlString[];
   }>
 ): AccessRequest => {
   return {
@@ -58,6 +59,7 @@ export const mockAccessRequestVc = (
             ? undefined
             : "https://some.pod/profile#you",
         inherit: options?.inherit,
+        forPurpose: options?.purpose,
       },
       inbox: "https://some.inbox",
     },

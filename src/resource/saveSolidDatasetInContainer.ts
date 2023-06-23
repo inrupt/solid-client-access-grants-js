@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,15 +19,12 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import {
-  UrlString,
-  saveSolidDatasetInContainer as coreSaveSolidDatasetInContainer,
-  SolidDataset,
-} from "@inrupt/solid-client";
-import { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { UrlString, SolidDataset } from "@inrupt/solid-client";
+import { saveSolidDatasetInContainer as coreSaveSolidDatasetInContainer } from "@inrupt/solid-client";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
-import { FetchOptions } from "../type/FetchOptions";
-import { SaveInContainerOptions } from "../type/SaveInContainerOptions";
+import type { FetchOptions } from "../type/FetchOptions";
+import type { SaveInContainerOptions } from "../type/SaveInContainerOptions";
 
 /**
  * Given a SolidDataset, store it in a Solid Pod as a new Resource inside a Container.

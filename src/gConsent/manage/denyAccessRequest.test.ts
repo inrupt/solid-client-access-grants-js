@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -125,7 +125,10 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
-    await denyAccessRequest(mockAccessRequestVc(), {
+    const accessRequestWithPurpose = mockAccessRequestVc({
+      purpose: ["https://example.org/some-purpose"],
+    });
+    await denyAccessRequest(accessRequestWithPurpose, {
       fetch: jest.fn(global.fetch),
     });
 
@@ -134,13 +137,16 @@ describe("denyAccessRequest", () => {
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: {
-          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
+          mode: accessRequestWithPurpose.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
+            accessRequestWithPurpose.credentialSubject.hasConsent
+              .forPersonalData,
           isProvidedTo: "https://some.requestor",
+          forPurpose:
+            accessRequestWithPurpose.credentialSubject.hasConsent.forPurpose,
         },
-        inbox: mockAccessRequestVc().credentialSubject.inbox,
+        inbox: accessRequestWithPurpose.credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessDenial"],
@@ -268,11 +274,14 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential"
     );
+    const accessRequestWithPurpose = mockAccessRequestVc({
+      purpose: ["https://example.org/some-purpose"],
+    });
 
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(mockAccessRequestVc()))
+        new Response(JSON.stringify(accessRequestWithPurpose))
       );
     await denyAccessRequest("https://some.resource.owner", "https://some.vc", {
       fetch: mockedFetch,
@@ -283,13 +292,16 @@ describe("denyAccessRequest", () => {
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: {
-          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
+          mode: accessRequestWithPurpose.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
+            accessRequestWithPurpose.credentialSubject.hasConsent
+              .forPersonalData,
           isProvidedTo: "https://some.requestor",
+          forPurpose:
+            accessRequestWithPurpose.credentialSubject.hasConsent.forPurpose,
         },
-        inbox: mockAccessRequestVc().credentialSubject.inbox,
+        inbox: accessRequestWithPurpose.credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessDenial"],

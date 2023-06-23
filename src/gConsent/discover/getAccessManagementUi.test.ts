@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -20,11 +20,8 @@
 //
 
 import { jest, describe, it, expect } from "@jest/globals";
-import {
-  mockSolidDatasetFrom,
-  getWellKnownSolid,
-  getSolidDataset,
-} from "@inrupt/solid-client";
+import type { getWellKnownSolid, getSolidDataset } from "@inrupt/solid-client";
+import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 
 import { getAccessManagementUi } from "./getAccessManagementUi";
 

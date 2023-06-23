@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -20,10 +20,8 @@
 //
 
 import type { Iri, VerifiableCredential } from "@inrupt/solid-client-vc";
-import {
-  ResourceAccessMode,
-  RESOURCE_ACCESS_MODE,
-} from "../../type/ResourceAccessMode";
+import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
+import { RESOURCE_ACCESS_MODE } from "../../type/ResourceAccessMode";
 
 const ODRL_ACCESS = "https://www.w3.org/ns/solid/odrl/access";
 

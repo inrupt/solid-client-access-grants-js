@@ -16,17 +16,18 @@
     "start": "next start"
   },
   "dependencies": {
-    "@inrupt/solid-client": "^1.23.3",
+    "@inrupt/internal-playwright-testids": "^1.8.0",
+    "@inrupt/solid-client": "^1.29.0",
     "@inrupt/solid-client-access-grants": "file:../../../",
-    "@inrupt/solid-client-authn-browser": "^1.12.3",
-    "@inrupt/internal-playwright-testids": "file:../../../../typescript-sdk-tools/packages/internal-playwright-testids",
-    "next": "^13.0.5",
+    "@inrupt/solid-client-authn-browser": "^1.16.0",
+    "@inrupt/solid-client-authn-node": "^1.16.0",
+    "next": "^13.4.7",
     "react": "^18.2.0"
   },
   "devDependencies": {
-    "@types/node": "^18.11.9",
+    "@types/node": "^20.3.1",
     "@types/react": "^18.0.25",
-    "eslint-config-next": "^13.0.5",
-    "typescript": "^4.9.4"
+    "eslint-config-next": "^13.4.7",
+    "typescript": "^5.1.3"
   }
 }

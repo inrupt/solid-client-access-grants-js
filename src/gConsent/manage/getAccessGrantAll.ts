@@ -1,5 +1,5 @@
 //
-// Copyright 2022 Inrupt Inc.
+// Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal in
@@ -19,11 +19,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { UrlString } from "@inrupt/solid-client";
-import {
-  getVerifiableCredentialAllFromShape,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
+import type { UrlString } from "@inrupt/solid-client";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
   CONTEXT_ESS_DEFAULT,
   CONTEXT_VC_W3C,
@@ -40,9 +38,16 @@ import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { BaseGrantBody } from "../type/AccessVerifiableCredential";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
-import { AccessGrant } from "../type/AccessGrant";
+import type { AccessGrant } from "../type/AccessGrant";
 import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
+
+export type AccessParameters = Partial<
+  Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
+    requestor: string;
+    resource: URL | UrlString;
+  }
+>;
 
 // Iteratively build the list of ancestor containers from the breakdown of the
 // resource path: for resource https://pod.example/foo/bar/baz, we'll want the result
@@ -63,42 +68,32 @@ const getAncestorUrls = (resourceUrl: URL) => {
   );
 };
 
-/**
- * Retrieve Access Grants issued over a resource. The Access Grants may be filtered
- * by requestor, access modes and purpose. In order to discover all applicable Access
- * Grants for the target resource, including recursive Access Grants issued over
- * an ancestor container, the resources hierarchy is walked up to the storage root.
- *
- * @param resource The URL of a resource to which access grants might have been issued.
- * @param grantShape The properties of grants to filter results.
- * @param options Optional parameter:
- * - `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
- * This can be typically used for authentication. Note that if it is omitted, and
- * `@inrupt/solid-client-authn-browser` is in your dependencies, the default session
- * is picked up.
- * - `options.includeExpiredGrants`: include expired grants in the result set.
- * @returns A void promise.
- * @since 0.4.0
- */
-async function getAccessGrantAll(
-  resource: URL | UrlString,
-  params: Partial<
-    Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
-      requestor: string;
-    }
-  > = {},
+// The following temporary internal function can be merged into
+// `getAccessGrantAll` once the deprecated signature is removed.
+// eslint-disable-next-line camelcase
+async function internal_getAccessGrantAll(
+  params: AccessParameters = {},
   options: AccessBaseOptions & { includeExpired?: boolean } = {}
 ): Promise<Array<VerifiableCredential>> {
+  if (!params.resource && !options.accessEndpoint) {
+    throw new Error("resource and accessEndpoint cannot both be undefined");
+  }
   const sessionFetch = await getSessionFetch(options);
   // TODO: Fix access API endpoint retrieval (should include all the different API endpoints)
-  const holderEndpoint = new URL(
-    "derive",
-    await getAccessApiEndpoint(resource, options)
-  );
+  const queryEndpoint = options.accessEndpoint
+    ? new URL("derive", options.accessEndpoint)
+    : new URL(
+        "derive",
+        await getAccessApiEndpoint(params.resource as string, options)
+      );
 
-  const ancestorUrls = getAncestorUrls(
-    typeof resource === "string" ? new URL(resource) : resource
-  );
+  const ancestorUrls = params.resource
+    ? getAncestorUrls(
+        typeof params.resource === "string"
+          ? new URL(params.resource)
+          : params.resource
+      )
+    : [undefined];
 
   const specifiedModes = accessToResourceAccessModeArray(params.access ?? {});
 
@@ -109,7 +104,7 @@ async function getAccessGrantAll(
       credentialSubject: {
         providedConsent: {
           hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-          forPersonalData: [url.href],
+          forPersonalData: url ? [url.href] : undefined,
           forPurpose: params.purpose,
           isProvidedTo: params.requestor,
           mode: specifiedModes.length > 0 ? specifiedModes : undefined,
@@ -122,7 +117,7 @@ async function getAccessGrantAll(
     await Promise.all(
       vcShapes.map((vcShape) =>
         getVerifiableCredentialAllFromShape(
-          holderEndpoint.href,
+          queryEndpoint.href,
           vcShape as Partial<VerifiableCredential>,
           {
             fetch: sessionFetch,
@@ -149,8 +144,85 @@ async function getAccessGrantAll(
           // Explicitly non-recursive grants are filtered out, except if they apply
           // directly to the target resource.
           getInherit(grant) !== false ||
-          getResources(grant).includes(resource.toString())
+          (params.resource &&
+            getResources(grant).includes(params.resource.toString()))
       )
+  );
+}
+
+/**
+ * Retrieve Access Grants issued over a resource. The Access Grants may be filtered
+ * by requestor, access modes and purpose. In order to discover all applicable Access
+ * Grants for the target resource, including recursive Access Grants issued over
+ * an ancestor container, the resources hierarchy is walked up to the storage root.
+ *
+ * @param resource The URL of a resource to which access grants might have been issued.
+ * @param grantShape The properties of grants to filter results.
+ * @param options Optional parameter:
+ * - `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
+ * This can be typically used for authentication. Note that if it is omitted, and
+ * `@inrupt/solid-client-authn-browser` is in your dependencies, the default session
+ * is picked up.
+ * - `options.includeExpiredGrants`: include expired grants in the result set.
+ * @returns A void promise.
+ * @since 0.4.0
+ * @deprecated Please remove `resource` parameter.
+ */
+
+async function getAccessGrantAll(
+  resource: URL | UrlString,
+  params?: AccessParameters,
+  options?: AccessBaseOptions & { includeExpired?: boolean }
+): Promise<Array<VerifiableCredential>>;
+
+/**
+ * Retrieve Access Grants issued over a resource. The Access Grants may be filtered
+ * by requestor, access modes and purpose. In order to discover all applicable Access
+ * Grants for the target resource, including recursive Access Grants issued over
+ * an ancestor container, the resources hierarchy is walked up to the storage root.
+ *
+ * @param grantShape The properties of grants to filter results.
+ * @param options Optional parameter:
+ * - `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
+ * This can be typically used for authentication. Note that if it is omitted, and
+ * `@inrupt/solid-client-authn-browser` is in your dependencies, the default session
+ * is picked up.
+ * - `options.includeExpiredGrants`: include expired grants in the result set.
+ * @returns A void promise.
+ * @since 0.4.0
+ */
+
+async function getAccessGrantAll(
+  params: AccessParameters,
+  options?: AccessBaseOptions & { includeExpired?: boolean }
+): Promise<Array<VerifiableCredential>>;
+
+async function getAccessGrantAll(
+  resourceOrParams: URL | UrlString | AccessParameters,
+  paramsOrOptions:
+    | AccessParameters
+    | undefined
+    | (AccessBaseOptions & { includeExpired?: boolean }),
+  options: AccessBaseOptions & { includeExpired?: boolean } = {}
+): Promise<Array<VerifiableCredential>> {
+  if (
+    typeof resourceOrParams === "string" ||
+    typeof (resourceOrParams as URL).href === "string"
+  ) {
+    return internal_getAccessGrantAll(
+      {
+        ...paramsOrOptions,
+        resource:
+          typeof resourceOrParams === "string"
+            ? resourceOrParams
+            : (resourceOrParams as URL).href,
+      },
+      options
+    );
+  }
+  return internal_getAccessGrantAll(
+    resourceOrParams as AccessParameters,
+    paramsOrOptions as AccessBaseOptions & { includeExpired?: boolean }
   );
 }
 
