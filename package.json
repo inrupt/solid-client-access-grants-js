@@ -122,7 +122,7 @@
     "rollup-plugin-typescript2": "^0.35.0",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
-    "typedoc": "^0.23.2",
+    "typedoc": "^0.24.8",
     "typedoc-plugin-markdown": "^3.13.1",
     "typescript": "^5.0.4"
   },
