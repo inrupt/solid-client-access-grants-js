@@ -101,8 +101,8 @@
   },
   "devDependencies": {
     "@inrupt/eslint-config-lib": "^2.0.0",
-    "@inrupt/internal-playwright-helpers": "^2.0.0",
-    "@inrupt/internal-test-env": "^2.0.0",
+    "@inrupt/internal-playwright-helpers": "^2.0.3",
+    "@inrupt/internal-test-env": "^2.0.3",
     "@inrupt/jest-jsdom-polyfills": "^2.0.0",
     "@inrupt/solid-client-authn-browser": "^1.12.2",
     "@inrupt/solid-client-authn-node": "^1.12.1",
