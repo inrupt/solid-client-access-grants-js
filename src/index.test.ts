@@ -41,6 +41,7 @@ import {
   overwriteFile,
   getSolidDataset,
   createContainerInContainer,
+  deleteFile,
   deleteSolidDataset,
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
@@ -81,6 +82,7 @@ describe("Index exports", () => {
     expect(saveFileInContainer).toBeDefined();
     expect(createContainerInContainer).toBeDefined();
     expect(getSolidDataset).toBeDefined();
+    expect(deleteFile).toBeDefined();
     expect(deleteSolidDataset).toBeDefined();
     expect(saveSolidDatasetAt).toBeDefined();
     expect(saveSolidDatasetInContainer).toBeDefined();

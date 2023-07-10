@@ -73,6 +73,7 @@ export { fetchWithVc } from "./fetch";
 
 export {
   createContainerInContainer,
+  deleteFile,
   deleteSolidDataset,
   getFile,
   getSolidDataset,
