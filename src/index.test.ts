@@ -41,6 +41,8 @@ import {
   overwriteFile,
   getSolidDataset,
   createContainerInContainer,
+  deleteFile,
+  deleteSolidDataset,
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
   GRANT_VC_URL_PARAM_NAME,
@@ -80,6 +82,8 @@ describe("Index exports", () => {
     expect(saveFileInContainer).toBeDefined();
     expect(createContainerInContainer).toBeDefined();
     expect(getSolidDataset).toBeDefined();
+    expect(deleteFile).toBeDefined();
+    expect(deleteSolidDataset).toBeDefined();
     expect(saveSolidDatasetAt).toBeDefined();
     expect(saveSolidDatasetInContainer).toBeDefined();
     expect(GRANT_VC_URL_PARAM_NAME).toBeDefined();

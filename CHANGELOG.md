@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+### New feature
+
+- `deleteSolidDataset` and `deleteFile`: Add functions to the `resource` module
+  to delete resources, following the interface of `@inrupt/solid-client`.
+
 ## [2.3.2](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.3.2) - 2023-06-05
 
 ### Deprecation notice

@@ -21,6 +21,8 @@
 
 export { getFile, overwriteFile, saveFileInContainer } from "./file";
 export { createContainerInContainer } from "./createContainerInContainer";
+export { deleteFile } from "./deleteFile";
+export { deleteSolidDataset } from "./deleteSolidDataset";
 export { getSolidDataset } from "./getSolidDataset";
 export { saveSolidDatasetAt } from "./saveSolidDatasetAt";
 export { saveSolidDatasetInContainer } from "./saveSolidDatasetInContainer";
