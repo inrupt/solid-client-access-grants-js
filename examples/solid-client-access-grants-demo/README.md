@@ -7,13 +7,6 @@
 - Fill in the required settings following the instructions in `.env.local.example`.
 - Start the app `npm start`.
 
-## Run the demo app using the local library
-
-- Instead of `npm run build`, use `npm run build:local` to build the demo app using
-  the local `solid-client-access-grant-js` code (instead of the installed dependency
-  `@inrupt/solid-client-access-grants`).
-- All other steps remain the same as in "[Run the app](#run-the-app)"
-
 ## Access flow
 
 Let the application be ACME.
