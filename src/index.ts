@@ -44,6 +44,7 @@ export {
   getAccessGrant,
   getAccessGrantAll,
   getAccessGrantFromRedirectUrl,
+  getAccessRequest,
   getAccessManagementUi,
   getAccessRequestFromRedirectUrl,
   issueAccessRequest,

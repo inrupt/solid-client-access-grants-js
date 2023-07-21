@@ -32,6 +32,7 @@ export { denyAccessRequest } from "./denyAccessRequest";
 export { getAccessGrant } from "./getAccessGrant";
 export { getAccessGrantAll } from "./getAccessGrantAll";
 export { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
+export { getAccessRequest } from "./getAccessRequest";
 export { revokeAccessGrant } from "./revokeAccessGrant";
 
 export {
