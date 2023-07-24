@@ -21,7 +21,7 @@
     "@inrupt/solid-client-access-grants": "file:../../../",
     "@inrupt/solid-client-authn-browser": "^1.17.1",
     "@inrupt/solid-client-authn-node": "^1.17.1",
-    "next": "^13.4.9",
+    "next": "^13.4.12",
     "react": "^18.2.0"
   },
   "devDependencies": {
