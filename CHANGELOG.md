@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
+## [2.4.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.3.2) - 2023-07-24
+
 ### New feature
 
 - `deleteSolidDataset` and `deleteFile`: Add functions to the `resource` module
