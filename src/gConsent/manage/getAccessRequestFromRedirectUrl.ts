@@ -20,15 +20,22 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import { getVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   REDIRECT_URL_PARAM_NAME,
   REQUEST_VC_URL_PARAM_NAME,
 } from "../discover/redirectToAccessManagementUi";
-import { isAccessRequest } from "../guard/isAccessRequest";
 import type { AccessRequest } from "../type/AccessRequest";
-import { getSessionFetch } from "../../common/util/getSessionFetch";
-import { normalizeAccessRequest } from "../request/issueAccessRequest";
+import getAccessRequest from "./getAccessRequest";
+
+function getSearchParam(url: URL, param: string) {
+  const value = url.searchParams.get(param);
+  if (value === null) {
+    throw new Error(
+      `The provided redirect URL [${url.toString()}] is missing the expected [${param}] query parameter`
+    );
+  }
+  return value;
+}
 
 /**
  * Get the Access Request out of the incoming redirect from the Access Management app.
@@ -44,48 +51,31 @@ import { normalizeAccessRequest } from "../request/issueAccessRequest";
  */
 export async function getAccessRequestFromRedirectUrl(
   redirectUrl: UrlString | URL,
-  options: { fetch?: typeof fetch } = {}
+  options?: { fetch?: typeof fetch }
 ): Promise<{
   accessRequest: AccessRequest;
   requestorRedirectUrl: UrlString;
 }> {
   const redirectUrlObj =
     typeof redirectUrl === "string" ? new URL(redirectUrl) : redirectUrl;
-  const authFetch = options.fetch ?? (await getSessionFetch(options));
 
   // Get the URL where the requestor expects the user to be redirected with
   // the grant.
-  const requestorRedirectUrl = redirectUrlObj.searchParams.get(
+  const requestorRedirectUrl = getSearchParam(
+    redirectUrlObj,
     REDIRECT_URL_PARAM_NAME
   );
-  if (requestorRedirectUrl === null) {
-    throw new Error(
-      `The provided redirect URL [${redirectUrl}] is missing the expected [${REDIRECT_URL_PARAM_NAME}] query parameter`
-    );
-  }
 
   // Get the Access Request IRI.
-  const accessRequestIri = redirectUrlObj.searchParams.get(
+  const accessRequestIri = getSearchParam(
+    redirectUrlObj,
     REQUEST_VC_URL_PARAM_NAME
   );
-  if (accessRequestIri === null) {
-    throw new Error(
-      `The provided redirect URL [${redirectUrl}] is missing the expected [${REQUEST_VC_URL_PARAM_NAME}] query parameter`
-    );
-  }
 
-  const accessRequest = normalizeAccessRequest(
-    await getVerifiableCredential(accessRequestIri, {
-      fetch: authFetch,
-    })
-  );
-
-  if (!isAccessRequest(accessRequest)) {
-    throw new Error(
-      `${JSON.stringify(accessRequest)} is not an Access Request`
-    );
-  }
-  return { accessRequest, requestorRedirectUrl };
+  return {
+    accessRequest: await getAccessRequest(accessRequestIri, options),
+    requestorRedirectUrl,
+  };
 }
 
 export default getAccessRequestFromRedirectUrl;
