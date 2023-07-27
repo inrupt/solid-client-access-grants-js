@@ -7,6 +7,6 @@ on:
 
 jobs:
   audit:
-    uses: inrupt/typescript-sdk-tools/.github/workflows/reusable-audit.yml@v2.0.4
+    uses: inrupt/typescript-sdk-tools/.github/workflows/reusable-audit.yml@v2.1.1
     secrets:
       WEBHOOK_E2E_FAILURE: ${{ secrets.WEBHOOK_E2E_FAILURE }}
