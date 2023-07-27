@@ -47,15 +47,15 @@ test("Redirect to Podbrowser to accept Access Request", async ({
   await page.getByRole("button", { name: "Allow" }).click();
 
   // We validate the request fields are editable before we confirm access
-  // Select our permissions
+  // Select our purposes
   await page.getByRole("checkbox").nth(1).check();
 
   // Select our resources for allowing access
-  await page.getByTestId("request-select-all").click();
+  await page.getByRole("checkbox").nth(2).check();
 
   // The test user confirms the access they selected and is redirected back to app
   await Promise.all([
-    page.getByRole("button", { name: "Confirm Access" }).click(),
+    page.getByRole("button", { name: "Confirm Access" }).click({ force: true }),
     page.waitForURL("http://localhost:3000/?accessGrantUrl=*"),
   ]);
 
