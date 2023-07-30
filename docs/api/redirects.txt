@@ -1,1 +1,1 @@
-developer-tools/api/javascript/solid-client-access-grants/modules/manage.html -> developer-tools/api/javascript/solid-client-access-grants/modules/gConsent_manage.html
+modules/manage.html -> modules/gConsent_manage.html
