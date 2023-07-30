@@ -141,7 +141,7 @@ myst_url_schemes = ('https', 'http')
 myst_enable_extensions = ['colon_fence']
 
 redirects = {
-     "<source>": "<target>"
+    "modules/manage.html": "modules/gConsent_manage.html"
 }
 
 # Typedoc by default outputs all files as relative to their directory, but for
