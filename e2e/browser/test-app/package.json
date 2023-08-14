@@ -16,18 +16,18 @@
     "start": "next start"
   },
   "dependencies": {
-    "@inrupt/internal-playwright-testids": "^2.1.1",
+    "@inrupt/internal-playwright-testids": "^2.1.2",
     "@inrupt/solid-client": "^1.30.0",
     "@inrupt/solid-client-access-grants": "file:../../../",
     "@inrupt/solid-client-authn-browser": "^1.17.1",
     "@inrupt/solid-client-authn-node": "^1.17.1",
-    "next": "^13.4.12",
+    "next": "^13.4.13",
     "react": "^18.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20.4.5",
+    "@types/node": "^20.5.0",
     "@types/react": "^18.2.18",
-    "eslint-config-next": "^13.4.12",
+    "eslint-config-next": "^13.4.13",
     "typescript": "^5.1.6"
   }
 }
