@@ -23,6 +23,7 @@ import {
   login,
   logout,
   handleIncomingRedirect,
+  events
 } from "@inrupt/solid-client-authn-browser";
 import type { ISessionInfo } from "@inrupt/solid-client-authn-browser";
 import {
@@ -37,7 +38,7 @@ import AccessGrants from "../accessGrants";
 
 // This is the content of the file uploaded manually at SHARED_FILE_IRI.
 const DEFAULT_ISSUER = "https://login.inrupt.com/";
-const REDIRECT_URL = window.location.href;
+const REDIRECT_URL = "http://localhost:3000/";
 const APP_NAME = "Access Grants browser-based tests app";
 const AccessGrantContainer = ({
   sessionInfo,
@@ -53,6 +54,11 @@ const AccessGrantContainer = ({
 };
 
 export default function Home() {
+  // Kill the app if an error occurs
+  events().on("error", (err, errDescription) => {
+    throw new Error(`An error happened: ${err}, ${errDescription}`);
+  })
+
   const [sessionInfo, setSessionInfo] = useState<ISessionInfo>();
   const [issuer, setIssuer] = useState<string>(DEFAULT_ISSUER);
   const [errorMessage, setErrorMessage] = useState<string>();
