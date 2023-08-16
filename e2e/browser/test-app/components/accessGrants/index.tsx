@@ -48,7 +48,8 @@ export default function AccessGrant({
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
   const router = useRouter();
 
-  const handleCreate = async (e) => {
+  
+  const handleCreate = async (e: any) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
     e.preventDefault();
     if (typeof sharedResourceIri === "string") {
@@ -80,7 +81,7 @@ export default function AccessGrant({
     setSharedResourceIri(getSourceUrl(savedFile));
   };
 
-  const handleDelete = async (e) => {
+  const handleDelete = async (e: any) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
     e.preventDefault();
     if (typeof sharedResourceIri !== "string") {
@@ -93,7 +94,7 @@ export default function AccessGrant({
     setSharedResourceIri(undefined);
   };
 
-  const handleGrant = async (e) => {
+  const handleGrant = async (e: any) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
     e.preventDefault();
     if (typeof sharedResourceIri !== "string") {
@@ -114,7 +115,7 @@ export default function AccessGrant({
     setAccessGrant(JSON.stringify(accessGrantRequest, null, "  "));
   };
 
-  const handleRevoke = async (e) => {
+  const handleRevoke = async (e: any) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
     e.preventDefault();
     if (typeof accessGrant !== "string") {
