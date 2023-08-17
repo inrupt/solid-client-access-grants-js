@@ -157,14 +157,14 @@ export default function AccessGrant({
       <div>
         <button
           type="button"
-          onClick={ handleCreate }
+          onClick={handleCreate}
           data-testid="create-resource"
         >
           Create resource
         </button>
         <button
           type="button"
-          onClick={ handleDelete }
+          onClick={handleDelete}
           data-testid="delete-resource"
         >
           Delete resource
@@ -188,23 +188,19 @@ export default function AccessGrant({
         </input>
       </p>
       <div>
-        <button
-          type="button"
-          onClick={ handleGrant }
-          data-testid="grant-access"
-        >
+        <button type="button" onClick={handleGrant} data-testid="grant-access">
           Grant access
         </button>
         <button
           type="button"
-          onClick={ handleRevoke }
+          onClick={handleRevoke}
           data-testid="revoke-access"
         >
           Revoke access
         </button>
         <button
           type="button"
-          onClick={ handleAccessRequest }
+          onClick={handleAccessRequest}
           data-testid="redirect-for-access"
         >
           Redirect to PodBrowser to Grant Access
@@ -216,14 +212,14 @@ export default function AccessGrant({
 
       <button
         type="button"
-        onClick={ handleCallAuthedGrant }
+        onClick={handleCallAuthedGrant}
         data-testid="get-authed-grant"
       >
         Authenticated Fetch of Grant
       </button>
       <button
         type="button"
-        onClick={ handleGrantResponse }
+        onClick={handleGrantResponse}
         data-testid="handle-grant-response"
       >
         Handle Grant Response
