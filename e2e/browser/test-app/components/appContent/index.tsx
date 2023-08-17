@@ -73,6 +73,10 @@ export default function Home() {
 
   const handleLogin = async () => {
     try {
+      const currentURL = new URL(window.location.href);
+      if(currentURL.searchParams.has("accessGrantUrl")) {
+        window.localStorage.setItem("accessGrantUrl", decodeURIComponent(currentURL.searchParams.get("accessGrantUrl")!));
+      }
       // Login will redirect the user away so that they can log in the OIDC issuer,
       // and back to the provided redirect URL (which should be controlled by your app).
       await login({

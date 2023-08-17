@@ -150,10 +150,11 @@ export default function AccessGrant({
 
   const handleGrantResponse = async () => {
     if (
-      router.query.accessGrantUrl !== "" &&
-      typeof router.query.accessGrantUrl === "string"
+      (router.query.accessGrantUrl !== "" &&
+      typeof router.query.accessGrantUrl === "string") 
+      || window.localStorage.getItem("accessGrantUrl") !== null
     ) {
-      setAccessGrant(router.query.accessGrantUrl);
+      setAccessGrant(window.localStorage.getItem("accessGrantUrl") ?? router.query.accessGrantUrl as string);
     }
   };
 
