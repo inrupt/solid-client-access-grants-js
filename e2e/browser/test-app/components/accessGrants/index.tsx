@@ -48,7 +48,6 @@ export default function AccessGrant({
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
   const router = useRouter();
 
-  
   const handleCreate = async (e: any) => {
     // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
     e.preventDefault();
@@ -151,10 +150,13 @@ export default function AccessGrant({
   const handleGrantResponse = async () => {
     if (
       (router.query.accessGrantUrl !== "" &&
-      typeof router.query.accessGrantUrl === "string") 
-      || window.localStorage.getItem("accessGrantUrl") !== null
+        typeof router.query.accessGrantUrl === "string") ||
+      window.localStorage.getItem("accessGrantUrl") !== null
     ) {
-      setAccessGrant(window.localStorage.getItem("accessGrantUrl") ?? router.query.accessGrantUrl as string);
+      setAccessGrant(
+        window.localStorage.getItem("accessGrantUrl") ??
+          (router.query.accessGrantUrl as string)
+      );
     }
   };
 

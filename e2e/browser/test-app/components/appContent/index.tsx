@@ -23,7 +23,7 @@ import {
   login,
   logout,
   handleIncomingRedirect,
-  events
+  events,
 } from "@inrupt/solid-client-authn-browser";
 import type { ISessionInfo } from "@inrupt/solid-client-authn-browser";
 import {
@@ -57,7 +57,7 @@ export default function Home() {
   // Kill the app if an error occurs
   events().on("error", (err, errDescription) => {
     throw new Error(`An error happened: ${err}, ${errDescription}`);
-  })
+  });
 
   const [sessionInfo, setSessionInfo] = useState<ISessionInfo>();
   const [issuer, setIssuer] = useState<string>(DEFAULT_ISSUER);
@@ -74,8 +74,11 @@ export default function Home() {
   const handleLogin = async () => {
     try {
       const currentURL = new URL(window.location.href);
-      if(currentURL.searchParams.has("accessGrantUrl")) {
-        window.localStorage.setItem("accessGrantUrl", decodeURIComponent(currentURL.searchParams.get("accessGrantUrl")!));
+      if (currentURL.searchParams.has("accessGrantUrl")) {
+        window.localStorage.setItem(
+          "accessGrantUrl",
+          decodeURIComponent(currentURL.searchParams.get("accessGrantUrl")!)
+        );
       }
       // Login will redirect the user away so that they can log in the OIDC issuer,
       // and back to the provided redirect URL (which should be controlled by your app).
