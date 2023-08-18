@@ -55,7 +55,7 @@ describe("getAccessRequest", () => {
       "https://some.vc",
       {
         fetch: mockedFetch,
-      }
+      },
     );
   });
 
@@ -67,7 +67,7 @@ describe("getAccessRequest", () => {
       "https://some.vc",
       {
         fetch: mockedFetch,
-      }
+      },
     );
   });
 
@@ -75,7 +75,7 @@ describe("getAccessRequest", () => {
     // Check that both URL strings and objects are supported.
     const accessRequestFromString = await getAccessRequest("https://some.vc");
     const accessRequestFromUrl = await getAccessRequest(
-      new URL("https://some.vc")
+      new URL("https://some.vc"),
     );
 
     expect(accessRequestFromString).toStrictEqual(accessRequestFromUrl);

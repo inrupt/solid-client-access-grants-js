@@ -37,17 +37,17 @@ import { normalizeAccessRequest } from "../request/issueAccessRequest";
  */
 export async function getAccessRequest(
   url: UrlString | URL,
-  options: { fetch?: typeof fetch } = {}
+  options: { fetch?: typeof fetch } = {},
 ): Promise<AccessRequest> {
   const accessRequest = normalizeAccessRequest(
     await getVerifiableCredential(url.toString(), {
       fetch: options.fetch ?? (await getSessionFetch(options)),
-    })
+    }),
   );
 
   if (!isAccessRequest(accessRequest)) {
     throw new Error(
-      `${JSON.stringify(accessRequest)} is not an Access Request`
+      `${JSON.stringify(accessRequest)} is not an Access Request`,
     );
   }
   return accessRequest;

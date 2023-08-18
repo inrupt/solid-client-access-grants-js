@@ -48,7 +48,7 @@ export async function saveSolidDatasetAt<Dataset extends SolidDataset>(
   datasetUrl: UrlString,
   solidDataset: Dataset,
   accessGrant: VerifiableCredential,
-  options?: FetchOptions
+  options?: FetchOptions,
 ) {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
@@ -58,7 +58,7 @@ export async function saveSolidDatasetAt<Dataset extends SolidDataset>(
   const authenticatedFetch = await fetchWithVc(
     datasetUrl,
     accessGrant,
-    fetchOptions
+    fetchOptions,
   );
 
   return await coreSaveSolidDatasetAt(datasetUrl, solidDataset, {

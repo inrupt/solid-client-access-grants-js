@@ -35,7 +35,7 @@ jest.mock("@inrupt/solid-client", () => {
 describe("deleteSolidDataset", () => {
   it("authenticates using the provided VC", async () => {
     const solidClientModule = jest.requireMock(
-      "@inrupt/solid-client"
+      "@inrupt/solid-client",
     ) as jest.Mocked<typeof SolidClientCore>;
     const mockedFetch = jest.fn<typeof fetch>();
     await deleteSolidDataset("https://some.dataset.url", mockAccessGrantVc(), {
@@ -44,11 +44,11 @@ describe("deleteSolidDataset", () => {
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
       mockAccessGrantVc(),
-      { fetch: mockedFetch }
+      { fetch: mockedFetch },
     );
     expect(solidClientModule.deleteSolidDataset).toHaveBeenCalledWith(
       "https://some.dataset.url",
-      expect.anything()
+      expect.anything(),
     );
   });
 });

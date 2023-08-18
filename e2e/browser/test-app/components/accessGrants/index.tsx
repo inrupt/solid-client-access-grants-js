@@ -62,7 +62,7 @@ export default function AccessGrant({
     const resourceOwnerPodAll = await getPodUrlAll(session.info.webId);
     if (resourceOwnerPodAll.length === 0) {
       setErrorMessage(
-        "The Resource Owner WebID Profile is missing a link to at least one Pod root."
+        "The Resource Owner WebID Profile is missing a link to at least one Pod root.",
       );
     }
 
@@ -73,7 +73,7 @@ export default function AccessGrant({
         // The session ID is a random string, used here as a unique slug.
         slug: `${session.info.sessionId}.txt`,
         fetch: session.fetch,
-      }
+      },
     );
     setSharedResourceIri(getSourceUrl(savedFile));
   };
@@ -103,7 +103,7 @@ export default function AccessGrant({
       },
       {
         fetch: session.fetch,
-      }
+      },
     );
     setAccessGrant(JSON.stringify(accessGrantRequest, null, "  "));
   };
@@ -135,7 +135,7 @@ export default function AccessGrant({
         },
         fallbackAccessManagementUi: `https://podbrowser.inrupt.com/privacy/access/requests/`,
         fetch: session.fetch,
-      }
+      },
     );
   };
 
@@ -147,7 +147,7 @@ export default function AccessGrant({
     ) {
       setAccessGrant(
         window.localStorage.getItem("accessGrantUrl") ??
-          (router.query.accessGrantUrl as string)
+          (router.query.accessGrantUrl as string),
       );
     }
   };

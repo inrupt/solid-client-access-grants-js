@@ -75,7 +75,7 @@ async function discoverAccessManagementUi(options: {
   } else {
     accessManagementUi = await getAccessManagementUiFromWellKnown(
       options.resourceUrl,
-      { fetch: authFetch }
+      { fetch: authFetch },
     );
   }
   return accessManagementUi ?? options.fallbackUi;
@@ -95,13 +95,13 @@ async function discoverAccessManagementUi(options: {
 export async function redirectToAccessManagementUi(
   accessRequestVc: VerifiableCredential | UrlString | URL,
   redirectUrl: UrlString | URL,
-  options: RedirectToAccessManagementUiOptions = {}
+  options: RedirectToAccessManagementUiOptions = {},
 ): Promise<void> {
   const fallbackUi = options.fallbackAccessManagementUi;
 
   const requestVc = await getBaseAccessRequestVerifiableCredential(
     accessRequestVc,
-    { fetch: options.fetch }
+    { fetch: options.fetch },
   );
   const accessManagementUi = await discoverAccessManagementUi({
     resourceUrl: requestVc.credentialSubject.hasConsent.forPersonalData[0],
@@ -116,7 +116,7 @@ export async function redirectToAccessManagementUi(
         requestVc.credentialSubject.hasConsent.forPersonalData[0]
       }]${
         options.resourceOwner ? `, neither from [${options.resourceOwner}]` : ""
-      }`
+      }`,
     );
   }
 
@@ -125,9 +125,9 @@ export async function redirectToAccessManagementUi(
     {
       [`${REQUEST_VC_URL_PARAM_NAME}`]: encodeURI(requestVc.id),
       [`${REDIRECT_URL_PARAM_NAME}`]: encodeURI(
-        typeof redirectUrl === "string" ? redirectUrl : redirectUrl.href
+        typeof redirectUrl === "string" ? redirectUrl : redirectUrl.href,
       ),
     },
-    options
+    options,
   );
 }

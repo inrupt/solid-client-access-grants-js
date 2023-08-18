@@ -34,7 +34,7 @@ import {
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getSolidDataset = jest.fn(
-    solidClientModule.getSolidDataset
+    solidClientModule.getSolidDataset,
   );
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
@@ -47,7 +47,7 @@ describe("getAccessManagementUi", () => {
         jest.requireMock("@inrupt/solid-client") as {
           getSolidDataset: typeof getSolidDataset;
         },
-        "getSolidDataset"
+        "getSolidDataset",
       )
       .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid"));
     const mockedFetch = jest.fn(global.fetch);
@@ -67,7 +67,7 @@ describe("getAccessManagementUi", () => {
     jest.spyOn(solidClient, "getSolidDataset").mockRejectedValue("Some error");
 
     await expect(getAccessManagementUi("https://some.webid")).rejects.toThrow(
-      /some.webid.*Some error/
+      /some.webid.*Some error/,
     );
   });
 
@@ -81,7 +81,7 @@ describe("getAccessManagementUi", () => {
       .mockResolvedValue(mockSolidDatasetFrom("https://some.webid"));
 
     await expect(getAccessManagementUi("https://some.webid")).rejects.toThrow(
-      /some.webid.*WebID cannot be dereferenced/
+      /some.webid.*WebID cannot be dereferenced/,
     );
   });
 
@@ -96,7 +96,7 @@ describe("getAccessManagementUi", () => {
     const spiedGetWellKnown = jest.spyOn(solidClient, "getWellKnownSolid");
 
     await expect(getAccessManagementUi("https://some.webid")).resolves.toBe(
-      MOCKED_ACCESS_UI_IRI
+      MOCKED_ACCESS_UI_IRI,
     );
     // If the profile contains a preferred UI, the .well-known document should not be looked up.
     expect(spiedGetWellKnown).not.toHaveBeenCalled();
@@ -115,7 +115,7 @@ describe("getAccessManagementUi", () => {
       .mockResolvedValueOnce(mockWellKnownWithAccess());
 
     await expect(getAccessManagementUi("https://some.webid")).resolves.toBe(
-      MOCKED_ACCESS_UI_IRI
+      MOCKED_ACCESS_UI_IRI,
     );
 
     expect(spiedGetWellKnown).toHaveBeenCalled();
@@ -129,11 +129,11 @@ describe("getAccessManagementUi", () => {
     jest
       .spyOn(solidClient, "getSolidDataset")
       .mockResolvedValueOnce(
-        mockWebIdWithUi("https://some.webid", false, false)
+        mockWebIdWithUi("https://some.webid", false, false),
       );
 
     await expect(
-      getAccessManagementUi("https://some.webid")
+      getAccessManagementUi("https://some.webid"),
     ).resolves.toBeUndefined();
   });
 
@@ -150,7 +150,7 @@ describe("getAccessManagementUi", () => {
       .mockResolvedValueOnce(mockWellKnownWithAccess(false));
 
     await expect(
-      getAccessManagementUi("https://some.webid")
+      getAccessManagementUi("https://some.webid"),
     ).resolves.toBeUndefined();
 
     expect(spiedGetWellKnown).toHaveBeenCalled();
@@ -167,11 +167,11 @@ describe("getAccessManagementUi", () => {
     const spiedGetWellKnown = jest
       .spyOn(solidClient, "getWellKnownSolid")
       .mockResolvedValueOnce(
-        mockSolidDatasetFrom("https://some.server/.well-known/solid")
+        mockSolidDatasetFrom("https://some.server/.well-known/solid"),
       );
 
     await expect(
-      getAccessManagementUi("https://some.webid")
+      getAccessManagementUi("https://some.webid"),
     ).resolves.toBeUndefined();
 
     expect(spiedGetWellKnown).toHaveBeenCalled();

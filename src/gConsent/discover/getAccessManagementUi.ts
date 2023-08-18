@@ -38,7 +38,7 @@ interface AccessManagementUiFromProfile {
 
 async function getAccessManagementUiFromProfile(
   webId: UrlString,
-  options: { fetch: typeof global.fetch }
+  options: { fetch: typeof global.fetch },
 ): Promise<AccessManagementUiFromProfile> {
   const result: AccessManagementUiFromProfile = {};
 
@@ -54,7 +54,7 @@ async function getAccessManagementUiFromProfile(
   const profile = getThing(webIdDocument, webId);
   if (profile === null) {
     throw new Error(
-      `Cannot get the Access Management UI for ${webId}: the WebID cannot be dereferenced.`
+      `Cannot get the Access Management UI for ${webId}: the WebID cannot be dereferenced.`,
     );
   }
 
@@ -79,7 +79,7 @@ async function getAccessManagementUiFromProfile(
  */
 export async function getAccessManagementUiFromWellKnown(
   storage: UrlString | undefined,
-  options: { fetch: typeof global.fetch }
+  options: { fetch: typeof global.fetch },
 ): Promise<UrlString | undefined> {
   if (storage === undefined) {
     return undefined;
@@ -95,7 +95,7 @@ export async function getAccessManagementUiFromWellKnown(
 
   const wellKnownAccesstUi = getIri(
     getThingAll(wellKnown, { acceptBlankNodes: true })[0],
-    PREFERRED_CONSENT_MANAGEMENT_UI
+    PREFERRED_CONSENT_MANAGEMENT_UI,
   );
 
   return wellKnownAccesstUi ?? undefined;
@@ -113,14 +113,14 @@ export async function getAccessManagementUiFromWellKnown(
  */
 async function getAccessManagementUi(
   webId: URL | UrlString,
-  options: Pick<AccessBaseOptions, "fetch"> = {}
+  options: Pick<AccessBaseOptions, "fetch"> = {},
 ): Promise<UrlString | undefined> {
   const fetcher = await getSessionFetch(options);
 
   // TODO: Complete code coverage for URL argument
   const { accessEndpoint, storage } = await getAccessManagementUiFromProfile(
     webId.toString(),
-    { fetch: fetcher }
+    { fetch: fetcher },
   );
 
   return (

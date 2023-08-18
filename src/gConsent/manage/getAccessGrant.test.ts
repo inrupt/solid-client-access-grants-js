@@ -29,7 +29,7 @@ import { getAccessGrant } from "./getAccessGrant";
 
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch"
+    "@inrupt/universal-fetch",
   ) as jest.Mocked<typeof CrossFetch>;
   return {
     // Do no mock the globals such as Response.
@@ -56,15 +56,15 @@ describe("getAccessGrant", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
-        new Response("Not Found", { status: 404, statusText: "Not Found" })
+        new Response("Not Found", { status: 404, statusText: "Not Found" }),
       );
 
     await expect(
       getAccessGrant("https://some.vc.url", {
         fetch: mockedFetch,
-      })
+      }),
     ).rejects.toThrow(
-      /Could not resolve \[https:\/\/some.vc.url\].*404 Not Found/
+      /Could not resolve \[https:\/\/some.vc.url\].*404 Not Found/,
     );
   });
 
@@ -77,9 +77,9 @@ describe("getAccessGrant", () => {
     await expect(
       getAccessGrant("https://some.vc.url", {
         fetch: mockedFetch,
-      })
+      }),
     ).rejects.toThrow(
-      /Unexpected response.*\[https:\/\/some.vc.url\].*not a Verifiable Credential/
+      /Unexpected response.*\[https:\/\/some.vc.url\].*not a Verifiable Credential/,
     );
   });
 
@@ -88,13 +88,13 @@ describe("getAccessGrant", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(mockConsentRequestVc()))
+        new Response(JSON.stringify(mockConsentRequestVc())),
       );
 
     await expect(
       getAccessGrant("https://some.vc.url", {
         fetch: mockedFetch,
-      })
+      }),
     ).rejects.toThrow(/not an Access Grant/);
   });
 
@@ -147,13 +147,13 @@ describe("getAccessGrant", () => {
               inherit: "true",
             },
           },
-        })
-      )
+        }),
+      ),
     );
     await expect(
       getAccessGrant("https://some.vc.url", {
         fetch: mockedFetch,
-      })
+      }),
     ).resolves.toEqual(normalizedAccessGrant);
   });
 

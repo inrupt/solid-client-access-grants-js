@@ -31,7 +31,7 @@ jest.mock("./getAccessManagementUi");
 
 const mockAccessManagementUiDiscovery = (url: string | undefined) => {
   const accessUiDiscoveryModule = jest.requireMock(
-    "./getAccessManagementUi"
+    "./getAccessManagementUi",
   ) as any;
   accessUiDiscoveryModule.getAccessManagementUiFromWellKnown = jest
     .fn(getAccessManagementUiFromWellKnown)
@@ -49,10 +49,10 @@ describe("redirectToAccessManagementUi", () => {
       await expect(
         redirectToAccessManagementUi(
           mockAccessRequestVc(),
-          "https://some.redirect.iri"
-        )
+          "https://some.redirect.iri",
+        ),
       ).rejects.toThrow(
-        `In a non-browser environment, a redirectCallback must be provided by the user.`
+        `In a non-browser environment, a redirectCallback must be provided by the user.`,
       );
     });
   });

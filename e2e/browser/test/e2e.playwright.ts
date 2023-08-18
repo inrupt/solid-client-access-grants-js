@@ -71,6 +71,7 @@ test("Redirect to Podbrowser to accept Access Request", async ({
 
   // The test user confirms the access they selected and is redirected back to app
   await Promise.all([
+    // eslint-disable-next-line playwright/no-force-option
     page.getByRole("button", { name: "Confirm Access" }).click({ force: true }),
     page.waitForURL("http://localhost:3000/?accessGrantUrl=*"),
   ]);
@@ -87,7 +88,7 @@ test("Redirect to Podbrowser to accept Access Request", async ({
 
   // Confirm we received an accessGrantURL
   await expect(
-    page.innerText("pre[data-testid=access-grant]")
+    page.innerText("pre[data-testid=access-grant]"),
   ).resolves.not.toBe("");
 
   // The test app sends an authenticated request to get the resource it has been granted access to
@@ -110,7 +111,7 @@ test("Granting access to a resource, then revoking the access grant", async ({
     page.waitForResponse((response) => response.status() === 201),
   ]);
   await expect(
-    page.innerText("span[data-testid=resource-iri]")
+    page.innerText("span[data-testid=resource-iri]"),
   ).resolves.toMatch(/https:\/\/.*\.txt/);
 
   // Grant access to the resource.
@@ -120,7 +121,7 @@ test("Granting access to a resource, then revoking the access grant", async ({
     page.waitForResponse((response) => response.status() === 201),
   ]);
   await expect(
-    page.innerText("pre[data-testid=access-grant]")
+    page.innerText("pre[data-testid=access-grant]"),
   ).resolves.not.toBe("");
 
   // Revoke the access grant.
@@ -130,7 +131,7 @@ test("Granting access to a resource, then revoking the access grant", async ({
     page.waitForResponse((response) => response.status() === 204),
   ]);
   await expect(page.innerText("pre[data-testid=access-grant]")).resolves.toBe(
-    ""
+    "",
   );
 
   // Cleanup the resource
@@ -140,6 +141,6 @@ test("Granting access to a resource, then revoking the access grant", async ({
     page.waitForResponse((response) => response.status() === 204),
   ]);
   await expect(
-    page.innerText("span[data-testid=resource-iri]")
+    page.innerText("span[data-testid=resource-iri]"),
   ).resolves.toMatch("");
 });

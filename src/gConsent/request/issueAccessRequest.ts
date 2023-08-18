@@ -42,7 +42,7 @@ import { isAccessRequest } from "../guard/isAccessRequest";
  * @returns An equivalent JSON-LD document framed according to our typing.
  */
 export function normalizeAccessRequest<T extends VerifiableCredential>(
-  accessRequest: T
+  accessRequest: T,
 ): T {
   // Proper type checking is performed after normalization, so casting here is fine.
   const normalized = { ...accessRequest } as unknown as AccessRequest;
@@ -76,29 +76,29 @@ export function normalizeAccessRequest<T extends VerifiableCredential>(
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<AccessRequest>;
 /**
  * @deprecated Please remove the `requestor` parameter.
  */
 async function issueAccessRequest(
   params: DeprecatedAccessRequestParameters,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<AccessRequest>;
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options: AccessBaseOptions = {}
+  options: AccessBaseOptions = {},
 ): Promise<AccessRequest> {
   const requestBody = getRequestBody({
     ...params,
     status: GC_CONSENT_STATUS_REQUESTED,
   });
   const accessRequest = normalizeAccessRequest(
-    await issueAccessVc(requestBody, options)
+    await issueAccessVc(requestBody, options),
   );
   if (!isAccessRequest(accessRequest)) {
     throw new Error(
-      `${JSON.stringify(accessRequest)} is not an Access Request`
+      `${JSON.stringify(accessRequest)} is not an Access Request`,
     );
   }
 

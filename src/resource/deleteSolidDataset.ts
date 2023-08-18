@@ -42,7 +42,7 @@ import type { FetchOptions } from "../type/FetchOptions";
 export async function deleteSolidDataset(
   datasetUrl: UrlString,
   accessGrant: VerifiableCredential,
-  options?: FetchOptions
+  options?: FetchOptions,
 ) {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
@@ -52,7 +52,7 @@ export async function deleteSolidDataset(
   const authenticatedFetch = await fetchWithVc(
     datasetUrl,
     accessGrant,
-    fetchOptions
+    fetchOptions,
   );
 
   return await coreDeleteSolidDataset(datasetUrl, {

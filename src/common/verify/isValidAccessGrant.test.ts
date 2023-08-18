@@ -32,7 +32,7 @@ import { isValidAccessGrant } from "./isValidAccessGrant";
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getSolidDataset = jest.fn(
-    solidClientModule.getSolidDataset
+    solidClientModule.getSolidDataset,
   );
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
@@ -40,7 +40,7 @@ jest.mock("@inrupt/solid-client", () => {
 jest.mock("@inrupt/solid-client-vc");
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch"
+    "@inrupt/universal-fetch",
   ) as jest.Mocked<typeof CrossFetch>;
   return {
     // Do no mock the globals such as Response.
@@ -88,7 +88,7 @@ describe("isValidAccessGrant", () => {
       .mockResolvedValueOnce(
         new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
           status: 200,
-        })
+        }),
       );
     await isValidAccessGrant(MOCK_ACCESS_GRANT, {
       fetch: mockedFetch,
@@ -110,7 +110,7 @@ describe("isValidAccessGrant", () => {
       .mockResolvedValueOnce(
         new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
           status: 200,
-        })
+        }),
       );
 
     await isValidAccessGrant(MOCK_ACCESS_GRANT, {
@@ -121,7 +121,7 @@ describe("isValidAccessGrant", () => {
       expect.anything(),
       expect.objectContaining({
         body: JSON.stringify({ verifiableCredential: MOCK_ACCESS_GRANT }),
-      })
+      }),
     );
   });
 
@@ -131,13 +131,13 @@ describe("isValidAccessGrant", () => {
       .fn<(typeof CrossFetch)["fetch"]>()
       // First, the VC is fetched
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(MOCK_ACCESS_GRANT), { status: 200 })
+        new Response(JSON.stringify(MOCK_ACCESS_GRANT), { status: 200 }),
       )
       // Then, the verification endpoint is called
       .mockResolvedValueOnce(
         new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
           status: 200,
-        })
+        }),
       );
 
     await isValidAccessGrant("https://example.com/someVc", {
@@ -152,7 +152,7 @@ describe("isValidAccessGrant", () => {
     const mockedFetch = jest
       .fn<(typeof CrossFetch)["fetch"]>()
       .mockResolvedValue(
-        new Response(JSON.stringify({ someField: "Not a credential" }))
+        new Response(JSON.stringify({ someField: "Not a credential" })),
       );
     jest.mocked(isVerifiableCredential).mockReturnValueOnce(false);
 
@@ -160,9 +160,9 @@ describe("isValidAccessGrant", () => {
       isValidAccessGrant("https://example.com/someVc", {
         fetch: mockedFetch,
         verificationEndpoint: MOCK_ACCESS_ENDPOINT,
-      })
+      }),
     ).rejects.toThrow(
-      "The request to [https://example.com/someVc] returned an unexpected response:"
+      "The request to [https://example.com/someVc] returned an unexpected response:",
     );
   });
 
@@ -172,7 +172,7 @@ describe("isValidAccessGrant", () => {
     };
     const spiedConfigurationDiscovery = jest.spyOn(
       vcModule,
-      "getVerifiableCredentialApiConfiguration"
+      "getVerifiableCredentialApiConfiguration",
     );
     jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
     const mockedFetch = jest
@@ -180,7 +180,7 @@ describe("isValidAccessGrant", () => {
       .mockResolvedValueOnce(
         new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
           status: 200,
-        })
+        }),
       );
     await isValidAccessGrant(MOCK_ACCESS_GRANT, {
       fetch: mockedFetch,
@@ -188,7 +188,7 @@ describe("isValidAccessGrant", () => {
     });
     expect(mockedFetch).toHaveBeenCalledWith(
       "https://some.verification.api",
-      expect.anything()
+      expect.anything(),
     );
     expect(spiedConfigurationDiscovery).not.toHaveBeenCalled();
   });
@@ -206,13 +206,13 @@ describe("isValidAccessGrant", () => {
       .fn<(typeof CrossFetch)["fetch"]>()
       // First, the VC is fetched
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(MOCK_ACCESS_GRANT), { status: 200 })
+        new Response(JSON.stringify(MOCK_ACCESS_GRANT), { status: 200 }),
       )
       // Then, the verification endpoint is called
       .mockResolvedValueOnce(
         new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
           status: 200,
-        })
+        }),
       );
 
     await isValidAccessGrant(MOCK_ACCESS_GRANT, {
@@ -232,21 +232,21 @@ describe("isValidAccessGrant", () => {
       .fn<(typeof CrossFetch)["fetch"]>()
       // First, the VC is fetched
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(MOCK_ACCESS_GRANT), { status: 200 })
+        new Response(JSON.stringify(MOCK_ACCESS_GRANT), { status: 200 }),
       )
       // Then, the verification endpoint is called
       .mockResolvedValueOnce(
         new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
           status: 200,
-        })
+        }),
       );
 
     await expect(
       isValidAccessGrant(MOCK_ACCESS_GRANT, {
         fetch: mockedFetch,
-      })
+      }),
     ).rejects.toThrow(
-      `The VC service provider ${MOCK_ACCESS_GRANT.issuer} does not advertize for a verifier service in its .well-known/vc-configuration document`
+      `The VC service provider ${MOCK_ACCESS_GRANT.issuer} does not advertize for a verifier service in its .well-known/vc-configuration document`,
     );
   });
 
@@ -262,13 +262,13 @@ describe("isValidAccessGrant", () => {
       .mockResolvedValueOnce(
         new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
           status: 200,
-        })
+        }),
       );
     await expect(
       isValidAccessGrant(MOCK_ACCESS_GRANT, {
         fetch: mockedFetch,
         verificationEndpoint: "https://some.verification.api",
-      })
+      }),
     ).resolves.toEqual({ checks: [], errors: [], warning: [] });
   });
 });

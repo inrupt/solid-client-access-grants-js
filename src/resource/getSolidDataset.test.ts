@@ -42,16 +42,16 @@ describe("getSolidDataset", () => {
     const resultDataset = await getSolidDataset(
       "https://some.dataset.url",
       mockAccessRequestVc(),
-      { fetch: mockedFetch }
+      { fetch: mockedFetch },
     );
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
       mockAccessRequestVc(),
-      { fetch: mockedFetch }
+      { fetch: mockedFetch },
     );
     expect(solidClientModule.getSolidDataset).toHaveBeenCalledWith(
       "https://some.dataset.url",
-      expect.anything()
+      expect.anything(),
     );
     expect(resultDataset).toBe(mockedDataset);
   });

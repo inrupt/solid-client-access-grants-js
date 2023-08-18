@@ -70,13 +70,13 @@ export function parseUMAAuthIri(header: string): UrlString | null {
  * @hidden This is just an internal utility function to get the UMA configuration from .well-known.
  */
 export async function getUmaConfiguration(
-  authIri: string
+  authIri: string,
 ): Promise<UmaConfiguration> {
   const configurationUrl = new URL(UMA_CONFIG_PATH, authIri).href;
   const response = await crossFetch(configurationUrl);
   return response.json().catch((e) => {
     throw new Error(
-      `Parsing the UMA configuration found at ${configurationUrl} failed with the following error: ${e.toString()}`
+      `Parsing the UMA configuration found at ${configurationUrl} failed with the following error: ${e.toString()}`,
     );
   });
 }
@@ -88,7 +88,7 @@ export async function exchangeTicketForAccessToken(
   tokenEndpoint: UrlString,
   accessGrant: VerifiableCredential,
   authTicket: string,
-  authFetch: typeof fetch
+  authFetch: typeof fetch,
 ): Promise<string | null> {
   const credentialPresentation = {
     "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
@@ -158,7 +158,7 @@ export async function fetchWithVc(
   // with the fetch return type.
   resourceIri: UrlString,
   accessGrant: VerifiableCredential,
-  options?: FetchOptions
+  options?: FetchOptions,
 ): Promise<typeof fetch> {
   // Use an authenticated session to fetch the resource so that we can parse
   // its headers to find the UMA endpoint information and ticket
@@ -189,7 +189,7 @@ export async function fetchWithVc(
     tokenEndpoint,
     accessGrant,
     authTicket,
-    options?.fetch ?? crossFetch
+    options?.fetch ?? crossFetch,
   );
 
   if (!accessToken) {

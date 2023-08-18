@@ -33,7 +33,7 @@ import {
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getSolidDataset = jest.fn(
-    solidClientModule.getSolidDataset
+    solidClientModule.getSolidDataset,
   );
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
@@ -41,7 +41,7 @@ jest.mock("@inrupt/solid-client", () => {
 jest.mock("@inrupt/solid-client-vc");
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch"
+    "@inrupt/universal-fetch",
   ) as jest.Mocked<typeof CrossFetch>;
   return {
     // Do no mock the globals such as Response.
@@ -58,16 +58,16 @@ describe("denyAccessRequest", () => {
       denyAccessRequest({
         ...mockAccessRequestVc(),
         type: ["NotASolidAccessRequest"],
-      })
+      }),
     ).rejects.toThrow(
-      "An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential."
+      "An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.",
     );
   });
 
   it("throws if there is no well known access endpoint", async () => {
     mockAccessApiEndpoint(false);
     await expect(denyAccessRequest(mockAccessRequestVc())).rejects.toThrow(
-      "No access issuer listed for property [verifiable_credential_issuer] in"
+      "No access issuer listed for property [verifiable_credential_issuer] in",
     );
   });
 
@@ -77,7 +77,7 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     await denyAccessRequest(mockAccessRequestVc(), {
       accessEndpoint: "https://some.access-endpoint.override/",
@@ -87,7 +87,7 @@ describe("denyAccessRequest", () => {
       "https://some.access-endpoint.override/".concat("issue"),
       expect.anything(),
       expect.anything(),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -99,20 +99,20 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     await denyAccessRequest(
       "https://some.resource/owner",
       mockAccessRequestVc(),
       {
         fetch: mockedFetch,
-      }
+      },
     );
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       expect.anything(),
       expect.anything(),
       expect.anything(),
-      { fetch: mockedFetch }
+      { fetch: mockedFetch },
     );
   });
 
@@ -123,7 +123,7 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     const accessRequestWithPurpose = mockAccessRequestVc({
       purpose: ["https://example.org/some-purpose"],
@@ -151,7 +151,7 @@ describe("denyAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessDenial"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -162,12 +162,12 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(mockAccessRequestVc()))
+        new Response(JSON.stringify(mockAccessRequestVc())),
       );
     await denyAccessRequest("https://some.credential", {
       fetch: mockedFetch,
@@ -187,7 +187,7 @@ describe("denyAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessDenial"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -198,12 +198,12 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(mockAccessRequestVc()))
+        new Response(JSON.stringify(mockAccessRequestVc())),
       );
     await denyAccessRequest(new URL("https://some.credential"), {
       fetch: mockedFetch,
@@ -224,7 +224,7 @@ describe("denyAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessDenial"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -235,14 +235,14 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     await denyAccessRequest(
       "https://some.resource.owner",
       mockAccessRequestVc(),
       {
         fetch: jest.fn(global.fetch),
-      }
+      },
     );
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
@@ -261,7 +261,7 @@ describe("denyAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessDenial"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -272,7 +272,7 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     const accessRequestWithPurpose = mockAccessRequestVc({
       purpose: ["https://example.org/some-purpose"],
@@ -281,7 +281,7 @@ describe("denyAccessRequest", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(accessRequestWithPurpose))
+        new Response(JSON.stringify(accessRequestWithPurpose)),
       );
     await denyAccessRequest("https://some.resource.owner", "https://some.vc", {
       fetch: mockedFetch,
@@ -306,7 +306,7 @@ describe("denyAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessDenial"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 });

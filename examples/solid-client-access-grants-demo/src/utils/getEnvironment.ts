@@ -38,13 +38,13 @@ export function getEnvironment(): Environment {
     url,
     managementApp: new URL(
       process.env.ACCESS_MANAGEMENT_APP ??
-        "https://podbrowser.inrupt.com/privacy/access/requests/"
+        "https://podbrowser.inrupt.com/privacy/access/requests/",
     ),
     clientId: process.env.CLIENT_ID ?? "",
     clientSecret: process.env.CLIENT_SECRET ?? "",
     oidcIssuer: new URL(process.env.OIDC_ISSUER ?? "https://login.inrupt.com"),
     redirectUrl: new URL(
-      process.env.FRONTENT_REDIRECT ?? new URL(RESOURCE_FETCHER_PATHNAME, url)
+      process.env.FRONTENT_REDIRECT ?? new URL(RESOURCE_FETCHER_PATHNAME, url),
     ),
   };
 }

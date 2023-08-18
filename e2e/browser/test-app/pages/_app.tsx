@@ -20,8 +20,8 @@
 //
 
 import React from "react";
-
-/* eslint react/prop-types: 0, react/jsx-props-no-spreading: 0 */
+// This is boilerplate code
+/* eslint react/prop-types: 0, react/jsx-props-no-spreading: 0, @typescript-eslint/no-explicit-any: 0 */
 function MyApp({ Component, pageProps }: { Component: any; pageProps: any }) {
   return <Component {...pageProps} />;
 }
