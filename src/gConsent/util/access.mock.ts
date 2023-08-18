@@ -43,7 +43,7 @@ export const mockAccessRequestVc = (
     resourceOwner: string | null;
     inherit: boolean;
     purpose: UrlString[];
-  }>
+  }>,
 ): AccessRequest => {
   return {
     "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
@@ -83,7 +83,7 @@ export const mockAccessGrantVc = (
     subjectId: string;
     inherit: boolean;
     resources: string[];
-  }>
+  }>,
 ): AccessGrant => {
   return {
     "@context": ACCESS_GRANT_CONTEXT_DEFAULT,

@@ -20,6 +20,7 @@
 //
 
 // Globals are actually not injected, so this does not shadow anything.
+import { File as NodeFile } from "buffer";
 import {
   jest,
   describe,
@@ -39,7 +40,6 @@ import {
 // the access grant API
 import * as sc from "@inrupt/solid-client";
 import { custom } from "openid-client";
-import { File as NodeFile } from "buffer";
 import type { AccessGrant, AccessRequest } from "../../src/index";
 import {
   approveAccessRequest,
@@ -154,11 +154,11 @@ describe.each(contentArr)(
 
       // Create a file in the resource owner's Pod
       const resourceOwnerPodAll = await sc.getPodUrlAll(
-        resourceOwnerSession.info.webId as string
+        resourceOwnerSession.info.webId as string,
       );
       if (resourceOwnerPodAll.length === 0) {
         throw new Error(
-          "The Resource Owner WebID Profile is missing a link to at least one Pod root."
+          "The Resource Owner WebID Profile is missing a link to at least one Pod root.",
         );
       }
       // eslint-disable-next-line prefer-destructuring
@@ -170,9 +170,9 @@ describe.each(contentArr)(
         {
           fetch: addUserAgent(
             addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            TEST_USER_AGENT
+            TEST_USER_AGENT,
           ),
-        }
+        },
       );
 
       sharedFileIri = sc.getSourceUrl(savedFile);
@@ -185,7 +185,7 @@ describe.each(contentArr)(
         await sc.deleteFile(sharedFileIri, {
           fetch: addUserAgent(
             addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            TEST_USER_AGENT
+            TEST_USER_AGENT,
           ),
         });
       }
@@ -210,7 +210,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
         expect(isVerifiableCredential(request)).toBe(true);
 
@@ -220,7 +220,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
 
         await expect(
@@ -230,7 +230,7 @@ describe.each(contentArr)(
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
             verificationEndpoint: `${vcProvider}/verify`,
-          })
+          }),
         ).resolves.toMatchObject({ errors: [] });
 
         const grantedAccess = await getAccessGrantAll(
@@ -239,7 +239,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
 
         // Test that looking up the access grants for the given resource returns
@@ -249,7 +249,7 @@ describe.each(contentArr)(
         // if the issued grant is part of the query result set. Matching on the proofs
         // is sufficient, as proofs are generated on canonicalized datasets.
         expect(
-          grantedAccess.map((matchingGrant) => matchingGrant.proof)
+          grantedAccess.map((matchingGrant) => matchingGrant.proof),
         ).toContainEqual(grant.proof);
 
         const sharedFile = await getFile(sharedFileIri, grant, {
@@ -267,7 +267,7 @@ describe.each(contentArr)(
               // FIXME: Ditto verification endpoint discovery.
               verificationEndpoint: `${vcProvider}/verify`,
             })
-          ).errors
+          ).errors,
         ).toHaveLength(1);
 
         const filePromise = getFile(sharedFileIri, grant, {
@@ -280,7 +280,7 @@ describe.each(contentArr)(
         // In particular the error should be a 403
         const fileResponse = await addUserAgent(
           requestorSession.fetch,
-          TEST_USER_AGENT
+          TEST_USER_AGENT,
         )(sharedFileIri);
         expect(fileResponse.status).toBe(403);
       });
@@ -303,7 +303,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
 
         const grant = await approveAccessRequest(
@@ -319,7 +319,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
 
         await expect(
@@ -329,11 +329,11 @@ describe.each(contentArr)(
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
             verificationEndpoint: `${vcProvider}/verify`,
-          })
+          }),
         ).resolves.toMatchObject({ errors: [] });
         expect(grant.expirationDate).toBeUndefined();
         expect(["http://www.w3.org/ns/auth/acl#Read", "Read"]).toContain(
-          grant.credentialSubject.providedConsent.mode[0]
+          grant.credentialSubject.providedConsent.mode[0],
         );
       });
 
@@ -353,7 +353,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
         await expect(
           isValidAccessGrant(grant, {
@@ -362,7 +362,7 @@ describe.each(contentArr)(
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
             verificationEndpoint: `${vcProvider}/verify`,
-          })
+          }),
         ).resolves.toMatchObject({ errors: [] });
         expect(grant.credentialSubject.providedConsent.inherit).toBe(false);
       });
@@ -381,7 +381,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
         expect(isVerifiableCredential(request)).toBe(true);
 
@@ -392,7 +392,7 @@ describe.each(contentArr)(
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
             updateAcr: false,
-          }
+          },
         );
 
         await expect(
@@ -402,14 +402,14 @@ describe.each(contentArr)(
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
             verificationEndpoint: `${vcProvider}/verify`,
-          })
+          }),
         ).resolves.toMatchObject({ errors: [] });
 
         const sharedFileWithAcr = await sc.acp_ess_2.getFileWithAcr(
           sharedFileIri,
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
 
         if (!sc.acp_ess_2.hasAccessibleAcr(sharedFileWithAcr)) {
@@ -423,7 +423,7 @@ describe.each(contentArr)(
             read: false,
             write: false,
             append: false,
-          })
+          }),
         );
       });
 
@@ -441,7 +441,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
         expect(isVerifiableCredential(request)).toBe(true);
 
@@ -452,7 +452,7 @@ describe.each(contentArr)(
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
             updateAcr: true,
-          }
+          },
         );
 
         await expect(
@@ -462,14 +462,14 @@ describe.each(contentArr)(
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
             verificationEndpoint: `${vcProvider}/verify`,
-          })
+          }),
         ).resolves.toMatchObject({ errors: [] });
 
         const sharedFileWithAcr = await sc.acp_ess_2.getFileWithAcr(
           sharedFileIri,
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
 
         if (!sc.acp_ess_2.hasAccessibleAcr(sharedFileWithAcr)) {
@@ -483,7 +483,7 @@ describe.each(contentArr)(
             read: true,
             write: false,
             append: false,
-          })
+          }),
         );
       });
     });
@@ -507,7 +507,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
 
         const grant = await denyAccessRequest(
@@ -516,7 +516,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
 
         await expect(
@@ -526,7 +526,7 @@ describe.each(contentArr)(
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
             verificationEndpoint: `${vcProvider}/verify`,
-          })
+          }),
         ).resolves.toMatchObject({ errors: [] });
         expect(grant.expirationDate).toBeUndefined();
 
@@ -540,7 +540,7 @@ describe.each(contentArr)(
         // In particular the error should be a 403
         const fileResponse = await addUserAgent(
           requestorSession.fetch,
-          TEST_USER_AGENT
+          TEST_USER_AGENT,
         )(sharedFileIri);
         expect(fileResponse.status).toBe(403);
       });
@@ -562,7 +562,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
 
         accessGrant = await approveAccessRequest(
@@ -571,7 +571,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
       });
 
@@ -589,8 +589,8 @@ describe.each(contentArr)(
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
-            }
-          )
+            },
+          ),
         ).resolves.not.toHaveLength(0);
         await expect(
           getAccessGrantAll(
@@ -599,8 +599,8 @@ describe.each(contentArr)(
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
-            }
-          )
+            },
+          ),
         ).resolves.toHaveLength(0);
       });
 
@@ -609,13 +609,13 @@ describe.each(contentArr)(
           getAccessGrantAll(sharedFileIri, undefined, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          })
+          }),
         ).resolves.not.toHaveLength(0);
         await expect(
           getAccessGrantAll("https://some.unkown.resource", undefined, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          })
+          }),
         ).resolves.toHaveLength(0);
       });
 
@@ -637,7 +637,7 @@ describe.each(contentArr)(
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
-            }
+            },
           ),
           getAccessGrantAll(
             sharedFileIri,
@@ -645,7 +645,7 @@ describe.each(contentArr)(
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
-            }
+            },
           ),
           getAccessGrantAll(
             sharedFileIri,
@@ -658,7 +658,7 @@ describe.each(contentArr)(
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
-            }
+            },
           ),
           getAccessGrantAll(
             sharedFileIri,
@@ -666,7 +666,7 @@ describe.each(contentArr)(
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
-            }
+            },
           ),
         ]);
 
@@ -682,23 +682,23 @@ describe.each(contentArr)(
           bothPurposeFilter.every((vc) =>
             noPurposeFilter
               .map((vcNoPurpose) => JSON.stringify(vcNoPurpose))
-              .includes(JSON.stringify(vc))
-          )
+              .includes(JSON.stringify(vc)),
+          ),
         ).toBe(true);
         // Filtering on both purposes should include the results filtered on individual purposes
         expect(
           partialPurposeFilter.every((vc) =>
             bothPurposeFilter
               .map((vcWithPurpose) => JSON.stringify(vcWithPurpose))
-              .includes(JSON.stringify(vc))
-          )
+              .includes(JSON.stringify(vc)),
+          ),
         ).toBe(true);
         expect(
           otherPartialPurposeFilter.every((vc) =>
             bothPurposeFilter
               .map((vcWithPurpose) => JSON.stringify(vcWithPurpose))
-              .includes(JSON.stringify(vc))
-          )
+              .includes(JSON.stringify(vc)),
+          ),
         ).toBe(true);
       });
     });
@@ -714,7 +714,7 @@ describe.each(contentArr)(
           resourceOwnerPod,
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
         testContainerIri = sc.getSourceUrl(testContainer);
 
@@ -723,7 +723,7 @@ describe.each(contentArr)(
             name: "e2e-test-thing",
           }),
           "https://arbitrary.vocab/regular-predicate",
-          "initial-dataset"
+          "initial-dataset",
         );
 
         const dataset = sc.setThing(sc.createSolidDataset(), newThing);
@@ -733,7 +733,7 @@ describe.each(contentArr)(
           dataset,
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
 
         testResourceIri = sc.getSourceUrl(persistedDataset);
@@ -751,7 +751,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
 
         accessGrant = await approveAccessRequest(
@@ -760,7 +760,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
       });
 
@@ -782,8 +782,8 @@ describe.each(contentArr)(
           sc.getContainedResourceUrlAll(testContainer).map((childUrl) =>
             sc.deleteSolidDataset(childUrl, {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            })
-          )
+            }),
+          ),
         );
       });
 
@@ -797,7 +797,7 @@ describe.each(contentArr)(
           accessGrant,
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
 
         const ownerTtl = await sc.solidDatasetAsTurtle(ownerDataset);
@@ -822,7 +822,7 @@ describe.each(contentArr)(
         newThing = sc.setBoolean(
           newThing,
           "https://arbitrary.vocab/regular-predicate",
-          true
+          true,
         );
         const datasetUpdate = sc.setThing(dataset, newThing);
 
@@ -833,7 +833,7 @@ describe.each(contentArr)(
           accessGrant,
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
 
         // Fetch it back as the owner to prove the dataset was actually updated:
@@ -841,16 +841,15 @@ describe.each(contentArr)(
           testResourceIri,
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
 
         // Serialize each to turtle:
         const updatedDatasetTtl = await sc.solidDatasetAsTurtle(updatedDataset);
-        const existingDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
-          dataset
-        );
+        const existingDatasetAsOwnerTtl =
+          await sc.solidDatasetAsTurtle(dataset);
         const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
-          updatedDatasetAsOwner
+          updatedDatasetAsOwner,
         );
 
         // Assert that the dataset changed:
@@ -864,7 +863,7 @@ describe.each(contentArr)(
           accessGrant,
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
 
         const parentContainer = await sc.getSolidDataset(testContainerIri, {
@@ -873,9 +872,9 @@ describe.each(contentArr)(
         const parentContainerContainsAll = sc.getUrlAll(
           sc.getThing(
             parentContainer,
-            sc.getSourceUrl(parentContainer)
+            sc.getSourceUrl(parentContainer),
           ) as sc.Thing,
-          "http://www.w3.org/ns/ldp#contains"
+          "http://www.w3.org/ns/ldp#contains",
         );
         testContainerIriChild = sc.getSourceUrl(newChildContainer);
 
@@ -900,14 +899,14 @@ describe.each(contentArr)(
           accessGrant,
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
 
         const datasetInPodAsResourceOwner = await sc.getSolidDataset(
           sc.getSourceIri(savedDataset),
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
 
         // We cannot request the newly created dataset using our existing Access
@@ -923,7 +922,7 @@ describe.each(contentArr)(
         // );
 
         const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
-          datasetInPodAsResourceOwner
+          datasetInPodAsResourceOwner,
         );
         const savedDatasetTtl = await sc.solidDatasetAsTurtle(savedDataset);
         expect(savedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
@@ -941,7 +940,7 @@ describe.each(contentArr)(
           resourceOwnerPod,
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
         testContainerIri = sc.getSourceIri(fileApisContainer);
 
@@ -952,7 +951,7 @@ describe.each(contentArr)(
           fileContents,
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
 
         testFileIri = sc.getSourceIri(uploadedFile);
@@ -966,7 +965,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
 
         accessGrant = await approveAccessRequest(
@@ -975,7 +974,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
       });
 
@@ -999,8 +998,8 @@ describe.each(contentArr)(
           sc.getContainedResourceUrlAll(testContainer).map((childUrl) =>
             sc.deleteFile(childUrl, {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            })
-          )
+            }),
+          ),
         );
 
         await sc.deleteContainer(testContainerIri, {
@@ -1019,11 +1018,11 @@ describe.each(contentArr)(
       if (nodeMajor >= 18) {
         fileContentMatrix.push(
           // ["File", new File(["new contents"], "file.txt")],
-          ["Node File", new NodeFile(["new contents"], "file.txt")]
+          ["Node File", new NodeFile(["new contents"], "file.txt")],
         );
         overwrittenContentMatrix.push(
           // ["File", new File(["overwritten contents"], "file.txt")],
-          ["Node File", new NodeFile(["overwritten contents"], "file.txt")]
+          ["Node File", new NodeFile(["overwritten contents"], "file.txt")],
         );
       }
 
@@ -1035,7 +1034,7 @@ describe.each(contentArr)(
             accessGrant,
             {
               fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            }
+            },
           );
 
           expect(await toString(newFile)).toBe(await toString(newFileContents));
@@ -1045,11 +1044,11 @@ describe.each(contentArr)(
             sc.getSourceUrl(newFile),
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            }
+            },
           );
 
           await expect(fileAsResourceOwner.text()).resolves.toBe(
-            await toString(newFileContents)
+            await toString(newFileContents),
           );
         });
       });
@@ -1062,7 +1061,7 @@ describe.each(contentArr)(
 
         expect(sc.getSourceUrl(existingFile)).toBe(testFileIri);
         await expect(existingFile.text()).resolves.toBe(
-          await toString(fileContents)
+          await toString(fileContents),
         );
       });
 
@@ -1076,11 +1075,11 @@ describe.each(contentArr)(
               accessGrant,
               {
                 fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-              }
+              },
             );
 
             expect(await toString(newFile)).toBe(
-              await toString(newFileContents)
+              await toString(newFileContents),
             );
             expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
 
@@ -1090,10 +1089,10 @@ describe.each(contentArr)(
             });
 
             await expect(fileAsResourceOwner.text()).resolves.toBe(
-              await toString(newFileContents)
+              await toString(newFileContents),
             );
           });
-        }
+        },
       );
     });
 
@@ -1110,7 +1109,7 @@ describe.each(contentArr)(
           resourceOwnerPod,
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
         testContainerIri = sc.getSourceUrl(testContainer);
 
@@ -1119,7 +1118,7 @@ describe.each(contentArr)(
           Buffer.from(testFileContent),
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          }
+          },
         );
         testFileIri = sc.getSourceUrl(testFile);
 
@@ -1137,7 +1136,7 @@ describe.each(contentArr)(
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          }
+          },
         );
       });
 
@@ -1175,7 +1174,7 @@ describe.each(contentArr)(
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
-            }
+            },
           );
           const requestorFile = await getFile(testFileIri, accessGrant, {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -1188,9 +1187,9 @@ describe.each(contentArr)(
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
           });
           expect(grants.map((grant) => grant.proof)).toContainEqual(
-            accessGrant.proof
+            accessGrant.proof,
           );
-        }
+        },
       );
 
       testIf(environmentFeatures?.RECURSIVE_ACCESS_GRANTS === "true")(
@@ -1203,13 +1202,13 @@ describe.each(contentArr)(
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
-            }
+            },
           );
 
           await expect(
             getFile(testFileIri, accessGrant, {
               fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            })
+            }),
           ).rejects.toThrow();
 
           // Lookup grants for the target resource, while it has been issued for the container.
@@ -1218,7 +1217,7 @@ describe.each(contentArr)(
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
           });
           expect(grants).not.toContainEqual(accessGrant);
-        }
+        },
       );
 
       testIf(environmentFeatures?.RECURSIVE_ACCESS_GRANTS === "true")(
@@ -1236,7 +1235,7 @@ describe.each(contentArr)(
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
-            }
+            },
           );
 
           const newFileContents = Buffer.from("overwritten contents", "utf-8");
@@ -1247,7 +1246,7 @@ describe.each(contentArr)(
             accessGrant,
             {
               fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            }
+            },
           );
 
           expect(await toString(newFile)).toBe(await toString(newFileContents));
@@ -1259,9 +1258,9 @@ describe.each(contentArr)(
           });
 
           await expect(fileAsResourceOwner.text()).resolves.toBe(
-            await toString(newFileContents)
+            await toString(newFileContents),
           );
-        }
+        },
       );
 
       testIf(environmentFeatures?.RECURSIVE_ACCESS_GRANTS === "true")(
@@ -1274,7 +1273,7 @@ describe.each(contentArr)(
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
-            }
+            },
           );
 
           await sc.deleteFile(testFileIri, {
@@ -1290,7 +1289,7 @@ describe.each(contentArr)(
             accessGrant,
             {
               fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            }
+            },
           );
 
           // Fetch it back as the owner to prove the dataset was actually created:
@@ -1299,17 +1298,16 @@ describe.each(contentArr)(
           });
 
           // Serialize each to turtle:
-          const updatedDatasetTtl = await sc.solidDatasetAsTurtle(
-            updatedDataset
-          );
+          const updatedDatasetTtl =
+            await sc.solidDatasetAsTurtle(updatedDataset);
           const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
-            updatedDatasetAsOwner
+            updatedDatasetAsOwner,
           );
 
           // Assert that the dataset was created correctly:
           expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
-        }
+        },
       );
     });
-  }
+  },
 );

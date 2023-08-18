@@ -38,7 +38,7 @@ import { getEnvironment } from "../utils/getEnvironment";
  */
 export async function postAccessRequestForm(
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> {
   const env = getEnvironment();
   const session = new Session();
@@ -69,7 +69,7 @@ export async function postAccessRequestForm(
     {
       fetch: session.fetch,
       accessEndpoint,
-    }
+    },
   );
 
   /**

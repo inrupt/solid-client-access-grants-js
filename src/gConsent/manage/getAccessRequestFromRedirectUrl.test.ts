@@ -52,25 +52,25 @@ describe("getAccessRequestFromRedirectUrl", () => {
     redirectedToUrl = new URL("https://redirect.url");
     redirectedToUrl.searchParams.append(
       "requestVcUrl",
-      encodeURI("https://some.vc")
+      encodeURI("https://some.vc"),
     );
     redirectedToUrl.searchParams.append(
       "redirectUrl",
-      encodeURI("https://requestor.redirect.url")
+      encodeURI("https://requestor.redirect.url"),
     );
   });
 
   it("throws if the requestVcUrl query parameter is missing", async () => {
     redirectedToUrl.searchParams.delete("requestVcUrl");
     await expect(
-      getAccessRequestFromRedirectUrl(redirectedToUrl.href)
+      getAccessRequestFromRedirectUrl(redirectedToUrl.href),
     ).rejects.toThrow(/https:\/\/redirect.url.*requestVcUrl/);
   });
 
   it("throws if the redirectUrl query parameter is missing", async () => {
     redirectedToUrl.searchParams.delete("redirectUrl");
     await expect(
-      getAccessRequestFromRedirectUrl(redirectedToUrl.href)
+      getAccessRequestFromRedirectUrl(redirectedToUrl.href),
     ).rejects.toThrow(/https:\/\/redirect.url.*redirectUrl/);
   });
 
@@ -82,7 +82,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
       "https://some.vc",
       {
         fetch: mockedFetch,
-      }
+      },
     );
   });
 
@@ -94,24 +94,23 @@ describe("getAccessRequestFromRedirectUrl", () => {
       "https://some.vc",
       {
         fetch: mockedFetch,
-      }
+      },
     );
   });
 
   it("returns the fetched VC and the redirect URL", async () => {
     // Check that both URL strings and objects are supported.
     const accessRequestFromString = await getAccessRequestFromRedirectUrl(
-      redirectedToUrl.href
+      redirectedToUrl.href,
     );
-    const accessRequestFromUrl = await getAccessRequestFromRedirectUrl(
-      redirectedToUrl
-    );
+    const accessRequestFromUrl =
+      await getAccessRequestFromRedirectUrl(redirectedToUrl);
 
     expect(accessRequestFromString.accessRequest).toStrictEqual(
-      accessRequestFromUrl.accessRequest
+      accessRequestFromUrl.accessRequest,
     );
     expect(accessRequestFromString.requestorRedirectUrl).toBe(
-      accessRequestFromUrl.requestorRedirectUrl
+      accessRequestFromUrl.requestorRedirectUrl,
     );
 
     const { accessRequest, requestorRedirectUrl } = accessRequestFromUrl;
@@ -123,7 +122,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
   it("throws if the fetched VC is not an Access Request", async () => {
     vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
     await expect(
-      getAccessRequestFromRedirectUrl(redirectedToUrl.href)
+      getAccessRequestFromRedirectUrl(redirectedToUrl.href),
     ).rejects.toThrow();
   });
 
@@ -144,9 +143,8 @@ describe("getAccessRequestFromRedirectUrl", () => {
         },
       },
     });
-    const { accessRequest } = await getAccessRequestFromRedirectUrl(
-      redirectedToUrl
-    );
+    const { accessRequest } =
+      await getAccessRequestFromRedirectUrl(redirectedToUrl);
     expect(accessRequest).toStrictEqual(mockAccessRequestVc());
   });
 });

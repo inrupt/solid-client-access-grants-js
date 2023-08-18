@@ -38,7 +38,7 @@ import { normalizeAccessGrant } from "./approveAccessRequest";
  */
 export async function getAccessGrant(
   accessGrantVcUrl: UrlString | URL,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<AccessGrant> {
   const sessionFetch = await getSessionFetch(options ?? {});
   const vcUrl =
@@ -48,7 +48,7 @@ export async function getAccessGrant(
   const response = await sessionFetch(vcUrl);
   if (!response.ok) {
     throw new Error(
-      `Could not resolve [${vcUrl}]: ${response.status} ${response.statusText}`
+      `Could not resolve [${vcUrl}]: ${response.status} ${response.statusText}`,
     );
   }
   const responseErrorClone = response.clone();
@@ -57,7 +57,7 @@ export async function getAccessGrant(
     data = await response.json();
   } catch (e) {
     throw new Error(
-      `Unexpected response when resolving [${vcUrl}], the result is not a Verifiable Credential: ${await responseErrorClone.text()}`
+      `Unexpected response when resolving [${vcUrl}], the result is not a Verifiable Credential: ${await responseErrorClone.text()}`,
     );
   }
   data = normalizeAccessGrant(data);
@@ -68,8 +68,8 @@ export async function getAccessGrant(
   ) {
     throw new Error(
       `Unexpected response when resolving [${vcUrl}], the result is not an Access Grant: ${JSON.stringify(
-        data
-      )}`
+        data,
+      )}`,
     );
   }
   return data;

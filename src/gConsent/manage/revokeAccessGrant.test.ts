@@ -36,7 +36,7 @@ describe("revokeAccessGrant", () => {
     };
     const spiedRevoke = jest.spyOn(
       mockedVcModule,
-      "revokeVerifiableCredential"
+      "revokeVerifiableCredential",
     );
     const mockedFetch = jest
       .fn(global.fetch)
@@ -49,7 +49,7 @@ describe("revokeAccessGrant", () => {
       expect.anything(),
       {
         fetch: mockedFetch,
-      }
+      },
     );
   });
 
@@ -59,7 +59,7 @@ describe("revokeAccessGrant", () => {
     };
     const spiedRevoke = jest.spyOn(
       mockedVcModule,
-      "revokeVerifiableCredential"
+      "revokeVerifiableCredential",
     );
     const mockedFetch = jest
       .fn(global.fetch)
@@ -71,7 +71,7 @@ describe("revokeAccessGrant", () => {
     expect(spiedRevoke).toHaveBeenCalledWith(
       "https://some.issuer/status",
       MOCKED_CREDENTIAL_ID,
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -80,16 +80,16 @@ describe("revokeAccessGrant", () => {
       new Response(undefined, {
         status: 401,
         statusText: "Unauthorized",
-      })
+      }),
     );
     await expect(
-      revokeAccessGrant("https://some.credential", { fetch: mockedFetch })
+      revokeAccessGrant("https://some.credential", { fetch: mockedFetch }),
     ).rejects.toThrow(/\[https:\/\/some.credential\].*401.*Unauthorized/);
   });
 
   it("throws if the resource is not a base access grant VC", async () => {
     await expect(revokeAccessGrant(mockAccessRequestVc())).rejects.toThrow(
-      "An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential."
+      "An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.",
     );
   });
 
@@ -99,19 +99,19 @@ describe("revokeAccessGrant", () => {
     };
     const spiedRevoke = jest.spyOn(
       mockedVcModule,
-      "revokeVerifiableCredential"
+      "revokeVerifiableCredential",
     );
     const mockedFetch = jest.fn(global.fetch);
     await revokeAccessGrant(
       mockAccessGrantVc({ issuer: "https://some.issuer/" }),
       {
         fetch: mockedFetch,
-      }
+      },
     );
     expect(spiedRevoke).toHaveBeenCalledWith(
       "https://some.issuer/status",
       MOCKED_CREDENTIAL_ID,
-      expect.anything()
+      expect.anything(),
     );
     expect(mockedFetch).not.toHaveBeenCalled();
   });

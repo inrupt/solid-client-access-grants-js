@@ -33,14 +33,14 @@ import { normalizeAccessRequest } from "../request/issueAccessRequest";
 
 async function getVerifiableCredential(
   vc: URL | UrlString,
-  options: AccessBaseOptions
+  options: AccessBaseOptions,
 ): Promise<VerifiableCredential> {
   const fetcher = await getSessionFetch(options);
   const vcAsUrlString = vc.toString();
   const issuerResponse = await fetcher(vcAsUrlString);
   if (!issuerResponse.ok) {
     throw new Error(
-      `An error occurred when looking up [${vcAsUrlString}]: ${issuerResponse.status} ${issuerResponse.statusText}`
+      `An error occurred when looking up [${vcAsUrlString}]: ${issuerResponse.status} ${issuerResponse.statusText}`,
     );
   }
   // TODO: Type checking VerifiableCredential (probably via solid-client-vc?)
@@ -49,7 +49,7 @@ async function getVerifiableCredential(
 
 export async function getBaseAccessGrantVerifiableCredential(
   vc: VerifiableCredential | URL | UrlString,
-  options: AccessBaseOptions
+  options: AccessBaseOptions,
 ): Promise<AccessGrantBody & VerifiableCredential> {
   const fetchedVerifiableCredential =
     typeof vc === "string" || vc instanceof URL
@@ -57,7 +57,7 @@ export async function getBaseAccessGrantVerifiableCredential(
       : vc;
   if (!isBaseAccessGrantVerifiableCredential(fetchedVerifiableCredential)) {
     throw new Error(
-      `An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.`
+      `An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.`,
     );
   }
   return fetchedVerifiableCredential as AccessGrantBody & VerifiableCredential;
@@ -65,16 +65,16 @@ export async function getBaseAccessGrantVerifiableCredential(
 
 export async function getBaseAccessRequestVerifiableCredential(
   vc: VerifiableCredential | URL | UrlString,
-  options: AccessBaseOptions
+  options: AccessBaseOptions,
 ): Promise<AccessRequestBody & VerifiableCredential> {
   const fetchedVerifiableCredential = normalizeAccessRequest(
     typeof vc === "string" || vc instanceof URL
       ? await getVerifiableCredential(vc, options)
-      : vc
+      : vc,
   );
   if (!isBaseAccessRequestVerifiableCredential(fetchedVerifiableCredential)) {
     throw new Error(
-      `An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.`
+      `An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.`,
     );
   }
   return fetchedVerifiableCredential as AccessRequestBody &

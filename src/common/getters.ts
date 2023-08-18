@@ -39,11 +39,11 @@ import { isCredentialAccessGrantOdrl } from "../odrl";
  * @returns The resources IRIs
  */
 export function getResources(
-  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): string[] {
   if (isCredentialAccessGrantOdrl(vc)) {
     return vc.credentialSubject.permission.map(
-      (permission) => permission.target
+      (permission) => permission.target,
     );
   }
   if (isGConsentAccessGrant(vc)) {
@@ -65,13 +65,13 @@ export function getResources(
  * @returns The resource owner WebID
  */
 export function getResourceOwner(
-  vc: AccessGrantGConsent | AccessGrantOdrl
+  vc: AccessGrantGConsent | AccessGrantOdrl,
 ): string;
 export function getResourceOwner(
-  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): string | undefined;
 export function getResourceOwner(
-  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): string | undefined {
   if (isCredentialAccessGrantOdrl(vc) || isGConsentAccessGrant(vc)) {
     return vc.credentialSubject.id;
@@ -92,7 +92,7 @@ export function getResourceOwner(
  * @returns The requestor WebID
  */
 export function getRequestor(
-  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): string {
   if (isCredentialAccessGrantOdrl(vc)) {
     return vc.credentialSubject.assignee;
@@ -116,7 +116,7 @@ export function getRequestor(
  * @returns The access modes the grant recipient can exercise.
  */
 export function getAccessModes(
-  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): AccessModes {
   if (isCredentialAccessGrantOdrl(vc)) {
     const modes = vc.credentialSubject.permission
@@ -126,7 +126,7 @@ export function getAccessModes(
   }
   if (isGConsentAccessGrant(vc)) {
     return resourceAccessToAccessMode(
-      vc.credentialSubject.providedConsent.mode
+      vc.credentialSubject.providedConsent.mode,
     );
   }
   return resourceAccessToAccessMode(vc.credentialSubject.hasConsent.mode);
@@ -145,7 +145,7 @@ export function getAccessModes(
  * @returns The VC ID URL
  */
 export function getId(
-  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): string {
   return vc.id;
 }
@@ -163,7 +163,7 @@ export function getId(
  * @returns The VC types
  */
 export function getTypes(
-  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): string[] {
   return vc.type;
 }
@@ -181,7 +181,7 @@ export function getTypes(
  * @returns The issuance date
  */
 export function getIssuanceDate(
-  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): Date {
   return new Date(vc.issuanceDate);
 }
@@ -199,7 +199,7 @@ export function getIssuanceDate(
  * @returns The expiration date
  */
 export function getExpirationDate(
-  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): Date | undefined {
   return typeof vc.expirationDate === "string"
     ? new Date(vc.expirationDate)
@@ -219,7 +219,7 @@ export function getExpirationDate(
  * @returns The VC issuer
  */
 export function getIssuer(
-  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): string {
   return vc.issuer;
 }
@@ -237,7 +237,7 @@ export function getIssuer(
  * @returns true if the Grant applies to contained resources, false otherwise.
  */
 export function getInherit(
-  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl
+  vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): boolean {
   if (isCredentialAccessGrantOdrl(vc)) {
     return true;

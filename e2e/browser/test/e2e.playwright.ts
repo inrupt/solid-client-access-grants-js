@@ -19,7 +19,23 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import type { Page } from "@playwright/test";
 import { test, expect } from "./fixtures";
+
+const clickOpenIdPrompt = async (page: Page) => {
+  // Class-based selector that will remain compatible with previous code
+  const classBasedSelector = page.locator(".allow-button");
+  // Testid-based selector that will be compatible with newer releases
+  const testidBasedSelector = page.getByTestId("prompt-continue");
+  // Once we no longer support ESS 2.1, we can remove the class-based selector and only use the testid-based one.
+  await expect(classBasedSelector.or(testidBasedSelector)).toBeVisible();
+  // Fallback selector to support class attributes, until testid supports is fully deployed.
+  // eslint-disable-next-line playwright/no-conditional-in-test
+  const correctSelector = (await testidBasedSelector.isVisible())
+    ? testidBasedSelector
+    : classBasedSelector;
+  await correctSelector.click();
+};
 
 test("Redirect to Podbrowser to accept Access Request", async ({
   page,
@@ -44,7 +60,7 @@ test("Redirect to Podbrowser to accept Access Request", async ({
   await page.getByTestId("other-providers-button").click();
   await page.getByTestId("login-field").fill(idp);
   await page.getByTestId("go-button").click();
-  await page.getByRole("button", { name: "Allow" }).click();
+  await clickOpenIdPrompt(page);
 
   // We validate the request fields are editable before we confirm access
   // Select our purposes
@@ -55,6 +71,7 @@ test("Redirect to Podbrowser to accept Access Request", async ({
 
   // The test user confirms the access they selected and is redirected back to app
   await Promise.all([
+    // eslint-disable-next-line playwright/no-force-option
     page.getByRole("button", { name: "Confirm Access" }).click({ force: true }),
     page.waitForURL("http://localhost:3000/?accessGrantUrl=*"),
   ]);
@@ -63,7 +80,7 @@ test("Redirect to Podbrowser to accept Access Request", async ({
   await Promise.all([
     await page.getByTestId("identityProviderInput").fill(idp),
     page.getByTestId("loginButton").click(),
-    page.getByRole("button", { name: "Allow" }).click(),
+    clickOpenIdPrompt(page),
   ]);
 
   // Parse the accessGrantUrl from the query params
@@ -71,7 +88,7 @@ test("Redirect to Podbrowser to accept Access Request", async ({
 
   // Confirm we received an accessGrantURL
   await expect(
-    page.innerText("pre[data-testid=access-grant]")
+    page.innerText("pre[data-testid=access-grant]"),
   ).resolves.not.toBe("");
 
   // The test app sends an authenticated request to get the resource it has been granted access to
@@ -94,7 +111,7 @@ test("Granting access to a resource, then revoking the access grant", async ({
     page.waitForResponse((response) => response.status() === 201),
   ]);
   await expect(
-    page.innerText("span[data-testid=resource-iri]")
+    page.innerText("span[data-testid=resource-iri]"),
   ).resolves.toMatch(/https:\/\/.*\.txt/);
 
   // Grant access to the resource.
@@ -104,7 +121,7 @@ test("Granting access to a resource, then revoking the access grant", async ({
     page.waitForResponse((response) => response.status() === 201),
   ]);
   await expect(
-    page.innerText("pre[data-testid=access-grant]")
+    page.innerText("pre[data-testid=access-grant]"),
   ).resolves.not.toBe("");
 
   // Revoke the access grant.
@@ -114,7 +131,7 @@ test("Granting access to a resource, then revoking the access grant", async ({
     page.waitForResponse((response) => response.status() === 204),
   ]);
   await expect(page.innerText("pre[data-testid=access-grant]")).resolves.toBe(
-    ""
+    "",
   );
 
   // Cleanup the resource
@@ -124,6 +141,6 @@ test("Granting access to a resource, then revoking the access grant", async ({
     page.waitForResponse((response) => response.status() === 204),
   ]);
   await expect(
-    page.innerText("span[data-testid=resource-iri]")
+    page.innerText("span[data-testid=resource-iri]"),
   ).resolves.toMatch("");
 });

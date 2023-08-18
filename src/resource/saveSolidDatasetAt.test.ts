@@ -45,17 +45,17 @@ describe("saveSolidDatasetAt", () => {
       "https://some.dataset.url",
       MOCKED_DATASET,
       mockAccessRequestVc(),
-      { fetch: mockedFetch }
+      { fetch: mockedFetch },
     );
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
       mockAccessRequestVc(),
-      { fetch: mockedFetch }
+      { fetch: mockedFetch },
     );
     expect(solidClientModule.saveSolidDatasetAt).toHaveBeenCalledWith(
       "https://some.dataset.url",
       MOCKED_DATASET,
-      expect.anything()
+      expect.anything(),
     );
     expect(resultDataset).toBe(mockedDataset);
   });

@@ -89,7 +89,7 @@ function isOdrlPermission(permission: unknown): permission is OdrlPermission {
   if (
     !Array.isArray((permission as OdrlPermission).action) ||
     (permission as OdrlPermission).action.some(
-      (mode) => !RESOURCE_ACCESS_MODE.has(mode)
+      (mode) => !RESOURCE_ACCESS_MODE.has(mode),
     )
   ) {
     return false;
@@ -104,7 +104,7 @@ function isOdrlPermission(permission: unknown): permission is OdrlPermission {
   }
   if (
     (permission as OdrlPermission).constraint?.some(
-      (constraint) => !isOdrlConstraint(constraint)
+      (constraint) => !isOdrlConstraint(constraint),
     )
   ) {
     return false;
@@ -143,7 +143,7 @@ function isOdrlPermission(permission: unknown): permission is OdrlPermission {
  * @since 2.1.0
  */
 export function isCredentialAccessGrantOdrl(
-  vc: VerifiableCredential
+  vc: VerifiableCredential,
 ): vc is AccessGrantOdrl {
   if (!vc.type.includes("SolidAccessGrant")) {
     return false;
@@ -170,10 +170,10 @@ export function isCredentialAccessGrantOdrl(
 
   if (
     !Array.isArray(
-      (vc.credentialSubject as CredentialSubjectOdrl).permission
+      (vc.credentialSubject as CredentialSubjectOdrl).permission,
     ) ||
     (vc.credentialSubject as CredentialSubjectOdrl).permission.some(
-      (permission) => !isOdrlPermission(permission)
+      (permission) => !isOdrlPermission(permission),
     )
   ) {
     return false;
@@ -182,7 +182,7 @@ export function isCredentialAccessGrantOdrl(
   // vc.credentialSubject.prohibition is either undefined or an array of prohibitions.
   if (
     !Array.isArray(
-      (vc.credentialSubject as CredentialSubjectOdrl).prohibition
+      (vc.credentialSubject as CredentialSubjectOdrl).prohibition,
     ) &&
     typeof (vc.credentialSubject as CredentialSubjectOdrl).prohibition !==
       "undefined"
@@ -192,7 +192,7 @@ export function isCredentialAccessGrantOdrl(
 
   if (
     (vc.credentialSubject as CredentialSubjectOdrl).prohibition?.some(
-      (permission) => !isOdrlPermission(permission)
+      (permission) => !isOdrlPermission(permission),
     )
   ) {
     return false;

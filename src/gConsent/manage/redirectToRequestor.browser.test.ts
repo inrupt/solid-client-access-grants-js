@@ -56,7 +56,7 @@ describe("redirectToRequestor", () => {
       // eslint-disable-next-line no-void
       void redirectToRequestor(
         "https://some.grant-vc.iri",
-        "https://some.redirect.iri"
+        "https://some.redirect.iri",
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
@@ -73,7 +73,7 @@ describe("redirectToRequestor", () => {
       // eslint-disable-next-line no-void
       void redirectToRequestor(
         "https://some.grant-vc.iri",
-        "https://some.redirect.iri"
+        "https://some.redirect.iri",
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
@@ -83,8 +83,8 @@ describe("redirectToRequestor", () => {
       const targetIri = new URL(window.location.href);
       expect(
         decodeURIComponent(
-          targetIri.searchParams.get("accessGrantUrl") as string
-        )
+          targetIri.searchParams.get("accessGrantUrl") as string,
+        ),
       ).toBe("https://some.grant-vc.iri");
     });
 
@@ -94,7 +94,7 @@ describe("redirectToRequestor", () => {
       // eslint-disable-next-line no-void
       void redirectToRequestor(
         new URL("https://some.grant-vc.iri"),
-        new URL("https://some.redirect.iri")
+        new URL("https://some.redirect.iri"),
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
@@ -104,8 +104,8 @@ describe("redirectToRequestor", () => {
       const targetIri = new URL(window.location.href);
       expect(
         decodeURIComponent(
-          targetIri.searchParams.get("accessGrantUrl") as string
-        )
+          targetIri.searchParams.get("accessGrantUrl") as string,
+        ),
       ).toBe("https://some.grant-vc.iri/");
       expect(targetIri.href).toContain("https://some.redirect.iri");
     });
@@ -120,7 +120,7 @@ describe("redirectToRequestor", () => {
         "https://some.redirect.iri",
         {
           redirectCallback,
-        }
+        },
       );
       // Yield the event loop to make sure the blocking promises completes.
       await new Promise((resolve) => {
@@ -130,8 +130,8 @@ describe("redirectToRequestor", () => {
       expect(redirectIri.origin).toBe("https://some.redirect.iri");
       expect(
         decodeURIComponent(
-          redirectIri.searchParams.get("accessGrantUrl") as string
-        )
+          redirectIri.searchParams.get("accessGrantUrl") as string,
+        ),
       ).toBe("https://some.grant-vc.iri");
       expect(window.location.href).toBe("https://some.site");
     });
@@ -155,10 +155,10 @@ describe("redirectToRequestor", () => {
       await expect(
         redirectToRequestor(
           "https://some.grant-vc.iri",
-          "https://some.redirect.iri"
-        )
+          "https://some.redirect.iri",
+        ),
       ).rejects.toThrow(
-        `In a non-browser environment, a redirectCallback must be provided by the user.`
+        `In a non-browser environment, a redirectCallback must be provided by the user.`,
       );
     });
   });

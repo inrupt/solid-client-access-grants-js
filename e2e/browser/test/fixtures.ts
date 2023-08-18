@@ -65,7 +65,7 @@ const createAccessRequest = async (
   issuer,
   vcProvider,
   owner,
-  resource
+  resource,
 ) => {
   const session = new Session();
 
@@ -89,7 +89,7 @@ const createAccessRequest = async (
       {
         fetch: session.fetch,
         accessEndpoint: vcProvider,
-      }
+      },
     );
     return accessRequest;
   } catch (error) {
@@ -125,7 +125,7 @@ export const test = base.extend<Fixtures>({
       pods[0],
       {
         fetch: ownerSession.fetch,
-      }
+      },
     );
 
     const testContainerUrl = getSourceUrl(testContainer);
@@ -144,7 +144,7 @@ export const test = base.extend<Fixtures>({
       setupEnvironment.idp,
       setupEnvironment.vcProvider,
       ownerSession.info.webId,
-      publicFileUrl
+      publicFileUrl,
     );
     await use(accessRequest.id);
   },

@@ -32,7 +32,7 @@ const otherFetch = jest.fn(global.fetch);
 
 jest.mock("@inrupt/solid-client-vc");
 const mockedVcModule = jest.requireMock(
-  "@inrupt/solid-client-vc"
+  "@inrupt/solid-client-vc",
 ) as jest.Mocked<typeof VcModule>;
 mockedVcModule.getVerifiableCredentialAllFromShape.mockResolvedValue([
   mockAccessGrantVc(),
@@ -46,7 +46,7 @@ jest.mock("../discover/getAccessApiEndpoint", () => {
 
 describe("getAccessGrantAll", () => {
   const resource = new URL(
-    "https://pod.example/container-1/container-2/some-resource"
+    "https://pod.example/container-1/container-2/some-resource",
   );
   const resourceAncestors = [
     "https://pod.example/container-1/container-2/",
@@ -78,7 +78,7 @@ describe("getAccessGrantAll", () => {
         // getSessionFetch function returns the default @inrupt/solid-client-authn-browser
         // fetch instead.
         fetch: expect.anything(),
-      })
+      }),
     );
   });
 
@@ -108,7 +108,7 @@ describe("getAccessGrantAll", () => {
         // getSessionFetch function returns the default @inrupt/solid-client-authn-browser
         // fetch instead.
         fetch: expect.anything(),
-      })
+      }),
     );
   });
 
@@ -125,7 +125,7 @@ describe("getAccessGrantAll", () => {
 
     await getAccessGrantAll(
       { requestor },
-      { accessEndpoint: "https://some.api.endpoint/derive" }
+      { accessEndpoint: "https://some.api.endpoint/derive" },
     );
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
@@ -138,7 +138,7 @@ describe("getAccessGrantAll", () => {
         // getSessionFetch function returns the default @inrupt/solid-client-authn-browser
         // fetch instead.
         fetch: expect.anything(),
-      })
+      }),
     );
   });
 
@@ -176,7 +176,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
-      }
+      },
     );
   });
 
@@ -213,7 +213,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
-      }
+      },
     );
   });
 
@@ -250,7 +250,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
-      }
+      },
     );
   });
 
@@ -261,7 +261,7 @@ describe("getAccessGrantAll", () => {
       {
         includeExpired: true,
         fetch: mockedFetch,
-      }
+      },
     );
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       "https://some.api.endpoint/derive",
@@ -270,7 +270,7 @@ describe("getAccessGrantAll", () => {
         // FIXME: expecting fetch to match crossFetch fails in node.
         fetch: mockedFetch,
         includeExpiredVc: true,
-      })
+      }),
     );
   });
 
@@ -295,22 +295,22 @@ describe("getAccessGrantAll", () => {
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining(expectedVcShape[0]),
-      expect.anything()
+      expect.anything(),
     );
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining(expectedVcShape[1]),
-      expect.anything()
+      expect.anything(),
     );
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining(expectedVcShape[2]),
-      expect.anything()
+      expect.anything(),
     );
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining(expectedVcShape[3]),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -323,7 +323,7 @@ describe("getAccessGrantAll", () => {
       mockedGrant,
     ]);
     await expect(
-      getAccessGrantAll({ resource: resource.href })
+      getAccessGrantAll({ resource: resource.href }),
     ).resolves.toStrictEqual([]);
   });
 
@@ -342,12 +342,12 @@ describe("getAccessGrantAll", () => {
         }),
       ]);
     await expect(
-      getAccessGrantAll({ resource: resource.href })
+      getAccessGrantAll({ resource: resource.href }),
     ).resolves.toStrictEqual([mockedGrant]);
   });
   it("throws if both resource and accessEndpoint are undefined", async () => {
     await expect(getAccessGrantAll({})).rejects.toThrow(
-      "resource and accessEndpoint cannot both be undefined"
+      "resource and accessEndpoint cannot both be undefined",
     );
   });
 });

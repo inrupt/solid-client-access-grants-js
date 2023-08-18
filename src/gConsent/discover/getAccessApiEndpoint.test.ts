@@ -32,7 +32,7 @@ import { getAccessApiEndpoint } from "./getAccessApiEndpoint";
 
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch"
+    "@inrupt/universal-fetch",
   ) as jest.Mocked<typeof CrossFetch>;
   return {
     // Do no mock the globals such as Response.
@@ -61,14 +61,14 @@ describe("getAccessApiEndpoint", () => {
       new Response("", {
         status: 200,
         statusText: "Ok",
-      })
+      }),
     );
     const crossFetchModule = jest.requireMock("@inrupt/universal-fetch") as {
       fetch: typeof global.fetch;
     };
     crossFetchModule.fetch = mockedFetch;
     await expect(getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI)).rejects.toThrow(
-      "Expected a 401 error with a WWW-Authenticate header, got a [200: Ok] response lacking the WWW-Authenticate header"
+      "Expected a 401 error with a WWW-Authenticate header, got a [200: Ok] response lacking the WWW-Authenticate header",
     );
   });
 
@@ -79,14 +79,14 @@ describe("getAccessApiEndpoint", () => {
         headers: {
           "WWW-Authenticate": `someScheme aParam="Some value"`,
         },
-      })
+      }),
     );
     const crossFetchModule = jest.requireMock("@inrupt/universal-fetch") as {
       fetch: typeof global.fetch;
     };
     crossFetchModule.fetch = mockedFetch;
     await expect(getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI)).rejects.toThrow(
-      "Unsupported authorization scheme: [someScheme]"
+      "Unsupported authorization scheme: [someScheme]",
     );
   });
 
@@ -99,21 +99,21 @@ describe("getAccessApiEndpoint", () => {
           headers: {
             "WWW-Authenticate": `UMA realm="Solid Pod", as_uri="https://uma.inrupt.com", ticket="some UMA ticket`,
           },
-        })
+        }),
       )
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
             some_property: "some value",
-          })
-        )
+          }),
+        ),
       );
     const crossFetchModule = jest.requireMock("@inrupt/universal-fetch") as {
       fetch: typeof global.fetch;
     };
     crossFetchModule.fetch = mockedFetch;
     await expect(getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI)).rejects.toThrow(
-      /No access issuer listed for property \[verifiable_credential_issuer\] in.*some_property.*some value/
+      /No access issuer listed for property \[verifiable_credential_issuer\] in.*some_property.*some value/,
     );
   });
 });

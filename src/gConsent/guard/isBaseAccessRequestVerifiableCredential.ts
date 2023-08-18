@@ -34,13 +34,13 @@ function isRequestCredentialSubject(
     | RequestCredentialSubject
     | GrantCredentialSubject
     | GrantCredentialSubjectPayload
-    | RequestCredentialSubjectPayload
+    | RequestCredentialSubjectPayload,
 ): x is RequestCredentialSubject {
   return (x as RequestCredentialSubject).hasConsent !== undefined;
 }
 
 export function isBaseAccessRequestVerifiableCredential(
-  x: unknown
+  x: unknown,
 ): x is BaseRequestBody {
   return (
     isBaseAccessVcBody(x) &&

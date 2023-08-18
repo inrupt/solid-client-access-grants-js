@@ -58,8 +58,8 @@ describe("isBaseAccessRequestVerifiableCredential", () => {
   it("Returns true on valid Access Request VC", () => {
     expect(
       isBaseAccessRequestVerifiableCredential(
-        validAccessRequestVerifiableCredential
-      )
+        validAccessRequestVerifiableCredential,
+      ),
     ).toBe(true);
   });
 
@@ -71,7 +71,7 @@ describe("isBaseAccessRequestVerifiableCredential", () => {
           ...validAccessRequestVerifiableCredential.credentialSubject,
           inbox: undefined,
         },
-      })
+      }),
     ).toBe(true);
   });
 
@@ -87,7 +87,7 @@ describe("isBaseAccessRequestVerifiableCredential", () => {
             mode: ["http://www.w3.org/ns/auth/acl#Read", "SOME_INVALID_MODE"],
           },
         },
-      })
+      }),
     ).toBe(false);
   });
 });
