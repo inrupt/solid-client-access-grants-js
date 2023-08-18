@@ -30,7 +30,7 @@ import type { RedirectOptions } from "../../type/RedirectOptions";
 export async function redirectWithParameters(
   target: UrlString,
   queryParams: Record<string, string>,
-  options: RedirectOptions
+  options: RedirectOptions,
 ): Promise<void> {
   const targetUrl = new URL(target);
 
@@ -43,7 +43,7 @@ export async function redirectWithParameters(
   } else {
     if (typeof window === "undefined") {
       throw new Error(
-        "In a non-browser environment, a redirectCallback must be provided by the user."
+        "In a non-browser environment, a redirectCallback must be provided by the user.",
       );
     }
     window.location.href = targetUrl.href;

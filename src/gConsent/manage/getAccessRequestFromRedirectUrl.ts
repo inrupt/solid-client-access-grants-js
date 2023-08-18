@@ -31,7 +31,7 @@ function getSearchParam(url: URL, param: string) {
   const value = url.searchParams.get(param);
   if (value === null) {
     throw new Error(
-      `The provided redirect URL [${url.toString()}] is missing the expected [${param}] query parameter`
+      `The provided redirect URL [${url.toString()}] is missing the expected [${param}] query parameter`,
     );
   }
   return value;
@@ -51,7 +51,7 @@ function getSearchParam(url: URL, param: string) {
  */
 export async function getAccessRequestFromRedirectUrl(
   redirectUrl: UrlString | URL,
-  options?: { fetch?: typeof fetch }
+  options?: { fetch?: typeof fetch },
 ): Promise<{
   accessRequest: AccessRequest;
   requestorRedirectUrl: UrlString;
@@ -63,13 +63,13 @@ export async function getAccessRequestFromRedirectUrl(
   // the grant.
   const requestorRedirectUrl = getSearchParam(
     redirectUrlObj,
-    REDIRECT_URL_PARAM_NAME
+    REDIRECT_URL_PARAM_NAME,
   );
 
   // Get the Access Request IRI.
   const accessRequestIri = getSearchParam(
     redirectUrlObj,
-    REQUEST_VC_URL_PARAM_NAME
+    REQUEST_VC_URL_PARAM_NAME,
   );
 
   return {

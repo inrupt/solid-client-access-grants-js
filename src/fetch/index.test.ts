@@ -128,7 +128,7 @@ describe("getUmaConfiguration", () => {
     mockFetch(new Response("Not a JSON document."));
 
     await expect(getUmaConfiguration(iri)).rejects.toThrow(
-      `Parsing the UMA configuration found at ${expectedIri} failed`
+      `Parsing the UMA configuration found at ${expectedIri} failed`,
     );
   });
 });
@@ -142,15 +142,15 @@ describe("exchangeTicketForAccessToken", () => {
       new Response(
         JSON.stringify({
           access_token: "some_access_token",
-        })
-      )
+        }),
+      ),
     );
 
     const token = await exchangeTicketForAccessToken(
       tokenEndpoint,
       MOCK_VC,
       authTicket,
-      mockedFetch
+      mockedFetch,
     );
 
     expect(token).toBe("some_access_token");
@@ -168,7 +168,7 @@ describe("exchangeTicketForAccessToken", () => {
             ],
             type: ["VerifiablePresentation"],
             verifiableCredential: [MOCK_VC],
-          })
+          }),
         ),
         claim_token_format: "https://www.w3.org/TR/vc-data-model/#json-ld",
         grant_type: "urn:ietf:params:oauth:grant-type:uma-ticket",
@@ -187,7 +187,7 @@ describe("exchangeTicketForAccessToken", () => {
       tokenEndpoint,
       MOCK_VC,
       authTicket,
-      mockedFetch
+      mockedFetch,
     );
 
     expect(token).toBeNull();
@@ -203,7 +203,7 @@ describe("exchangeTicketForAccessToken", () => {
       tokenEndpoint,
       MOCK_VC,
       authTicket,
-      mockedFetch
+      mockedFetch,
     );
 
     expect(token).toBeNull();
@@ -257,7 +257,7 @@ describe("fetchWithVc", () => {
     mockFetch(new Response());
 
     await expect(fetchWithVc(resourceIri, MOCK_VC)).rejects.toThrow(
-      "No www-authentication header found"
+      "No www-authentication header found",
     );
   });
 
@@ -269,11 +269,11 @@ describe("fetchWithVc", () => {
         headers: {
           "WWW-Authenticate": 'UMA realm="test" as_uri="https://fake.url"',
         },
-      })
+      }),
     );
 
     await expect(fetchWithVc(resourceIri, MOCK_VC)).rejects.toThrow(
-      'did not include "ticket"'
+      'did not include "ticket"',
     );
   });
 
@@ -285,11 +285,11 @@ describe("fetchWithVc", () => {
         headers: {
           "WWW-Authenticate": 'UMA realm="test" ticket="some_value"',
         },
-      })
+      }),
     );
 
     await expect(fetchWithVc(resourceIri, MOCK_VC)).rejects.toThrow(
-      'did not include "as_uri"'
+      'did not include "as_uri"',
     );
   });
 
@@ -305,29 +305,29 @@ describe("fetchWithVc", () => {
           headers: {
             "WWW-Authenticate": mockHeader,
           },
-        })
+        }),
       )
       // second request is for config
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
             token_endpoint: "https://fake.url/token-endpoint",
-          })
-        )
+          }),
+        ),
       )
       // third request is for the token
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
             access_token: "access-token",
-          })
-        )
+          }),
+        ),
       );
 
     await fetchWithVc(resourceIri, MOCK_VC);
 
     expect(crossFetch).toHaveBeenCalledWith(
-      "https://fake.url/.well-known/uma2-configuration"
+      "https://fake.url/.well-known/uma2-configuration",
     );
   });
 
@@ -343,21 +343,21 @@ describe("fetchWithVc", () => {
           headers: {
             "WWW-Authenticate": mockHeader,
           },
-        })
+        }),
       )
       // second request is for config
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
             token_endpoint: "https://fake.url/token-endpoint",
-          })
-        )
+          }),
+        ),
       )
       // third request is for the token. Note that the token is missing here.
       .mockResolvedValueOnce(new Response(JSON.stringify({})));
 
     await expect(fetchWithVc(resourceIri, MOCK_VC)).rejects.toThrow(
-      "No access token was returned"
+      "No access token was returned",
     );
   });
 
@@ -373,15 +373,15 @@ describe("fetchWithVc", () => {
           headers: {
             "WWW-Authenticate": mockHeader,
           },
-        })
+        }),
       )
       // second request is for config
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
             token_endpoint: "https://fake.url/token-endpoint",
-          })
-        )
+          }),
+        ),
       );
     const mockedFetch = jest
       .fn(global.fetch)
@@ -390,8 +390,8 @@ describe("fetchWithVc", () => {
         new Response(
           JSON.stringify({
             access_token: "access-token",
-          })
-        )
+          }),
+        ),
       );
 
     await fetchWithVc(resourceIri, MOCK_VC, { fetch: mockedFetch });

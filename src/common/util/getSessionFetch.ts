@@ -29,7 +29,7 @@ import type { AccessBaseOptions } from "../../gConsent/type/AccessBaseOptions";
  * @returns fetch function
  */
 export async function getSessionFetch(
-  options: AccessBaseOptions
+  options: AccessBaseOptions,
 ): Promise<typeof fetch> {
   if (options.fetch) {
     return options.fetch;

@@ -44,14 +44,14 @@ describe("getResources", () => {
     it("gets the resources from a gConsent access grant", () => {
       const gConsentGrant = mockGConsentGrant();
       expect(getResources(gConsentGrant)).toBe(
-        gConsentGrant.credentialSubject.providedConsent.forPersonalData
+        gConsentGrant.credentialSubject.providedConsent.forPersonalData,
       );
     });
 
     it("gets the resources from a gConsent access request", () => {
       const gConsentRequest = mockGConsentRequest();
       expect(getResources(gConsentRequest)).toBe(
-        gConsentRequest.credentialSubject.hasConsent.forPersonalData
+        gConsentRequest.credentialSubject.hasConsent.forPersonalData,
       );
     });
   });
@@ -70,7 +70,7 @@ describe("getResourceOwner", () => {
     it("gets the resource owner from a gConsent access grant", () => {
       const gConsentGrant = mockGConsentGrant();
       expect(getResourceOwner(gConsentGrant)).toBe(
-        gConsentGrant.credentialSubject.id
+        gConsentGrant.credentialSubject.id,
       );
     });
 
@@ -79,7 +79,7 @@ describe("getResourceOwner", () => {
         resourceOwner: "https://example.org/some-owner",
       });
       expect(getResourceOwner(gConsentRequest)).toBe(
-        gConsentRequest.credentialSubject.hasConsent.isConsentForDataSubject
+        gConsentRequest.credentialSubject.hasConsent.isConsentForDataSubject,
       );
     });
 
@@ -102,14 +102,14 @@ describe("getRequestor", () => {
     it("gets the recipient of a gConsent access grant", () => {
       const gConsentGrant = mockGConsentGrant();
       expect(getRequestor(gConsentGrant)).toBe(
-        gConsentGrant.credentialSubject.providedConsent.isProvidedTo
+        gConsentGrant.credentialSubject.providedConsent.isProvidedTo,
       );
     });
 
     it("gets the resource owner from a gConsent access request", () => {
       const gConsentRequest = mockGConsentRequest();
       expect(getRequestor(gConsentRequest)).toBe(
-        gConsentRequest.credentialSubject.id
+        gConsentRequest.credentialSubject.id,
       );
     });
   });
@@ -117,7 +117,7 @@ describe("getRequestor", () => {
     it("gets the recipient of an ODRL access grant", () => {
       const odrlGrant = mockOdrlGrant();
       expect(getRequestor(odrlGrant)).toBe(
-        odrlGrant.credentialSubject.assignee
+        odrlGrant.credentialSubject.assignee,
       );
     });
   });
@@ -128,7 +128,7 @@ describe("getAccessModes", () => {
     it("gets the access modes of a gConsent access grant", () => {
       const gConsentGrant = mockGConsentGrant();
       expect(
-        gConsentGrant.credentialSubject.providedConsent.mode
+        gConsentGrant.credentialSubject.providedConsent.mode,
       ).toStrictEqual(["http://www.w3.org/ns/auth/acl#Read"]);
       expect(getAccessModes(gConsentGrant)).toStrictEqual({
         read: true,
@@ -214,7 +214,7 @@ describe("getIssuanceDate", () => {
       const gConsentGrant = mockGConsentGrant();
       gConsentGrant.issuanceDate = new Date().toString();
       expect(getIssuanceDate(gConsentGrant)).toStrictEqual(
-        new Date(gConsentGrant.issuanceDate)
+        new Date(gConsentGrant.issuanceDate),
       );
     });
 
@@ -222,7 +222,7 @@ describe("getIssuanceDate", () => {
       const gConsentRequest = mockGConsentRequest();
       gConsentRequest.issuanceDate = new Date().toString();
       expect(getIssuanceDate(gConsentRequest)).toStrictEqual(
-        new Date(gConsentRequest.issuanceDate)
+        new Date(gConsentRequest.issuanceDate),
       );
     });
   });
@@ -231,7 +231,7 @@ describe("getIssuanceDate", () => {
       const odrlGrant = mockOdrlGrant();
       odrlGrant.issuanceDate = new Date().toString();
       expect(getIssuanceDate(odrlGrant)).toStrictEqual(
-        new Date(odrlGrant.issuanceDate)
+        new Date(odrlGrant.issuanceDate),
       );
     });
   });
@@ -243,7 +243,7 @@ describe("getExpirationDate", () => {
       const gConsentGrant = mockGConsentGrant();
       gConsentGrant.expirationDate = new Date().toString();
       expect(getExpirationDate(gConsentGrant)).toStrictEqual(
-        new Date(gConsentGrant.expirationDate)
+        new Date(gConsentGrant.expirationDate),
       );
     });
 
@@ -251,7 +251,7 @@ describe("getExpirationDate", () => {
       const gConsentRequest = mockGConsentRequest();
       gConsentRequest.expirationDate = new Date().toString();
       expect(getExpirationDate(gConsentRequest)).toStrictEqual(
-        new Date(gConsentRequest.expirationDate)
+        new Date(gConsentRequest.expirationDate),
       );
     });
   });
@@ -259,7 +259,7 @@ describe("getExpirationDate", () => {
     it("gets the ODRL access expiration date", () => {
       const odrlGrant = mockOdrlGrant();
       expect(getExpirationDate(odrlGrant)).toStrictEqual(
-        new Date(odrlGrant.expirationDate as string)
+        new Date(odrlGrant.expirationDate as string),
       );
     });
   });
@@ -321,29 +321,29 @@ describe("AccessGrant", () => {
     const gConsentRequest = mockGConsentRequest();
     const wrappedConsentRequest = new AccessGrantWrapper(gConsentRequest);
     expect(wrappedConsentRequest.getAccessModes()).toStrictEqual(
-      getAccessModes(gConsentRequest)
+      getAccessModes(gConsentRequest),
     );
     expect(wrappedConsentRequest.getExpirationDate()).toStrictEqual(
-      getExpirationDate(gConsentRequest)
+      getExpirationDate(gConsentRequest),
     );
     expect(wrappedConsentRequest.getId()).toStrictEqual(getId(gConsentRequest));
     expect(wrappedConsentRequest.getIssuanceDate()).toStrictEqual(
-      getIssuanceDate(gConsentRequest)
+      getIssuanceDate(gConsentRequest),
     );
     expect(wrappedConsentRequest.getIssuer()).toStrictEqual(
-      getIssuer(gConsentRequest)
+      getIssuer(gConsentRequest),
     );
     expect(wrappedConsentRequest.getRequestor()).toStrictEqual(
-      getRequestor(gConsentRequest)
+      getRequestor(gConsentRequest),
     );
     expect(wrappedConsentRequest.getResourceOwner()).toStrictEqual(
-      getResourceOwner(gConsentRequest)
+      getResourceOwner(gConsentRequest),
     );
     expect(wrappedConsentRequest.getResources()).toStrictEqual(
-      getResources(gConsentRequest)
+      getResources(gConsentRequest),
     );
     expect(wrappedConsentRequest.getTypes()).toStrictEqual(
-      getTypes(gConsentRequest)
+      getTypes(gConsentRequest),
     );
   });
 });

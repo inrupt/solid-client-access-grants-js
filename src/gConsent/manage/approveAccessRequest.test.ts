@@ -40,7 +40,7 @@ import {
 
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual(
-    "@inrupt/solid-client"
+    "@inrupt/solid-client",
   ) as typeof SolidClient;
   solidClientModule.getSolidDataset =
     jest.fn<(typeof SolidClient)["getSolidDataset"]>();
@@ -64,7 +64,7 @@ jest.mock("@inrupt/solid-client", () => {
 jest.mock("@inrupt/solid-client-vc");
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch"
+    "@inrupt/universal-fetch",
   ) as jest.Mocked<typeof CrossFetch>;
   return {
     // Do no mock the globals such as Response.
@@ -78,24 +78,24 @@ const mockAcpClient = (
     hasAccessibleAcr: boolean;
     initialResource: SolidClient.WithServerResourceInfo & SolidClient.WithAcp;
     updatedResource: SolidClient.WithAccessibleAcr;
-  }>
+  }>,
 ) => {
   const solidClientModule = jest.requireMock(
-    "@inrupt/solid-client"
+    "@inrupt/solid-client",
   ) as jest.Mocked<typeof SolidClient>;
   solidClientModule.acp_ess_2.hasAccessibleAcr.mockReturnValueOnce(
-    options?.hasAccessibleAcr ?? true
+    options?.hasAccessibleAcr ?? true,
   );
 
   if (options?.updatedResource) {
     solidClientModule.acp_ess_2.setVcAccess.mockReturnValueOnce(
-      options?.updatedResource
+      options?.updatedResource,
     );
   }
 
   if (options?.initialResource) {
     solidClientModule.acp_ess_2.getResourceInfoWithAcr.mockResolvedValueOnce(
-      options?.initialResource
+      options?.initialResource,
     );
   }
 
@@ -106,18 +106,18 @@ const mockAcpClient = (
 };
 
 const mockedInitialResource = mockSolidDatasetFrom(
-  "https://some.resource"
+  "https://some.resource",
 ) as unknown as SolidClient.WithServerResourceInfo & SolidClient.WithAcp;
 const mockedUpdatedResource = mockSolidDatasetFrom(
-  "https://some.acr"
+  "https://some.acr",
 ) as unknown as SolidClient.WithAccessibleAcr;
 
 const mockedClientModule = jest.requireMock(
-  "@inrupt/solid-client"
+  "@inrupt/solid-client",
 ) as jest.Mocked<typeof SolidClient>;
 const spiedAcrLookup = jest.spyOn(
   mockedClientModule.acp_ess_2,
-  "getResourceInfoWithAcr"
+  "getResourceInfoWithAcr",
 );
 const spiedAcrUpdate = jest.spyOn(mockedClientModule.acp_ess_2, "setVcAccess");
 
@@ -134,7 +134,7 @@ describe("approveAccessRequest", () => {
     const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as typeof VcClient,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
 
@@ -149,12 +149,12 @@ describe("approveAccessRequest", () => {
       undefined,
       {
         fetch: jest.fn(global.fetch),
-      }
+      },
     );
     // The resource's IRI is picked up from the access grant.
     expect(spiedAcrLookup).toHaveBeenCalledWith(
       "https://some.custom.resource",
-      expect.anything()
+      expect.anything(),
     );
     // The resources' ACR is updated with the modes from the grant.
     expect(spiedAcrUpdate).toHaveBeenCalledWith(
@@ -164,13 +164,13 @@ describe("approveAccessRequest", () => {
         write: true,
         append: false,
       },
-      { inherit: true }
+      { inherit: true },
     );
 
     // The resources' ACR is written back.
     expect(spiedAcrSave).toHaveBeenCalledWith(
       mockedUpdatedResource,
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -178,7 +178,7 @@ describe("approveAccessRequest", () => {
     mockAcpClient({ hasAccessibleAcr: false });
     mockAccessApiEndpoint();
     await expect(approveAccessRequest(mockAccessRequestVc())).rejects.toThrow(
-      "The current user does not have access to the resource's Access Control Resource"
+      "The current user does not have access to the resource's Access Control Resource",
     );
   });
 
@@ -188,9 +188,9 @@ describe("approveAccessRequest", () => {
       approveAccessRequest({
         ...mockAccessRequestVc(),
         type: ["NotASolidAccessRequest"],
-      })
+      }),
     ).rejects.toThrow(
-      "An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential."
+      "An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.",
     );
   });
 
@@ -207,18 +207,18 @@ describe("approveAccessRequest", () => {
             hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           },
         },
-      })
+      }),
     ).rejects.toThrow(/Unexpected VC.*credentialSubject/);
   });
 
   it("uses the provided access endpoint, if any", async () => {
     mockAcpClient();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(mockAccessGrantVc());
     await approveAccessRequest(mockAccessRequestVc(), undefined, {
@@ -229,7 +229,7 @@ describe("approveAccessRequest", () => {
       "https://some.consent-endpoint.override/issue",
       expect.anything(),
       expect.anything(),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -238,11 +238,11 @@ describe("approveAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedFetch = jest.fn(global.fetch);
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(mockAccessGrantVc());
     await approveAccessRequest(mockAccessRequestVc(), undefined, {
@@ -252,7 +252,7 @@ describe("approveAccessRequest", () => {
       expect.anything(),
       expect.anything(),
       expect.anything(),
-      { fetch: mockedFetch }
+      { fetch: mockedFetch },
     );
   });
 
@@ -260,11 +260,11 @@ describe("approveAccessRequest", () => {
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     const mockedIssue = jest.spyOn(mockedVcModule, "issueVerifiableCredential");
     mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
@@ -287,7 +287,7 @@ describe("approveAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessGrant"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -296,12 +296,12 @@ describe("approveAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as typeof VcClient,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
     const mockedFetch = jest.fn(global.fetch);
     mockedFetch.mockResolvedValueOnce(
-      new Response(JSON.stringify(mockConsentRequestVc()))
+      new Response(JSON.stringify(mockConsentRequestVc())),
     );
     await approveAccessRequest("https://some.credential", undefined, {
       fetch: mockedFetch,
@@ -324,14 +324,14 @@ describe("approveAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessGrant"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
   it("accepts the returned VC using the abbreviated status instead of the fully qualified IRI", async () => {
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const mockedIssue = jest.spyOn(mockedVcModule, "issueVerifiableCredential");
     const mockedVc = mockAccessGrantVc();
@@ -342,7 +342,7 @@ describe("approveAccessRequest", () => {
       approveAccessRequest(mockAccessRequestVc(), undefined, {
         fetch: jest.fn(global.fetch),
         updateAcr: false,
-      })
+      }),
     ).resolves.not.toThrow();
   });
 
@@ -351,18 +351,18 @@ describe("approveAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as typeof VcClient,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
     const mockedFetch = jest.fn(global.fetch);
     mockedFetch.mockResolvedValueOnce(
-      new Response(JSON.stringify(mockConsentRequestVc()))
+      new Response(JSON.stringify(mockConsentRequestVc())),
     );
 
     await expect(
       approveAccessRequest("https://some.credential", undefined, {
         fetch: mockedFetch,
-      })
+      }),
     ).rejects.toThrow();
   });
 
@@ -370,11 +370,11 @@ describe("approveAccessRequest", () => {
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(mockAccessGrantVc());
     await approveAccessRequest(mockConsentRequestVc(), undefined, {
@@ -399,7 +399,7 @@ describe("approveAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessGrant"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -407,11 +407,11 @@ describe("approveAccessRequest", () => {
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     const mockedIssue = jest.spyOn(mockedVcModule, "issueVerifiableCredential");
     mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
@@ -423,7 +423,7 @@ describe("approveAccessRequest", () => {
       },
       {
         fetch: jest.fn(global.fetch),
-      }
+      },
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -441,7 +441,7 @@ describe("approveAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessGrant"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -449,11 +449,11 @@ describe("approveAccessRequest", () => {
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(mockAccessGrantVc());
     await approveAccessRequest(
@@ -463,7 +463,7 @@ describe("approveAccessRequest", () => {
       },
       {
         fetch: jest.fn(global.fetch),
-      }
+      },
     );
     expect(spiedIssueRequest.mock.lastCall?.[1]).toMatchObject({
       providedConsent: {
@@ -476,11 +476,11 @@ describe("approveAccessRequest", () => {
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(mockAccessGrantVc());
     await approveAccessRequest(
@@ -496,7 +496,7 @@ describe("approveAccessRequest", () => {
       },
       {
         fetch: jest.fn(global.fetch),
-      }
+      },
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -514,7 +514,7 @@ describe("approveAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessGrant"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -522,11 +522,11 @@ describe("approveAccessRequest", () => {
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(mockAccessGrantVc());
     await approveAccessRequest(
@@ -542,7 +542,7 @@ describe("approveAccessRequest", () => {
       },
       {
         fetch: jest.fn(global.fetch),
-      }
+      },
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -560,7 +560,7 @@ describe("approveAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessGrant"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -568,11 +568,11 @@ describe("approveAccessRequest", () => {
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(mockAccessGrantVc());
     await approveAccessRequest(
@@ -582,7 +582,7 @@ describe("approveAccessRequest", () => {
       },
       {
         fetch: jest.fn(global.fetch),
-      }
+      },
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -605,7 +605,7 @@ describe("approveAccessRequest", () => {
         expirationDate: mockConsentRequestVc().expirationDate,
         issuanceDate: new Date(2021, 8, 15).toISOString(),
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -613,11 +613,11 @@ describe("approveAccessRequest", () => {
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(mockAccessGrantVc());
     await approveAccessRequest(
@@ -627,7 +627,7 @@ describe("approveAccessRequest", () => {
       },
       {
         fetch: jest.fn(global.fetch),
-      }
+      },
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -649,7 +649,7 @@ describe("approveAccessRequest", () => {
         issuanceDate: mockConsentRequestVc().issuanceDate,
         expirationDate: new Date(2021, 8, 16).toISOString(),
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -657,11 +657,11 @@ describe("approveAccessRequest", () => {
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(mockAccessGrantVc());
     await approveAccessRequest(
@@ -671,7 +671,7 @@ describe("approveAccessRequest", () => {
       },
       {
         fetch: jest.fn(global.fetch),
-      }
+      },
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -694,7 +694,7 @@ describe("approveAccessRequest", () => {
         // The expiration date should have been overridden.
         expirationDate: undefined,
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -702,11 +702,11 @@ describe("approveAccessRequest", () => {
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(mockAccessGrantVc());
     await approveAccessRequest(
@@ -717,7 +717,7 @@ describe("approveAccessRequest", () => {
       undefined,
       {
         fetch: jest.fn(global.fetch),
-      }
+      },
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -738,7 +738,7 @@ describe("approveAccessRequest", () => {
         type: ["SolidAccessGrant"],
         issuanceDate: mockConsentRequestVc().issuanceDate,
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -746,11 +746,11 @@ describe("approveAccessRequest", () => {
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(mockAccessGrantVc());
     await approveAccessRequest(
@@ -759,7 +759,7 @@ describe("approveAccessRequest", () => {
       undefined,
       {
         fetch: jest.fn(global.fetch),
-      }
+      },
     );
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -777,7 +777,7 @@ describe("approveAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessGrant"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -786,7 +786,7 @@ describe("approveAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as typeof VcClient,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
     await expect(
@@ -796,8 +796,8 @@ describe("approveAccessRequest", () => {
         undefined,
         {
           fetch: jest.fn(global.fetch),
-        }
-      )
+        },
+      ),
     ).rejects.toThrow();
   });
 
@@ -805,11 +805,11 @@ describe("approveAccessRequest", () => {
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc"
+      "@inrupt/solid-client-vc",
     ) as typeof VcClient;
     const spiedIssueRequest = jest.spyOn(
       mockedVcModule,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     const normalizedAccessGrant = mockAccessGrantVc();
     // The server returns an equivalent JSON-LD with a different frame:
@@ -831,7 +831,7 @@ describe("approveAccessRequest", () => {
     await expect(
       approveAccessRequest(mockAccessRequestVc(), undefined, {
         fetch: jest.fn(global.fetch),
-      })
+      }),
     ).resolves.toStrictEqual(normalizedAccessGrant);
   });
 
@@ -845,7 +845,7 @@ describe("approveAccessRequest", () => {
     const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as typeof VcClient,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
 
@@ -860,12 +860,12 @@ describe("approveAccessRequest", () => {
       undefined,
       {
         fetch: jest.fn(global.fetch),
-      }
+      },
     );
     // The resource's IRI is picked up from the access grant.
     expect(spiedAcrLookup).toHaveBeenCalledWith(
       "https://some.custom.resource",
-      expect.anything()
+      expect.anything(),
     );
     // // The resources' ACR is updated with the modes from the grant.
     expect(spiedAcrUpdate).toHaveBeenCalledWith(
@@ -875,7 +875,7 @@ describe("approveAccessRequest", () => {
         write: true,
         append: false,
       },
-      { inherit: true }
+      { inherit: true },
     );
     // The resources' ACR is written back.
     expect(spiedAcrSave).toHaveBeenCalled();
@@ -891,7 +891,7 @@ describe("approveAccessRequest", () => {
     const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as typeof VcClient,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
 
     mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
@@ -908,13 +908,13 @@ describe("approveAccessRequest", () => {
       {
         fetch: jest.fn(global.fetch),
         updateAcr: true,
-      }
+      },
     );
 
     // The resource's IRI is picked up from the access grant.
     expect(spiedAcrLookup).toHaveBeenCalledWith(
       "https://some.custom.resource",
-      expect.anything()
+      expect.anything(),
     );
     // The resources' ACR is updated with the modes from the grant.
     expect(spiedAcrUpdate).toHaveBeenCalledWith(
@@ -924,7 +924,7 @@ describe("approveAccessRequest", () => {
         write: true,
         append: false,
       },
-      { inherit: true }
+      { inherit: true },
     );
 
     // The resources' ACR is written back.
@@ -941,7 +941,7 @@ describe("approveAccessRequest", () => {
     const spiedAcrSave = jest.spyOn(mockedClientModule.acp_ess_2, "saveAcrFor");
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as typeof VcClient,
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
 
@@ -957,7 +957,7 @@ describe("approveAccessRequest", () => {
       {
         fetch: jest.fn(global.fetch),
         updateAcr: false,
-      }
+      },
     );
 
     expect(spiedAcrLookup).toHaveBeenCalledTimes(0);

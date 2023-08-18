@@ -19,6 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import type { Buffer as NodeBuffer, File as NodeFile } from "buffer";
 import type { UrlString, WithResourceInfo } from "@inrupt/solid-client";
 import {
   getFile as coreGetFile,
@@ -26,7 +27,6 @@ import {
   saveFileInContainer as coreSaveFileInContainer,
 } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import type { Buffer as NodeBuffer, File as NodeFile } from "buffer";
 import { fetchWithVc } from "../fetch";
 import type { FetchOptions } from "../type/FetchOptions";
 
@@ -47,7 +47,7 @@ import type { FetchOptions } from "../type/FetchOptions";
 export async function getFile(
   resourceUrl: UrlString,
   accessGrant: VerifiableCredential,
-  options?: FetchOptions
+  options?: FetchOptions,
 ) {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
@@ -57,7 +57,7 @@ export async function getFile(
   const authenticatedFetch = await fetchWithVc(
     resourceUrl,
     accessGrant,
-    fetchOptions
+    fetchOptions,
   );
 
   return await coreGetFile(resourceUrl, {
@@ -91,7 +91,7 @@ export async function overwriteFile<T extends File | NodeFile>(
   resourceUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential,
-  options?: FetchOptions & { contentType?: string }
+  options?: FetchOptions & { contentType?: string },
 ): Promise<T & WithResourceInfo>;
 /**
  * @deprecated `overwriteFile` should only have `File` input
@@ -100,13 +100,13 @@ export async function overwriteFile<T extends File | NodeFile | NodeBuffer>(
   resourceUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential,
-  options?: FetchOptions & { contentType?: string }
+  options?: FetchOptions & { contentType?: string },
 ): Promise<T & WithResourceInfo>;
 export async function overwriteFile<T extends File | NodeFile | NodeBuffer>(
   resourceUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential,
-  options?: FetchOptions & { contentType?: string }
+  options?: FetchOptions & { contentType?: string },
 ): Promise<T & WithResourceInfo> {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
@@ -116,7 +116,7 @@ export async function overwriteFile<T extends File | NodeFile | NodeBuffer>(
   const authenticatedFetch = await fetchWithVc(
     resourceUrl,
     accessGrant,
-    fetchOptions
+    fetchOptions,
   );
 
   const overwriteFileOptions: { contentType?: string } = {};
@@ -150,26 +150,26 @@ export async function saveFileInContainer<T extends File | NodeFile>(
   containerUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential,
-  options?: FetchOptions & { contentType?: string; slug?: string }
+  options?: FetchOptions & { contentType?: string; slug?: string },
 ): Promise<T & WithResourceInfo>;
 /**
  * @deprecated `saveFileInContainer` should only have `File` input; not `Buffer`
  */
 export async function saveFileInContainer<
-  T extends File | NodeFile | NodeBuffer
+  T extends File | NodeFile | NodeBuffer,
 >(
   containerUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential,
-  options?: FetchOptions & { contentType?: string; slug?: string }
+  options?: FetchOptions & { contentType?: string; slug?: string },
 ): Promise<T & WithResourceInfo>;
 export async function saveFileInContainer<
-  T extends File | NodeFile | NodeBuffer
+  T extends File | NodeFile | NodeBuffer,
 >(
   containerUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential,
-  options?: FetchOptions & { contentType?: string; slug?: string }
+  options?: FetchOptions & { contentType?: string; slug?: string },
 ): Promise<T & WithResourceInfo> {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
@@ -179,7 +179,7 @@ export async function saveFileInContainer<
   const authenticatedFetch = await fetchWithVc(
     containerUrl,
     accessGrant,
-    fetchOptions
+    fetchOptions,
   );
 
   const fileOptions: { contentType?: string; slug?: string } = {};

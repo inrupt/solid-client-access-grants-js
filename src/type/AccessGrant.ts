@@ -29,7 +29,7 @@ import { isBaseAccessVcBody } from "../gConsent/guard/isBaseAccessVcBody";
 export type AccessGrantAny = AccessGrantOdrl | AccessGrantGConsent;
 
 export function CredentialIsAccessGrantAny(
-  vc: VerifiableCredential
+  vc: VerifiableCredential,
 ): vc is AccessGrantAny {
   return (
     isCredentialAccessGrantOdrl(vc) ||

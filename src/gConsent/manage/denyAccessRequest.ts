@@ -36,13 +36,13 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
 // eslint-disable-next-line camelcase
 async function internal_denyAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
-  options: AccessBaseOptions
+  options: AccessBaseOptions,
 ): Promise<VerifiableCredential> {
   const baseAccessVerifiableCredential =
     await getBaseAccessRequestVerifiableCredential(vc, options);
 
   const internalOptions = initializeGrantParameters(
-    baseAccessVerifiableCredential
+    baseAccessVerifiableCredential,
   );
   const denialBody = getGrantBody({
     access: internalOptions.access,
@@ -70,7 +70,7 @@ async function internal_denyAccessRequest(
  */
 async function denyAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<VerifiableCredential>;
 /**
  * @deprecated Please remove the `resourceOwner` parameter.
@@ -78,12 +78,12 @@ async function denyAccessRequest(
 async function denyAccessRequest(
   resourceOwner: WebId,
   vc: VerifiableCredential | URL | UrlString,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<VerifiableCredential>;
 async function denyAccessRequest(
   resourceOwnerOrVc: WebId | VerifiableCredential | URL | UrlString,
   vcOrOptions?: VerifiableCredential | URL | UrlString | AccessBaseOptions,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<VerifiableCredential> {
   if (
     typeof options !== "undefined" ||
@@ -94,12 +94,12 @@ async function denyAccessRequest(
     // The deprecated signature is being used: ignore the first parameter
     return internal_denyAccessRequest(
       vcOrOptions as VerifiableCredential | URL | UrlString,
-      options ?? {}
+      options ?? {},
     );
   }
   return internal_denyAccessRequest(
     resourceOwnerOrVc,
-    (vcOrOptions as AccessBaseOptions) ?? {}
+    (vcOrOptions as AccessBaseOptions) ?? {},
   );
 }
 

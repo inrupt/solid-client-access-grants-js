@@ -58,8 +58,8 @@ describe("isBaseAccessGrantVerifiableCredential", () => {
   it("Returns true on valid Access Grant VC", () => {
     expect(
       isBaseAccessGrantVerifiableCredential(
-        validAccessGrantVerifiableCredential
-      )
+        validAccessGrantVerifiableCredential,
+      ),
     ).toBe(true);
   });
 
@@ -75,7 +75,7 @@ describe("isBaseAccessGrantVerifiableCredential", () => {
             forPersonalData: ["https://example.pod/resourceX", {}],
           },
         },
-      })
+      }),
     ).toBe(false);
   });
 
@@ -84,7 +84,7 @@ describe("isBaseAccessGrantVerifiableCredential", () => {
       isBaseAccessGrantVerifiableCredential({
         ...validAccessGrantVerifiableCredential,
         issuanceDate: [],
-      })
+      }),
     ).toBe(false);
   });
 
@@ -93,7 +93,7 @@ describe("isBaseAccessGrantVerifiableCredential", () => {
       isBaseAccessGrantVerifiableCredential({
         ...validAccessGrantVerifiableCredential,
         issuanceDate: undefined,
-      })
+      }),
     ).toBe(true);
   });
 });

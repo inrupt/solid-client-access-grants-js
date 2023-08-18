@@ -29,7 +29,7 @@ import { mockAccessGrantVc } from "../util/access.mock";
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getSolidDataset = jest.fn(
-    solidClientModule.getSolidDataset
+    solidClientModule.getSolidDataset,
   );
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
@@ -43,7 +43,7 @@ describe("cancelAccessRequest", () => {
     };
     const spiedRevoke = jest.spyOn(
       mockedVcModule,
-      "revokeVerifiableCredential"
+      "revokeVerifiableCredential",
     );
     const mockedFetch = jest
       .fn(global.fetch)
@@ -56,7 +56,7 @@ describe("cancelAccessRequest", () => {
       expect.anything(),
       {
         fetch: mockedFetch,
-      }
+      },
     );
   });
 
@@ -66,7 +66,7 @@ describe("cancelAccessRequest", () => {
     };
     const spiedRevoke = jest.spyOn(
       mockedVcModule,
-      "revokeVerifiableCredential"
+      "revokeVerifiableCredential",
     );
     const mockedFetch = jest
       .fn(global.fetch)
@@ -78,7 +78,7 @@ describe("cancelAccessRequest", () => {
     expect(spiedRevoke).toHaveBeenCalledWith(
       "https://some.issuer/status",
       MOCKED_CREDENTIAL_ID,
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -87,10 +87,10 @@ describe("cancelAccessRequest", () => {
       new Response(undefined, {
         status: 401,
         statusText: "Unauthorized",
-      })
+      }),
     );
     await expect(
-      cancelAccessRequest("https://some.credential", { fetch: mockedFetch })
+      cancelAccessRequest("https://some.credential", { fetch: mockedFetch }),
     ).rejects.toThrow(/\[https:\/\/some.credential\].*401.*Unauthorized/);
   });
 
@@ -100,19 +100,19 @@ describe("cancelAccessRequest", () => {
     };
     const spiedRevoke = jest.spyOn(
       mockedVcModule,
-      "revokeVerifiableCredential"
+      "revokeVerifiableCredential",
     );
     const mockedFetch = jest.fn(global.fetch);
     await cancelAccessRequest(
       mockAccessGrantVc({ issuer: "https://some.issuer" }),
       {
         fetch: mockedFetch,
-      }
+      },
     );
     expect(spiedRevoke).toHaveBeenCalledWith(
       "https://some.issuer/status",
       MOCKED_CREDENTIAL_ID,
-      expect.anything()
+      expect.anything(),
     );
     expect(mockedFetch).not.toHaveBeenCalled();
   });

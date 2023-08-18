@@ -51,15 +51,15 @@ import type { AccessCredentialType } from "../type/AccessCredentialType";
 
 function getGConsentAttributes(
   params: AccessRequestParameters,
-  type: "BaseRequestBody"
+  type: "BaseRequestBody",
 ): GConsentRequestAttributes;
 function getGConsentAttributes(
   params: AccessGrantParameters,
-  type: "BaseGrantBody"
+  type: "BaseGrantBody",
 ): GConsentGrantAttributes;
 function getGConsentAttributes(
   params: AccessRequestParameters | AccessGrantParameters,
-  type: "BaseRequestBody" | "BaseGrantBody"
+  type: "BaseRequestBody" | "BaseGrantBody",
 ): GConsentRequestAttributes | GConsentGrantAttributes {
   const modes = accessToResourceAccessModeArray(params.access);
   const consentAttributes: GConsentRequestAttributes = {
@@ -88,15 +88,15 @@ function getGConsentAttributes(
 
 function getBaseBody(
   params: AccessRequestParameters,
-  type: "BaseRequestBody"
+  type: "BaseRequestBody",
 ): BaseRequestPayload;
 function getBaseBody(
   params: AccessGrantParameters,
-  type: "BaseGrantBody"
+  type: "BaseGrantBody",
 ): BaseGrantPayload;
 function getBaseBody(
   params: AccessRequestParameters | AccessGrantParameters,
-  type: "BaseRequestBody" | "BaseGrantBody"
+  type: "BaseRequestBody" | "BaseGrantBody",
 ): BaseRequestPayload | BaseGrantPayload {
   const body = {
     "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
@@ -123,7 +123,7 @@ function getBaseBody(
         ...body.credentialSubject,
         providedConsent: getGConsentAttributes(
           params as AccessGrantParameters,
-          type
+          type,
         ),
       },
     };
@@ -134,14 +134,14 @@ function getBaseBody(
       ...body.credentialSubject,
       hasConsent: getGConsentAttributes(
         params as AccessRequestParameters,
-        type
+        type,
       ),
     },
   };
 }
 
 export function getRequestBody(
-  params: AccessRequestParameters
+  params: AccessRequestParameters,
 ): AccessRequestBody {
   return getBaseBody(params, "BaseRequestBody") as AccessRequestBody;
 }
@@ -152,7 +152,7 @@ export function getGrantBody(params: AccessGrantParameters): AccessGrantBody {
 
 export async function issueAccessVc(
   vcBody: BaseRequestBody | BaseGrantBody,
-  options: AccessBaseOptions
+  options: AccessBaseOptions,
 ): Promise<VerifiableCredential> {
   const fetcher = await getSessionFetch(options);
   const targetResourceIri = isBaseRequest(vcBody)
@@ -166,14 +166,14 @@ export async function issueAccessVc(
   // (issuer service, verifier service... supposedly status and query and vc???)
   const accessIssuerEndpoint = new URL(
     "issue",
-    await getAccessApiEndpoint(targetResourceIri, options)
+    await getAccessApiEndpoint(targetResourceIri, options),
   );
 
   return issueVerifiableCredential(
     accessIssuerEndpoint.href,
     {
       "@context": instanciateEssAccessGrantContext(
-        accessIssuerEndpoint.hostname
+        accessIssuerEndpoint.hostname,
       ),
       ...vcBody.credentialSubject,
     },
@@ -188,6 +188,6 @@ export async function issueAccessVc(
     },
     {
       fetch: fetcher,
-    }
+    },
   );
 }

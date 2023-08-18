@@ -64,7 +64,7 @@ const getAncestorUrls = (resourceUrl: URL) => {
     },
     // The storage origin may be the storage root (it happens not to be the case in ESS).
     // The target resource should also be included.
-    [new URL("/", resourceUrl.origin), resourceUrl]
+    [new URL("/", resourceUrl.origin), resourceUrl],
   );
 };
 
@@ -73,7 +73,7 @@ const getAncestorUrls = (resourceUrl: URL) => {
 // eslint-disable-next-line camelcase
 async function internal_getAccessGrantAll(
   params: AccessParameters = {},
-  options: AccessBaseOptions & { includeExpired?: boolean } = {}
+  options: AccessBaseOptions & { includeExpired?: boolean } = {},
 ): Promise<Array<VerifiableCredential>> {
   if (!params.resource && !options.accessEndpoint) {
     throw new Error("resource and accessEndpoint cannot both be undefined");
@@ -84,14 +84,14 @@ async function internal_getAccessGrantAll(
     ? new URL("derive", options.accessEndpoint)
     : new URL(
         "derive",
-        await getAccessApiEndpoint(params.resource as string, options)
+        await getAccessApiEndpoint(params.resource as string, options),
       );
 
   const ancestorUrls = params.resource
     ? getAncestorUrls(
         typeof params.resource === "string"
           ? new URL(params.resource)
-          : params.resource
+          : params.resource,
       )
     : [undefined];
 
@@ -122,9 +122,9 @@ async function internal_getAccessGrantAll(
           {
             fetch: sessionFetch,
             includeExpiredVc: options.includeExpired,
-          }
-        )
-      )
+          },
+        ),
+      ),
     )
   )
     // getVerifiableCredentialAllFromShape returns a list, so the previous map
@@ -135,7 +135,7 @@ async function internal_getAccessGrantAll(
   return (
     result
       .filter(
-        (vc) => isBaseAccessGrantVerifiableCredential(vc) && isAccessGrant(vc)
+        (vc) => isBaseAccessGrantVerifiableCredential(vc) && isAccessGrant(vc),
       )
       // FIXME why isn't the previous filter enough?
       .map((vc) => vc as AccessGrant)
@@ -145,7 +145,7 @@ async function internal_getAccessGrantAll(
           // directly to the target resource.
           getInherit(grant) !== false ||
           (params.resource &&
-            getResources(grant).includes(params.resource.toString()))
+            getResources(grant).includes(params.resource.toString())),
       )
   );
 }
@@ -172,7 +172,7 @@ async function internal_getAccessGrantAll(
 async function getAccessGrantAll(
   resource: URL | UrlString,
   params?: AccessParameters,
-  options?: AccessBaseOptions & { includeExpired?: boolean }
+  options?: AccessBaseOptions & { includeExpired?: boolean },
 ): Promise<Array<VerifiableCredential>>;
 
 /**
@@ -194,7 +194,7 @@ async function getAccessGrantAll(
 
 async function getAccessGrantAll(
   params: AccessParameters,
-  options?: AccessBaseOptions & { includeExpired?: boolean }
+  options?: AccessBaseOptions & { includeExpired?: boolean },
 ): Promise<Array<VerifiableCredential>>;
 
 async function getAccessGrantAll(
@@ -203,7 +203,7 @@ async function getAccessGrantAll(
     | AccessParameters
     | undefined
     | (AccessBaseOptions & { includeExpired?: boolean }),
-  options: AccessBaseOptions & { includeExpired?: boolean } = {}
+  options: AccessBaseOptions & { includeExpired?: boolean } = {},
 ): Promise<Array<VerifiableCredential>> {
   if (
     typeof resourceOrParams === "string" ||
@@ -217,12 +217,12 @@ async function getAccessGrantAll(
             ? resourceOrParams
             : (resourceOrParams as URL).href,
       },
-      options
+      options,
     );
   }
   return internal_getAccessGrantAll(
     resourceOrParams as AccessParameters,
-    paramsOrOptions as AccessBaseOptions & { includeExpired?: boolean }
+    paramsOrOptions as AccessBaseOptions & { includeExpired?: boolean },
   );
 }
 

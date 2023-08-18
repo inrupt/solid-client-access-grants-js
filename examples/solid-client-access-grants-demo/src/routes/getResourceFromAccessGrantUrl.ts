@@ -29,7 +29,7 @@ import { getEnvironment } from "../utils/getEnvironment";
 
 export async function getResourceFromAccessGrantUrl(
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> {
   const env = getEnvironment();
   const session = new Session();

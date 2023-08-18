@@ -54,7 +54,7 @@ app.get("/manage", async (req, res) => {
       new URL(req.url, config.grant.href).href,
       {
         fetch: session.fetch,
-      }
+      },
     );
 
   res.render("grant-form", { accessRequest, requestorRedirectUrl });
@@ -75,7 +75,7 @@ app.post("/redirect", async (req, res) => {
     undefined,
     {
       fetch: session.fetch,
-    }
+    },
   );
   const redirectUrl = new URL(decodeURI(req.body.redirectUrl));
   await redirectToRequestor(accessGrant.id, redirectUrl, {

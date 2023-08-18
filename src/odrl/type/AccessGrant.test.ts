@@ -99,7 +99,7 @@ describe("Valid Access Grants are recognized", () => {
           ...mockAccessGrantOdrl.credentialSubject,
           prohibition: undefined,
         },
-      })
+      }),
     ).toBe(true);
   });
 
@@ -116,7 +116,7 @@ describe("Valid Access Grants are recognized", () => {
             },
           ],
         },
-      })
+      }),
     ).toBe(true);
   });
 });
@@ -127,7 +127,7 @@ describe("Invalid Access Grants are rejected", () => {
       isCredentialAccessGrantOdrl({
         ...mockAccessGrantOdrl,
         type: [],
-      })
+      }),
     ).toBe(false);
   });
 
@@ -140,7 +140,7 @@ describe("Invalid Access Grants are rejected", () => {
             ...mockAccessGrantOdrl.credentialSubject,
             type: "InvalidType",
           },
-        })
+        }),
       ).toBe(false);
     });
 
@@ -152,7 +152,7 @@ describe("Invalid Access Grants are rejected", () => {
             ...mockAccessGrantOdrl.credentialSubject,
             type: "InvalidType",
           },
-        })
+        }),
       ).toBe(false);
     });
 
@@ -164,7 +164,7 @@ describe("Invalid Access Grants are rejected", () => {
             ...mockAccessGrantOdrl.credentialSubject,
             profile: "https://some.invalid/profile",
           },
-        })
+        }),
       ).toBe(false);
     });
 
@@ -176,7 +176,7 @@ describe("Invalid Access Grants are rejected", () => {
             ...mockAccessGrantOdrl.credentialSubject,
             assigner: undefined,
           },
-        })
+        }),
       ).toBe(false);
     });
 
@@ -188,7 +188,7 @@ describe("Invalid Access Grants are rejected", () => {
             ...mockAccessGrantOdrl.credentialSubject,
             assignee: undefined,
           },
-        })
+        }),
       ).toBe(false);
     });
 
@@ -200,7 +200,7 @@ describe("Invalid Access Grants are rejected", () => {
             ...mockAccessGrantOdrl.credentialSubject,
             permission: undefined,
           },
-        })
+        }),
       ).toBe(false);
     });
   });
@@ -219,7 +219,7 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        })
+        }),
       ).toBe(false);
     });
 
@@ -236,7 +236,7 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        })
+        }),
       ).toBe(false);
     });
 
@@ -253,7 +253,7 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        })
+        }),
       ).toBe(false);
     });
 
@@ -270,7 +270,7 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        })
+        }),
       ).toBe(false);
     });
   });
@@ -294,7 +294,7 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        })
+        }),
       ).toBe(false);
     });
 
@@ -316,7 +316,7 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        })
+        }),
       ).toBe(false);
     });
 
@@ -338,7 +338,7 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        })
+        }),
       ).toBe(false);
     });
   });
@@ -352,7 +352,7 @@ describe("Invalid Access Grants are rejected", () => {
             ...mockAccessGrantOdrl.credentialSubject,
             prohibition: "some invalid prohibition",
           },
-        })
+        }),
       ).toBe(false);
     });
 
@@ -372,7 +372,7 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        })
+        }),
       ).toBe(false);
     });
 
@@ -392,7 +392,7 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        })
+        }),
       ).toBe(false);
     });
   });

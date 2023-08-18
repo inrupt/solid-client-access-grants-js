@@ -23,7 +23,7 @@ import type { AccessGrantOdrl } from "../type/AccessGrant";
 
 export const mockOdrlGrant = (
   issuer = "https://some.issuer",
-  subjectId = "https://some.resource.owner"
+  subjectId = "https://some.resource.owner",
 ): AccessGrantOdrl => {
   return {
     "@context": [

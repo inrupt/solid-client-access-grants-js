@@ -66,7 +66,7 @@ app.post("/request", async (req, res) => {
     {
       fetch: session.fetch,
       accessEndpoint: "https://vc.inrupt.com",
-    }
+    },
   );
 
   await redirectToAccessManagementUi(
@@ -87,7 +87,7 @@ app.post("/request", async (req, res) => {
       // on solid-client-authn-browser, which is picked up automatically for convenience in
       // browser-side apps. A typical node app would not have this dependence.
       fetch: crossFetch,
-    }
+    },
   );
 });
 
@@ -105,7 +105,7 @@ app.get("/redirect", async (req, res) => {
     new URL(req.url, config.request.href).toString(),
     {
       fetch: session.fetch,
-    }
+    },
   );
   const targetResource = (
     accessGrant.credentialSubject.providedConsent as {

@@ -38,7 +38,7 @@ function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
 }
 
 function getModesFromRequest(
-  requestVc: AccessRequestBody
+  requestVc: AccessRequestBody,
 ): ResourceAccessMode[] {
   return requestVc.credentialSubject.hasConsent.mode;
 }
@@ -50,26 +50,26 @@ function modesToAccess(modes: ResourceAccessMode[]): AccessModes {
     [
       ACL_RESOURCE_ACCESS_MODE_APPEND,
       ACL_RESOURCE_ACCESS_MODE_APPEND_ABBREV,
-    ].includes(mode)
+    ].includes(mode),
   );
   accessMode.read = modes.some((mode) =>
     [
       ACL_RESOURCE_ACCESS_MODE_READ,
       ACL_RESOURCE_ACCESS_MODE_READ_ABBREV,
-    ].includes(mode)
+    ].includes(mode),
   );
   accessMode.write = modes.some((mode) =>
     [
       ACL_RESOURCE_ACCESS_MODE_WRITE,
       ACL_RESOURCE_ACCESS_MODE_WRITE_ABBREV,
-    ].includes(mode)
+    ].includes(mode),
   );
 
   return accessMode;
 }
 
 function getInboxFromRequest(
-  requestVc: AccessRequestBody
+  requestVc: AccessRequestBody,
 ): UrlString | undefined {
   return requestVc.credentialSubject.inbox;
 }
@@ -79,19 +79,19 @@ function getResourcesFromRequest(requestVc: AccessRequestBody): UrlString[] {
 }
 
 function getIssuanceFromRequest(
-  requestVc: AccessRequestBody & { issuanceDate: string }
+  requestVc: AccessRequestBody & { issuanceDate: string },
 ): Date | undefined {
   return new Date(requestVc.issuanceDate);
 }
 
 function getPurposeFromRequest(
-  requestVc: AccessRequestBody
+  requestVc: AccessRequestBody,
 ): UrlString[] | undefined {
   return requestVc.credentialSubject.hasConsent.forPurpose;
 }
 
 function getExpirationFromRequest(
-  requestVc: AccessRequestBody
+  requestVc: AccessRequestBody,
 ): Date | undefined {
   return requestVc.expirationDate !== undefined
     ? new Date(requestVc.expirationDate)
@@ -99,14 +99,14 @@ function getExpirationFromRequest(
 }
 
 function getInheritFromRequest(
-  requestVc: AccessRequestBody
+  requestVc: AccessRequestBody,
 ): boolean | undefined {
   return requestVc.credentialSubject.hasConsent.inherit;
 }
 
 export function initializeGrantParameters(
   requestVc: (AccessRequestBody & { issuanceDate: string }) | undefined,
-  requestOverride?: Partial<ApproveAccessRequestOverrides>
+  requestOverride?: Partial<ApproveAccessRequestOverrides>,
 ): ApproveAccessRequestOverrides {
   const resultGrant =
     requestVc === undefined

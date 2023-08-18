@@ -41,7 +41,7 @@ function isStringArray(x: unknown): x is Array<UrlString> {
 }
 
 export function isGConsentAttributes(
-  x: unknown
+  x: unknown,
 ): x is GConsentRequestAttributes {
   return (
     isUnknownObject(x) &&

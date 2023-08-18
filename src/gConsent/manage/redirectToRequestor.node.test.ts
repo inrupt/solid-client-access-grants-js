@@ -29,10 +29,10 @@ describe("redirectToRequestor", () => {
       await expect(
         redirectToRequestor(
           "https://some.grant-vc.iri",
-          "https://some.redirect.iri"
-        )
+          "https://some.redirect.iri",
+        ),
       ).rejects.toThrow(
-        `In a non-browser environment, a redirectCallback must be provided by the user.`
+        `In a non-browser environment, a redirectCallback must be provided by the user.`,
       );
     });
   });

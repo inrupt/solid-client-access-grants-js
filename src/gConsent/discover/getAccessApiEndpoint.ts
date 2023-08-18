@@ -25,35 +25,35 @@ import { parse } from "auth-header";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 
 async function getAccessEndpointForResource(
-  resource: UrlString
+  resource: UrlString,
 ): Promise<UrlString> {
   // Explicitly makes an unauthenticated fetch to be sure to get the link to the
   // authorization server.
   const response = await crossFetch(resource);
   if (!response.headers.has("WWW-Authenticate")) {
     throw new Error(
-      `Expected a 401 error with a WWW-Authenticate header, got a [${response.status}: ${response.statusText}] response lacking the WWW-Authenticate header.`
+      `Expected a 401 error with a WWW-Authenticate header, got a [${response.status}: ${response.statusText}] response lacking the WWW-Authenticate header.`,
     );
   }
   const authHeader = response.headers.get("WWW-Authenticate") as string;
   const authHeaderToken = parse(authHeader);
   if (authHeaderToken.scheme !== "UMA") {
     throw new Error(
-      `Unsupported authorization scheme: [${authHeaderToken.scheme}]`
+      `Unsupported authorization scheme: [${authHeaderToken.scheme}]`,
     );
   }
   const authorizationServerIri = authHeaderToken.params.as_uri as string;
   const wellKnownIri = new URL(
     "/.well-known/uma2-configuration",
-    authorizationServerIri
+    authorizationServerIri,
   );
   const rawDiscoveryDocument = await crossFetch(wellKnownIri.href);
   const discoveryDocument = await rawDiscoveryDocument.json();
   if (typeof discoveryDocument.verifiable_credential_issuer !== "string") {
     throw new Error(
       `No access issuer listed for property [verifiable_credential_issuer] in [${JSON.stringify(
-        discoveryDocument
-      )}]`
+        discoveryDocument,
+      )}]`,
     );
   }
   return discoveryDocument.verifiable_credential_issuer as string;
@@ -69,7 +69,7 @@ async function getAccessEndpointForResource(
  */
 async function getAccessApiEndpoint(
   resource: URL | UrlString,
-  options: AccessBaseOptions = {}
+  options: AccessBaseOptions = {},
 ): Promise<UrlString> {
   if (options.accessEndpoint !== undefined) {
     return options.accessEndpoint.toString();

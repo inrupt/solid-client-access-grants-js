@@ -25,7 +25,7 @@ import type {
 } from "../type/AccessVerifiableCredential";
 
 export function isBaseRequest(
-  vc: BaseAccessVcBody
+  vc: BaseAccessVcBody,
 ): vc is BaseAccessVcBody & BaseRequestBody {
   return (vc as BaseRequestBody).credentialSubject.hasConsent !== undefined;
 }

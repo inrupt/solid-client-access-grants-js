@@ -59,7 +59,7 @@ import type { SaveInContainerOptions } from "../type/SaveInContainerOptions";
 export async function createContainerInContainer(
   containerUrl: UrlString,
   accessGrant: VerifiableCredential,
-  options?: SaveInContainerOptions
+  options?: SaveInContainerOptions,
 ) {
   const fetchOptions: FetchOptions = {};
 
@@ -70,7 +70,7 @@ export async function createContainerInContainer(
   const authenticatedFetch = await fetchWithVc(
     containerUrl,
     accessGrant,
-    fetchOptions
+    fetchOptions,
   );
 
   return await coreCreateContainerInContainer(containerUrl, {

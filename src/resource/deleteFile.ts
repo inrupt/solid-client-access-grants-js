@@ -42,7 +42,7 @@ import type { FetchOptions } from "../type/FetchOptions";
 export async function deleteFile(
   fileUrl: UrlString,
   accessGrant: VerifiableCredential,
-  options?: FetchOptions
+  options?: FetchOptions,
 ) {
   const fetchOptions: FetchOptions = {};
   if (options && options.fetch) {
@@ -52,7 +52,7 @@ export async function deleteFile(
   const authenticatedFetch = await fetchWithVc(
     fileUrl,
     accessGrant,
-    fetchOptions
+    fetchOptions,
   );
 
   return await coreDeleteFile(fileUrl, {

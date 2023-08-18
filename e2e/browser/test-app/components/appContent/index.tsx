@@ -77,7 +77,7 @@ export default function Home() {
       if (currentURL.searchParams.has("accessGrantUrl")) {
         window.localStorage.setItem(
           "accessGrantUrl",
-          decodeURIComponent(currentURL.searchParams.get("accessGrantUrl")!)
+          decodeURIComponent(currentURL.searchParams.get("accessGrantUrl")!),
         );
       }
       // Login will redirect the user away so that they can log in the OIDC issuer,

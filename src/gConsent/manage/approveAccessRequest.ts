@@ -59,13 +59,13 @@ export type ApproveAccessRequestOverrides = Omit<
  * @returns An equivalent JSON-LD document framed according to our typing.
  */
 export function normalizeAccessGrant<T extends VerifiableCredential>(
-  accessGrant: T
+  accessGrant: T,
 ): T {
   // Proper type checking is performed after normalization, so casting here is fine.
   const normalized = { ...accessGrant } as unknown as AccessGrant;
   if (normalized.credentialSubject.providedConsent === undefined) {
     throw new Error(
-      `[${normalized.id}] is not an Access Grant: missing field "credentialSubject.providedConsent".`
+      `[${normalized.id}] is not an Access Grant: missing field "credentialSubject.providedConsent".`,
     );
   }
   if (!Array.isArray(normalized.credentialSubject.providedConsent.mode)) {
@@ -106,19 +106,19 @@ function getAccessModesFromAccessGrant(request: AccessGrantBody): AccessModes {
 async function addVcMatcher(
   targetResources: Array<UrlString>,
   accessMode: AccessModes,
-  options?: { fetch?: typeof global.fetch; inherit?: boolean }
+  options?: { fetch?: typeof global.fetch; inherit?: boolean },
 ) {
   return Promise.all(
     targetResources.map(async (targetResource) => {
       // eslint-disable-next-line camelcase
       const resourceInfo = await acp_ess_2.getResourceInfoWithAcr(
         targetResource,
-        options
+        options,
       );
       // eslint-disable-next-line camelcase
       if (!acp_ess_2.hasAccessibleAcr(resourceInfo)) {
         throw new Error(
-          "The current user does not have access to the resource's Access Control Resource. Either they have insufficiant credentials, or the resource is not controlled using ACP. In either case, an Access Grant cannot be issued."
+          "The current user does not have access to the resource's Access Control Resource. Either they have insufficiant credentials, or the resource is not controlled using ACP. In either case, an Access Grant cannot be issued.",
         );
       }
       // eslint-disable-next-line camelcase
@@ -127,7 +127,7 @@ async function addVcMatcher(
       });
       // eslint-disable-next-line camelcase
       return acp_ess_2.saveAcrFor(updatedResource, options);
-    })
+    }),
   );
 }
 
@@ -138,20 +138,20 @@ async function internal_approveAccessRequest(
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<VerifiableCredential>;
 // eslint-disable-next-line camelcase
 async function internal_approveAccessRequest(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<VerifiableCredential>;
 // eslint-disable-next-line camelcase
 async function internal_approveAccessRequest(
   requestVc?: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options: AccessBaseOptions = {}
+  options: AccessBaseOptions = {},
 ): Promise<VerifiableCredential> {
   const internalOptions = {
     ...options,
@@ -162,19 +162,19 @@ async function internal_approveAccessRequest(
     typeof requestVc !== "undefined"
       ? await getBaseAccessRequestVerifiableCredential(
           requestVc,
-          internalOptions
+          internalOptions,
         )
       : requestVc;
 
   if (requestCredential !== undefined && !isAccessRequest(requestCredential)) {
     throw new Error(
-      `Unexpected VC provided for approval: ${JSON.stringify(requestVc)}`
+      `Unexpected VC provided for approval: ${JSON.stringify(requestVc)}`,
     );
   }
 
   const internalGrantOptions = initializeGrantParameters(
     requestCredential,
-    requestOverride
+    requestOverride,
   );
 
   const grantBody = getGrantBody({
@@ -195,7 +195,7 @@ async function internal_approveAccessRequest(
     await addVcMatcher(
       grantBody.credentialSubject.providedConsent.forPersonalData,
       grantedAccess,
-      internalOptions
+      internalOptions,
     );
   }
 
@@ -224,7 +224,7 @@ export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<AccessGrant>;
 
 /**
@@ -241,7 +241,7 @@ export async function approveAccessRequest(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<AccessGrant>;
 
 /**
@@ -253,7 +253,7 @@ export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<AccessGrant>;
 
 /**
@@ -265,7 +265,7 @@ export async function approveAccessRequest(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<AccessGrant>;
 export async function approveAccessRequest(
   resourceOwnerOrRequestVc:
@@ -282,7 +282,7 @@ export async function approveAccessRequest(
   requestOverrideOrOptions?:
     | Partial<ApproveAccessRequestOverrides>
     | AccessBaseOptions,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<AccessGrant> {
   if (typeof options === "object") {
     // The deprecated signature is being used, so ignore the first parameter.
@@ -290,8 +290,8 @@ export async function approveAccessRequest(
       await internal_approveAccessRequest(
         requestVcOrOverride as VerifiableCredential | URL | UrlString,
         requestOverrideOrOptions as Partial<ApproveAccessRequestOverrides>,
-        options
-      )
+        options,
+      ),
     );
 
     if (
@@ -300,8 +300,8 @@ export async function approveAccessRequest(
     ) {
       throw new Error(
         `Unexpected response when approving Access Request, the result is not an Access Grant: ${JSON.stringify(
-          accessGrant
-        )}`
+          accessGrant,
+        )}`,
       );
     }
 
@@ -312,8 +312,8 @@ export async function approveAccessRequest(
     await internal_approveAccessRequest(
       resourceOwnerOrRequestVc as VerifiableCredential | URL | UrlString,
       requestVcOrOverride as Partial<ApproveAccessRequestOverrides>,
-      requestOverrideOrOptions as AccessBaseOptions
-    )
+      requestOverrideOrOptions as AccessBaseOptions,
+    ),
   );
 
   if (
@@ -322,8 +322,8 @@ export async function approveAccessRequest(
   ) {
     throw new Error(
       `Unexpected response when approving Access Request, the result is not an Access Grant: ${JSON.stringify(
-        accessGrant
-      )}`
+        accessGrant,
+      )}`,
     );
   }
 
