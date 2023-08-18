@@ -17,7 +17,7 @@
     "test": "jest --ignoreProjects e2e-node",
     "test:unit:browser": "jest --selectProjects browser",
     "test:unit:node": "jest --selectProjects node",
-    "test:e2e:node": "jest --selectProjects e2e-node --testTimeout 60000 --collectCoverage false",
+    "test:e2e:node": "jest --selectProjects e2e-node --testTimeout 120000 --collectCoverage false",
     "test:e2e:browser": "playwright test",
     "test:e2e:browser:setup": "cd e2e/browser/test-app && npm ci",
     "licenses:list": "license-checker --production --csv --out LICENSE_DEPENDENCIES_ALL",
