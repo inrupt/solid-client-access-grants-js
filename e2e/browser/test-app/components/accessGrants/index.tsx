@@ -48,9 +48,7 @@ export default function AccessGrant({
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
   const router = useRouter();
 
-  const handleCreate = async (e) => {
-    // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
-    e.preventDefault();
+  const handleCreate = async () => {
     if (typeof sharedResourceIri === "string") {
       // If a resource already exist, do nothing
       return;
@@ -80,9 +78,7 @@ export default function AccessGrant({
     setSharedResourceIri(getSourceUrl(savedFile));
   };
 
-  const handleDelete = async (e) => {
-    // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
-    e.preventDefault();
+  const handleDelete = async () => {
     if (typeof sharedResourceIri !== "string") {
       // If no resource exist, do nothing
       return;
@@ -93,9 +89,7 @@ export default function AccessGrant({
     setSharedResourceIri(undefined);
   };
 
-  const handleGrant = async (e) => {
-    // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
-    e.preventDefault();
+  const handleGrant = async () => {
     if (typeof sharedResourceIri !== "string") {
       // If the resource does not exist, do nothing.
       return;
@@ -114,9 +108,7 @@ export default function AccessGrant({
     setAccessGrant(JSON.stringify(accessGrantRequest, null, "  "));
   };
 
-  const handleRevoke = async (e) => {
-    // This prevents the default behaviour of the button, i.e. to resubmit, which reloads the page.
-    e.preventDefault();
+  const handleRevoke = async () => {
     if (typeof accessGrant !== "string") {
       // If the resource does not exist, do nothing.
       return;
@@ -149,10 +141,14 @@ export default function AccessGrant({
 
   const handleGrantResponse = async () => {
     if (
-      router.query.accessGrantUrl !== "" &&
-      typeof router.query.accessGrantUrl === "string"
+      (router.query.accessGrantUrl !== "" &&
+        typeof router.query.accessGrantUrl === "string") ||
+      window.localStorage.getItem("accessGrantUrl") !== null
     ) {
-      setAccessGrant(router.query.accessGrantUrl);
+      setAccessGrant(
+        window.localStorage.getItem("accessGrantUrl") ??
+          (router.query.accessGrantUrl as string)
+      );
     }
   };
 
@@ -160,13 +156,15 @@ export default function AccessGrant({
     <>
       <div>
         <button
-          onClick={async (e) => handleCreate(e)}
+          type="button"
+          onClick={handleCreate}
           data-testid="create-resource"
         >
           Create resource
         </button>
         <button
-          onClick={async (e) => handleDelete(e)}
+          type="button"
+          onClick={handleDelete}
           data-testid="delete-resource"
         >
           Delete resource
@@ -190,20 +188,19 @@ export default function AccessGrant({
         </input>
       </p>
       <div>
-        <button
-          onClick={async (e) => handleGrant(e)}
-          data-testid="grant-access"
-        >
+        <button type="button" onClick={handleGrant} data-testid="grant-access">
           Grant access
         </button>
         <button
-          onClick={async (e) => handleRevoke(e)}
+          type="button"
+          onClick={handleRevoke}
           data-testid="revoke-access"
         >
           Revoke access
         </button>
         <button
-          onClick={async () => handleAccessRequest()}
+          type="button"
+          onClick={handleAccessRequest}
           data-testid="redirect-for-access"
         >
           Redirect to PodBrowser to Grant Access
@@ -214,13 +211,15 @@ export default function AccessGrant({
       </p>
 
       <button
-        onClick={async () => handleCallAuthedGrant()}
+        type="button"
+        onClick={handleCallAuthedGrant}
         data-testid="get-authed-grant"
       >
         Authenticated Fetch of Grant
       </button>
       <button
-        onClick={async () => handleGrantResponse()}
+        type="button"
+        onClick={handleGrantResponse}
         data-testid="handle-grant-response"
       >
         Handle Grant Response

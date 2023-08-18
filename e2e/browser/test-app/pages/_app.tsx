@@ -22,7 +22,7 @@
 import React from "react";
 
 /* eslint react/prop-types: 0, react/jsx-props-no-spreading: 0 */
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }: { Component: any; pageProps: any }) {
   return <Component {...pageProps} />;
 }
 
