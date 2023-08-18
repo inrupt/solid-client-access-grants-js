@@ -35,6 +35,7 @@ export type { AccessModes } from "./type/AccessModes";
 export type { FetchOptions } from "./type/FetchOptions";
 export type { RedirectOptions } from "./type/RedirectOptions";
 export type { SaveInContainerOptions } from "./type/SaveInContainerOptions";
+export { CredentialIsAccessGrantAny } from "./type/AccessGrant";
 
 export {
   approveAccessRequest,

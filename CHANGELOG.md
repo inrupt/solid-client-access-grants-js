@@ -4,7 +4,13 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 ## Unreleased
 
-## [2.4.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.3.2) - 2023-07-24
+## [2.5.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.5.0) - 2023-08-11
+
+### New feature
+
+- Export `CredentialIsAccessGrantAny` which checks if a `VerifiableCredential` is an `AccessGrantAny`.
+
+## [2.4.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.4.0) - 2023-07-24
 
 ### New feature
 
