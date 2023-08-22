@@ -41,12 +41,12 @@ describe("getAccessRequest", () => {
   let vcModule: jest.Mocked<{
     getVerifiableCredential: typeof getVerifiableCredential;
   }>;
-  beforeEach(() => {
+  beforeEach(async () => {
     mockedFetch = jest.fn(fetch);
     embeddedFetch = jest.requireMock("../../common/util/getSessionFetch");
     embeddedFetch.getSessionFetch.mockResolvedValueOnce(mockedFetch);
     vcModule = jest.requireMock("@inrupt/solid-client-vc");
-    vcModule.getVerifiableCredential.mockResolvedValue(mockAccessRequestVc());
+    vcModule.getVerifiableCredential.mockResolvedValue(await (await mockAccessRequestVc()));
   });
 
   it("uses the default fetch if none is provided", async () => {
@@ -79,16 +79,16 @@ describe("getAccessRequest", () => {
     );
 
     expect(accessRequestFromString).toStrictEqual(accessRequestFromUrl);
-    expect(accessRequestFromString).toStrictEqual(mockAccessRequestVc());
+    expect(accessRequestFromString).toStrictEqual((await mockAccessRequestVc()));
   });
 
   it("throws if the fetched VC is not an Access Request", async () => {
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(await mockAccessGrantVc());
     await expect(getAccessRequest("https://some.vc")).rejects.toThrow();
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
-    const normalizedAccessRequest = mockAccessRequestVc();
+    const normalizedAccessRequest = (await mockAccessRequestVc());
     // The server returns an equivalent JSON-LD with a different frame:
     vcModule.getVerifiableCredential.mockResolvedValueOnce({
       ...normalizedAccessRequest,
@@ -103,8 +103,8 @@ describe("getAccessRequest", () => {
           mode: normalizedAccessRequest.credentialSubject.hasConsent.mode[0],
         },
       },
-    });
+    } as any);
     const accessRequest = await getAccessRequest("https://some.vc");
-    expect(accessRequest).toStrictEqual(mockAccessRequestVc());
+    expect(accessRequest).toStrictEqual((await mockAccessRequestVc()));
   });
 });

@@ -56,7 +56,7 @@ describe("denyAccessRequest", () => {
     mockAccessApiEndpoint();
     await expect(
       denyAccessRequest({
-        ...mockAccessRequestVc(),
+        ...(await (await mockAccessRequestVc())),
         type: ["NotASolidAccessRequest"],
       }),
     ).rejects.toThrow(
@@ -66,7 +66,7 @@ describe("denyAccessRequest", () => {
 
   it("throws if there is no well known access endpoint", async () => {
     mockAccessApiEndpoint(false);
-    await expect(denyAccessRequest(mockAccessRequestVc())).rejects.toThrow(
+    await expect(denyAccessRequest((await (await mockAccessRequestVc())))).rejects.toThrow(
       "No access issuer listed for property [verifiable_credential_issuer] in",
     );
   });
@@ -79,7 +79,7 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential",
     );
-    await denyAccessRequest(mockAccessRequestVc(), {
+    await denyAccessRequest((await (await mockAccessRequestVc())), {
       accessEndpoint: "https://some.access-endpoint.override/",
       fetch: jest.fn<typeof fetch>(),
     });
@@ -103,7 +103,7 @@ describe("denyAccessRequest", () => {
     );
     await denyAccessRequest(
       "https://some.resource/owner",
-      mockAccessRequestVc(),
+      (await (await mockAccessRequestVc())),
       {
         fetch: mockedFetch,
       },
@@ -125,7 +125,7 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential",
     );
-    const accessRequestWithPurpose = mockAccessRequestVc({
+    const accessRequestWithPurpose = await mockAccessRequestVc({
       purpose: ["https://example.org/some-purpose"],
     });
     await denyAccessRequest(accessRequestWithPurpose, {
@@ -167,7 +167,7 @@ describe("denyAccessRequest", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(mockAccessRequestVc())),
+        new Response(JSON.stringify((await (await mockAccessRequestVc())))),
       );
     await denyAccessRequest("https://some.credential", {
       fetch: mockedFetch,
@@ -177,12 +177,12 @@ describe("denyAccessRequest", () => {
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: expect.objectContaining({
-          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
+          mode: (await (await mockAccessRequestVc())).credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
+            (await (await mockAccessRequestVc())).credentialSubject.hasConsent.forPersonalData,
         }),
-        inbox: mockAccessRequestVc().credentialSubject.inbox,
+        inbox: (await (await mockAccessRequestVc())).credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessDenial"],
@@ -203,7 +203,7 @@ describe("denyAccessRequest", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(mockAccessRequestVc())),
+        new Response(JSON.stringify((await (await mockAccessRequestVc())))),
       );
     await denyAccessRequest(new URL("https://some.credential"), {
       fetch: mockedFetch,
@@ -214,12 +214,12 @@ describe("denyAccessRequest", () => {
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: expect.objectContaining({
-          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
+          mode: (await (await mockAccessRequestVc())).credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
+            (await (await mockAccessRequestVc())).credentialSubject.hasConsent.forPersonalData,
         }),
-        inbox: mockAccessRequestVc().credentialSubject.inbox,
+        inbox: (await (await mockAccessRequestVc())).credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessDenial"],
@@ -239,7 +239,7 @@ describe("denyAccessRequest", () => {
     );
     await denyAccessRequest(
       "https://some.resource.owner",
-      mockAccessRequestVc(),
+      (await (await mockAccessRequestVc())),
       {
         fetch: jest.fn(global.fetch),
       },
@@ -250,13 +250,13 @@ describe("denyAccessRequest", () => {
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: {
-          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
+          mode: (await (await mockAccessRequestVc())).credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
+            (await (await mockAccessRequestVc())).credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: "https://some.requestor",
         },
-        inbox: mockAccessRequestVc().credentialSubject.inbox,
+        inbox: (await (await mockAccessRequestVc())).credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessDenial"],
@@ -274,7 +274,7 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential",
     );
-    const accessRequestWithPurpose = mockAccessRequestVc({
+    const accessRequestWithPurpose = await mockAccessRequestVc({
       purpose: ["https://example.org/some-purpose"],
     });
 

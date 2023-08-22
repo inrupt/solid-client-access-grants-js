@@ -160,7 +160,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
     vcModule.getVerifiableCredential.mockResolvedValueOnce(
-      mockAccessRequestVc(),
+      (await mockAccessRequestVc()),
     );
 
     const redirectUrl = new URL("https://redirect.url");

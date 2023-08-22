@@ -41,12 +41,12 @@ describe("getSolidDataset", () => {
     // TODO: change to mockAccessGrantVc when rebasing
     const resultDataset = await getSolidDataset(
       "https://some.dataset.url",
-      mockAccessRequestVc(),
+      (await mockAccessRequestVc()),
       { fetch: mockedFetch },
     );
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
-      mockAccessRequestVc(),
+      (await mockAccessRequestVc()),
       { fetch: mockedFetch },
     );
     expect(solidClientModule.getSolidDataset).toHaveBeenCalledWith(

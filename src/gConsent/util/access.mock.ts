@@ -19,8 +19,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { isValidVc, type VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
+import { getVerifiableCredentialFromResponse } from "@inrupt/solid-client-vc/dist/common/common";
+import type { DatasetCore, Quad } from "@rdfjs/types";
 import type {
   BaseGrantBody,
   BaseRequestBody,
@@ -35,8 +37,12 @@ import {
 import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import type { AccessGrant } from "../type/AccessGrant";
 import type { AccessRequest } from "../type/AccessRequest";
+import { normalizeAccessRequest } from "../request/issueAccessRequest";
+import { isAccessRequest } from "../guard/isAccessRequest";
+import { normalizeAccessGrant } from "../manage/approveAccessRequest";
+import { isAccessGrant } from "../guard/isAccessGrant";
 
-export const mockAccessRequestVc = (
+export const mockAccessRequestVc = async (
   options?: Partial<{
     resources: UrlString[];
     modes: ResourceAccessMode[];
@@ -44,8 +50,8 @@ export const mockAccessRequestVc = (
     inherit: boolean;
     purpose: UrlString[];
   }>,
-): AccessRequest => {
-  return {
+): Promise<AccessRequest & DatasetCore<Quad, Quad>> => {
+  const asObject = {
     "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
     id: "https://some.credential",
     credentialSubject: {
@@ -75,17 +81,31 @@ export const mockAccessRequestVc = (
     type: [CREDENTIAL_TYPE_ACCESS_REQUEST],
     inherit: options?.inherit,
   };
+
+  const asString = JSON.stringify(asObject);
+  const asResponse = new Response(asString);
+  const accessRequest = normalizeAccessRequest(
+    await getVerifiableCredentialFromResponse(asResponse, asObject.id),
+  );
+
+  if (!isAccessRequest(accessRequest)) {
+    throw new Error(
+      `${JSON.stringify(accessRequest)} is not an Access Request`,
+    );
+  }
+
+  return accessRequest;
 };
 
-export const mockAccessGrantVc = (
+export const mockAccessGrantVc = async (
   options?: Partial<{
     issuer: string;
     subjectId: string;
     inherit: boolean;
     resources: string[];
   }>,
-): AccessGrant => {
-  return {
+): Promise<AccessGrant & DatasetCore<Quad, Quad>> => {
+  const asObject = {
     "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
     id: "https://some.credential",
     credentialSubject: {
@@ -110,19 +130,35 @@ export const mockAccessGrantVc = (
     },
     type: [CREDENTIAL_TYPE_ACCESS_GRANT],
   };
+
+
+  const asString = JSON.stringify(asObject);
+  const asResponse = new Response(asString);
+  const accessGrant = normalizeAccessGrant(
+    await getVerifiableCredentialFromResponse(asResponse, asObject.id),
+  );
+  
+  // FIXME the type casting ias bad
+  if (!isAccessGrant(accessGrant as any)) {
+    throw new Error("Not an access grant")
+  }
+  
+  // FIXME type casting is bad
+  return accessGrant as unknown as AccessGrant & DatasetCore<Quad, Quad>;
 };
 
-export const mockConsentRequestVc = (): VerifiableCredential &
-  BaseRequestBody => {
-  const requestVc = mockAccessRequestVc();
+export const mockConsentRequestVc = async (): Promise<
+  VerifiableCredential & BaseRequestBody & DatasetCore<Quad, Quad>
+> => {
+  const requestVc = await mockAccessRequestVc();
   requestVc.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
   requestVc.expirationDate = new Date(2021, 8, 14).toISOString();
   requestVc.issuanceDate = new Date(2021, 8, 13).toISOString();
   return requestVc;
 };
 
-export const mockConsentGrantVc = (): VerifiableCredential & BaseGrantBody => {
-  const requestVc = mockAccessGrantVc();
+export const mockConsentGrantVc = async (): Promise<VerifiableCredential & BaseGrantBody & DatasetCore<Quad, Quad>> => {
+  const requestVc = await mockAccessGrantVc();
   requestVc.credentialSubject.providedConsent.forPurpose = [
     "https://some.purpose",
   ];

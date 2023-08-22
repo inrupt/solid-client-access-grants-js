@@ -47,7 +47,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
     embeddedFetch = jest.requireMock("../../common/util/getSessionFetch");
     embeddedFetch.getSessionFetch.mockResolvedValueOnce(mockedFetch);
     vcModule = jest.requireMock("@inrupt/solid-client-vc");
-    vcModule.getVerifiableCredential.mockResolvedValue(mockAccessRequestVc());
+    vcModule.getVerifiableCredential.mockResolvedValue((await mockAccessRequestVc()));
 
     redirectedToUrl = new URL("https://redirect.url");
     redirectedToUrl.searchParams.append(
@@ -115,7 +115,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
 
     const { accessRequest, requestorRedirectUrl } = accessRequestFromUrl;
 
-    expect(accessRequest).toStrictEqual(mockAccessRequestVc());
+    expect(accessRequest).toStrictEqual((await mockAccessRequestVc()));
     expect(requestorRedirectUrl).toBe("https://requestor.redirect.url");
   });
 
@@ -127,7 +127,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
-    const normalizedAccessRequest = mockAccessRequestVc();
+    const normalizedAccessRequest = (await mockAccessRequestVc());
     // The server returns an equivalent JSON-LD with a different frame:
     vcModule.getVerifiableCredential.mockResolvedValueOnce({
       ...normalizedAccessRequest,
@@ -145,6 +145,6 @@ describe("getAccessRequestFromRedirectUrl", () => {
     });
     const { accessRequest } =
       await getAccessRequestFromRedirectUrl(redirectedToUrl);
-    expect(accessRequest).toStrictEqual(mockAccessRequestVc());
+    expect(accessRequest).toStrictEqual((await mockAccessRequestVc()));
   });
 });

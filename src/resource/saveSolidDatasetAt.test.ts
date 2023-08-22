@@ -44,12 +44,12 @@ describe("saveSolidDatasetAt", () => {
     const resultDataset = await saveSolidDatasetAt(
       "https://some.dataset.url",
       MOCKED_DATASET,
-      mockAccessRequestVc(),
+      (await mockAccessRequestVc()),
       { fetch: mockedFetch },
     );
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
-      mockAccessRequestVc(),
+      (await mockAccessRequestVc()),
       { fetch: mockedFetch },
     );
     expect(solidClientModule.saveSolidDatasetAt).toHaveBeenCalledWith(
