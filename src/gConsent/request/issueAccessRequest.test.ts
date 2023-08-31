@@ -150,7 +150,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(await (await mockAccessRequestVc()));
+    mockedIssue.mockResolvedValueOnce(await await mockAccessRequestVc());
 
     await issueAccessRequest(
       {
@@ -189,7 +189,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential",
     );
-    const mockedVc = await (await mockAccessRequestVc());
+    const mockedVc = await await mockAccessRequestVc();
     mockedVc.credentialSubject.hasConsent.hasStatus =
       GC_CONSENT_STATUS_REQUESTED_ABBREV;
     mockedIssue.mockResolvedValueOnce(mockedVc);
@@ -217,7 +217,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
+    mockedIssue.mockResolvedValueOnce(await mockAccessGrantVc());
 
     await expect(
       issueAccessRequest(
@@ -242,7 +242,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(await (await mockAccessRequestVc()));
+    mockedIssue.mockResolvedValueOnce(await await mockAccessRequestVc());
 
     await issueAccessRequest(
       {
@@ -288,7 +288,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(await (await mockAccessRequestVc()));
+    mockedIssue.mockResolvedValueOnce(await await mockAccessRequestVc());
 
     await issueAccessRequest(
       {
@@ -333,7 +333,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(await (await mockAccessRequestVc()));
+    mockedIssue.mockResolvedValueOnce(await await mockAccessRequestVc());
 
     await issueAccessRequest({
       access: { read: true },
@@ -369,7 +369,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(await (await mockAccessRequestVc()));
+    mockedIssue.mockResolvedValueOnce(await await mockAccessRequestVc());
 
     await issueAccessRequest(
       {
@@ -399,7 +399,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(await (await mockAccessRequestVc()));
+    mockedIssue.mockResolvedValueOnce(await await mockAccessRequestVc());
 
     await issueAccessRequest(
       {
@@ -429,7 +429,7 @@ describe("issueAccessRequest", () => {
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(await (await mockAccessRequestVc()));
+    mockedIssue.mockResolvedValueOnce(await await mockAccessRequestVc());
 
     await issueAccessRequest(
       {

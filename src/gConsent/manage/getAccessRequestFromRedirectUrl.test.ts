@@ -42,12 +42,14 @@ describe("getAccessRequestFromRedirectUrl", () => {
     getVerifiableCredential: typeof getVerifiableCredential;
   }>;
   let redirectedToUrl: URL;
-  beforeEach(() => {
+  beforeEach(async () => {
     mockedFetch = jest.fn(fetch);
     embeddedFetch = jest.requireMock("../../common/util/getSessionFetch");
     embeddedFetch.getSessionFetch.mockResolvedValueOnce(mockedFetch);
     vcModule = jest.requireMock("@inrupt/solid-client-vc");
-    vcModule.getVerifiableCredential.mockResolvedValue((await mockAccessRequestVc()));
+    vcModule.getVerifiableCredential.mockResolvedValue(
+      await mockAccessRequestVc(),
+    );
 
     redirectedToUrl = new URL("https://redirect.url");
     redirectedToUrl.searchParams.append(
@@ -115,19 +117,21 @@ describe("getAccessRequestFromRedirectUrl", () => {
 
     const { accessRequest, requestorRedirectUrl } = accessRequestFromUrl;
 
-    expect(accessRequest).toStrictEqual((await mockAccessRequestVc()));
+    expect(accessRequest).toStrictEqual(await mockAccessRequestVc());
     expect(requestorRedirectUrl).toBe("https://requestor.redirect.url");
   });
 
   it("throws if the fetched VC is not an Access Request", async () => {
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(
+      await mockAccessGrantVc(),
+    );
     await expect(
       getAccessRequestFromRedirectUrl(redirectedToUrl.href),
     ).rejects.toThrow();
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
-    const normalizedAccessRequest = (await mockAccessRequestVc());
+    const normalizedAccessRequest = await mockAccessRequestVc();
     // The server returns an equivalent JSON-LD with a different frame:
     vcModule.getVerifiableCredential.mockResolvedValueOnce({
       ...normalizedAccessRequest,
@@ -145,6 +149,6 @@ describe("getAccessRequestFromRedirectUrl", () => {
     });
     const { accessRequest } =
       await getAccessRequestFromRedirectUrl(redirectedToUrl);
-    expect(accessRequest).toStrictEqual((await mockAccessRequestVc()));
+    expect(accessRequest).toStrictEqual(await mockAccessRequestVc());
   });
 });

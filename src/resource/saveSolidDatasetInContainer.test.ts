@@ -49,13 +49,13 @@ describe("saveSolidDatasetInContainer", () => {
     const resultDataset = await saveSolidDatasetInContainer(
       TEST_CONTAINER_URL,
       MOCKED_DATASET,
-      (await mockAccessRequestVc()),
+      await mockAccessRequestVc(),
       { fetch: mockedFetch, slugSuggestion: "test" },
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(
       TEST_CONTAINER_URL,
-      (await mockAccessRequestVc()),
+      await mockAccessRequestVc(),
       { fetch: mockedFetch },
     );
 

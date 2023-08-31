@@ -19,9 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { isValidVc, type VerifiableCredential } from "@inrupt/solid-client-vc";
+import {
+  type VerifiableCredential,
+  getVerifiableCredentialFromResponse,
+} from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
-import { getVerifiableCredentialFromResponse } from "@inrupt/solid-client-vc/dist/common/common";
 import type { DatasetCore, Quad } from "@rdfjs/types";
 import type {
   BaseGrantBody,
@@ -83,7 +85,9 @@ export const mockAccessRequestVc = async (
   };
 
   const asString = JSON.stringify(asObject);
-  const asResponse = new Response(asString);
+  const asResponse = new Response(asString, {
+    headers: new Headers([["content-type", "application/ld+json"]]),
+  });
   const accessRequest = normalizeAccessRequest(
     await getVerifiableCredentialFromResponse(asResponse, asObject.id),
   );
@@ -131,18 +135,20 @@ export const mockAccessGrantVc = async (
     type: [CREDENTIAL_TYPE_ACCESS_GRANT],
   };
 
-
   const asString = JSON.stringify(asObject);
-  const asResponse = new Response(asString);
+  const asResponse = new Response(asString, {
+    headers: new Headers([["content-type", "application/ld+json"]]),
+  });
   const accessGrant = normalizeAccessGrant(
     await getVerifiableCredentialFromResponse(asResponse, asObject.id),
   );
-  
+
   // FIXME the type casting ias bad
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (!isAccessGrant(accessGrant as any)) {
-    throw new Error("Not an access grant")
+    throw new Error("Not an access grant");
   }
-  
+
   // FIXME type casting is bad
   return accessGrant as unknown as AccessGrant & DatasetCore<Quad, Quad>;
 };
@@ -157,7 +163,9 @@ export const mockConsentRequestVc = async (): Promise<
   return requestVc;
 };
 
-export const mockConsentGrantVc = async (): Promise<VerifiableCredential & BaseGrantBody & DatasetCore<Quad, Quad>> => {
+export const mockConsentGrantVc = async (): Promise<
+  VerifiableCredential & BaseGrantBody & DatasetCore<Quad, Quad>
+> => {
   const requestVc = await mockAccessGrantVc();
   requestVc.credentialSubject.providedConsent.forPurpose = [
     "https://some.purpose",

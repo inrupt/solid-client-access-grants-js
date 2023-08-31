@@ -57,7 +57,9 @@ describe("getAccessGrantFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(
+      await await mockAccessGrantVc(),
+    );
 
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.set(
@@ -82,7 +84,9 @@ describe("getAccessGrantFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(
+      await await mockAccessGrantVc(),
+    );
 
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.set(
@@ -108,7 +112,9 @@ describe("getAccessGrantFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(
+      await await mockAccessGrantVc(),
+    );
 
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.set(
@@ -117,7 +123,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
     );
 
     const fetchedVc = await getAccessGrantFromRedirectUrl(redirectUrl);
-    expect(fetchedVc).toStrictEqual(mockAccessGrantVc());
+    expect(fetchedVc).toStrictEqual(await mockAccessGrantVc());
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
@@ -126,7 +132,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    const normalizedAccessGrant = mockAccessGrantVc();
+    const normalizedAccessGrant = await await mockAccessGrantVc();
     // The server returns an equivalent JSON-LD with a different frame:
     vcModule.getVerifiableCredential.mockResolvedValueOnce({
       ...normalizedAccessGrant,
@@ -150,7 +156,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
     );
 
     const fetchedVc = await getAccessGrantFromRedirectUrl(redirectUrl);
-    expect(fetchedVc).toStrictEqual(mockAccessGrantVc());
+    expect(fetchedVc).toStrictEqual(await mockAccessGrantVc());
   });
 
   it("throws if the fetched VC is not an Access Grant", async () => {
@@ -160,7 +166,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
     vcModule.getVerifiableCredential.mockResolvedValueOnce(
-      (await mockAccessRequestVc()),
+      await mockAccessRequestVc(),
     );
 
     const redirectUrl = new URL("https://redirect.url");

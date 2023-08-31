@@ -38,12 +38,12 @@ describe("deleteSolidDataset", () => {
       "@inrupt/solid-client",
     ) as jest.Mocked<typeof SolidClientCore>;
     const mockedFetch = jest.fn<typeof fetch>();
-    await deleteFile("https://some.file.url", mockAccessGrantVc(), {
+    await deleteFile("https://some.file.url", await await mockAccessGrantVc(), {
       fetch: mockedFetch,
     });
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
-      mockAccessGrantVc(),
+      await mockAccessGrantVc(),
       { fetch: mockedFetch },
     );
     expect(solidClientModule.deleteFile).toHaveBeenCalledWith(

@@ -73,12 +73,13 @@ describe("redirectToAccessManagementUi", () => {
       mockAccessManagementUiDiscovery(undefined);
       await expect(
         redirectToAccessManagementUi(
-          (await mockAccessRequestVc()),
+          await mockAccessRequestVc(),
           "https://some.redirect.iri",
         ),
       ).rejects.toThrow(
         `Cannot discover access management UI URL for [${
-          (await mockAccessRequestVc()).credentialSubject.hasConsent.forPersonalData[0]
+          (await mockAccessRequestVc()).credentialSubject.hasConsent
+            .forPersonalData[0]
         }]`,
       );
     });
@@ -88,7 +89,7 @@ describe("redirectToAccessManagementUi", () => {
       const resourceOwner = "https://some.webid";
       await expect(
         redirectToAccessManagementUi(
-          (await mockAccessRequestVc()),
+          await mockAccessRequestVc(),
           "https://some.redirect.iri",
           {
             resourceOwner,
@@ -96,7 +97,8 @@ describe("redirectToAccessManagementUi", () => {
         ),
       ).rejects.toThrow(
         `Cannot discover access management UI URL for [${
-          (await mockAccessRequestVc()).credentialSubject.hasConsent.forPersonalData[0]
+          (await mockAccessRequestVc()).credentialSubject.hasConsent
+            .forPersonalData[0]
         }], neither from [${resourceOwner}]`,
       );
     });
@@ -108,7 +110,7 @@ describe("redirectToAccessManagementUi", () => {
       // if it is awaited.
       // eslint-disable-next-line no-void
       void redirectToAccessManagementUi(
-        (await mockAccessRequestVc()),
+        await mockAccessRequestVc(),
         "https://some.redirect.iri",
         {
           resourceOwner,
@@ -128,7 +130,7 @@ describe("redirectToAccessManagementUi", () => {
       // if it is awaited.
       // eslint-disable-next-line no-void
       void redirectToAccessManagementUi(
-        (await mockAccessRequestVc()),
+        await mockAccessRequestVc(),
         "https://some.redirect.iri",
         {
           fallbackAccessManagementUi: "https://some.app",
@@ -148,7 +150,7 @@ describe("redirectToAccessManagementUi", () => {
       // if it is awaited.
       // eslint-disable-next-line no-void
       void redirectToAccessManagementUi(
-        (await mockAccessRequestVc()),
+        await mockAccessRequestVc(),
         "https://some.redirect.iri",
         {
           fallbackAccessManagementUi: "https://some.app",
@@ -169,7 +171,7 @@ describe("redirectToAccessManagementUi", () => {
       // if it is awaited.
       // eslint-disable-next-line no-void
       void redirectToAccessManagementUi(
-        (await mockAccessRequestVc()),
+        await mockAccessRequestVc(),
         "https://some.redirect.iri",
       );
       // Yield the event loop to make sure the blocking promises completes.
@@ -186,7 +188,7 @@ describe("redirectToAccessManagementUi", () => {
       // if it is awaited.
       // eslint-disable-next-line no-void
       void redirectToAccessManagementUi(
-        (await mockAccessRequestVc()),
+        await mockAccessRequestVc(),
         "https://some.redirect.iri",
       );
       // Yield the event loop to make sure the blocking promises completes.
@@ -207,7 +209,7 @@ describe("redirectToAccessManagementUi", () => {
       const mockedFetch = jest
         .fn(global.fetch)
         .mockResolvedValueOnce(
-          new Response(JSON.stringify((await mockAccessRequestVc()))),
+          new Response(JSON.stringify(await mockAccessRequestVc())),
         );
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
@@ -236,7 +238,7 @@ describe("redirectToAccessManagementUi", () => {
       // if it is awaited.
       // eslint-disable-next-line no-void
       void redirectToAccessManagementUi(
-        (await mockAccessRequestVc()),
+        await mockAccessRequestVc(),
         new URL("https://some.redirect.iri"),
       );
       // Yield the event loop to make sure the blocking promises completes.
@@ -257,7 +259,7 @@ describe("redirectToAccessManagementUi", () => {
       // if it is awaited.
       // eslint-disable-next-line no-void
       void redirectToAccessManagementUi(
-        (await mockAccessRequestVc()),
+        await mockAccessRequestVc(),
         "https://some.redirect.iri",
         {
           redirectCallback,

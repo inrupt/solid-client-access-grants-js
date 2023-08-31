@@ -34,9 +34,9 @@ jest.mock("@inrupt/solid-client-vc");
 const mockedVcModule = jest.requireMock(
   "@inrupt/solid-client-vc",
 ) as jest.Mocked<typeof VcModule>;
-mockedVcModule.getVerifiableCredentialAllFromShape.mockResolvedValue([
-  mockAccessGrantVc(),
-]);
+mockedVcModule.getVerifiableCredentialAllFromShape.mockReturnValue(
+  mockAccessGrantVc().then((res) => [res]),
+);
 
 jest.mock("../discover/getAccessApiEndpoint", () => {
   return {
@@ -315,7 +315,7 @@ describe("getAccessGrantAll", () => {
   });
 
   it("filters out non-recursive grants for ancestors", async () => {
-    const mockedGrant = mockAccessGrantVc({
+    const mockedGrant = await mockAccessGrantVc({
       inherit: false,
       resources: [resourceAncestors[0]],
     });
@@ -328,7 +328,7 @@ describe("getAccessGrantAll", () => {
   });
 
   it("accepts explicitly non-recursive grants for target resource", async () => {
-    const mockedGrant = mockAccessGrantVc({
+    const mockedGrant = await mockAccessGrantVc({
       inherit: false,
       resources: [resource.href],
     });
@@ -336,7 +336,7 @@ describe("getAccessGrantAll", () => {
       .mockResolvedValueOnce([mockedGrant])
       // Override the default mock to an unapplicable non-recursive grant.
       .mockResolvedValue([
-        mockAccessGrantVc({
+        await mockAccessGrantVc({
           inherit: false,
           resources: [resourceAncestors[0]],
         }),

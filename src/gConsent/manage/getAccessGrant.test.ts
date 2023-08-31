@@ -43,7 +43,9 @@ describe("getAccessGrant", () => {
     mockAccessApiEndpoint();
     const mockedFetch = jest
       .fn<typeof fetch>()
-      .mockResolvedValueOnce(new Response(JSON.stringify(mockAccessGrantVc())));
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(await mockAccessGrantVc())),
+      );
 
     await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
@@ -88,7 +90,7 @@ describe("getAccessGrant", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(mockConsentRequestVc())),
+        new Response(JSON.stringify(await mockConsentRequestVc())),
       );
 
     await expect(
@@ -100,7 +102,7 @@ describe("getAccessGrant", () => {
 
   it("supports denied access grants with a given IRI", async () => {
     mockAccessApiEndpoint();
-    const mockedAccessGrant = mockAccessGrantVc();
+    const mockedAccessGrant = await await mockAccessGrantVc();
     mockedAccessGrant.credentialSubject.providedConsent.hasStatus =
       "https://w3id.org/GConsent#ConsentStatusDenied";
     const mockedFetch = jest
@@ -115,7 +117,7 @@ describe("getAccessGrant", () => {
 
   it("returns the access grant with the given IRI", async () => {
     mockAccessApiEndpoint();
-    const mockedAccessGrant = mockAccessGrantVc();
+    const mockedAccessGrant = await mockAccessGrantVc();
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(new Response(JSON.stringify(mockedAccessGrant)));
@@ -128,7 +130,7 @@ describe("getAccessGrant", () => {
 
   it("normalizes equivalent JSON-LD VCs", async () => {
     mockAccessApiEndpoint();
-    const normalizedAccessGrant = mockAccessGrantVc();
+    const normalizedAccessGrant = await mockAccessGrantVc();
     // The server returns an equivalent JSON-LD with a different frame:
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
       new Response(
@@ -159,7 +161,7 @@ describe("getAccessGrant", () => {
 
   it("returns the access grant with the given URL object", async () => {
     mockAccessApiEndpoint();
-    const mockedAccessGrant = mockAccessGrantVc();
+    const mockedAccessGrant = await mockAccessGrantVc();
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(new Response(JSON.stringify(mockedAccessGrant)));

@@ -39,10 +39,16 @@ import {
   getTypes,
 } from "./getters";
 
+jest.mock("@inrupt/universal-fetch", () => ({
+  fetch: (async (...args) => {
+    throw new Error(`tried to fetch ${args[0]}`);
+  }) as typeof fetch,
+}));
+
 describe("getResources", () => {
   describe("gConsent data model", () => {
-    it("gets the resources from a gConsent access grant", () => {
-      const gConsentGrant = mockGConsentGrant();
+    it("gets the resources from a gConsent access grant", async () => {
+      const gConsentGrant = await mockGConsentGrant();
       expect(getResources(gConsentGrant)).toBe(
         gConsentGrant.credentialSubject.providedConsent.forPersonalData,
       );
@@ -67,8 +73,8 @@ describe("getResources", () => {
 
 describe("getResourceOwner", () => {
   describe("gConsent data model", () => {
-    it("gets the resource owner from a gConsent access grant", () => {
-      const gConsentGrant = mockGConsentGrant();
+    it("gets the resource owner from a gConsent access grant", async () => {
+      const gConsentGrant = await mockGConsentGrant();
       expect(getResourceOwner(gConsentGrant)).toBe(
         gConsentGrant.credentialSubject.id,
       );
@@ -84,7 +90,9 @@ describe("getResourceOwner", () => {
     });
 
     it("returns undefined if the resource owner is absent from a gConsent access request", async () => {
-      const gConsentRequest = await mockGConsentRequest({ resourceOwner: null });
+      const gConsentRequest = await mockGConsentRequest({
+        resourceOwner: null,
+      });
       expect(getResourceOwner(gConsentRequest)).toBeUndefined();
     });
   });
@@ -99,8 +107,8 @@ describe("getResourceOwner", () => {
 
 describe("getRequestor", () => {
   describe("gConsent data model", () => {
-    it("gets the recipient of a gConsent access grant", () => {
-      const gConsentGrant = mockGConsentGrant();
+    it("gets the recipient of a gConsent access grant", async () => {
+      const gConsentGrant = await mockGConsentGrant();
       expect(getRequestor(gConsentGrant)).toBe(
         gConsentGrant.credentialSubject.providedConsent.isProvidedTo,
       );
@@ -125,8 +133,8 @@ describe("getRequestor", () => {
 
 describe("getAccessModes", () => {
   describe("gConsent data model", () => {
-    it("gets the access modes of a gConsent access grant", () => {
-      const gConsentGrant = mockGConsentGrant();
+    it("gets the access modes of a gConsent access grant", async () => {
+      const gConsentGrant = await mockGConsentGrant();
       expect(
         gConsentGrant.credentialSubject.providedConsent.mode,
       ).toStrictEqual(["http://www.w3.org/ns/auth/acl#Read"]);
@@ -170,8 +178,8 @@ describe("getAccessModes", () => {
 
 describe("getId", () => {
   describe("gConsent data model", () => {
-    it("gets the gConsent access grant id", () => {
-      const gConsentGrant = mockGConsentGrant();
+    it("gets the gConsent access grant id", async () => {
+      const gConsentGrant = await mockGConsentGrant();
       expect(getId(gConsentGrant)).toBe(gConsentGrant.id);
     });
 
@@ -190,8 +198,8 @@ describe("getId", () => {
 
 describe("getTypes", () => {
   describe("gConsent data model", () => {
-    it("gets the gConsent access grant types", () => {
-      const gConsentGrant = mockGConsentGrant();
+    it("gets the gConsent access grant types", async () => {
+      const gConsentGrant = await mockGConsentGrant();
       expect(getTypes(gConsentGrant)).toBe(gConsentGrant.type);
     });
 
@@ -210,8 +218,8 @@ describe("getTypes", () => {
 
 describe("getIssuanceDate", () => {
   describe("gConsent data model", () => {
-    it("gets the gConsent access issuance date", () => {
-      const gConsentGrant = mockGConsentGrant();
+    it("gets the gConsent access issuance date", async () => {
+      const gConsentGrant = await mockGConsentGrant();
       gConsentGrant.issuanceDate = new Date().toString();
       expect(getIssuanceDate(gConsentGrant)).toStrictEqual(
         new Date(gConsentGrant.issuanceDate),
@@ -239,8 +247,8 @@ describe("getIssuanceDate", () => {
 
 describe("getExpirationDate", () => {
   describe("gConsent data model", () => {
-    it("gets the gConsent access expiration date", () => {
-      const gConsentGrant = mockGConsentGrant();
+    it("gets the gConsent access expiration date", async () => {
+      const gConsentGrant = await mockGConsentGrant();
       gConsentGrant.expirationDate = new Date().toString();
       expect(getExpirationDate(gConsentGrant)).toStrictEqual(
         new Date(gConsentGrant.expirationDate),
@@ -267,8 +275,8 @@ describe("getExpirationDate", () => {
 
 describe("getIssuer", () => {
   describe("gConsent data model", () => {
-    it("gets the gConsent access grant issuer", () => {
-      const gConsentGrant = mockGConsentGrant();
+    it("gets the gConsent access grant issuer", async () => {
+      const gConsentGrant = await mockGConsentGrant();
       expect(getIssuer(gConsentGrant)).toStrictEqual(gConsentGrant.issuer);
     });
 
@@ -287,13 +295,13 @@ describe("getIssuer", () => {
 
 describe("getInherit", () => {
   describe("gConsent data model", () => {
-    it("gets the gConsent access grant issuer", () => {
-      const gConsentGrant = mockGConsentGrant({ inherit: false });
+    it("gets the gConsent access grant issuer", async () => {
+      const gConsentGrant = await mockGConsentGrant({ inherit: false });
       expect(getIssuer(gConsentGrant)).toStrictEqual(gConsentGrant.issuer);
     });
 
-    it("defaults the recursive nature from a gConsent access grant to true", () => {
-      const gConsentGrant = mockGConsentGrant({ inherit: undefined });
+    it("defaults the recursive nature from a gConsent access grant to true", async () => {
+      const gConsentGrant = await mockGConsentGrant({ inherit: undefined });
       expect(getInherit(gConsentGrant)).toBe(true);
     });
 
