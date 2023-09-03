@@ -43,6 +43,7 @@ import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import { normalizeAccessGrant } from "../manage/approveAccessRequest";
 import { isAccessGrant } from "../guard/isAccessGrant";
+import { response } from '../../../mocks/data'
 
 export const mockAccessRequestVc = async (
   options?: Partial<{
@@ -53,43 +54,58 @@ export const mockAccessRequestVc = async (
     purpose: UrlString[];
   }>,
 ): Promise<AccessRequest & DatasetCore<Quad, Quad>> => {
-  const asObject = {
+  const asObject: Record<string, any> = {
     "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
     id: "https://some.credential",
     credentialSubject: {
       id: "https://some.requestor",
-      hasConsent: {
-        forPersonalData: options?.resources ?? ["https://some.resource"],
-        hasStatus: GC_CONSENT_STATUS_REQUESTED,
-        mode: options?.modes ?? ["http://www.w3.org/ns/auth/acl#Read"],
-        isConsentForDataSubject:
-          options?.resourceOwner === null
-            ? undefined
-            : "https://some.pod/profile#you",
-        inherit: options?.inherit,
-        forPurpose: options?.purpose,
-      },
-      inbox: "https://some.inbox",
+      // hasConsent: {
+      //   forPersonalData: options?.resources ?? ["https://some.resource"],
+      //   hasStatus: GC_CONSENT_STATUS_REQUESTED,
+      //   mode: options?.modes ?? ["http://www.w3.org/ns/auth/acl#Read"],
+      //   isConsentForDataSubject:
+      //     options?.resourceOwner === null
+      //       ? undefined
+      //       : "https://some.pod/profile#you",
+      // },
+      // inbox: "https://some.inbox",
     },
-    issuanceDate: "2022-02-22",
-    issuer: "https://some.issuer",
-    proof: {
-      created: "2022-06-08T15:28:51.810Z",
-      proofPurpose: "some proof purpose",
-      proofValue: "some proof",
-      type: "some proof type",
-      verificationMethod: "some method",
-    },
-    type: [CREDENTIAL_TYPE_ACCESS_REQUEST],
-    inherit: options?.inherit,
+    // issuanceDate: "2022-02-22",
+    // issuer: "https://some.issuer",
+    // proof: {
+    //   created: "2022-06-08T15:28:51.810Z",
+    //   proofPurpose: "some proof purpose",
+    //   proofValue: "some proof",
+    //   type: "some proof type",
+    //   verificationMethod: "some method",
+    // },
+    type: ["VerifiableCredential"],
   };
+
+
+  if (options?.inherit) {
+    asObject.inherit = options.inherit;
+    asObject.credentialSubject.hasConsent.inherit = options.inherit
+  }
+
+  if (options?.purpose) {
+    asObject.credentialSubject.hasConsent.forPurpose = options.purpose
+  }
 
   const asString = JSON.stringify(asObject);
   const asResponse = new Response(asString, {
     headers: new Headers([["content-type", "application/ld+json"]]),
   });
+  console.log('mocking', asObject)
   const accessRequest = normalizeAccessRequest(
-    await getVerifiableCredentialFromResponse(asResponse, asObject.id),
+    await getVerifiableCredentialFromResponse(asResponse, asObject.id, {
+      fetch: async (url, ...args) => {
+        if (url.toString() in response) {
+          return response[url.toString() as keyof typeof response]()
+        }
+        throw new Error(`Unexpected URL [${url}]`)
+      }
+    }),
   );
 
   if (!isAccessRequest(accessRequest)) {

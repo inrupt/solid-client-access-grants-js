@@ -66,7 +66,7 @@ const instanciateContextVcEssTemplate = (essVcDomain: string): string =>
 export const ACCESS_GRANT_CONTEXT_DEFAULT = [
   CONTEXT_VC_W3C,
   CONTEXT_ESS_DEFAULT,
-  instanciateContextVcEssTemplate("vc.inrupt.com"),
+  // instanciateContextVcEssTemplate("vc.inrupt.com"),
 ] as const;
 
 // When issuing a VC using a given service,"https://schema.inrupt.com/credentials/v1.jsonld" be sure to set the context using the following.
@@ -76,7 +76,7 @@ export const instanciateEssAccessGrantContext = (
   [
     CONTEXT_VC_W3C,
     CONTEXT_ESS_DEFAULT,
-    instanciateContextVcEssTemplate(essVcDomain),
+    // instanciateContextVcEssTemplate(essVcDomain),
   ] as const;
 
 export const WELL_KNOWN_SOLID = ".well-known/solid";
