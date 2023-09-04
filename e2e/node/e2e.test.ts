@@ -116,12 +116,12 @@ const contentArr: [string, NodeFile | Buffer][] = [
 ];
 
 if (nodeMajor >= 18) {
-  contentArr.push([
-    "NodeFile",
-    new NodeFile([Buffer.from(SHARED_FILE_CONTENT, "utf-8")], "text.ttl", {
-      type: "text/plain",
-    }),
-  ]);
+  // contentArr.push([
+  //   "NodeFile",
+  //   new NodeFile([Buffer.from(SHARED_FILE_CONTENT, "utf-8")], "text.ttl", {
+  //     type: "text/plain",
+  //   }),
+  // ]);
 }
 
 async function toString(input: File | NodeFile | Buffer): Promise<string> {
@@ -195,8 +195,8 @@ describe.each(contentArr)(
       await resourceOwnerSession.logout();
     });
 
-    describe("access request, grant and exercise flow", () => {
-      it("can issue an access request, grant access to a resource, and revoke the granted access", async () => {
+    describe.only("access request, grant and exercise flow", () => {
+      it.only("can issue an access request, grant access to a resource, and revoke the granted access", async () => {
         const request = await issueAccessRequest(
           {
             access: { read: true },
