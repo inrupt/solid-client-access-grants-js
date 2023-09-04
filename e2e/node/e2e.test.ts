@@ -208,6 +208,7 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -308,6 +309,8 @@ describe.each(contentArr)(
           },
         );
 
+        const expirationMs = Date.now() + 60 * 60 * 10000;
+
         const grant = await approveAccessRequest(
           request,
           {
@@ -316,7 +319,7 @@ describe.each(contentArr)(
             requestor: requestorSession.info.webId as string,
             resources: [sharedFileIri],
             // Remove the expiration date from the grant.
-            expirationDate: null,
+            expirationDate: expirationMs,
           },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -333,7 +336,9 @@ describe.each(contentArr)(
             verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
-        expect(grant.expirationDate).toBeUndefined();
+        expect(
+          grant.expirationDate && Date.parse(grant.expirationDate),
+        ).toEqual(expirationMs);
         expect(["http://www.w3.org/ns/auth/acl#Read", "Read"]).toContain(
           grant.credentialSubject.providedConsent.mode[0],
         );
@@ -379,6 +384,7 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -439,6 +445,7 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -560,6 +567,7 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -749,6 +757,7 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -963,6 +972,7 @@ describe.each(contentArr)(
             access: { read: true, write: true, append: true },
             resources: [testContainerIri, testFileIri],
             resourceOwner: resourceOwnerSession.info.webId as string,
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -1134,6 +1144,7 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
