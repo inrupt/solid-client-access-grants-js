@@ -45,6 +45,7 @@ import {
   approveAccessRequest,
   createContainerInContainer,
   denyAccessRequest,
+  getAccessApiEndpoint,
   getAccessGrantAll,
   getFile,
   getSolidDataset,
@@ -79,7 +80,6 @@ const {
   idp: oidcIssuer,
   environment,
   clientCredentials,
-  vcProvider,
   features: environmentFeatures,
 } = env;
 
@@ -138,6 +138,7 @@ describe.each(contentArr)(
 
     let resourceOwnerPod: string;
     let sharedFileIri: string;
+    let vcProvider: string;
 
     // Setup the shared file
     beforeEach(async () => {
@@ -176,6 +177,7 @@ describe.each(contentArr)(
       );
 
       sharedFileIri = sc.getSourceUrl(savedFile);
+      vcProvider = await getAccessApiEndpoint(sharedFileIri);
     });
 
     // Cleanup the shared file
@@ -229,7 +231,7 @@ describe.each(contentArr)(
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
-            verificationEndpoint: `${vcProvider}/verify`,
+            verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
 
@@ -265,7 +267,7 @@ describe.each(contentArr)(
             await isValidAccessGrant(grant, {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               // FIXME: Ditto verification endpoint discovery.
-              verificationEndpoint: `${vcProvider}/verify`,
+              verificationEndpoint: new URL("verify", vcProvider).href,
             })
           ).errors,
         ).toHaveLength(1);
@@ -328,7 +330,7 @@ describe.each(contentArr)(
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
-            verificationEndpoint: `${vcProvider}/verify`,
+            verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
         expect(grant.expirationDate).toBeUndefined();
@@ -361,7 +363,7 @@ describe.each(contentArr)(
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
-            verificationEndpoint: `${vcProvider}/verify`,
+            verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
         expect(grant.credentialSubject.providedConsent.inherit).toBe(false);
@@ -401,7 +403,7 @@ describe.each(contentArr)(
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
-            verificationEndpoint: `${vcProvider}/verify`,
+            verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
 
@@ -461,7 +463,7 @@ describe.each(contentArr)(
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
-            verificationEndpoint: `${vcProvider}/verify`,
+            verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
 
@@ -525,7 +527,7 @@ describe.each(contentArr)(
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
-            verificationEndpoint: `${vcProvider}/verify`,
+            verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
         expect(grant.expirationDate).toBeUndefined();
