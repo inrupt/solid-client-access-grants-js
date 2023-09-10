@@ -582,41 +582,49 @@ describe.each(contentArr)(
       let accessGrant: AccessGrant;
       let denyGrant: VerifiableCredential;
       beforeAll(async () => {
-        const request = await issueAccessRequest(
-          {
-            access: { read: true, write: true, append: true },
-            resourceOwner: resourceOwnerSession.info.webId as string,
-            resources: [sharedFileIri],
-            purpose: [
-              "https://some.purpose/not-a-nefarious-one/i-promise",
-              "https://some.other.purpose/",
-            ],
-          },
-          {
-            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            accessEndpoint: vcProvider,
-          },
+        const request = await retryAsync(() =>
+          issueAccessRequest(
+            {
+              access: { read: true, write: true, append: true },
+              resourceOwner: resourceOwnerSession.info.webId as string,
+              resources: [sharedFileIri],
+              purpose: [
+                "https://some.purpose/not-a-nefarious-one/i-promise",
+                "https://some.other.purpose/",
+              ],
+            },
+            {
+              fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+            },
+          ),
         );
 
-        accessGrant = await approveAccessRequest(
-          request,
-          {},
-          {
+        accessGrant = await retryAsync(() =>
+          approveAccessRequest(
+            request,
+            {},
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+            },
+          ),
+        );
+
+        denyGrant = await retryAsync(() =>
+          denyAccessRequest(request.id, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          },
+          }),
         );
-
-        denyGrant = await denyAccessRequest(request.id, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          accessEndpoint: vcProvider,
-        });
       });
 
       afterAll(async () => {
-        await revokeAccessGrant(accessGrant, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-        });
+        await retryAsync(() =>
+          revokeAccessGrant(accessGrant, {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          }),
+        );
       });
 
       it("can filter VCs held by the service based on requestor", async () => {
@@ -796,11 +804,10 @@ describe.each(contentArr)(
       let testContainerIriChild: string;
 
       beforeEach(async () => {
-        const testContainer = await sc.createContainerInContainer(
-          resourceOwnerPod,
-          {
+        const testContainer = await retryAsync(() =>
+          sc.createContainerInContainer(resourceOwnerPod, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          },
+          }),
         );
         testContainerIri = sc.getSourceUrl(testContainer);
 
@@ -814,61 +821,74 @@ describe.each(contentArr)(
 
         const dataset = sc.setThing(sc.createSolidDataset(), newThing);
 
-        const persistedDataset = await sc.saveSolidDatasetInContainer(
-          testContainerIri,
-          dataset,
-          {
+        const persistedDataset = await retryAsync(() =>
+          sc.saveSolidDatasetInContainer(testContainerIri, dataset, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          },
+          }),
         );
 
         testResourceIri = sc.getSourceUrl(persistedDataset);
 
-        const request = await issueAccessRequest(
-          {
-            access: { read: true, write: true, append: true },
-            resourceOwner: resourceOwnerSession.info.webId as string,
-            resources: [testResourceIri, testContainerIri],
-            purpose: [
-              "https://some.purpose/not-a-nefarious-one/i-promise",
-              "https://some.other.purpose/",
-            ],
-          },
-          {
-            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            accessEndpoint: vcProvider,
-          },
+        const request = await retryAsync(() =>
+          issueAccessRequest(
+            {
+              access: { read: true, write: true, append: true },
+              resourceOwner: resourceOwnerSession.info.webId as string,
+              resources: [testResourceIri, testContainerIri],
+              purpose: [
+                "https://some.purpose/not-a-nefarious-one/i-promise",
+                "https://some.other.purpose/",
+              ],
+            },
+            {
+              fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+            },
+          ),
         );
 
-        accessGrant = await approveAccessRequest(
-          request,
-          {},
-          {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            accessEndpoint: vcProvider,
-          },
+        accessGrant = await retryAsync(() =>
+          approveAccessRequest(
+            request,
+            {},
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+            },
+          ),
         );
       });
 
       afterEach(async () => {
-        await revokeAccessGrant(accessGrant, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-        });
+        await retryAsync(() =>
+          revokeAccessGrant(accessGrant, {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          }),
+        );
 
-        await sc.deleteFile(testResourceIri, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-        });
+        await retryAsync(() =>
+          sc.deleteFile(testResourceIri, {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          }),
+        );
 
-        const testContainer = await sc.getSolidDataset(testContainerIri, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-        });
+        const testContainer = await retryAsync(() =>
+          sc.getSolidDataset(testContainerIri, {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          }),
+        );
         // Iterate over the contained resources because the IRI of some child resources
         // is unknown.
         await Promise.all(
           sc.getContainedResourceUrlAll(testContainer).map((childUrl) =>
-            sc.deleteSolidDataset(childUrl, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            }),
+            retryAsync(() =>
+              sc.deleteSolidDataset(childUrl, {
+                fetch: addUserAgent(
+                  resourceOwnerSession.fetch,
+                  TEST_USER_AGENT,
+                ),
+              }),
+            ),
           ),
         );
       });
@@ -952,9 +972,11 @@ describe.each(contentArr)(
           },
         );
 
-        const parentContainer = await sc.getSolidDataset(testContainerIri, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-        });
+        const parentContainer = await retryAsync(() =>
+          sc.getSolidDataset(testContainerIri, {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          }),
+        );
         const parentContainerContainsAll = sc.getUrlAll(
           sc.getThing(
             parentContainer,
@@ -1022,75 +1044,87 @@ describe.each(contentArr)(
       let fileContents: Buffer;
 
       beforeEach(async () => {
-        const fileApisContainer = await sc.createContainerInContainer(
-          resourceOwnerPod,
-          {
+        const fileApisContainer = await retryAsync(() =>
+          sc.createContainerInContainer(resourceOwnerPod, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          },
+          }),
         );
         testContainerIri = sc.getSourceIri(fileApisContainer);
 
         fileContents = Buffer.from("hello world", "utf-8");
 
-        const uploadedFile = await sc.saveFileInContainer(
-          testContainerIri,
-          fileContents,
-          {
+        const uploadedFile = await retryAsync(() =>
+          sc.saveFileInContainer(testContainerIri, fileContents, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          },
+          }),
         );
 
         testFileIri = sc.getSourceIri(uploadedFile);
 
-        const request = await issueAccessRequest(
-          {
-            access: { read: true, write: true, append: true },
-            resources: [testContainerIri, testFileIri],
-            resourceOwner: resourceOwnerSession.info.webId as string,
-          },
-          {
-            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            accessEndpoint: vcProvider,
-          },
+        const request = await retryAsync(() =>
+          issueAccessRequest(
+            {
+              access: { read: true, write: true, append: true },
+              resources: [testContainerIri, testFileIri],
+              resourceOwner: resourceOwnerSession.info.webId as string,
+            },
+            {
+              fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+            },
+          ),
         );
 
-        accessGrant = await approveAccessRequest(
-          request,
-          {},
-          {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            accessEndpoint: vcProvider,
-          },
+        accessGrant = await retryAsync(() =>
+          approveAccessRequest(
+            request,
+            {},
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+            },
+          ),
         );
       });
 
       afterEach(async () => {
         try {
-          await revokeAccessGrant(accessGrant, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          });
+          await retryAsync(() =>
+            revokeAccessGrant(accessGrant, {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            }),
+          );
         } catch (e) {
           // Allow console statement as this is useful to capture, either
           // running tests locally or in CI.
           // eslint-disable-next-line no-console
           console.error(`Revoking the Access Grant failed: ${e}`);
         }
-        const testContainer = await sc.getSolidDataset(testContainerIri, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-        });
+        const testContainer = await retryAsync(() =>
+          sc.getSolidDataset(testContainerIri, {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          }),
+        );
         // Iterate over the contained resources because the IRI of some child resources
         // is unknown.
         await Promise.all(
           sc.getContainedResourceUrlAll(testContainer).map((childUrl) =>
-            sc.deleteFile(childUrl, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            }),
+            retryAsync(() =>
+              sc.deleteFile(childUrl, {
+                fetch: addUserAgent(
+                  resourceOwnerSession.fetch,
+                  TEST_USER_AGENT,
+                ),
+              }),
+            ),
           ),
         );
 
-        await sc.deleteContainer(testContainerIri, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-        });
+        await retryAsync(() =>
+          sc.deleteContainer(testContainerIri, {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          }),
+        );
       });
 
       const fileContentMatrix: [string, Buffer | File | NodeFile][] = [
@@ -1191,62 +1225,73 @@ describe.each(contentArr)(
       const testFileContent = "This is a test.";
 
       beforeEach(async () => {
-        const testContainer = await sc.createContainerInContainer(
-          resourceOwnerPod,
-          {
+        const testContainer = await retryAsync(() =>
+          sc.createContainerInContainer(resourceOwnerPod, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          },
+          }),
         );
         testContainerIri = sc.getSourceUrl(testContainer);
 
-        const testFile = await sc.saveFileInContainer(
-          testContainerIri,
-          Buffer.from(testFileContent),
-          {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          },
+        const testFile = await retryAsync(() =>
+          sc.saveFileInContainer(
+            testContainerIri,
+            Buffer.from(testFileContent),
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            },
+          ),
         );
         testFileIri = sc.getSourceUrl(testFile);
 
-        accessRequest = await issueAccessRequest(
-          {
-            access: { read: true, write: true, append: true },
-            resourceOwner: resourceOwnerSession.info.webId as string,
-            // Note that access is only requested for the container, not the contained file.
-            resources: [testContainerIri],
-            purpose: [
-              "https://some.purpose/not-a-nefarious-one/i-promise",
-              "https://some.other.purpose/",
-            ],
-          },
-          {
-            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            accessEndpoint: vcProvider,
-          },
+        accessRequest = await retryAsync(() =>
+          issueAccessRequest(
+            {
+              access: { read: true, write: true, append: true },
+              resourceOwner: resourceOwnerSession.info.webId as string,
+              // Note that access is only requested for the container, not the contained file.
+              resources: [testContainerIri],
+              purpose: [
+                "https://some.purpose/not-a-nefarious-one/i-promise",
+                "https://some.other.purpose/",
+              ],
+            },
+            {
+              fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+            },
+          ),
         );
       });
 
       afterEach(async () => {
-        await revokeAccessGrant(accessGrant, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-        });
+        await retryAsync(() =>
+          revokeAccessGrant(accessGrant, {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          }),
+        );
 
-        await sc.deleteFile(testFileIri, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-        });
+        await retryAsync(() =>
+          sc.deleteFile(testFileIri, {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          }),
+        );
 
         if (testContainerIriChild !== undefined) {
           // This resource is only created in some tests, but cleaning it up here
           // rather than in the test ensures it is properly removed even on test
           // failure.
-          await sc.deleteContainer(testContainerIriChild, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          });
+          await retryAsync(() =>
+            sc.deleteContainer(testContainerIriChild, {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            }),
+          );
         }
 
-        await sc.deleteContainer(testContainerIri, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-        });
+        await retryAsync(() =>
+          sc.deleteContainer(testContainerIri, {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          }),
+        );
       });
 
       // Only enable this test in environments supporting recursive access grants
