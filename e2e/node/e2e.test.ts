@@ -289,9 +289,7 @@ describe.each(contentArr)(
       });
 
       it("can issue an access grant overriding an access request", async () => {
-        const expirationDate = new Date();
-        // Request a 3-month grant
-        expirationDate.setMonth((expirationDate.getMonth() + 3) % 12);
+        const expirationDate = new Date(Date.now() + 120 * 60 * 1000);
         const request = await issueAccessRequest(
           {
             access: { read: true, append: true },
@@ -301,11 +299,11 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
-            // expirationDate,
+            expirationDate,
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            // accessEndpoint: vcProvider,
+            accessEndpoint: vcProvider,
           },
         );
 
