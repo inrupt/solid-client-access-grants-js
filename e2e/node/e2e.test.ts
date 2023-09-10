@@ -633,38 +633,38 @@ describe.each(contentArr)(
         const [granted, denied, both, none] = await Promise.all([
           getAccessGrantAll(
             sharedFileIri,
-            {},
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-              accessEndpoint: vcProvider,
               status: ["granted"],
             },
-          ),
-          getAccessGrantAll(
-            sharedFileIri,
-            {},
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
+            },
+          ),
+          getAccessGrantAll(
+            sharedFileIri,
+            {
               status: ["denied"],
             },
-          ),
-          getAccessGrantAll(
-            sharedFileIri,
-            {},
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
-              status: ["granted", "denied"],
             },
           ),
           getAccessGrantAll(
             sharedFileIri,
-            {},
+            { status: ["granted", "denied"] },
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
-              status: [],
+            },
+          ),
+          getAccessGrantAll(
+            sharedFileIri,
+            { status: [] },
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
             },
           ),
         ]);

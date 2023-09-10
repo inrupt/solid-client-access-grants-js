@@ -23,7 +23,10 @@ import { jest, it, describe, expect } from "@jest/globals";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import type * as VcModule from "@inrupt/solid-client-vc";
 import type { fetch } from "@inrupt/universal-fetch";
-import type { IssueAccessRequestParameters } from "./getAccessGrantAll";
+import type {
+  AccessParameters,
+  IssueAccessRequestParameters,
+} from "./getAccessGrantAll";
 import { getAccessGrantAll } from "./getAccessGrantAll";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import { mockAccessGrantVc } from "../util/access.mock";
@@ -181,20 +184,15 @@ describe("getAccessGrantAll", () => {
   });
 
   it("Does not call @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape when status list is empty", async () => {
-    const paramsInput: Partial<
-      IssueAccessRequestParameters & {
-        requestor: string;
-        resource: string | URL;
-      }
-    > = {
+    const paramsInput: AccessParameters = {
       requestor: "https://some.requestor",
       resource,
+      status: [],
     };
 
     await expect(
       getAccessGrantAll(paramsInput, {
         fetch: otherFetch,
-        status: [],
       }),
     ).resolves.toHaveLength(0);
 
@@ -204,14 +202,10 @@ describe("getAccessGrantAll", () => {
   });
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the correct status when searching for denied grants", async () => {
-    const paramsInput: Partial<
-      IssueAccessRequestParameters & {
-        requestor: string;
-        resource: string | URL;
-      }
-    > = {
+    const paramsInput: AccessParameters = {
       requestor: "https://some.requestor",
       resource,
+      status: ["denied"],
     };
 
     const expectedVcShape = {
@@ -226,7 +220,6 @@ describe("getAccessGrantAll", () => {
 
     await getAccessGrantAll(paramsInput, {
       fetch: otherFetch,
-      status: ["denied"],
     });
 
     expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
@@ -243,14 +236,10 @@ describe("getAccessGrantAll", () => {
   });
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape twice when both granted and denied status' are requested", async () => {
-    const paramsInput: Partial<
-      IssueAccessRequestParameters & {
-        requestor: string;
-        resource: string | URL;
-      }
-    > = {
+    const paramsInput: AccessParameters = {
       requestor: "https://some.requestor",
       resource,
+      status: ["granted", "denied"],
     };
 
     const expectedVcShapeDenied = {
@@ -275,7 +264,6 @@ describe("getAccessGrantAll", () => {
 
     await getAccessGrantAll(paramsInput, {
       fetch: otherFetch,
-      status: ["granted", "denied"],
     });
 
     expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);

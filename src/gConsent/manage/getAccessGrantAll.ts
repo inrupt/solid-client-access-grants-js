@@ -47,12 +47,12 @@ export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
     requestor: string;
     resource: URL | UrlString;
+    status?: ("granted" | "denied")[];
   }
 >;
 
 interface QueryOptions extends AccessBaseOptions {
   includeExpired?: boolean;
-  status?: ("granted" | "denied")[];
 }
 
 // Iteratively build the list of ancestor containers from the breakdown of the
@@ -103,7 +103,7 @@ async function internal_getAccessGrantAll(
 
   const specifiedModes = accessToResourceAccessModeArray(params.access ?? {});
 
-  const statusShorthand = options.status ?? ["granted"];
+  const statusShorthand = params.status ?? ["granted"];
   const statusFull: string[] = [];
 
   if (statusShorthand.includes("granted")) {
