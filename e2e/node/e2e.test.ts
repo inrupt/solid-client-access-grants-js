@@ -550,7 +550,8 @@ describe.each(contentArr)(
 
     describe("resource owner interaction with VC provider", () => {
       let accessGrant: AccessGrant;
-      beforeEach(async () => {
+      let denyGrant: VerifiableCredential;
+      beforeAll(async () => {
         const request = await issueAccessRequest(
           {
             access: { read: true, write: true, append: true },
@@ -575,9 +576,14 @@ describe.each(contentArr)(
             accessEndpoint: vcProvider,
           },
         );
+
+        denyGrant = await denyAccessRequest(request.id, {
+          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          accessEndpoint: vcProvider,
+        });
       });
 
-      afterEach(async () => {
+      afterAll(async () => {
         await revokeAccessGrant(accessGrant, {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
         });
@@ -619,6 +625,54 @@ describe.each(contentArr)(
             accessEndpoint: vcProvider,
           }),
         ).resolves.toHaveLength(0);
+      });
+
+      it("can filter VCs held by the service based on status", async () => {
+        const [granted, denied, both, none] = await Promise.all([
+          getAccessGrantAll(
+            sharedFileIri,
+            {},
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+              status: ["granted"],
+            },
+          ),
+          getAccessGrantAll(
+            sharedFileIri,
+            {},
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+              status: ["denied"],
+            },
+          ),
+          getAccessGrantAll(
+            sharedFileIri,
+            {},
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+              status: ["granted", "denied"],
+            },
+          ),
+          getAccessGrantAll(
+            sharedFileIri,
+            {},
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+              status: [],
+            },
+          ),
+        ]);
+
+        expect(none).toHaveLength(0);
+        expect(granted).not.toHaveLength(0);
+        expect(denied).toHaveLength(1);
+        expect(both).toHaveLength(granted.length + denied.length);
+
+        expect(denied).toMatchObject([denyGrant]);
       });
 
       it("can filter VCs held by the service based on purpose", async () => {
