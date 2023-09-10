@@ -180,6 +180,125 @@ describe("getAccessGrantAll", () => {
     );
   });
 
+  it("Does not call @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape when status list is empty", async () => {
+    const paramsInput: Partial<
+      IssueAccessRequestParameters & {
+        requestor: string;
+        resource: string | URL;
+      }
+    > = {
+      requestor: "https://some.requestor",
+      resource,
+    };
+
+    await expect(
+      getAccessGrantAll(paramsInput, {
+        fetch: otherFetch,
+        status: [],
+      }),
+    ).resolves.toHaveLength(0);
+
+    expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
+
+    expect(getVerifiableCredentialAllFromShape).not.toHaveBeenCalled();
+  });
+
+  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the correct status when searching for denied grants", async () => {
+    const paramsInput: Partial<
+      IssueAccessRequestParameters & {
+        requestor: string;
+        resource: string | URL;
+      }
+    > = {
+      requestor: "https://some.requestor",
+      resource,
+    };
+
+    const expectedVcShape = {
+      credentialSubject: {
+        providedConsent: {
+          forPersonalData: [resource.href],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
+          isProvidedTo: "https://some.requestor",
+        },
+      },
+    };
+
+    await getAccessGrantAll(paramsInput, {
+      fetch: otherFetch,
+      status: ["denied"],
+    });
+
+    expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      "https://some.api.endpoint/derive",
+      expect.objectContaining(expectedVcShape),
+      {
+        fetch: otherFetch,
+      },
+    );
+  });
+
+  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape twice when both granted and denied status' are requested", async () => {
+    const paramsInput: Partial<
+      IssueAccessRequestParameters & {
+        requestor: string;
+        resource: string | URL;
+      }
+    > = {
+      requestor: "https://some.requestor",
+      resource,
+    };
+
+    const expectedVcShapeDenied = {
+      credentialSubject: {
+        providedConsent: {
+          forPersonalData: [resource.href],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
+          isProvidedTo: "https://some.requestor",
+        },
+      },
+    };
+
+    const expectedVcShapeApproved = {
+      credentialSubject: {
+        providedConsent: {
+          forPersonalData: [resource.href],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          isProvidedTo: "https://some.requestor",
+        },
+      },
+    };
+
+    await getAccessGrantAll(paramsInput, {
+      fetch: otherFetch,
+      status: ["granted", "denied"],
+    });
+
+    expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(8);
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      "https://some.api.endpoint/derive",
+      expect.objectContaining(expectedVcShapeDenied),
+      {
+        fetch: otherFetch,
+      },
+    );
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      "https://some.api.endpoint/derive",
+      expect.objectContaining(expectedVcShapeApproved),
+      {
+        fetch: otherFetch,
+      },
+    );
+  });
+
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape appropriate purpose", async () => {
     const paramsInput: Partial<
       IssueAccessRequestParameters & {
