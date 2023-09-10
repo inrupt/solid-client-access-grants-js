@@ -60,6 +60,34 @@ import {
   saveSolidDatasetInContainer,
 } from "../../src/index";
 
+async function retryAsync<T>(
+  callback: () => Promise<T>,
+  maxRetries = 5,
+  interval = 5_000,
+): Promise<T> {
+  let tries = 0;
+  const errors: Error[] = [];
+  while (tries < maxRetries) {
+    try {
+      // The purpose here is to retry an async operation, not to parallelize.
+      // Awaiting the callback will throw on error before returning.
+      // eslint-disable-next-line no-await-in-loop
+      return await callback();
+    } catch (e: unknown) {
+      errors.push(e as Error);
+      tries += 1;
+      // eslint-disable-next-line no-await-in-loop
+      await new Promise((resolve) => {
+        setTimeout(resolve, interval);
+      });
+    }
+  }
+  const errorsString = errors.map((e) => e.toString()).join("\n");
+  throw new Error(
+    `An async callback is still failing after ${maxRetries} retries. The errors were: ${errorsString}`,
+  );
+}
+
 if (process.env.CI === "true") {
   // Tests running in the CI runners tend to be more flaky.
   jest.retryTimes(3, { logErrorsBeforeRetry: true });
@@ -143,7 +171,7 @@ describe.each(contentArr)(
     let vcProvider: string;
 
     // Setup the shared file
-    beforeEach(async () => {
+    beforeAll(async () => {
       // Log both sessions in.
       await requestorSession.login({
         oidcIssuer,
@@ -156,8 +184,8 @@ describe.each(contentArr)(
       resourceOwnerSession = await getAuthenticatedSession(env);
 
       // Create a file in the resource owner's Pod
-      const resourceOwnerPodAll = await sc.getPodUrlAll(
-        resourceOwnerSession.info.webId as string,
+      const resourceOwnerPodAll = await retryAsync(() =>
+        sc.getPodUrlAll(resourceOwnerSession.info.webId as string),
       );
       if (resourceOwnerPodAll.length === 0) {
         throw new Error(
@@ -167,31 +195,31 @@ describe.each(contentArr)(
       // eslint-disable-next-line prefer-destructuring
       resourceOwnerPod = resourceOwnerPodAll[0];
 
-      const savedFile = await sc.saveFileInContainer(
-        resourceOwnerPodAll[0],
-        content,
-        {
+      const savedFile = await retryAsync(() =>
+        sc.saveFileInContainer(resourceOwnerPodAll[0], content, {
           fetch: addUserAgent(
             addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             TEST_USER_AGENT,
           ),
-        },
+        }),
       );
 
       sharedFileIri = sc.getSourceUrl(savedFile);
-      vcProvider = await getAccessApiEndpoint(sharedFileIri);
+      vcProvider = await retryAsync(() => getAccessApiEndpoint(sharedFileIri));
     });
 
     // Cleanup the shared file
-    afterEach(async () => {
+    afterAll(async () => {
       if (sharedFileIri) {
         // Remove the shared file from the resource owner's Pod.
-        await sc.deleteFile(sharedFileIri, {
-          fetch: addUserAgent(
-            addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            TEST_USER_AGENT,
-          ),
-        });
+        await retryAsync(() =>
+          sc.deleteFile(sharedFileIri, {
+            fetch: addUserAgent(
+              addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              TEST_USER_AGENT,
+            ),
+          }),
+        );
       }
       // Making sure the session is logged out prevents tests from hanging due
       // to the callback refreshing the access token.
