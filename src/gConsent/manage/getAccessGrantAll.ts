@@ -27,6 +27,7 @@ import {
   CONTEXT_VC_W3C,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_BASE,
+  GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
@@ -48,6 +49,11 @@ export type AccessParameters = Partial<
     resource: URL | UrlString;
   }
 >;
+
+interface QueryOptions extends AccessBaseOptions {
+  includeExpired?: boolean;
+  status?: ("granted" | "denied")[];
+}
 
 // Iteratively build the list of ancestor containers from the breakdown of the
 // resource path: for resource https://pod.example/foo/bar/baz, we'll want the result
@@ -73,7 +79,7 @@ const getAncestorUrls = (resourceUrl: URL) => {
 // eslint-disable-next-line camelcase
 async function internal_getAccessGrantAll(
   params: AccessParameters = {},
-  options: AccessBaseOptions & { includeExpired?: boolean } = {},
+  options: QueryOptions = {},
 ): Promise<Array<VerifiableCredential>> {
   if (!params.resource && !options.accessEndpoint) {
     throw new Error("resource and accessEndpoint cannot both be undefined");
@@ -97,20 +103,34 @@ async function internal_getAccessGrantAll(
 
   const specifiedModes = accessToResourceAccessModeArray(params.access ?? {});
 
+  const statusShorthand = options.status ?? ["granted"];
+  const statusFull: string[] = [];
+
+  if (statusShorthand.includes("granted")) {
+    statusFull.push(GC_CONSENT_STATUS_EXPLICITLY_GIVEN);
+  }
+
+  if (statusShorthand.includes("denied")) {
+    statusFull.push(GC_CONSENT_STATUS_DENIED);
+  }
+
   const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
-    ancestorUrls.map((url) => ({
-      "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
-      type: [CREDENTIAL_TYPE_ACCESS_GRANT, CREDENTIAL_TYPE_BASE],
-      credentialSubject: {
-        providedConsent: {
-          hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-          forPersonalData: url ? [url.href] : undefined,
-          forPurpose: params.purpose,
-          isProvidedTo: params.requestor,
-          mode: specifiedModes.length > 0 ? specifiedModes : undefined,
-        },
-      },
-    }));
+    statusFull.flatMap(
+      (hasStatus) =>
+        ancestorUrls.map((url) => ({
+          "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
+          type: [CREDENTIAL_TYPE_ACCESS_GRANT, CREDENTIAL_TYPE_BASE],
+          credentialSubject: {
+            providedConsent: {
+              hasStatus,
+              forPersonalData: url ? [url.href] : undefined,
+              forPurpose: params.purpose,
+              isProvidedTo: params.requestor,
+              mode: specifiedModes.length > 0 ? specifiedModes : undefined,
+            },
+          },
+        })) as RecursivePartial<BaseGrantBody & VerifiableCredential>[],
+    );
 
   // TODO: Fix up the type of accepted arguments (this function should allow deep partial)
   const result = (
@@ -172,7 +192,7 @@ async function internal_getAccessGrantAll(
 async function getAccessGrantAll(
   resource: URL | UrlString,
   params?: AccessParameters,
-  options?: AccessBaseOptions & { includeExpired?: boolean },
+  options?: QueryOptions,
 ): Promise<Array<VerifiableCredential>>;
 
 /**
@@ -194,16 +214,13 @@ async function getAccessGrantAll(
 
 async function getAccessGrantAll(
   params: AccessParameters,
-  options?: AccessBaseOptions & { includeExpired?: boolean },
+  options?: QueryOptions,
 ): Promise<Array<VerifiableCredential>>;
 
 async function getAccessGrantAll(
   resourceOrParams: URL | UrlString | AccessParameters,
-  paramsOrOptions:
-    | AccessParameters
-    | undefined
-    | (AccessBaseOptions & { includeExpired?: boolean }),
-  options: AccessBaseOptions & { includeExpired?: boolean } = {},
+  paramsOrOptions: AccessParameters | undefined | QueryOptions,
+  options: QueryOptions = {},
 ): Promise<Array<VerifiableCredential>> {
   if (
     typeof resourceOrParams === "string" ||
@@ -222,7 +239,7 @@ async function getAccessGrantAll(
   }
   return internal_getAccessGrantAll(
     resourceOrParams as AccessParameters,
-    paramsOrOptions as AccessBaseOptions & { includeExpired?: boolean },
+    paramsOrOptions as QueryOptions,
   );
 }
 
