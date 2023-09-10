@@ -301,15 +301,15 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
-            expirationDate,
+            // expirationDate,
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            accessEndpoint: vcProvider,
+            // accessEndpoint: vcProvider,
           },
         );
 
-        const expirationMs = Date.now() + 60 * 60 * 10000;
+        const expirationMs = Date.now() + 55 * 60 * 10000;
 
         const grant = await approveAccessRequest(
           request,
@@ -319,7 +319,7 @@ describe.each(contentArr)(
             requestor: requestorSession.info.webId as string,
             resources: [sharedFileIri],
             // Remove the expiration date from the grant.
-            expirationDate: expirationMs,
+            expirationDate: new Date(expirationMs),
           },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -499,9 +499,8 @@ describe.each(contentArr)(
 
     describe("access request, deny flow", () => {
       it("can issue an access grant denying an access request", async () => {
-        const expirationDate = new Date();
-        // Request a 3-month grant
-        expirationDate.setMonth((expirationDate.getMonth() + 3) % 12);
+        // Request a 2hr grant
+        const expirationDate = new Date(Date.now() + 120 * 60 * 1000);
         const request: VerifiableCredential = await issueAccessRequest(
           {
             access: { read: true, append: true },
