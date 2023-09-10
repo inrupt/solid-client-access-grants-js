@@ -2,7 +2,19 @@
 
 This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Deprecation notice]
+
+The following changes are pending, and will be applied on the next major release:
+
+- The `status` parameter for `getAccessGrantAll` will default to [`granted`, `denied`] rather than [`granted`].
+
 ## Unreleased
+
+### New feature
+
+- Export `getAccessGrantAll` has a new `status` parameter which allows selection of `granted` or `denied` access grants.
+  By default only `granted` access grants are returned as this is the existing behavior. In the next major version of this
+  library the default will be to return `granted` _and_ `denied` access grants.
 
 ## [2.5.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.5.0) - 2023-08-11
 
