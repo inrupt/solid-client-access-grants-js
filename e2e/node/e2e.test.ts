@@ -598,6 +598,24 @@ describe.each(contentArr)(
           ),
         );
 
+        const requestForDenial = await retryAsync(() =>
+          issueAccessRequest(
+            {
+              access: { read: true, write: true, append: true },
+              resourceOwner: resourceOwnerSession.info.webId as string,
+              resources: [sharedFileIri],
+              purpose: [
+                "https://some.purpose/not-a-nefarious-one/i-promise",
+                "https://some.other.purpose/",
+              ],
+            },
+            {
+              fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+            },
+          ),
+        );
+
         accessGrant = await retryAsync(() =>
           approveAccessRequest(
             request,
@@ -610,7 +628,7 @@ describe.each(contentArr)(
         );
 
         denyGrant = await retryAsync(() =>
-          denyAccessRequest(request.id, {
+          denyAccessRequest(requestForDenial.id, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
           }),
