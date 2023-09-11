@@ -171,7 +171,7 @@ describe.each(contentArr)(
     let vcProvider: string;
 
     // Setup the shared file
-    beforeAll(async () => {
+    beforeEach(async () => {
       // Log both sessions in.
       await requestorSession.login({
         oidcIssuer,
@@ -209,7 +209,7 @@ describe.each(contentArr)(
     });
 
     // Cleanup the shared file
-    afterAll(async () => {
+    afterEach(async () => {
       if (sharedFileIri) {
         // Remove the shared file from the resource owner's Pod.
         await retryAsync(() =>
