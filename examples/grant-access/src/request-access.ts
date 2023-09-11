@@ -62,6 +62,7 @@ app.post("/request", async (req, res) => {
       ],
       resourceOwner: req.body.owner,
       resources: [req.body.resource],
+      expirationDate: new Date(Date.now() + 60 * 60 * 10000),
     },
     {
       fetch: session.fetch,
