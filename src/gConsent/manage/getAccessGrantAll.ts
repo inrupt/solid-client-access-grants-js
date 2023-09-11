@@ -25,6 +25,7 @@ import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
   CONTEXT_ESS_DEFAULT,
   CONTEXT_VC_W3C,
+  CREDENTIAL_TYPE_ACCESS_DENIAL,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_BASE,
   GC_CONSENT_STATUS_DENIED,
@@ -39,7 +40,6 @@ import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { BaseGrantBody } from "../type/AccessVerifiableCredential";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
-import type { AccessGrant } from "../type/AccessGrant";
 import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 
@@ -119,7 +119,12 @@ async function internal_getAccessGrantAll(
       (hasStatus) =>
         ancestorUrls.map((url) => ({
           "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
-          type: [CREDENTIAL_TYPE_ACCESS_GRANT, CREDENTIAL_TYPE_BASE],
+          type: [
+            hasStatus === GC_CONSENT_STATUS_EXPLICITLY_GIVEN
+              ? CREDENTIAL_TYPE_ACCESS_GRANT
+              : CREDENTIAL_TYPE_ACCESS_DENIAL,
+            CREDENTIAL_TYPE_BASE,
+          ],
           credentialSubject: {
             providedConsent: {
               hasStatus,
@@ -152,21 +157,15 @@ async function internal_getAccessGrantAll(
     .flat()
     .map(normalizeAccessGrant);
 
-  return (
-    result
-      .filter(
-        (vc) => isBaseAccessGrantVerifiableCredential(vc) && isAccessGrant(vc),
-      )
-      // FIXME why isn't the previous filter enough?
-      .map((vc) => vc as AccessGrant)
-      .filter(
-        (grant) =>
-          // Explicitly non-recursive grants are filtered out, except if they apply
-          // directly to the target resource.
-          getInherit(grant) !== false ||
-          (params.resource &&
-            getResources(grant).includes(params.resource.toString())),
-      )
+  return result.filter(
+    (vc) =>
+      isBaseAccessGrantVerifiableCredential(vc) &&
+      isAccessGrant(vc) &&
+      // Explicitly non-recursive grants are filtered out, except if they apply
+      // directly to the target resource.
+      (getInherit(vc) !== false ||
+        (params.resource &&
+          getResources(vc).includes(params.resource.toString()))),
   );
 }
 
