@@ -28,8 +28,6 @@ import {
   expect,
   beforeEach,
   afterEach,
-  beforeAll,
-  afterAll,
 } from "@jest/globals";
 import { Session } from "@inrupt/solid-client-authn-node";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
@@ -581,7 +579,7 @@ describe.each(contentArr)(
     describe("resource owner interaction with VC provider", () => {
       let accessGrant: AccessGrant;
       let denyGrant: VerifiableCredential;
-      beforeAll(async () => {
+      beforeEach(async () => {
         const request = await retryAsync(() =>
           issueAccessRequest(
             {
@@ -619,7 +617,7 @@ describe.each(contentArr)(
         );
       });
 
-      afterAll(async () => {
+      afterEach(async () => {
         await retryAsync(() =>
           revokeAccessGrant(accessGrant, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
