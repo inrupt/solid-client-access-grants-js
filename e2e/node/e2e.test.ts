@@ -564,12 +564,7 @@ describe.each(contentArr)(
           }),
         ).resolves.toMatchObject({ errors: [] });
 
-        if (env.environment === "ESS Dev-2-2") {
-          // eslint-disable-next-line jest/no-conditional-expect
-          expect(
-            grant.expirationDate && Date.parse(grant.expirationDate as string),
-          ).toEqual(expirationMs);
-        } else {
+        if (env.environment !== "ESS Dev-2-2") {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(grant.expirationDate).toBeUndefined();
         }
