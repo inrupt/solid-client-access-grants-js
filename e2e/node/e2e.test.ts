@@ -687,11 +687,11 @@ describe.each(contentArr)(
       });
 
       it("can filter VCs held by the service based on status", async () => {
-        const [granted, denied, both, none] = await Promise.all([
+        const [granted, denied, both, unspecified] = await Promise.all([
           getAccessGrantAll(
             sharedFileIri,
             {
-              status: ["granted"],
+              status: "granted",
             },
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -701,7 +701,7 @@ describe.each(contentArr)(
           getAccessGrantAll(
             sharedFileIri,
             {
-              status: ["denied"],
+              status: "denied",
             },
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -710,7 +710,7 @@ describe.each(contentArr)(
           ),
           getAccessGrantAll(
             sharedFileIri,
-            { status: ["granted", "denied"] },
+            { status: "all" },
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
@@ -718,7 +718,7 @@ describe.each(contentArr)(
           ),
           getAccessGrantAll(
             sharedFileIri,
-            { status: [] },
+            {},
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
@@ -726,7 +726,8 @@ describe.each(contentArr)(
           ),
         ]);
 
-        expect(none).toHaveLength(0);
+        // Currently not specifying the status should be equivalent to setting it to granted
+        expect(unspecified).toHaveLength(granted.length);
         expect(granted).not.toHaveLength(0);
         expect(denied).toHaveLength(1);
         expect(both).toHaveLength(granted.length + denied.length);

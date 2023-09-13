@@ -183,29 +183,45 @@ describe("getAccessGrantAll", () => {
     );
   });
 
-  it("Does not call @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape when status list is empty", async () => {
+  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the correct status when searching for granted grants explicitly", async () => {
     const paramsInput: AccessParameters = {
       requestor: "https://some.requestor",
       resource,
-      status: [],
+      status: "granted",
     };
 
-    await expect(
-      getAccessGrantAll(paramsInput, {
-        fetch: otherFetch,
-      }),
-    ).resolves.toHaveLength(0);
+    const expectedVcShape = {
+      credentialSubject: {
+        providedConsent: {
+          forPersonalData: [resource.href],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          isProvidedTo: "https://some.requestor",
+        },
+      },
+    };
+
+    await getAccessGrantAll(paramsInput, {
+      fetch: otherFetch,
+    });
 
     expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
 
-    expect(getVerifiableCredentialAllFromShape).not.toHaveBeenCalled();
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
+
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
+      "https://some.api.endpoint/derive",
+      expect.objectContaining(expectedVcShape),
+      {
+        fetch: otherFetch,
+      },
+    );
   });
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the correct status when searching for denied grants", async () => {
     const paramsInput: AccessParameters = {
       requestor: "https://some.requestor",
       resource,
-      status: ["denied"],
+      status: "denied",
     };
 
     const expectedVcShape = {
@@ -239,7 +255,7 @@ describe("getAccessGrantAll", () => {
     const paramsInput: AccessParameters = {
       requestor: "https://some.requestor",
       resource,
-      status: ["granted", "denied"],
+      status: "all",
     };
 
     const expectedVcShapeDenied = {

@@ -47,7 +47,7 @@ export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
     requestor: string;
     resource: URL | UrlString;
-    status?: ("granted" | "denied")[];
+    status?: "granted" | "denied" | "all";
   }
 >;
 
@@ -103,14 +103,14 @@ async function internal_getAccessGrantAll(
 
   const specifiedModes = accessToResourceAccessModeArray(params.access ?? {});
 
-  const statusShorthand = params.status ?? ["granted"];
+  const statusShorthand = params.status ?? "granted";
   const statusFull: string[] = [];
 
-  if (statusShorthand.includes("granted")) {
+  if (["granted", "all"].includes(statusShorthand)) {
     statusFull.push(GC_CONSENT_STATUS_EXPLICITLY_GIVEN);
   }
 
-  if (statusShorthand.includes("denied")) {
+  if (["denied", "all"].includes(statusShorthand)) {
     statusFull.push(GC_CONSENT_STATUS_DENIED);
   }
 
