@@ -526,7 +526,8 @@ describe.each(contentArr)(
     describe("access request, deny flow", () => {
       it("can issue an access grant denying an access request", async () => {
         // Request a 2hr grant
-        const expirationDate = new Date(Date.now() + 120 * 60 * 1000);
+        const expirationMs = Date.now() + 120 * 60 * 1000;
+        const expirationDate = new Date(expirationMs);
         const request: VerifiableCredential = await issueAccessRequest(
           {
             access: { read: true, append: true },
@@ -562,7 +563,16 @@ describe.each(contentArr)(
             verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
-        expect(grant.expirationDate).toBeUndefined();
+
+        if (env.environment === "ESS Dev-2-2") {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(
+            grant.expirationDate && Date.parse(grant.expirationDate as string),
+          ).toEqual(expirationMs);
+        } else {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(grant.expirationDate).toBeUndefined();
+        }
 
         const filePromise = getFile(sharedFileIri, grant, {
           fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
