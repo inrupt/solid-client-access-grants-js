@@ -45,6 +45,7 @@ import {
   approveAccessRequest,
   createContainerInContainer,
   denyAccessRequest,
+  getAccessApiEndpoint,
   getAccessGrantAll,
   getFile,
   getSolidDataset,
@@ -79,7 +80,6 @@ const {
   idp: oidcIssuer,
   environment,
   clientCredentials,
-  vcProvider,
   features: environmentFeatures,
 } = env;
 
@@ -138,6 +138,7 @@ describe.each(contentArr)(
 
     let resourceOwnerPod: string;
     let sharedFileIri: string;
+    let vcProvider: string;
 
     // Setup the shared file
     beforeEach(async () => {
@@ -176,6 +177,7 @@ describe.each(contentArr)(
       );
 
       sharedFileIri = sc.getSourceUrl(savedFile);
+      vcProvider = await getAccessApiEndpoint(sharedFileIri);
     });
 
     // Cleanup the shared file
@@ -206,6 +208,7 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -229,7 +232,7 @@ describe.each(contentArr)(
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
-            verificationEndpoint: `${vcProvider}/verify`,
+            verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
 
@@ -265,7 +268,7 @@ describe.each(contentArr)(
             await isValidAccessGrant(grant, {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               // FIXME: Ditto verification endpoint discovery.
-              verificationEndpoint: `${vcProvider}/verify`,
+              verificationEndpoint: new URL("verify", vcProvider).href,
             })
           ).errors,
         ).toHaveLength(1);
@@ -286,9 +289,7 @@ describe.each(contentArr)(
       });
 
       it("can issue an access grant overriding an access request", async () => {
-        const expirationDate = new Date();
-        // Request a 3-month grant
-        expirationDate.setMonth((expirationDate.getMonth() + 3) % 12);
+        const expirationDate = new Date(Date.now() + 120 * 60 * 1000);
         const request = await issueAccessRequest(
           {
             access: { read: true, append: true },
@@ -306,6 +307,8 @@ describe.each(contentArr)(
           },
         );
 
+        const expirationMs = Date.now() + 55 * 60 * 10000;
+
         const grant = await approveAccessRequest(
           request,
           {
@@ -314,7 +317,7 @@ describe.each(contentArr)(
             requestor: requestorSession.info.webId as string,
             resources: [sharedFileIri],
             // Remove the expiration date from the grant.
-            expirationDate: null,
+            expirationDate: new Date(expirationMs),
           },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -328,10 +331,12 @@ describe.each(contentArr)(
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
-            verificationEndpoint: `${vcProvider}/verify`,
+            verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
-        expect(grant.expirationDate).toBeUndefined();
+        expect(
+          grant.expirationDate && Date.parse(grant.expirationDate),
+        ).toEqual(expirationMs);
         expect(["http://www.w3.org/ns/auth/acl#Read", "Read"]).toContain(
           grant.credentialSubject.providedConsent.mode[0],
         );
@@ -361,7 +366,7 @@ describe.each(contentArr)(
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
-            verificationEndpoint: `${vcProvider}/verify`,
+            verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
         expect(grant.credentialSubject.providedConsent.inherit).toBe(false);
@@ -377,6 +382,7 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -401,7 +407,7 @@ describe.each(contentArr)(
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
-            verificationEndpoint: `${vcProvider}/verify`,
+            verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
 
@@ -437,6 +443,7 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -461,7 +468,7 @@ describe.each(contentArr)(
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
-            verificationEndpoint: `${vcProvider}/verify`,
+            verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
 
@@ -490,9 +497,8 @@ describe.each(contentArr)(
 
     describe("access request, deny flow", () => {
       it("can issue an access grant denying an access request", async () => {
-        const expirationDate = new Date();
-        // Request a 3-month grant
-        expirationDate.setMonth((expirationDate.getMonth() + 3) % 12);
+        // Request a 2hr grant
+        const expirationDate = new Date(Date.now() + 120 * 60 * 1000);
         const request: VerifiableCredential = await issueAccessRequest(
           {
             access: { read: true, append: true },
@@ -525,7 +531,7 @@ describe.each(contentArr)(
             // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
             // It is an issue documented in the VC library e2e test, and in a ticket
             // to be fixed.
-            verificationEndpoint: `${vcProvider}/verify`,
+            verificationEndpoint: new URL("verify", vcProvider).href,
           }),
         ).resolves.toMatchObject({ errors: [] });
         expect(grant.expirationDate).toBeUndefined();
@@ -558,6 +564,7 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -747,6 +754,7 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -961,6 +969,7 @@ describe.each(contentArr)(
             access: { read: true, write: true, append: true },
             resources: [testContainerIri, testFileIri],
             resourceOwner: resourceOwnerSession.info.webId as string,
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -1132,6 +1141,7 @@ describe.each(contentArr)(
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),

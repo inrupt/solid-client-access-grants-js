@@ -23,7 +23,7 @@ jobs:
           - environment-name: "ESS Dev-2-2"
             experimental: true
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 20.x
