@@ -157,6 +157,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
   let vcProvider: string;
 
   beforeAll(async () => {
+    console.log("before all top");
     // Log both sessions in.
     await retryAsync(() =>
       requestorSession.login({
@@ -179,23 +180,11 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
         "The Resource Owner WebID Profile is missing a link to at least one Pod root.",
       );
     }
-    // eslint-disable-next-line prefer-destructuring
-    resourceOwnerPod = resourceOwnerPodAll[0];
+    [resourceOwnerPod] = resourceOwnerPodAll;
 
     vcProvider = await retryAsync(() => getAccessApiEndpoint(resourceOwnerPod));
-  });
 
-  afterAll(async () => {
-    // Making sure the session is logged out prevents tests from hanging due
-    // to the callback refreshing the access token.
-    await Promise.all([
-      requestorSession.logout(),
-      resourceOwnerSession.logout(),
-    ]);
-  });
-
-  // Setup the shared file
-  beforeEach(async () => {
+    // setup the shared file
     const savedFile = await retryAsync(() =>
       sc.saveFileInContainer(
         resourceOwnerPod,
@@ -212,19 +201,22 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
     sharedFileIri = sc.getSourceUrl(savedFile);
   });
 
-  // Cleanup the shared file
-  afterEach(async () => {
-    if (sharedFileIri) {
-      // Remove the shared file from the resource owner's Pod.
-      await retryAsync(() =>
-        sc.deleteFile(sharedFileIri, {
-          fetch: addUserAgent(
-            addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            TEST_USER_AGENT,
-          ),
-        }),
-      );
-    }
+  afterAll(async () => {
+    // Remove the shared file from the resource owner's Pod.
+    await retryAsync(() =>
+      sc.deleteFile(sharedFileIri, {
+        fetch: addUserAgent(
+          addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          TEST_USER_AGENT,
+        ),
+      }),
+    );
+    // Making sure the session is logged out prevents tests from hanging due
+    // to the callback refreshing the access token.
+    await Promise.all([
+      requestorSession.logout(),
+      resourceOwnerSession.logout(),
+    ]);
   });
 
   describe("access request, grant and exercise flow", () => {
@@ -585,6 +577,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
     let accessGrant: AccessGrant;
     let denyGrant: VerifiableCredential;
     beforeAll(async () => {
+      console.log("before all grant creation");
       const request = await retryAsync(() =>
         issueAccessRequest(
           {
