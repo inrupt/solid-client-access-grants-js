@@ -28,6 +28,8 @@ import {
   expect,
   beforeEach,
   afterEach,
+  beforeAll,
+  afterAll,
 } from "@jest/globals";
 import { Session } from "@inrupt/solid-client-authn-node";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
@@ -158,43 +160,55 @@ async function toString(input: File | NodeFile | Buffer): Promise<string> {
   return input.text();
 }
 
+const requestorSession = new Session();
+let resourceOwnerSession: Session;
+let resourceOwnerPod: string;
+let vcProvider: string;
+
+beforeAll(async () => {
+  // Log both sessions in.
+  await retryAsync(() =>
+    requestorSession.login({
+      oidcIssuer,
+      clientId: clientCredentials?.requestor?.id,
+      clientSecret: clientCredentials?.requestor?.secret,
+      // Note that currently, using a Bearer token (as opposed to a DPoP one)
+      // is required for the UMA access token to be usable.
+      tokenType: "Bearer",
+    }),
+  );
+  resourceOwnerSession = await retryAsync(() => getAuthenticatedSession(env));
+
+  // Create a file in the resource owner's Pod
+  const resourceOwnerPodAll = await retryAsync(() =>
+    sc.getPodUrlAll(resourceOwnerSession.info.webId as string),
+  );
+  if (resourceOwnerPodAll.length === 0) {
+    throw new Error(
+      "The Resource Owner WebID Profile is missing a link to at least one Pod root.",
+    );
+  }
+  // eslint-disable-next-line prefer-destructuring
+  resourceOwnerPod = resourceOwnerPodAll[0];
+
+  vcProvider = await retryAsync(() => getAccessApiEndpoint(resourceOwnerPod));
+});
+
+afterAll(async () => {
+  // Making sure the session is logged out prevents tests from hanging due
+  // to the callback refreshing the access token.
+  await Promise.all([requestorSession.logout(), resourceOwnerSession.logout()]);
+});
+
 describe.each(contentArr)(
   `End-to-end access grant tests for environment [${environment}}] initialized with %s`,
   (_, content) => {
-    const requestorSession = new Session();
-    let resourceOwnerSession: Session;
-
-    let resourceOwnerPod: string;
     let sharedFileIri: string;
-    let vcProvider: string;
 
     // Setup the shared file
     beforeEach(async () => {
-      // Log both sessions in.
-      await requestorSession.login({
-        oidcIssuer,
-        clientId: clientCredentials?.requestor?.id,
-        clientSecret: clientCredentials?.requestor?.secret,
-        // Note that currently, using a Bearer token (as opposed to a DPoP one)
-        // is required for the UMA access token to be usable.
-        tokenType: "Bearer",
-      });
-      resourceOwnerSession = await getAuthenticatedSession(env);
-
-      // Create a file in the resource owner's Pod
-      const resourceOwnerPodAll = await retryAsync(() =>
-        sc.getPodUrlAll(resourceOwnerSession.info.webId as string),
-      );
-      if (resourceOwnerPodAll.length === 0) {
-        throw new Error(
-          "The Resource Owner WebID Profile is missing a link to at least one Pod root.",
-        );
-      }
-      // eslint-disable-next-line prefer-destructuring
-      resourceOwnerPod = resourceOwnerPodAll[0];
-
       const savedFile = await retryAsync(() =>
-        sc.saveFileInContainer(resourceOwnerPodAll[0], content, {
+        sc.saveFileInContainer(resourceOwnerPod, content, {
           fetch: addUserAgent(
             addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             TEST_USER_AGENT,
@@ -203,7 +217,6 @@ describe.each(contentArr)(
       );
 
       sharedFileIri = sc.getSourceUrl(savedFile);
-      vcProvider = await retryAsync(() => getAccessApiEndpoint(sharedFileIri));
     });
 
     // Cleanup the shared file
@@ -219,10 +232,6 @@ describe.each(contentArr)(
           }),
         );
       }
-      // Making sure the session is logged out prevents tests from hanging due
-      // to the callback refreshing the access token.
-      await requestorSession.logout();
-      await resourceOwnerSession.logout();
     });
 
     describe("access request, grant and exercise flow", () => {
@@ -439,11 +448,10 @@ describe.each(contentArr)(
           }),
         ).resolves.toMatchObject({ errors: [] });
 
-        const sharedFileWithAcr = await sc.acp_ess_2.getFileWithAcr(
-          sharedFileIri,
-          {
+        const sharedFileWithAcr = await retryAsync(() =>
+          sc.acp_ess_2.getFileWithAcr(sharedFileIri, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          },
+          }),
         );
 
         if (!sc.acp_ess_2.hasAccessibleAcr(sharedFileWithAcr)) {
@@ -500,11 +508,10 @@ describe.each(contentArr)(
           }),
         ).resolves.toMatchObject({ errors: [] });
 
-        const sharedFileWithAcr = await sc.acp_ess_2.getFileWithAcr(
-          sharedFileIri,
-          {
+        const sharedFileWithAcr = await retryAsync(() =>
+          sc.acp_ess_2.getFileWithAcr(sharedFileIri, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          },
+          }),
         );
 
         if (!sc.acp_ess_2.hasAccessibleAcr(sharedFileWithAcr)) {
