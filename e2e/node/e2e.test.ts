@@ -211,9 +211,8 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
     }
     [resourceOwnerPod] = resourceOwnerPodAll;
 
-    vcProvider = await retryAsync(() => getAccessApiEndpoint(resourceOwnerPod));
-
     sharedFileIri = await getSharedFile();
+    vcProvider = await retryAsync(() => getAccessApiEndpoint(sharedFileIri));
   });
 
   afterAll(async () => {
