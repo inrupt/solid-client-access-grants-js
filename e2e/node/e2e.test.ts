@@ -581,7 +581,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
   describe("resource owner interaction with VC provider", () => {
     let accessGrant: AccessGrant;
     let denyGrant: VerifiableCredential;
-    beforeEach(async () => {
+    beforeAll(async () => {
       const request = await retryAsync(() =>
         issueAccessRequest(
           {
@@ -601,44 +601,27 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
         ),
       );
 
-      const requestForDenial = await retryAsync(() =>
-        issueAccessRequest(
-          {
-            access: { read: true, write: true, append: true },
-            resourceOwner: resourceOwnerSession.info.webId as string,
-            resources: [sharedFileIri],
-            purpose: [
-              "https://some.purpose/not-a-nefarious-one/i-promise",
-              "https://some.other.purpose/",
-            ],
-          },
-          {
-            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            accessEndpoint: vcProvider,
-          },
+      [accessGrant, denyGrant] = await Promise.all([
+        retryAsync(() =>
+          approveAccessRequest(
+            request,
+            {},
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+            },
+          ),
         ),
-      );
-
-      accessGrant = await retryAsync(() =>
-        approveAccessRequest(
-          request,
-          {},
-          {
+        retryAsync(() =>
+          denyAccessRequest(request.id, {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
-          },
+          }),
         ),
-      );
-
-      denyGrant = await retryAsync(() =>
-        denyAccessRequest(requestForDenial.id, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          accessEndpoint: vcProvider,
-        }),
-      );
+      ]);
     });
 
-    afterEach(async () => {
+    afterAll(async () => {
       await retryAsync(() =>
         revokeAccessGrant(accessGrant, {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
