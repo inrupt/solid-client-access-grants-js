@@ -148,48 +148,51 @@ async function toString(input: File | NodeFile | Buffer): Promise<string> {
   return input.text();
 }
 
-const requestorSession = new Session();
-let resourceOwnerSession: Session;
-let resourceOwnerPod: string;
-let vcProvider: string;
-
-beforeAll(async () => {
-  // Log both sessions in.
-  await retryAsync(() =>
-    requestorSession.login({
-      oidcIssuer,
-      clientId: clientCredentials?.requestor?.id,
-      clientSecret: clientCredentials?.requestor?.secret,
-      // Note that currently, using a Bearer token (as opposed to a DPoP one)
-      // is required for the UMA access token to be usable.
-      tokenType: "Bearer",
-    }),
-  );
-  resourceOwnerSession = await retryAsync(() => getAuthenticatedSession(env));
-
-  // Create a file in the resource owner's Pod
-  const resourceOwnerPodAll = await retryAsync(() =>
-    sc.getPodUrlAll(resourceOwnerSession.info.webId as string),
-  );
-  if (resourceOwnerPodAll.length === 0) {
-    throw new Error(
-      "The Resource Owner WebID Profile is missing a link to at least one Pod root.",
-    );
-  }
-  // eslint-disable-next-line prefer-destructuring
-  resourceOwnerPod = resourceOwnerPodAll[0];
-
-  vcProvider = await retryAsync(() => getAccessApiEndpoint(resourceOwnerPod));
-});
-
-afterAll(async () => {
-  // Making sure the session is logged out prevents tests from hanging due
-  // to the callback refreshing the access token.
-  await Promise.all([requestorSession.logout(), resourceOwnerSession.logout()]);
-});
-
 describe(`End-to-end access grant tests for environment [${environment}]`, () => {
   let sharedFileIri: string;
+
+  const requestorSession = new Session();
+  let resourceOwnerSession: Session;
+  let resourceOwnerPod: string;
+  let vcProvider: string;
+
+  beforeAll(async () => {
+    // Log both sessions in.
+    await retryAsync(() =>
+      requestorSession.login({
+        oidcIssuer,
+        clientId: clientCredentials?.requestor?.id,
+        clientSecret: clientCredentials?.requestor?.secret,
+        // Note that currently, using a Bearer token (as opposed to a DPoP one)
+        // is required for the UMA access token to be usable.
+        tokenType: "Bearer",
+      }),
+    );
+    resourceOwnerSession = await retryAsync(() => getAuthenticatedSession(env));
+
+    // Create a file in the resource owner's Pod
+    const resourceOwnerPodAll = await retryAsync(() =>
+      sc.getPodUrlAll(resourceOwnerSession.info.webId as string),
+    );
+    if (resourceOwnerPodAll.length === 0) {
+      throw new Error(
+        "The Resource Owner WebID Profile is missing a link to at least one Pod root.",
+      );
+    }
+    // eslint-disable-next-line prefer-destructuring
+    resourceOwnerPod = resourceOwnerPodAll[0];
+
+    vcProvider = await retryAsync(() => getAccessApiEndpoint(resourceOwnerPod));
+  });
+
+  afterAll(async () => {
+    // Making sure the session is logged out prevents tests from hanging due
+    // to the callback refreshing the access token.
+    await Promise.all([
+      requestorSession.logout(),
+      resourceOwnerSession.logout(),
+    ]);
+  });
 
   // Setup the shared file
   beforeEach(async () => {
