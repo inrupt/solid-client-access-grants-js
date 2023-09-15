@@ -97,7 +97,7 @@ if (process.env.CI === "true") {
 
 // Extend the timeout because of frequent issues in CI (default is 3500)
 custom.setHttpOptionsDefaults({
-  timeout: 10000,
+  timeout: 1000,
 });
 
 const env = getNodeTestingEnvironment({
@@ -257,7 +257,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
             "https://some.purpose/not-a-nefarious-one/i-promise",
             "https://some.other.purpose/",
           ],
-          expirationDate: new Date(Date.now() + 60 * 60 * 10000),
+          expirationDate: new Date(Date.now() + 60 * 60 * 1000),
         },
         {
           fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -352,7 +352,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
         },
       );
 
-      const expirationMs = Date.now() + 55 * 60 * 10000;
+      const expirationMs = Date.now() + 55 * 60 * 1000;
 
       const grant = await approveAccessRequest(
         request,
@@ -428,7 +428,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
             "https://some.purpose/not-a-nefarious-one/i-promise",
             "https://some.other.purpose/",
           ],
-          expirationDate: new Date(Date.now() + 60 * 60 * 10000),
+          expirationDate: new Date(Date.now() + 60 * 60 * 1000),
         },
         {
           fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -489,7 +489,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
             "https://some.purpose/not-a-nefarious-one/i-promise",
             "https://some.other.purpose/",
           ],
-          expirationDate: new Date(Date.now() + 60 * 60 * 10000),
+          expirationDate: new Date(Date.now() + 60 * 60 * 1000),
         },
         {
           fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -619,7 +619,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
-            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
+            expirationDate: new Date(Date.now() + 60 * 60 * 1000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -917,7 +917,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
-            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
+            expirationDate: new Date(Date.now() + 60 * 60 * 1000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -1139,7 +1139,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
             access: { read: true, write: true, append: true },
             resources: [testContainerIri, testFileIri],
             resourceOwner: resourceOwnerSession.info.webId as string,
-            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
+            expirationDate: new Date(Date.now() + 60 * 60 * 1000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -1318,7 +1318,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
-            expirationDate: new Date(Date.now() + 60 * 60 * 10000),
+            expirationDate: new Date(Date.now() + 60 * 60 * 1000),
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
