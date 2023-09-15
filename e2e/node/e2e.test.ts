@@ -43,7 +43,6 @@ import {
 import * as sc from "@inrupt/solid-client";
 import { custom } from "openid-client";
 import { v4 } from "uuid";
-import type { AccessGrant, AccessRequest } from "../../src/index";
 import {
   approveAccessRequest,
   createContainerInContainer,
@@ -59,7 +58,9 @@ import {
   saveFileInContainer,
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
+  getResources,
 } from "../../src/index";
+import type { AccessGrant, AccessRequest } from "../../src/index";
 
 async function retryAsync<T>(
   callback: () => Promise<T>,
@@ -639,16 +640,28 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
     });
 
     it("can filter VCs held by the service based on requestor", async () => {
+      const allGrants = getAccessGrantAll(
+        sharedFilterTestIri,
+        { requestor: requestorSession.info.webId as string },
+        {
+          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          accessEndpoint: vcProvider,
+        },
+      );
+
+      // There should be at least one grant
+      await expect(allGrants).resolves.not.toHaveLength(0);
+
+      // There should be exactly one grant once we filter out grants
+      // that target the pod root
       await expect(
-        getAccessGrantAll(
-          sharedFilterTestIri,
-          { requestor: requestorSession.info.webId as string },
-          {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            accessEndpoint: vcProvider,
-          },
+        allGrants.then((grants) =>
+          grants.filter((grant) =>
+            getResources(grant as any).includes(resourceOwnerPod),
+          ),
         ),
       ).resolves.toHaveLength(1);
+
       await expect(
         getAccessGrantAll(
           sharedFilterTestIri,
@@ -719,6 +732,18 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       // Currently not specifying the status should be equivalent to setting it to granted
       expect(unspecified).toHaveLength(granted.length);
       expect(granted).toHaveLength(1);
+
+      // There should be at least one grant
+      expect(granted).not.toHaveLength(0);
+
+      // There should be exactly one grant once we filter out grants
+      // that target the pod root
+      expect(
+        granted.filter((grant) =>
+          getResources(grant as any).includes(resourceOwnerPod),
+        ),
+      ).toHaveLength(1);
+
       expect(denied).toHaveLength(1);
       expect(both).toHaveLength(granted.length + denied.length);
 
