@@ -42,6 +42,7 @@ import {
 // the access grant API
 import * as sc from "@inrupt/solid-client";
 import { custom } from "openid-client";
+import { v4 } from "uuid";
 import type { AccessGrant, AccessRequest } from "../../src/index";
 import {
   approveAccessRequest,
@@ -167,6 +168,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
             addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             TEST_USER_AGENT,
           ),
+          slug: v4(),
         },
       ),
     );
