@@ -156,8 +156,37 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
   let resourceOwnerPod: string;
   let vcProvider: string;
 
+  async function getSharedFile() {
+    // setup the shared file
+    const savedFile = await retryAsync(() =>
+      sc.saveFileInContainer(
+        resourceOwnerPod,
+        Buffer.from(SHARED_FILE_CONTENT),
+        {
+          fetch: addUserAgent(
+            addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            TEST_USER_AGENT,
+          ),
+        },
+      ),
+    );
+
+    return sc.getSourceUrl(savedFile);
+  }
+
+  function deleteSharedFile(iri: string) {
+    // Remove the shared file from the resource owner's Pod.
+    return retryAsync(() =>
+      sc.deleteFile(iri, {
+        fetch: addUserAgent(
+          addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          TEST_USER_AGENT,
+        ),
+      }),
+    );
+  }
+
   beforeAll(async () => {
-    console.log("before all top");
     // Log both sessions in.
     await retryAsync(() =>
       requestorSession.login({
@@ -184,33 +213,11 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
     vcProvider = await retryAsync(() => getAccessApiEndpoint(resourceOwnerPod));
 
-    // setup the shared file
-    const savedFile = await retryAsync(() =>
-      sc.saveFileInContainer(
-        resourceOwnerPod,
-        Buffer.from(SHARED_FILE_CONTENT),
-        {
-          fetch: addUserAgent(
-            addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            TEST_USER_AGENT,
-          ),
-        },
-      ),
-    );
-
-    sharedFileIri = sc.getSourceUrl(savedFile);
+    sharedFileIri = await getSharedFile();
   });
 
   afterAll(async () => {
-    // Remove the shared file from the resource owner's Pod.
-    await retryAsync(() =>
-      sc.deleteFile(sharedFileIri, {
-        fetch: addUserAgent(
-          addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          TEST_USER_AGENT,
-        ),
-      }),
-    );
+    await deleteSharedFile(sharedFileIri);
     // Making sure the session is logged out prevents tests from hanging due
     // to the callback refreshing the access token.
     await Promise.all([
@@ -391,11 +398,12 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
     });
 
     it("will issue an access request, grant access to a resource, but will not update the ACR if the updateAcr flag is set to false", async () => {
+      const sharedFile2Iri = await getSharedFile();
       const request = await issueAccessRequest(
         {
           access: { read: true },
           resourceOwner: resourceOwnerSession.info.webId as string,
-          resources: [sharedFileIri],
+          resources: [sharedFile2Iri],
           purpose: [
             "https://some.purpose/not-a-nefarious-one/i-promise",
             "https://some.other.purpose/",
@@ -430,7 +438,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       ).resolves.toMatchObject({ errors: [] });
 
       const sharedFileWithAcr = await retryAsync(() =>
-        sc.acp_ess_2.getFileWithAcr(sharedFileIri, {
+        sc.acp_ess_2.getFileWithAcr(sharedFile2Iri, {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
         }),
       );
@@ -448,6 +456,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
           append: false,
         }),
       );
+      await deleteSharedFile(sharedFile2Iri);
     });
 
     it("will issue an access request, grant access to a resource, and update the ACR if the updateAcr flag is set to true", async () => {
@@ -574,16 +583,18 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
   });
 
   describe("resource owner interaction with VC provider", () => {
+    let sharedFilterTestIri: string;
     let accessGrant: AccessGrant;
     let denyGrant: VerifiableCredential;
     beforeAll(async () => {
-      console.log("before all grant creation");
+      sharedFilterTestIri = await getSharedFile();
+
       const request = await retryAsync(() =>
         issueAccessRequest(
           {
             access: { read: true, write: true, append: true },
             resourceOwner: resourceOwnerSession.info.webId as string,
-            resources: [sharedFileIri],
+            resources: [sharedFilterTestIri],
             purpose: [
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
@@ -618,6 +629,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
     });
 
     afterAll(async () => {
+      await deleteSharedFile(sharedFilterTestIri);
       await retryAsync(() =>
         revokeAccessGrant(accessGrant, {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -628,7 +640,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
     it("can filter VCs held by the service based on requestor", async () => {
       await expect(
         getAccessGrantAll(
-          sharedFileIri,
+          sharedFilterTestIri,
           { requestor: requestorSession.info.webId as string },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -638,7 +650,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       ).resolves.not.toHaveLength(0);
       await expect(
         getAccessGrantAll(
-          sharedFileIri,
+          sharedFilterTestIri,
           { requestor: "https://some.unknown.requestor" },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -650,7 +662,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
     it("can filter VCs held by the service based on target resource", async () => {
       await expect(
-        getAccessGrantAll(sharedFileIri, undefined, {
+        getAccessGrantAll(sharedFilterTestIri, undefined, {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
           accessEndpoint: vcProvider,
         }),
@@ -666,7 +678,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
     it("can filter VCs held by the service based on status", async () => {
       const [granted, denied, both, unspecified] = await Promise.all([
         getAccessGrantAll(
-          sharedFileIri,
+          sharedFilterTestIri,
           {
             status: "granted",
           },
@@ -676,7 +688,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
           },
         ),
         getAccessGrantAll(
-          sharedFileIri,
+          sharedFilterTestIri,
           {
             status: "denied",
           },
@@ -686,7 +698,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
           },
         ),
         getAccessGrantAll(
-          sharedFileIri,
+          sharedFilterTestIri,
           { status: "all" },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -694,7 +706,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
           },
         ),
         getAccessGrantAll(
-          sharedFileIri,
+          sharedFilterTestIri,
           {},
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -705,7 +717,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
       // Currently not specifying the status should be equivalent to setting it to granted
       expect(unspecified).toHaveLength(granted.length);
-      expect(granted).not.toHaveLength(0);
+      expect(granted).toHaveLength(1);
       expect(denied).toHaveLength(1);
       expect(both).toHaveLength(granted.length + denied.length);
 
@@ -734,12 +746,12 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
         bothPurposeFilter,
         unknownPurposeFilter,
       ] = await Promise.all([
-        getAccessGrantAll(sharedFileIri, undefined, {
+        getAccessGrantAll(sharedFilterTestIri, undefined, {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
           accessEndpoint: vcProvider,
         }),
         getAccessGrantAll(
-          sharedFileIri,
+          sharedFilterTestIri,
           { purpose: ["https://some.purpose/not-a-nefarious-one/i-promise"] },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -747,7 +759,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
           },
         ),
         getAccessGrantAll(
-          sharedFileIri,
+          sharedFilterTestIri,
           { purpose: ["https://some.other.purpose/"] },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -755,7 +767,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
           },
         ),
         getAccessGrantAll(
-          sharedFileIri,
+          sharedFilterTestIri,
           {
             purpose: [
               "https://some.purpose/not-a-nefarious-one/i-promise",
@@ -768,7 +780,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
           },
         ),
         getAccessGrantAll(
-          sharedFileIri,
+          sharedFilterTestIri,
           { purpose: ["https://some.unknown.purpose/"] },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
