@@ -673,11 +673,21 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
     });
 
     it("can filter VCs held by the service based on target resource", async () => {
+      const allGrants = getAccessGrantAll(sharedFilterTestIri, undefined, {
+        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+        accessEndpoint: vcProvider,
+      });
+      // There should be at least one grant
+      await expect(allGrants).resolves.not.toHaveLength(0);
+
+      // There should be exactly one grant once we filter out grants
+      // that target the pod root
       await expect(
-        getAccessGrantAll(sharedFilterTestIri, undefined, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          accessEndpoint: vcProvider,
-        }),
+        allGrants.then((grants) =>
+          grants.filter((grant) =>
+            getResources(grant as any).includes(resourceOwnerPod),
+          ),
+        ),
       ).resolves.toHaveLength(1);
       await expect(
         getAccessGrantAll("https://some.unkown.resource", undefined, {
