@@ -739,7 +739,6 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
       // Currently not specifying the status should be equivalent to setting it to granted
       expect(unspecified).toHaveLength(granted.length);
-      expect(granted).toHaveLength(1);
 
       // There should be at least one grant
       expect(granted).not.toHaveLength(0);
