@@ -31,6 +31,7 @@ import {
   beforeAll,
   afterAll,
 } from "@jest/globals";
+import type { ILoginInputOptions } from "@inrupt/solid-client-authn-node";
 import { Session } from "@inrupt/solid-client-authn-node";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
@@ -188,18 +189,37 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
   }
 
   beforeAll(async () => {
+    const CREDENTIALS: ILoginInputOptions = {
+      oidcIssuer,
+      clientId: clientCredentials?.requestor?.id,
+      clientSecret: clientCredentials?.requestor?.secret,
+      // Note that currently, using a Bearer token (as opposed to a DPoP one)
+      // is required for the UMA access token to be usable.
+      tokenType: "Bearer",
+    };
     // Log both sessions in.
-    await retryAsync(() =>
-      requestorSession.login({
-        oidcIssuer,
-        clientId: clientCredentials?.requestor?.id,
-        clientSecret: clientCredentials?.requestor?.secret,
-        // Note that currently, using a Bearer token (as opposed to a DPoP one)
-        // is required for the UMA access token to be usable.
-        tokenType: "Bearer",
-      }),
+    await retryAsync(() => requestorSession.login(CREDENTIALS));
+    requestorSession.events.on("sessionExpired", () =>
+      retryAsync(() => requestorSession.login(CREDENTIALS)),
     );
+
+    const { owner } = env.clientCredentials;
+    if (owner.type !== "ESS Client Credentials") {
+      throw new Error(
+        `Unexpected credential type: ${env.clientCredentials.owner.type}`,
+      );
+    }
+
     resourceOwnerSession = await retryAsync(() => getAuthenticatedSession(env));
+    resourceOwnerSession.events.on("sessionExpired", () =>
+      retryAsync(() =>
+        resourceOwnerSession.login({
+          oidcIssuer: env.idp,
+          clientId: owner.id,
+          clientName: owner.secret,
+        }),
+      ),
+    );
 
     // Create a file in the resource owner's Pod
     const resourceOwnerPodAll = await retryAsync(() =>
