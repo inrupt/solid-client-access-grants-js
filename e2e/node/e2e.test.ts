@@ -655,7 +655,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       await expect(
         allGrants.then((grants) =>
           grants.filter((grant) =>
-            getResources(grant as any).includes(resourceOwnerPod),
+            !getResources(grant as any).includes(resourceOwnerPod),
           ),
         ),
       ).resolves.toHaveLength(1);
@@ -685,7 +685,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       await expect(
         allGrants.then((grants) =>
           grants.filter((grant) =>
-            getResources(grant as any).includes(resourceOwnerPod),
+            !getResources(grant as any).includes(resourceOwnerPod),
           ),
         ),
       ).resolves.toHaveLength(1);
@@ -747,7 +747,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       // that target the pod root
       expect(
         granted.filter((grant) =>
-          getResources(grant as any).includes(resourceOwnerPod),
+          !getResources(grant as any).includes(resourceOwnerPod),
         ),
       ).toHaveLength(1);
 
