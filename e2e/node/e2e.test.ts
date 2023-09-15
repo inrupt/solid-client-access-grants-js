@@ -648,7 +648,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
             accessEndpoint: vcProvider,
           },
         ),
-      ).resolves.not.toHaveLength(0);
+      ).resolves.toHaveLength(1);
       await expect(
         getAccessGrantAll(
           sharedFilterTestIri,
@@ -667,7 +667,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
           accessEndpoint: vcProvider,
         }),
-      ).resolves.not.toHaveLength(0);
+      ).resolves.toHaveLength(1);
       await expect(
         getAccessGrantAll("https://some.unkown.resource", undefined, {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
