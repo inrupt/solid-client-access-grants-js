@@ -170,7 +170,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
   let resourceOwnerPod: string;
   let vcProvider: string;
   let sessionInterval: NodeJS.Timeout;
-  const allSessions: Session[] = [];
+  let allSessions: Promise<Session>[];
 
   async function getSharedFile() {
     // setup the shared file
@@ -204,20 +204,21 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
   beforeAll(async () => {
     // Log both sessions in.
-    [requestorSession, resourceOwnerSession] = await Promise.all([
+    allSessions = [
       retryAsync(getRequestorSession),
       retryAsync(() => getAuthenticatedSession(env)),
-    ]);
-
-    allSessions.push(requestorSession, resourceOwnerSession)
+    ];
+    [requestorSession, resourceOwnerSession] = await Promise.all(allSessions);
 
     sessionInterval = setInterval(
       async () => {
-        [requestorSession, resourceOwnerSession] = await Promise.all([
+        const nextSessions = [
           retryAsync(getRequestorSession),
           retryAsync(() => getAuthenticatedSession(env)),
-        ]);
-        allSessions.push(requestorSession, resourceOwnerSession)
+        ];
+        allSessions.push(...nextSessions);
+        [requestorSession, resourceOwnerSession] =
+          await Promise.all(nextSessions);
       },
       4 * 60 * 1000,
     );
@@ -238,11 +239,13 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
   });
 
   afterAll(async () => {
-    clearInterval(sessionInterval)
+    clearInterval(sessionInterval);
     await deleteSharedFile(sharedFileIri);
     // Making sure the session is logged out prevents tests from hanging due
     // to the callback refreshing the access token.
-    await Promise.all(allSessions.map(session => session.logout()));
+    await Promise.all(
+      allSessions.map((session) => session.then((s) => s.logout())),
+    );
   });
 
   describe("access request, grant and exercise flow", () => {
