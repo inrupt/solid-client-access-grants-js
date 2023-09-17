@@ -208,7 +208,6 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       retryAsync(getRequestorSession),
       retryAsync(() => getAuthenticatedSession(env)),
     ];
-    [requestorSession, resourceOwnerSession] = await Promise.all(allSessions);
 
     sessionInterval = setInterval(
       async () => {
@@ -222,6 +221,8 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       },
       4 * 60 * 1000,
     );
+
+    [requestorSession, resourceOwnerSession] = await Promise.all(allSessions);
 
     // Create a file in the resource owner's Pod
     const resourceOwnerPodAll = await retryAsync(() =>
