@@ -25,8 +25,6 @@ import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
   CONTEXT_ESS_DEFAULT,
   CONTEXT_VC_W3C,
-  CREDENTIAL_TYPE_ACCESS_DENIAL,
-  CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_BASE,
   GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
@@ -110,26 +108,30 @@ async function internal_getAccessGrantAll(
   const type = [CREDENTIAL_TYPE_BASE];
   const statusShorthand = params.status ?? "granted";
 
-  if (statusShorthand === 'granted') {
+  if (statusShorthand === "granted") {
     type.push(GC_CONSENT_STATUS_EXPLICITLY_GIVEN);
-  } else if (statusShorthand === 'denied') {
+  } else if (statusShorthand === "denied") {
     type.push(GC_CONSENT_STATUS_DENIED);
   }
 
   const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
-  ancestorUrls.map((url) => ({
-    "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
-    type,
-    credentialSubject: {
-      providedConsent: {
-        hasStatus: ({ 'granted': GC_CONSENT_STATUS_EXPLICITLY_GIVEN, 'denied': GC_CONSENT_STATUS_DENIED, 'all': undefined })[statusShorthand],
-        forPersonalData: url ? [url.href] : undefined,
-        forPurpose: params.purpose,
-        isProvidedTo: params.requestor,
-        mode: specifiedModes.length > 0 ? specifiedModes : undefined,
+    ancestorUrls.map((url) => ({
+      "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
+      type,
+      credentialSubject: {
+        providedConsent: {
+          hasStatus: {
+            granted: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+            denied: GC_CONSENT_STATUS_DENIED,
+            all: undefined,
+          }[statusShorthand],
+          forPersonalData: url ? [url.href] : undefined,
+          forPurpose: params.purpose,
+          isProvidedTo: params.requestor,
+          mode: specifiedModes.length > 0 ? specifiedModes : undefined,
+        },
       },
-    },
-  }))
+    }));
 
   // TODO: Fix up the type of accepted arguments (this function should allow deep partial)
   const result = (
