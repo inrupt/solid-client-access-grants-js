@@ -96,7 +96,7 @@ if (process.env.CI === "true") {
 
 // Extend the timeout because of frequent issues in CI (default is 3500)
 custom.setHttpOptionsDefaults({
-  timeout: 1000,
+  timeout: 10000,
 });
 
 const env = getNodeTestingEnvironment({
