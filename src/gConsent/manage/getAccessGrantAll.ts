@@ -25,8 +25,10 @@ import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
   CONTEXT_ESS_DEFAULT,
   CONTEXT_VC_W3C,
+  CREDENTIAL_TYPE_ACCESS_DENIAL,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_BASE,
+  GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
@@ -38,7 +40,6 @@ import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { BaseGrantBody } from "../type/AccessVerifiableCredential";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
-import type { AccessGrant } from "../type/AccessGrant";
 import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 
@@ -46,8 +47,18 @@ export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
     requestor: string;
     resource: URL | UrlString;
+    /**
+     * By default only `granted` access grants are returned when the status is undefined.
+     * In the next major version of this library the default will be to return `all` access grants when the status is
+     * undefined.
+     */
+    status?: "granted" | "denied" | "all";
   }
 >;
+
+interface QueryOptions extends AccessBaseOptions {
+  includeExpired?: boolean;
+}
 
 // Iteratively build the list of ancestor containers from the breakdown of the
 // resource path: for resource https://pod.example/foo/bar/baz, we'll want the result
@@ -73,7 +84,7 @@ const getAncestorUrls = (resourceUrl: URL) => {
 // eslint-disable-next-line camelcase
 async function internal_getAccessGrantAll(
   params: AccessParameters = {},
-  options: AccessBaseOptions & { includeExpired?: boolean } = {},
+  options: QueryOptions = {},
 ): Promise<Array<VerifiableCredential>> {
   if (!params.resource && !options.accessEndpoint) {
     throw new Error("resource and accessEndpoint cannot both be undefined");
@@ -96,14 +107,26 @@ async function internal_getAccessGrantAll(
     : [undefined];
 
   const specifiedModes = accessToResourceAccessModeArray(params.access ?? {});
+  const type = [CREDENTIAL_TYPE_BASE];
+  const statusShorthand = params.status ?? "granted";
+
+  if (statusShorthand === "granted") {
+    type.push(CREDENTIAL_TYPE_ACCESS_GRANT);
+  } else if (statusShorthand === "denied") {
+    type.push(CREDENTIAL_TYPE_ACCESS_DENIAL);
+  }
 
   const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
     ancestorUrls.map((url) => ({
       "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
-      type: [CREDENTIAL_TYPE_ACCESS_GRANT, CREDENTIAL_TYPE_BASE],
+      type,
       credentialSubject: {
         providedConsent: {
-          hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+          hasStatus: {
+            granted: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+            denied: GC_CONSENT_STATUS_DENIED,
+            all: undefined,
+          }[statusShorthand],
           forPersonalData: url ? [url.href] : undefined,
           forPurpose: params.purpose,
           isProvidedTo: params.requestor,
@@ -132,21 +155,15 @@ async function internal_getAccessGrantAll(
     .flat()
     .map(normalizeAccessGrant);
 
-  return (
-    result
-      .filter(
-        (vc) => isBaseAccessGrantVerifiableCredential(vc) && isAccessGrant(vc),
-      )
-      // FIXME why isn't the previous filter enough?
-      .map((vc) => vc as AccessGrant)
-      .filter(
-        (grant) =>
-          // Explicitly non-recursive grants are filtered out, except if they apply
-          // directly to the target resource.
-          getInherit(grant) !== false ||
-          (params.resource &&
-            getResources(grant).includes(params.resource.toString())),
-      )
+  return result.filter(
+    (vc) =>
+      isBaseAccessGrantVerifiableCredential(vc) &&
+      isAccessGrant(vc) &&
+      // Explicitly non-recursive grants are filtered out, except if they apply
+      // directly to the target resource.
+      (getInherit(vc) !== false ||
+        (params.resource &&
+          getResources(vc).includes(params.resource.toString()))),
   );
 }
 
@@ -172,7 +189,7 @@ async function internal_getAccessGrantAll(
 async function getAccessGrantAll(
   resource: URL | UrlString,
   params?: AccessParameters,
-  options?: AccessBaseOptions & { includeExpired?: boolean },
+  options?: QueryOptions,
 ): Promise<Array<VerifiableCredential>>;
 
 /**
@@ -194,16 +211,13 @@ async function getAccessGrantAll(
 
 async function getAccessGrantAll(
   params: AccessParameters,
-  options?: AccessBaseOptions & { includeExpired?: boolean },
+  options?: QueryOptions,
 ): Promise<Array<VerifiableCredential>>;
 
 async function getAccessGrantAll(
   resourceOrParams: URL | UrlString | AccessParameters,
-  paramsOrOptions:
-    | AccessParameters
-    | undefined
-    | (AccessBaseOptions & { includeExpired?: boolean }),
-  options: AccessBaseOptions & { includeExpired?: boolean } = {},
+  paramsOrOptions: AccessParameters | undefined | QueryOptions,
+  options: QueryOptions = {},
 ): Promise<Array<VerifiableCredential>> {
   if (
     typeof resourceOrParams === "string" ||
@@ -222,7 +236,7 @@ async function getAccessGrantAll(
   }
   return internal_getAccessGrantAll(
     resourceOrParams as AccessParameters,
-    paramsOrOptions as AccessBaseOptions & { includeExpired?: boolean },
+    paramsOrOptions as QueryOptions,
   );
 }
 
