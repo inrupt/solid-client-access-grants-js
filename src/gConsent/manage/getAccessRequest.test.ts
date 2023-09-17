@@ -86,7 +86,7 @@ describe("getAccessRequest", () => {
 
   it("throws if the fetched VC is not an Access Request", async () => {
     vcModule.getVerifiableCredential.mockResolvedValueOnce(
-      await await mockAccessGrantVc(),
+      await mockAccessGrantVc(),
     );
     await expect(getAccessRequest("https://some.vc")).rejects.toThrow();
   });

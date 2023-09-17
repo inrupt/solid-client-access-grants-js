@@ -40,7 +40,7 @@ describe("deleteSolidDataset", () => {
     const mockedFetch = jest.fn<typeof fetch>();
     await deleteSolidDataset(
       "https://some.dataset.url",
-      await await mockAccessGrantVc(),
+      await mockAccessGrantVc(),
       {
         fetch: mockedFetch,
       },

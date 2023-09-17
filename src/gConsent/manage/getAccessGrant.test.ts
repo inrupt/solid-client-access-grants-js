@@ -102,7 +102,7 @@ describe("getAccessGrant", () => {
 
   it("supports denied access grants with a given IRI", async () => {
     mockAccessApiEndpoint();
-    const mockedAccessGrant = await await mockAccessGrantVc();
+    const mockedAccessGrant = await mockAccessGrantVc();
     mockedAccessGrant.credentialSubject.providedConsent.hasStatus =
       "https://w3id.org/GConsent#ConsentStatusDenied";
     const mockedFetch = jest
