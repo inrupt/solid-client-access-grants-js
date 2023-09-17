@@ -258,21 +258,11 @@ describe("getAccessGrantAll", () => {
       status: "all",
     };
 
-    const expectedVcShapeDenied = {
+    const expectedVcShapeOpen = {
       credentialSubject: {
         providedConsent: {
           forPersonalData: [resource.href],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
-          isProvidedTo: "https://some.requestor",
-        },
-      },
-    };
-
-    const expectedVcShapeApproved = {
-      credentialSubject: {
-        providedConsent: {
-          forPersonalData: [resource.href],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          hasStatus: undefined,
           isProvidedTo: "https://some.requestor",
         },
       },
@@ -284,19 +274,11 @@ describe("getAccessGrantAll", () => {
 
     expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
 
-    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(8);
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(4);
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
       "https://some.api.endpoint/derive",
-      expect.objectContaining(expectedVcShapeDenied),
-      {
-        fetch: otherFetch,
-      },
-    );
-
-    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
-      "https://some.api.endpoint/derive",
-      expect.objectContaining(expectedVcShapeApproved),
+      expect.objectContaining(expectedVcShapeOpen),
       {
         fetch: otherFetch,
       },

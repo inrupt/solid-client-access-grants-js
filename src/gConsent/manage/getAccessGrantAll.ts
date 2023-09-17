@@ -47,6 +47,11 @@ export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
     requestor: string;
     resource: URL | UrlString;
+    /**
+     * By default only `granted` access grants are returned when the status is undefined.
+     * In the next major version of this library the default will be to return `all` access grants when the status is
+     * undefined.
+     */
     status?: "granted" | "denied" | "all";
   }
 >;
@@ -102,40 +107,33 @@ async function internal_getAccessGrantAll(
     : [undefined];
 
   const specifiedModes = accessToResourceAccessModeArray(params.access ?? {});
-
+  const type = [CREDENTIAL_TYPE_BASE];
   const statusShorthand = params.status ?? "granted";
-  const statusFull: string[] = [];
 
-  if (["granted", "all"].includes(statusShorthand)) {
-    statusFull.push(GC_CONSENT_STATUS_EXPLICITLY_GIVEN);
-  }
-
-  if (["denied", "all"].includes(statusShorthand)) {
-    statusFull.push(GC_CONSENT_STATUS_DENIED);
+  if (statusShorthand === "granted") {
+    type.push(CREDENTIAL_TYPE_ACCESS_GRANT);
+  } else if (statusShorthand === "denied") {
+    type.push(CREDENTIAL_TYPE_ACCESS_DENIAL);
   }
 
   const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
-    statusFull.flatMap(
-      (hasStatus) =>
-        ancestorUrls.map((url) => ({
-          "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
-          type: [
-            hasStatus === GC_CONSENT_STATUS_EXPLICITLY_GIVEN
-              ? CREDENTIAL_TYPE_ACCESS_GRANT
-              : CREDENTIAL_TYPE_ACCESS_DENIAL,
-            CREDENTIAL_TYPE_BASE,
-          ],
-          credentialSubject: {
-            providedConsent: {
-              hasStatus,
-              forPersonalData: url ? [url.href] : undefined,
-              forPurpose: params.purpose,
-              isProvidedTo: params.requestor,
-              mode: specifiedModes.length > 0 ? specifiedModes : undefined,
-            },
-          },
-        })) as RecursivePartial<BaseGrantBody & VerifiableCredential>[],
-    );
+    ancestorUrls.map((url) => ({
+      "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
+      type,
+      credentialSubject: {
+        providedConsent: {
+          hasStatus: {
+            granted: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+            denied: GC_CONSENT_STATUS_DENIED,
+            all: undefined,
+          }[statusShorthand],
+          forPersonalData: url ? [url.href] : undefined,
+          forPurpose: params.purpose,
+          isProvidedTo: params.requestor,
+          mode: specifiedModes.length > 0 ? specifiedModes : undefined,
+        },
+      },
+    }));
 
   // TODO: Fix up the type of accepted arguments (this function should allow deep partial)
   const result = (
