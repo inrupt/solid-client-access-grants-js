@@ -240,10 +240,10 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
   });
 
   afterAll(async () => {
-    clearInterval(sessionInterval);
     await deleteSharedFile(sharedFileIri);
     // Making sure the session is logged out prevents tests from hanging due
     // to the callback refreshing the access token.
+    clearInterval(sessionInterval);
     await Promise.all(
       allSessions.map((session) => session.then((s) => s.logout())),
     );
