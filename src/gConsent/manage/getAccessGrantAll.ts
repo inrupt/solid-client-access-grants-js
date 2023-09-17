@@ -25,6 +25,8 @@ import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
   CONTEXT_ESS_DEFAULT,
   CONTEXT_VC_W3C,
+  CREDENTIAL_TYPE_ACCESS_DENIAL,
+  CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_BASE,
   GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
@@ -109,9 +111,9 @@ async function internal_getAccessGrantAll(
   const statusShorthand = params.status ?? "granted";
 
   if (statusShorthand === "granted") {
-    type.push(GC_CONSENT_STATUS_EXPLICITLY_GIVEN);
+    type.push(CREDENTIAL_TYPE_ACCESS_GRANT);
   } else if (statusShorthand === "denied") {
-    type.push(GC_CONSENT_STATUS_DENIED);
+    type.push(CREDENTIAL_TYPE_ACCESS_DENIAL);
   }
 
   const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
