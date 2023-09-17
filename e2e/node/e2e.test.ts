@@ -22,27 +22,27 @@
 // Globals are actually not injected, so this does not shadow anything.
 import { File as NodeFile } from "buffer";
 import {
-  jest,
-  describe,
-  it,
-  expect,
-  beforeEach,
-  afterEach,
-  beforeAll,
-  afterAll,
-} from "@jest/globals";
-import type { ILoginInputOptions } from "@inrupt/solid-client-authn-node";
+  getAuthenticatedSession,
+  getNodeTestingEnvironment,
+} from "@inrupt/internal-test-env";
 import { Session } from "@inrupt/solid-client-authn-node";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
-  getNodeTestingEnvironment,
-  getAuthenticatedSession,
-} from "@inrupt/internal-test-env";
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from "@jest/globals";
 // Making a named import here to avoid confusion with the wrapped functions from
 // the access grant API
 import * as sc from "@inrupt/solid-client";
 import { custom } from "openid-client";
+import type { AccessGrant, AccessRequest } from "../../src/index";
 import {
   approveAccessRequest,
   createContainerInContainer,
@@ -50,17 +50,16 @@ import {
   getAccessApiEndpoint,
   getAccessGrantAll,
   getFile,
+  getResources,
   getSolidDataset,
-  issueAccessRequest,
   isValidAccessGrant,
+  issueAccessRequest,
   overwriteFile,
   revokeAccessGrant,
   saveFileInContainer,
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
-  getResources,
 } from "../../src/index";
-import type { AccessGrant, AccessRequest } from "../../src/index";
 
 async function retryAsync<T>(
   callback: () => Promise<T>,
@@ -150,10 +149,23 @@ async function toString(input: File | NodeFile | Buffer): Promise<string> {
   return input.text();
 }
 
+async function getRequestorSession() {
+  const session = new Session();
+  await session.login({
+    oidcIssuer,
+    clientId: clientCredentials?.requestor?.id,
+    clientSecret: clientCredentials?.requestor?.secret,
+    // Note that currently, using a Bearer token (as opposed to a DPoP one)
+    // is required for the UMA access token to be usable.
+    tokenType: "Bearer",
+  });
+  return session;
+}
+
 describe(`End-to-end access grant tests for environment [${environment}]`, () => {
   let sharedFileIri: string;
 
-  const requestorSession = new Session();
+  let requestorSession: Session;
   let resourceOwnerSession: Session;
   let resourceOwnerPod: string;
   let vcProvider: string;
@@ -189,36 +201,20 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
   }
 
   beforeAll(async () => {
-    const CREDENTIALS: ILoginInputOptions = {
-      oidcIssuer,
-      clientId: clientCredentials?.requestor?.id,
-      clientSecret: clientCredentials?.requestor?.secret,
-      // Note that currently, using a Bearer token (as opposed to a DPoP one)
-      // is required for the UMA access token to be usable.
-      tokenType: "Bearer",
-    };
     // Log both sessions in.
-    await retryAsync(() => requestorSession.login(CREDENTIALS));
-    requestorSession.events.on("sessionExpired", () =>
-      retryAsync(() => requestorSession.login(CREDENTIALS)),
-    );
+    [requestorSession, resourceOwnerSession] = await Promise.all([
+      retryAsync(getRequestorSession),
+      retryAsync(() => getAuthenticatedSession(env)),
+    ]);
 
-    const { owner } = env.clientCredentials;
-    if (owner.type !== "ESS Client Credentials") {
-      throw new Error(
-        `Unexpected credential type: ${env.clientCredentials.owner.type}`,
-      );
-    }
-
-    resourceOwnerSession = await retryAsync(() => getAuthenticatedSession(env));
-    resourceOwnerSession.events.on("sessionExpired", () =>
-      retryAsync(() =>
-        resourceOwnerSession.login({
-          oidcIssuer: env.idp,
-          clientId: owner.id,
-          clientName: owner.secret,
-        }),
-      ),
+    setInterval(
+      async () => {
+        [requestorSession, resourceOwnerSession] = await Promise.all([
+          retryAsync(getRequestorSession),
+          retryAsync(() => getAuthenticatedSession(env)),
+        ]);
+      },
+      4 * 60 * 1000,
     );
 
     // Create a file in the resource owner's Pod
