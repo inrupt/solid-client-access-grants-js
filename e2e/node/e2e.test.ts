@@ -171,6 +171,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
   let vcProvider: string;
   let sessionInterval: NodeJS.Timeout;
   let allSessions: Promise<Session>[];
+  let sharedRequest: AccessRequest;
 
   async function getSharedFile() {
     // setup the shared file
@@ -237,6 +238,22 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
     sharedFileIri = await getSharedFile();
     vcProvider = await retryAsync(() => getAccessApiEndpoint(sharedFileIri));
+    sharedRequest = await issueAccessRequest(
+      {
+        access: { read: true },
+        resourceOwner: resourceOwnerSession.info.webId as string,
+        resources: [sharedFileIri],
+        purpose: [
+          "https://some.purpose/not-a-nefarious-one/i-promise",
+          "https://some.other.purpose/",
+        ],
+        expirationDate: new Date(Date.now() + 60 * 60 * 1000),
+      },
+      {
+        fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+        accessEndpoint: vcProvider,
+      },
+    );
   });
 
   afterAll(async () => {
@@ -251,26 +268,10 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
   describe("access request, grant and exercise flow", () => {
     it("can issue an access request, grant access to a resource, and revoke the granted access", async () => {
-      const request = await issueAccessRequest(
-        {
-          access: { read: true },
-          resourceOwner: resourceOwnerSession.info.webId as string,
-          resources: [sharedFileIri],
-          purpose: [
-            "https://some.purpose/not-a-nefarious-one/i-promise",
-            "https://some.other.purpose/",
-          ],
-          expirationDate: new Date(Date.now() + 60 * 60 * 1000),
-        },
-        {
-          fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-          accessEndpoint: vcProvider,
-        },
-      );
-      expect(isVerifiableCredential(request)).toBe(true);
+      expect(isVerifiableCredential(sharedRequest)).toBe(true);
 
       const grant = await approveAccessRequest(
-        request,
+        sharedRequest,
         {},
         {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -337,28 +338,9 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
     });
 
     it("can issue an access grant overriding an access request", async () => {
-      const expirationDate = new Date(Date.now() + 120 * 60 * 1000);
-      const request = await issueAccessRequest(
-        {
-          access: { read: true, append: true },
-          resourceOwner: resourceOwnerSession.info.webId as string,
-          resources: [sharedFileIri],
-          purpose: [
-            "https://some.purpose/not-a-nefarious-one/i-promise",
-            "https://some.other.purpose/",
-          ],
-          expirationDate,
-        },
-        {
-          fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-          accessEndpoint: vcProvider,
-        },
-      );
-
-      const expirationMs = Date.now() + 55 * 60 * 1000;
-
+      const expirationMs = Date.now() + 25 * 60 * 1000;
       const grant = await approveAccessRequest(
-        request,
+        sharedRequest,
         {
           // Only grant a subset of the required access.
           access: { read: true },
@@ -545,29 +527,9 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
   describe("access request, deny flow", () => {
     it("can issue an access grant denying an access request", async () => {
-      // Request a 2hr grant
-      const expirationMs = Date.now() + 120 * 60 * 1000;
-      const expirationDate = new Date(expirationMs);
-      const request: VerifiableCredential = await issueAccessRequest(
-        {
-          access: { read: true, append: true },
-          resourceOwner: resourceOwnerSession.info.webId as string,
-          resources: [sharedFileIri],
-          purpose: [
-            "https://some.purpose/not-a-nefarious-one/i-promise",
-            "https://some.other.purpose/",
-          ],
-          expirationDate,
-        },
-        {
-          fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-          accessEndpoint: vcProvider,
-        },
-      );
-
       const grant = await denyAccessRequest(
         resourceOwnerSession.info.webId as string,
-        request,
+        sharedRequest,
         {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
           accessEndpoint: vcProvider,
