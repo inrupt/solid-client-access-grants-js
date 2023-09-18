@@ -48,6 +48,7 @@ import {
   createContainerInContainer,
   denyAccessRequest,
   getAccessApiEndpoint,
+  getAccessGrant,
   getAccessGrantAll,
   getFile,
   getResources,
@@ -527,14 +528,10 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
   describe("access request, deny flow", () => {
     it("can issue an access grant denying an access request", async () => {
-      const grant = await denyAccessRequest(
-        resourceOwnerSession.info.webId as string,
-        sharedRequest,
-        {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          accessEndpoint: vcProvider,
-        },
-      );
+      const grant = await denyAccessRequest(sharedRequest, {
+        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+        accessEndpoint: vcProvider,
+      });
 
       await expect(
         isValidAccessGrant(grant, {
@@ -564,6 +561,12 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
         TEST_USER_AGENT,
       )(sharedFileIri);
       expect(fileResponse.status).toBe(403);
+
+      // Retrieving the grant should still be possible:
+      const retrievedGrant = await getAccessGrant(grant.id, {
+        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT)
+      });
+      expect(retrievedGrant).toStrictEqual(grant);
     });
   });
 
