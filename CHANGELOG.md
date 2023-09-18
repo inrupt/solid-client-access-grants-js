@@ -10,6 +10,8 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+## [2.6.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.6.0) - 2023-09-18
+
 ### New feature
 
 - Export `getAccessGrantAll` has a new `status` parameter which allows selection of `granted`, `denied` or `all` access grants.

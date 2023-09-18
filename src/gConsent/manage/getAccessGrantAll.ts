@@ -51,6 +51,7 @@ export type AccessParameters = Partial<
      * By default only `granted` access grants are returned when the status is undefined.
      * In the next major version of this library the default will be to return `all` access grants when the status is
      * undefined.
+     * @since 2.6.0
      */
     status?: "granted" | "denied" | "all";
   }
