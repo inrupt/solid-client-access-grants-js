@@ -31,6 +31,8 @@ import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
+import { normalizeAccessGrant } from "./approveAccessRequest";
+import type { AccessGrant } from "../type/AccessGrant";
 
 // Merge back in denyAccessRequest after the deprecated signature has been removed.
 // eslint-disable-next-line camelcase
@@ -71,7 +73,7 @@ async function internal_denyAccessRequest(
 async function denyAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
   options?: AccessBaseOptions,
-): Promise<VerifiableCredential>;
+): Promise<AccessGrant>;
 /**
  * @deprecated Please remove the `resourceOwner` parameter.
  */
@@ -95,12 +97,12 @@ async function denyAccessRequest(
     return internal_denyAccessRequest(
       vcOrOptions as VerifiableCredential | URL | UrlString,
       options ?? {},
-    );
+    ).then(normalizeAccessGrant);
   }
   return internal_denyAccessRequest(
     resourceOwnerOrVc,
     (vcOrOptions as AccessBaseOptions) ?? {},
-  );
+  ).then(normalizeAccessGrant);
 }
 
 export { denyAccessRequest };
