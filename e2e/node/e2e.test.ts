@@ -564,7 +564,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
       // Retrieving the grant should still be possible:
       const retrievedGrant = await getAccessGrant(grant.id, {
-        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT)
+        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
       });
       expect(retrievedGrant).toStrictEqual(grant);
     });
