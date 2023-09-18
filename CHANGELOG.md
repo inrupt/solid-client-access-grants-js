@@ -14,7 +14,7 @@ The following changes are pending, and will be applied on the next major release
 
 - `denyAccessRequest` didn't normalize the returned denied Access Grant, resulting in it having a
   JSON-LD frame different from the value returned by `approveAccessRequest`. The value is now normalized,
-  and both functions return a similarly shaped object. This also fixes the return type of `denyAccessRequest`, 
+  and both functions return a similarly shaped object. This also fixes the return type of `denyAccessRequest`,
   which was looser than it should have been.
 
 ## [2.6.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.6.0) - 2023-09-18
