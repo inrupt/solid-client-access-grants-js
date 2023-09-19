@@ -195,17 +195,40 @@ async function getAccessGrantAll(
 
 /**
  * Retrieve Access Grants issued over a resource. The Access Grants may be filtered
- * by requestor, access modes and purpose. In order to discover all applicable Access
- * Grants for the target resource, including recursive Access Grants issued over
- * an ancestor container, the resources hierarchy is walked up to the storage root.
+ * by resource, requestor, access modes and purpose.
+ *
+ * If a resource filter is specified, the resources hierarchy is walked up to the
+ * storage root so that all applicable Access Grants for the target resource are
+ * discovered, including recursive Access Grants issued over an ancestor container.
+ *
+ * @example ```
+ * const grantsForResource = await getAccessGrantAll({
+ *  resource: "https://example.org/storage/some-resource"
+ * }, {
+ *  fetch: session.fetch,
+ *  accessEndpoint: "https://example.org/grants-holder/"
+ * });
+ *
+ * const grantsForAgentWrite = await getAccessGrantAll({
+ *  requestor: "https://id.example.org/some-agent-webid",
+ *  modes: ["write"]
+ * }, {
+ *  fetch: session.fetch,
+ *  accessEndpoint: "https://example.org/grants-holder/"
+ * });
+ * ```
  *
  * @param grantShape The properties of grants to filter results.
  * @param options Optional parameter:
- * - `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
- * This can be typically used for authentication. Note that if it is omitted, and
- * `@inrupt/solid-client-authn-browser` is in your dependencies, the default session
- * is picked up.
+ * - `options.fetch`: An alternative `fetch` function to make the HTTP request,
+ *   compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
+ *   This is typically used for authentication.
  * - `options.includeExpiredGrants`: include expired grants in the result set.
+ * - accessEndpoint: A base URL used when determining the location of access API calls.
+ *   If not given, it is attempted to be found by determining the server URL from the resource
+ *   involved in the request and reading its .well-known/solid file for an Access API entry. If
+ *   you are not providing a resource this url must point to the vcProvider endpoint associated
+ *   with the environment you are requesting against. 
  * @returns A void promise.
  * @since 0.4.0
  */
