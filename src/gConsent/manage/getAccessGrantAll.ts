@@ -203,7 +203,7 @@ async function internal_getAccessGrantAll(
  *   If not given, it is attempted to be found by determining the server URL from the resource
  *   involved in the request and reading its .well-known/solid file for an Access API entry. If
  *   you are not providing a resource this url must point to the vcProvider endpoint associated
- *   with the environment you are requesting against. 
+ *   with the environment you are requesting against.
  * @returns A promise resolving to an array of Access Grants matching the request.
  * @since 0.4.0
  */
