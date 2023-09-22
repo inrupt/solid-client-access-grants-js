@@ -535,7 +535,7 @@ describe("issueAccessRequest", () => {
       proofPurpose: "some purpose",
       proofValue: "some value",
       type: "some type",
-      verificationMethod: "https://some/method",
+      verificationMethod: "https://example.org/some/verification/method",
     };
   };
 

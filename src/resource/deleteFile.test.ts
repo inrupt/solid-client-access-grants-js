@@ -24,6 +24,7 @@ import type SolidClientCore from "@inrupt/solid-client";
 import { mockAccessGrantVc } from "../gConsent/util/access.mock";
 import { deleteFile } from "./deleteFile";
 import { fetchWithVc } from "../fetch";
+import { fetch } from '@inrupt/universal-fetch';
 
 jest.mock("../fetch");
 jest.mock("@inrupt/solid-client", () => {
@@ -37,7 +38,7 @@ describe("deleteSolidDataset", () => {
     const solidClientModule = jest.requireMock(
       "@inrupt/solid-client",
     ) as jest.Mocked<typeof SolidClientCore>;
-    const mockedFetch = jest.fn<typeof fetch>();
+    const mockedFetch = jest.fn<typeof fetch>(fetch);
     await deleteFile("https://some.file.url", await mockAccessGrantVc(), {
       fetch: mockedFetch,
     });

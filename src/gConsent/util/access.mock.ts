@@ -58,8 +58,10 @@ export const mockAccessRequestVc = async (
     forPersonalData: options?.resources ?? ["https://some.resource"],
     hasStatus: GC_CONSENT_STATUS_REQUESTED,
     mode: options?.modes ?? ["http://www.w3.org/ns/auth/acl#Read"],
-    isConsentForDataSubject: "https://some.pod/profile#you" as string | undefined
-  }
+    isConsentForDataSubject: "https://some.pod/profile#you" as
+      | string
+      | undefined,
+  };
 
   if (options?.resourceOwner === null) {
     delete hasConsent.isConsentForDataSubject;
@@ -73,16 +75,16 @@ export const mockAccessRequestVc = async (
     credentialSubject: {
       id: "https://some.requestor",
       hasConsent,
-      inbox: "https://some.inbox"
+      inbox: "https://some.inbox",
     },
     issuanceDate: "2022-02-22T00:00:00.000Z",
     issuer: "https://some.issuer",
     proof: {
       created: "2022-06-08T15:28:51.810Z",
-      proofPurpose: "some proof purpose",
+      proofPurpose: "https://example.org/some/proof/purpose",
       proofValue: "some proof",
       type: "Ed25519Signature2020",
-      verificationMethod: "https://some/method",
+      verificationMethod: "https://example.org/some/verification/method",
     },
     type: ["VerifiableCredential"],
   };
@@ -96,25 +98,30 @@ export const mockAccessRequestVc = async (
     asObject.credentialSubject.hasConsent.forPurpose = options.purpose;
   }
 
-  const asString = JSON.stringify(asObject);
+  const asString = JSON.stringify(asObject, null, 2);
   const asResponse = new Response(asString, {
     headers: new Headers([["content-type", "application/ld+json"]]),
   });
-  console.log("mocking", asObject);
-  const accessRequest = normalizeAccessRequest(
-    await getVerifiableCredentialFromResponse(asResponse, asObject.id, {
+
+  let accessRequest: VerifiableCredential & DatasetCore;
+  let nonNormalizedResponse: any;
+  try {
+    nonNormalizedResponse = await getVerifiableCredentialFromResponse(asResponse, asObject.id, {
       fetch: async (url, ...args) => {
         if (url.toString() in response) {
           return response[url.toString() as keyof typeof response]();
         }
         throw new Error(`Unexpected URL [${url}]`);
       },
-    }),
-  );
+    })
+    accessRequest = normalizeAccessRequest(nonNormalizedResponse);
+  } catch (e) {
+    throw new Error(`Error [${e}] for [${asString}] with nonNormalizedResponse [${nonNormalizedResponse}]`)
+  }
 
   if (!isAccessRequest(accessRequest)) {
     throw new Error(
-      `${JSON.stringify(accessRequest)} is not an Access Request`,
+      `${JSON.stringify(accessRequest, null, 2)} is not an Access Request. Trying to reframe [${asString}]`,
     );
   }
 
@@ -143,16 +150,17 @@ export const mockAccessGrantVc = async (
       },
       inbox: "https://some.inbox",
     },
-    issuanceDate: "1965-08-28",
+    issuanceDate: "1965-08-28T00:00:00.000Z",
     issuer: options?.issuer ?? "https://some.issuer",
     proof: {
-      created: "2021-10-05",
-      proofPurpose: "some proof purpose",
+      created: "2021-10-05T00:00:00.000Z",
+      proofPurpose: "https://example.org/some/proof/purpose",
       proofValue: "some proof",
       type: "Ed25519Signature2020",
-      verificationMethod: "https://some/method",
+      verificationMethod: "https://example.org/some/verification/method",
     },
-    type: [CREDENTIAL_TYPE_ACCESS_GRANT],
+    // FIXME: Confirm we need the vc type here
+    type: [CREDENTIAL_TYPE_ACCESS_GRANT, "VerifiableCredential"],
   };
 
   const asString = JSON.stringify(asObject);
