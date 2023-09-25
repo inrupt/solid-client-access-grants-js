@@ -19,10 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { jest, it, describe, expect } from "@jest/globals";
+import { jest, it, describe, expect, beforeAll } from "@jest/globals";
 import { Response } from "@inrupt/universal-fetch";
 import type * as CrossFetch from "@inrupt/universal-fetch";
 
+import type * as VcLibrary from "@inrupt/solid-client-vc";
 import { denyAccessRequest } from "./denyAccessRequest";
 import { mockAccessRequestVc } from "../util/access.mock";
 import {
@@ -38,7 +39,18 @@ jest.mock("@inrupt/solid-client", () => {
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
 });
-jest.mock("@inrupt/solid-client-vc");
+
+jest.mock("@inrupt/solid-client-vc", () => {
+  const { getVerifiableCredentialFromResponse, isVerifiableCredential } =
+    jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
+      typeof VcLibrary
+    >;
+  return {
+    getVerifiableCredentialFromResponse,
+    isVerifiableCredential,
+    issueVerifiableCredential: jest.fn(),
+  };
+});
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
     "@inrupt/universal-fetch",
@@ -55,7 +67,7 @@ describe("denyAccessRequest", () => {
   let accessRequestVc: Awaited<ReturnType<typeof mockAccessRequestVc>>;
 
   beforeAll(async () => {
-    accessRequestVc = await mockAccessRequestVc();
+    accessRequestVc = await mockAccessRequestVc({}, { expandModeUri: true });
   });
 
   it("throws if the provided VC isn't a Solid access request", async () => {
@@ -127,9 +139,12 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential",
     );
-    const accessRequestWithPurpose = await mockAccessRequestVc({
-      purpose: ["https://example.org/some-purpose"],
-    });
+    const accessRequestWithPurpose = await mockAccessRequestVc(
+      {
+        purpose: ["https://example.org/some-purpose"],
+      },
+      { expandModeUri: true },
+    );
     await denyAccessRequest(accessRequestWithPurpose, {
       fetch: jest.fn(global.fetch),
     });
@@ -268,9 +283,12 @@ describe("denyAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential",
     );
-    const accessRequestWithPurpose = await mockAccessRequestVc({
-      purpose: ["https://example.org/some-purpose"],
-    });
+    const accessRequestWithPurpose = await mockAccessRequestVc(
+      {
+        purpose: ["https://example.org/some-purpose"],
+      },
+      { expandModeUri: true },
+    );
 
     const mockedFetch = jest
       .fn(global.fetch)

@@ -21,8 +21,9 @@
 
 import { jest, it, describe, expect } from "@jest/globals";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
-import type * as VcModule from "@inrupt/solid-client-vc";
+import * as VcModule from "@inrupt/solid-client-vc";
 import type { fetch } from "@inrupt/universal-fetch";
+import type * as VcLibrary from "@inrupt/solid-client-vc";
 import type {
   AccessParameters,
   IssueAccessRequestParameters,
@@ -33,13 +34,21 @@ import { mockAccessGrantVc } from "../util/access.mock";
 
 const otherFetch = jest.fn(global.fetch);
 
-jest.mock("@inrupt/solid-client-vc");
-const mockedVcModule = jest.requireMock(
-  "@inrupt/solid-client-vc",
-) as jest.Mocked<typeof VcModule>;
-mockedVcModule.getVerifiableCredentialAllFromShape.mockReturnValue(
-  mockAccessGrantVc().then((res) => [res]),
-);
+jest.mock("@inrupt/solid-client-vc", () => {
+  const {
+    getVerifiableCredentialFromResponse,
+    getVerifiableCredentialAllFromShape,
+  } = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
+    typeof VcLibrary
+  >;
+  return {
+    getVerifiableCredentialFromResponse,
+    issueVerifiableCredential: jest.fn(),
+    getVerifiableCredentialAllFromShape: jest.fn(() =>
+      mockAccessGrantVc().then((res) => [res]),
+    ),
+  };
+});
 
 jest.mock("../discover/getAccessApiEndpoint", () => {
   return {
@@ -424,9 +433,9 @@ describe("getAccessGrantAll", () => {
       inherit: false,
       resources: [resourceAncestors[0]],
     });
-    mockedVcModule.getVerifiableCredentialAllFromShape.mockResolvedValue([
-      mockedGrant,
-    ]);
+    (
+      VcModule as jest.Mocked<typeof VcLibrary>
+    ).getVerifiableCredentialAllFromShape.mockResolvedValue([mockedGrant]);
     await expect(
       getAccessGrantAll({ resource: resource.href }),
     ).resolves.toStrictEqual([]);
@@ -437,7 +446,9 @@ describe("getAccessGrantAll", () => {
       inherit: false,
       resources: [resource.href],
     });
-    mockedVcModule.getVerifiableCredentialAllFromShape
+    (
+      VcModule as jest.Mocked<typeof VcLibrary>
+    ).getVerifiableCredentialAllFromShape
       .mockResolvedValueOnce([mockedGrant])
       // Override the default mock to an unapplicable non-recursive grant.
       .mockResolvedValue([

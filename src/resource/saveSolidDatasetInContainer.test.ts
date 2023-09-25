@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { it, jest, describe, expect } from "@jest/globals";
+import { it, jest, describe, expect, beforeAll } from "@jest/globals";
 import type { UrlString } from "@inrupt/solid-client";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import { mockAccessRequestVc } from "../gConsent/util/access.mock";
@@ -37,6 +37,12 @@ const MOCKED_DATASET = mockSolidDatasetFrom("https://some.url");
 const TEST_CONTAINER_URL: UrlString = "https://example.com/testContainerUrl";
 
 describe("saveSolidDatasetInContainer", () => {
+  let accessRequestVc: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+
+  beforeAll(async () => {
+    accessRequestVc = await mockAccessRequestVc();
+  });
+
   it("authenticates using the provided VC with a slugSuggestion", async () => {
     const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
     const mockedDataset = mockSolidDatasetFrom("https://some.url");
@@ -49,13 +55,13 @@ describe("saveSolidDatasetInContainer", () => {
     const resultDataset = await saveSolidDatasetInContainer(
       TEST_CONTAINER_URL,
       MOCKED_DATASET,
-      await mockAccessRequestVc(),
+      accessRequestVc,
       { fetch: mockedFetch, slugSuggestion: "test" },
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(
       TEST_CONTAINER_URL,
-      await mockAccessRequestVc(),
+      accessRequestVc,
       { fetch: mockedFetch },
     );
 

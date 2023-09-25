@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { it, jest, describe, expect } from "@jest/globals";
+import { it, jest, describe, expect, beforeAll } from "@jest/globals";
 import type SolidClientCore from "@inrupt/solid-client";
 import { fetch } from "@inrupt/universal-fetch";
 import { mockAccessGrantVc } from "../gConsent/util/access.mock";

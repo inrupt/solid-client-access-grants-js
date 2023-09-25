@@ -22,6 +22,7 @@
 import { jest, describe, it, expect } from "@jest/globals";
 import type { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { Response } from "@inrupt/universal-fetch";
+import type * as VcLibrary from "@inrupt/solid-client-vc";
 import { cancelAccessRequest } from "./cancelAccessRequest";
 import { MOCKED_CREDENTIAL_ID } from "./request.mock";
 import { mockAccessGrantVc } from "../util/access.mock";
@@ -34,7 +35,17 @@ jest.mock("@inrupt/solid-client", () => {
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
 });
-jest.mock("@inrupt/solid-client-vc");
+
+jest.mock("@inrupt/solid-client-vc", () => {
+  const { getVerifiableCredentialFromResponse } = jest.requireActual(
+    "@inrupt/solid-client-vc",
+  ) as jest.Mocked<typeof VcLibrary>;
+  return {
+    getVerifiableCredentialFromResponse,
+    issueVerifiableCredential: jest.fn(),
+    revokeVerifiableCredential: jest.fn(),
+  };
+});
 
 describe("cancelAccessRequest", () => {
   it("uses the provided fetch if any", async () => {

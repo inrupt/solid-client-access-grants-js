@@ -27,6 +27,7 @@ import {
   getVerifiableCredentialApiConfiguration,
 } from "@inrupt/solid-client-vc";
 
+import type * as VcLibrary from "@inrupt/solid-client-vc";
 import { isValidAccessGrant } from "./isValidAccessGrant";
 
 jest.mock("@inrupt/solid-client", () => {
@@ -37,7 +38,18 @@ jest.mock("@inrupt/solid-client", () => {
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
 });
-jest.mock("@inrupt/solid-client-vc");
+
+jest.mock("@inrupt/solid-client-vc", () => {
+  const { getVerifiableCredentialFromResponse } = jest.requireActual(
+    "@inrupt/solid-client-vc",
+  ) as jest.Mocked<typeof VcLibrary>;
+  return {
+    getVerifiableCredentialFromResponse,
+    isVerifiableCredential: jest.fn(),
+    issueVerifiableCredential: jest.fn(),
+    getVerifiableCredentialApiConfiguration: jest.fn(),
+  };
+});
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
     "@inrupt/universal-fetch",

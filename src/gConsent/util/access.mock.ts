@@ -35,6 +35,7 @@ import {
   CREDENTIAL_TYPE_ACCESS_REQUEST,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   GC_CONSENT_STATUS_REQUESTED,
+  MOCK_CONTEXT,
 } from "../constants";
 import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import type { AccessGrant } from "../type/AccessGrant";
@@ -60,6 +61,11 @@ export const mockAccessRequestVc = async (
     inherit: boolean;
     purpose: UrlString[];
   }>,
+  framingOptions?: {
+    // This should only be used for testing /issue calls
+    expandModeUri?: boolean;
+    skipValidation?: boolean;
+  },
 ): Promise<AccessRequest & DatasetCore<Quad, Quad>> => {
   const hasConsent = {
     forPersonalData: options?.resources ?? ["https://some.resource"],
@@ -77,7 +83,7 @@ export const mockAccessRequestVc = async (
   }
 
   const asObject: Record<string, any> = {
-    "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
+    "@context": MOCK_CONTEXT,
     id: "https://some.credential",
     credentialSubject: {
       id: "https://some.requestor",
@@ -96,7 +102,7 @@ export const mockAccessRequestVc = async (
     type: [CREDENTIAL_TYPE_ACCESS_REQUEST, "VerifiableCredential"],
   };
 
-  if (options?.inherit) {
+  if (typeof options?.inherit === "boolean") {
     asObject.inherit = options.inherit;
     asObject.credentialSubject.hasConsent.inherit = options.inherit;
   }
@@ -127,18 +133,65 @@ export const mockAccessRequestVc = async (
     );
   }
 
+  if (framingOptions?.skipValidation) {
+    return accessRequest as unknown as AccessRequest & DatasetCore;
+  }
+
   if (!isAccessRequest(accessRequest)) {
     throw new Error(
       `${JSON.stringify(
         accessRequest,
         null,
         2,
-      )} is not an Access Request. Trying to reframe [${asString}]`,
+      )} is not an Access Request. Trying to reframe [${asString}] [${JSON.stringify(
+        framingOptions,
+      )}]`,
     );
+  }
+
+  if (framingOptions?.expandModeUri) {
+    accessRequest.credentialSubject.hasConsent.mode =
+      accessRequest.credentialSubject.hasConsent.mode.map(
+        (mode) => `http://www.w3.org/ns/auth/acl#${mode}`,
+      );
   }
 
   return accessRequest;
 };
+
+export const mockAccessGrantObject = (
+  options?: Partial<{
+    issuer: string;
+    subjectId: string;
+    inherit: boolean;
+    resources: string[];
+  }>,
+) => ({
+  "@context": MOCK_CONTEXT,
+  id: "https://some.credential",
+  credentialSubject: {
+    id: options?.subjectId ?? "https://some.resource.owner",
+    providedConsent: {
+      forPersonalData: options?.resources ?? ["https://some.resource"],
+      hasStatus: "ConsentStatusExplicitlyGiven",
+      mode: ["http://www.w3.org/ns/auth/acl#Read"],
+      isProvidedTo: "https://some.requestor",
+      inherit: options?.inherit ?? true,
+    },
+    inbox: "https://some.inbox",
+  },
+  issuanceDate: "1965-08-28T00:00:00.000Z",
+  issuer: options?.issuer ?? "https://some.issuer",
+  proof: {
+    created: "2021-10-05T00:00:00.000Z",
+    proofPurpose: "https://example.org/some/proof/purpose",
+    proofValue: "some proof",
+    type: "Ed25519Signature2020",
+    verificationMethod: "https://example.org/some/verification/method",
+  },
+  // FIXME: Confirm we need the vc type here
+  type: [CREDENTIAL_TYPE_ACCESS_GRANT, "VerifiableCredential"],
+});
 
 export const mockAccessGrantVc = async (
   options?: Partial<{
@@ -147,33 +200,12 @@ export const mockAccessGrantVc = async (
     inherit: boolean;
     resources: string[];
   }>,
+  framingOptions?: {
+    // This should only be used for testing /issue calls
+    expandModeUri?: boolean;
+  },
 ): Promise<AccessGrant & DatasetCore<Quad, Quad>> => {
-  const asObject = {
-    "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
-    id: "https://some.credential",
-    credentialSubject: {
-      id: options?.subjectId ?? "https://some.resource.owner",
-      providedConsent: {
-        forPersonalData: options?.resources ?? ["https://some.resource"],
-        hasStatus: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-        mode: ["http://www.w3.org/ns/auth/acl#Read"],
-        isProvidedTo: "https://some.requestor",
-        inherit: options?.inherit ?? true,
-      },
-      inbox: "https://some.inbox",
-    },
-    issuanceDate: "1965-08-28T00:00:00.000Z",
-    issuer: options?.issuer ?? "https://some.issuer",
-    proof: {
-      created: "2021-10-05T00:00:00.000Z",
-      proofPurpose: "https://example.org/some/proof/purpose",
-      proofValue: "some proof",
-      type: "Ed25519Signature2020",
-      verificationMethod: "https://example.org/some/verification/method",
-    },
-    // FIXME: Confirm we need the vc type here
-    type: [CREDENTIAL_TYPE_ACCESS_GRANT, "VerifiableCredential"],
-  };
+  const asObject = mockAccessGrantObject(options);
 
   const asString = JSON.stringify(asObject);
   const asResponse = new Response(asString, {
@@ -191,24 +223,52 @@ export const mockAccessGrantVc = async (
     throw new Error("Not an access grant");
   }
 
+  if (framingOptions?.expandModeUri) {
+    // @ts-ignore
+    accessGrant.credentialSubject?.providedConsent?.mode =
+      accessGrant.credentialSubject?.providedConsent?.mode.map(
+        (mode) => `http://www.w3.org/ns/auth/acl#${mode}`,
+      );
+  }
+
   // FIXME type casting is bad
   return accessGrant as unknown as AccessGrant & DatasetCore<Quad, Quad>;
 };
 
-export const mockConsentRequestVc = async (): Promise<
+export const mockConsentRequestVc = async (
+  options?: Partial<{
+    issuer: string;
+    subjectId: string;
+    inherit: boolean;
+    resources: string[];
+  }>,
+  framingOptions?: {
+    // This should only be used for testing /issue calls
+    expandModeUri?: boolean;
+  },
+): Promise<
   VerifiableCredential & BaseRequestBody & DatasetCore<Quad, Quad>
 > => {
-  const requestVc = await mockAccessRequestVc();
+  const requestVc = await mockAccessRequestVc(options, framingOptions);
   requestVc.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
   requestVc.expirationDate = new Date(2021, 8, 14).toISOString();
   requestVc.issuanceDate = new Date(2021, 8, 13).toISOString();
   return requestVc;
 };
 
-export const mockConsentGrantVc = async (): Promise<
-  VerifiableCredential & BaseGrantBody & DatasetCore<Quad, Quad>
-> => {
-  const requestVc = await mockAccessGrantVc();
+export const mockConsentGrantVc = async (
+  options?: Partial<{
+    issuer: string;
+    subjectId: string;
+    inherit: boolean;
+    resources: string[];
+  }>,
+  framingOptions?: {
+    // This should only be used for testing /issue calls
+    expandModeUri?: boolean;
+  },
+): Promise<VerifiableCredential & BaseGrantBody & DatasetCore<Quad, Quad>> => {
+  const requestVc = await mockAccessGrantVc(options, framingOptions);
   requestVc.credentialSubject.providedConsent.forPurpose = [
     "https://some.purpose",
   ];

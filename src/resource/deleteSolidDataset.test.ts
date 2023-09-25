@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { it, jest, describe, expect } from "@jest/globals";
+import { it, jest, describe, expect, beforeAll } from "@jest/globals";
 import type SolidClientCore from "@inrupt/solid-client";
 import { mockAccessGrantVc } from "../gConsent/util/access.mock";
 import { deleteSolidDataset } from "./deleteSolidDataset";
@@ -33,21 +33,23 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 describe("deleteSolidDataset", () => {
+  let mockAccessGrant: Awaited<ReturnType<typeof mockAccessGrantVc>>;
+
+  beforeAll(async () => {
+    mockAccessGrant = await mockAccessGrantVc();
+  });
+
   it("authenticates using the provided VC", async () => {
     const solidClientModule = jest.requireMock(
       "@inrupt/solid-client",
     ) as jest.Mocked<typeof SolidClientCore>;
     const mockedFetch = jest.fn<typeof fetch>();
-    await deleteSolidDataset(
-      "https://some.dataset.url",
-      await mockAccessGrantVc(),
-      {
-        fetch: mockedFetch,
-      },
-    );
+    await deleteSolidDataset("https://some.dataset.url", mockAccessGrant, {
+      fetch: mockedFetch,
+    });
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
-      await mockAccessGrantVc(),
+      mockAccessGrant,
       { fetch: mockedFetch },
     );
     expect(solidClientModule.deleteSolidDataset).toHaveBeenCalledWith(

@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { it, jest, describe, expect } from "@jest/globals";
+import { it, jest, describe, expect, beforeAll } from "@jest/globals";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import type * as SolidClient from "@inrupt/solid-client";
 import { mockAccessRequestVc } from "../gConsent/util/access.mock";
@@ -41,6 +41,12 @@ const TEST_CONTAINER_URL: SolidClient.UrlString =
   "https://example.come/container/anothercontainer";
 
 describe("createContainerInContainer", () => {
+  let mockAccessRequest: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+
+  beforeAll(async () => {
+    mockAccessRequest = await mockAccessRequestVc();
+  });
+
   it("authenticates using the provided VC", async () => {
     const solidClientModule = jest.requireMock(
       "@inrupt/solid-client",
@@ -52,13 +58,13 @@ describe("createContainerInContainer", () => {
     const mockedFetch = jest.fn<typeof fetch>();
     const resultDataset = await createContainerInContainer(
       TEST_CONTAINER_URL,
-      await mockAccessRequestVc(),
+      mockAccessRequest,
       { fetch: mockedFetch, slugSuggestion: "NewChildContainer" },
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(
       TEST_CONTAINER_URL,
-      await mockAccessRequestVc(),
+      mockAccessRequest,
       { fetch: mockedFetch },
     );
 

@@ -90,9 +90,15 @@ describe("getResourceOwner", () => {
     });
 
     it("returns undefined if the resource owner is absent from a gConsent access request", async () => {
-      const gConsentRequest = await mockGConsentRequest({
-        resourceOwner: null,
-      });
+      const gConsentRequest = await mockGConsentRequest(
+        {
+          resourceOwner: null,
+        },
+        {
+          // The resource owner is actually required on access requests
+          skipValidation: true,
+        },
+      );
       expect(getResourceOwner(gConsentRequest)).toBeUndefined();
     });
   });
@@ -137,7 +143,7 @@ describe("getAccessModes", () => {
       const gConsentGrant = await mockGConsentGrant();
       expect(
         gConsentGrant.credentialSubject.providedConsent.mode,
-      ).toStrictEqual(["http://www.w3.org/ns/auth/acl#Read"]);
+      ).toStrictEqual(["Read"]);
       expect(getAccessModes(gConsentGrant)).toStrictEqual({
         read: true,
         append: false,
@@ -147,11 +153,7 @@ describe("getAccessModes", () => {
 
     it("gets the access modes from a gConsent access request", async () => {
       const gConsentRequest = await mockGConsentRequest({
-        modes: [
-          "http://www.w3.org/ns/auth/acl#Append",
-          "http://www.w3.org/ns/auth/acl#Read",
-          "http://www.w3.org/ns/auth/acl#Write",
-        ],
+        modes: ["Append", "Read", "Write"],
       });
       expect(getAccessModes(gConsentRequest)).toStrictEqual({
         read: true,

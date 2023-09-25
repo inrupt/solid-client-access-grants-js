@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { describe, it, jest, expect } from "@jest/globals";
+import { describe, it, jest, expect, beforeAll } from "@jest/globals";
 import type { getVerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetch } from "@inrupt/universal-fetch";
 import { getAccessGrantFromRedirectUrl } from "./getAccessGrantFromRedirectUrl";
@@ -39,6 +39,14 @@ jest.mock("@inrupt/solid-client-vc", () => {
 });
 
 describe("getAccessGrantFromRedirectUrl", () => {
+  let accessRequestVc: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+  let accessGrantVc: Awaited<ReturnType<typeof mockAccessGrantVc>>;
+
+  beforeAll(async () => {
+    accessRequestVc = await mockAccessRequestVc();
+    accessGrantVc = await mockAccessGrantVc();
+  });
+
   it("throws if the accessGrant query parameter is missing", async () => {
     await expect(
       getAccessGrantFromRedirectUrl("https://redirect.url"),
@@ -57,9 +65,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(
-      await mockAccessGrantVc(),
-    );
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(accessGrantVc);
 
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.set(
@@ -84,9 +90,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(
-      await mockAccessGrantVc(),
-    );
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(accessGrantVc);
 
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.set(
@@ -112,9 +116,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(
-      await mockAccessGrantVc(),
-    );
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(accessGrantVc);
 
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.set(
@@ -123,7 +125,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
     );
 
     const fetchedVc = await getAccessGrantFromRedirectUrl(redirectUrl);
-    expect(fetchedVc).toStrictEqual(await mockAccessGrantVc());
+    expect(fetchedVc).toStrictEqual(accessGrantVc);
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
@@ -132,7 +134,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    const normalizedAccessGrant = await mockAccessGrantVc();
+    const normalizedAccessGrant = accessGrantVc;
     // The server returns an equivalent JSON-LD with a different frame:
     vcModule.getVerifiableCredential.mockResolvedValueOnce({
       ...normalizedAccessGrant,
@@ -156,7 +158,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
     );
 
     const fetchedVc = await getAccessGrantFromRedirectUrl(redirectUrl);
-    expect(fetchedVc).toStrictEqual(await mockAccessGrantVc());
+    expect(fetchedVc).toStrictEqual(accessGrantVc);
   });
 
   it("throws if the fetched VC is not an Access Grant", async () => {
@@ -165,9 +167,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(
-      await mockAccessRequestVc(),
-    );
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(accessRequestVc);
 
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.set(

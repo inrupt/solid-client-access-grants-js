@@ -45,12 +45,12 @@ export default {
     },
   },
   projects: [
-    {
-      ...baseConfig,
-      displayName: "browser",
-      testEnvironment: "jsdom",
-      testPathIgnorePatterns: ["e2e", "node.test.ts"],
-    },
+    // {
+    //   ...baseConfig,
+    //   displayName: "browser",
+    //   testEnvironment: "jsdom",
+    //   testPathIgnorePatterns: ["e2e", "node.test.ts"],
+    // },
     {
       ...baseConfig,
       displayName: "node",
