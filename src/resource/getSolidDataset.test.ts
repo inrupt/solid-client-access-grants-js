@@ -33,6 +33,12 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 describe("getSolidDataset", () => {
+  let accessRequestVc: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+
+  beforeAll(async () => {
+    accessRequestVc = await mockAccessRequestVc();
+  });
+
   it("authenticates using the provided VC", async () => {
     const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
     const mockedDataset = mockSolidDatasetFrom("https://some.url");
@@ -41,12 +47,12 @@ describe("getSolidDataset", () => {
     // TODO: change to mockAccessGrantVc when rebasing
     const resultDataset = await getSolidDataset(
       "https://some.dataset.url",
-      await mockAccessRequestVc(),
+      accessRequestVc,
       { fetch: mockedFetch },
     );
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
-      await mockAccessRequestVc(),
+      accessRequestVc,
       { fetch: mockedFetch },
     );
     expect(solidClientModule.getSolidDataset).toHaveBeenCalledWith(

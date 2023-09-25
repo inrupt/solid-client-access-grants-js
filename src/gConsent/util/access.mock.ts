@@ -45,6 +45,13 @@ import { normalizeAccessGrant } from "../manage/approveAccessRequest";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { response } from "../../../mocks/data";
 
+const fetchFn: typeof fetch = async (url) => {
+  if (url.toString() in response) {
+    return response[url.toString() as keyof typeof response]();
+  }
+  throw new Error(`Unexpected URL [${url}]`);
+};
+
 export const mockAccessRequestVc = async (
   options?: Partial<{
     resources: UrlString[];
@@ -86,7 +93,7 @@ export const mockAccessRequestVc = async (
       type: "Ed25519Signature2020",
       verificationMethod: "https://example.org/some/verification/method",
     },
-    type: ["VerifiableCredential"],
+    type: [CREDENTIAL_TYPE_ACCESS_REQUEST, "VerifiableCredential"],
   };
 
   if (options?.inherit) {
@@ -106,22 +113,27 @@ export const mockAccessRequestVc = async (
   let accessRequest: VerifiableCredential & DatasetCore;
   let nonNormalizedResponse: any;
   try {
-    nonNormalizedResponse = await getVerifiableCredentialFromResponse(asResponse, asObject.id, {
-      fetch: async (url, ...args) => {
-        if (url.toString() in response) {
-          return response[url.toString() as keyof typeof response]();
-        }
-        throw new Error(`Unexpected URL [${url}]`);
+    nonNormalizedResponse = await getVerifiableCredentialFromResponse(
+      asResponse,
+      asObject.id,
+      {
+        fetch: fetchFn,
       },
-    })
+    );
     accessRequest = normalizeAccessRequest(nonNormalizedResponse);
   } catch (e) {
-    throw new Error(`Error [${e}] for [${asString}] with nonNormalizedResponse [${nonNormalizedResponse}]`)
+    throw new Error(
+      `Error [${e}] for [${asString}] with nonNormalizedResponse [${nonNormalizedResponse}]`,
+    );
   }
 
   if (!isAccessRequest(accessRequest)) {
     throw new Error(
-      `${JSON.stringify(accessRequest, null, 2)} is not an Access Request. Trying to reframe [${asString}]`,
+      `${JSON.stringify(
+        accessRequest,
+        null,
+        2,
+      )} is not an Access Request. Trying to reframe [${asString}]`,
     );
   }
 
@@ -168,7 +180,9 @@ export const mockAccessGrantVc = async (
     headers: new Headers([["content-type", "application/ld+json"]]),
   });
   const accessGrant = normalizeAccessGrant(
-    await getVerifiableCredentialFromResponse(asResponse, asObject.id),
+    await getVerifiableCredentialFromResponse(asResponse, asObject.id, {
+      fetch: fetchFn,
+    }),
   );
 
   // FIXME the type casting ias bad

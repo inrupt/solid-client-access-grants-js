@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { jest, it, describe, expect } from "@jest/globals";
+import { jest, it, describe, expect, beforeAll } from "@jest/globals";
 import { Response } from "@inrupt/universal-fetch";
 import type * as CrossFetch from "@inrupt/universal-fetch";
 
@@ -61,7 +61,15 @@ jest.mock("@inrupt/solid-client", () => {
   return solidClientModule;
 });
 
-jest.mock("@inrupt/solid-client-vc");
+jest.mock("@inrupt/solid-client-vc", () => {
+  const { getVerifiableCredentialFromResponse } = jest.requireActual(
+    "@inrupt/solid-client-vc",
+  ) as jest.Mocked<typeof VcClient>;
+  return {
+    getVerifiableCredentialFromResponse,
+    issueVerifiableCredential: jest.fn(),
+  };
+});
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
     "@inrupt/universal-fetch",
@@ -122,6 +130,16 @@ const spiedAcrLookup = jest.spyOn(
 const spiedAcrUpdate = jest.spyOn(mockedClientModule.acp_ess_2, "setVcAccess");
 
 describe("approveAccessRequest", () => {
+  let accessRequestVc: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+  let accessGrantVc: Awaited<ReturnType<typeof mockAccessGrantVc>>;
+
+  beforeAll(async () => {
+    accessRequestVc = await mockAccessRequestVc();
+    accessGrantVc = await mockAccessGrantVc();
+    console.log('the mocked access request vc is', JSON.stringify(accessRequestVc, null, 2))
+    console.log('the mocked access grant vc is', JSON.stringify(accessGrantVc, null, 2))
+  });
+
   // FIXME: This test must run before the other tests mocking the ACP client.
   // This means that some mocked isn't cleared properly between tests.
   it("updates the target resources' ACR appropriately", async () => {
@@ -177,9 +195,7 @@ describe("approveAccessRequest", () => {
   it("throws if the resource's ACR cannot be accessed by the current user", async () => {
     mockAcpClient({ hasAccessibleAcr: false });
     mockAccessApiEndpoint();
-    await expect(
-      approveAccessRequest(await mockAccessRequestVc()),
-    ).rejects.toThrow(
+    await expect(approveAccessRequest(accessRequestVc)).rejects.toThrow(
       "The current user does not have access to the resource's Access Control Resource",
     );
   });
@@ -188,7 +204,7 @@ describe("approveAccessRequest", () => {
     mockAccessApiEndpoint();
     await expect(
       approveAccessRequest({
-        ...(await mockAccessRequestVc()),
+        ...accessRequestVc,
         type: ["NotASolidAccessRequest"],
       }),
     ).rejects.toThrow(
@@ -198,7 +214,7 @@ describe("approveAccessRequest", () => {
 
   it("throws if the provided VC isn't an access request", async () => {
     mockAccessApiEndpoint();
-    const accessRequest = await mockAccessRequestVc();
+    const accessRequest = accessRequestVc;
     await expect(
       approveAccessRequest({
         ...accessRequest,
@@ -223,7 +239,7 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(await mockAccessGrantVc());
-    await approveAccessRequest(await mockAccessRequestVc(), undefined, {
+    await approveAccessRequest(accessRequestVc, undefined, {
       accessEndpoint: "https://some.consent-endpoint.override/",
       fetch: jest.fn<typeof fetch>(),
     });
@@ -247,7 +263,7 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(await mockAccessGrantVc());
-    await approveAccessRequest(await mockAccessRequestVc(), undefined, {
+    await approveAccessRequest(accessRequestVc, undefined, {
       fetch: mockedFetch,
     });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -270,7 +286,7 @@ describe("approveAccessRequest", () => {
     );
     const mockedIssue = jest.spyOn(mockedVcModule, "issueVerifiableCredential");
     mockedIssue.mockResolvedValueOnce(await mockAccessGrantVc());
-    await approveAccessRequest(await mockAccessRequestVc(), undefined, {
+    await approveAccessRequest(accessRequestVc, undefined, {
       fetch: jest.fn(global.fetch),
     });
 
@@ -278,13 +294,13 @@ describe("approveAccessRequest", () => {
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: {
-          mode: (await mockAccessRequestVc()).credentialSubject.hasConsent.mode,
+          mode: accessRequestVc.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          forPersonalData: (await mockAccessRequestVc()).credentialSubject
-            .hasConsent.forPersonalData,
-          isProvidedTo: (await mockAccessRequestVc()).credentialSubject.id,
+          forPersonalData:
+            accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+          isProvidedTo: accessRequestVc.credentialSubject.id,
         },
-        inbox: (await mockAccessRequestVc()).credentialSubject.inbox,
+        inbox: accessRequestVc.credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessGrant"],
@@ -313,15 +329,14 @@ describe("approveAccessRequest", () => {
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: {
-          mode: (await mockAccessRequestVc()).credentialSubject.hasConsent.mode,
+          mode: accessRequestVc.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          forPersonalData: (await mockAccessRequestVc()).credentialSubject
-            .hasConsent.forPersonalData,
-          isProvidedTo: (await mockAccessRequestVc()).credentialSubject.id,
-          forPurpose: (await mockAccessRequestVc()).credentialSubject.hasConsent
-            .forPurpose,
+          forPersonalData:
+            accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+          isProvidedTo: accessRequestVc.credentialSubject.id,
+          forPurpose: accessRequestVc.credentialSubject.hasConsent.forPurpose,
         },
-        inbox: (await mockAccessRequestVc()).credentialSubject.inbox,
+        inbox: accessRequestVc.credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessGrant"],
@@ -341,7 +356,7 @@ describe("approveAccessRequest", () => {
       "ConsentStatusExplicitlyGiven";
     mockedIssue.mockResolvedValueOnce(mockedVc);
     await expect(
-      approveAccessRequest(await mockAccessRequestVc(), undefined, {
+      approveAccessRequest(accessRequestVc, undefined, {
         fetch: jest.fn(global.fetch),
         updateAcr: false,
       }),
@@ -355,7 +370,7 @@ describe("approveAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as typeof VcClient,
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(await mockAccessRequestVc());
+    mockedIssue.mockResolvedValueOnce(accessRequestVc);
     const mockedFetch = jest.fn(global.fetch);
     mockedFetch.mockResolvedValueOnce(
       new Response(JSON.stringify(await mockConsentRequestVc())),
@@ -748,7 +763,9 @@ describe("approveAccessRequest", () => {
     );
   });
 
-  it("issues a proper access grant from a request VC using the deprecated signature", async () => {
+  it.only("issues a proper access grant from a request VC using the deprecated signature", async () => {
+    // console.log('calling issue request with', accessRequestVc)
+    
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
@@ -761,24 +778,25 @@ describe("approveAccessRequest", () => {
     spiedIssueRequest.mockResolvedValueOnce(await mockAccessGrantVc());
     await approveAccessRequest(
       "https://some.resource.owner",
-      await mockAccessRequestVc(),
+      accessRequestVc,
       undefined,
       {
         fetch: jest.fn(global.fetch),
       },
     );
 
+    // Tests like this are failing because of the fact that 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: {
-          mode: (await mockAccessRequestVc()).credentialSubject.hasConsent.mode,
+          mode: accessRequestVc.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          forPersonalData: (await mockAccessRequestVc()).credentialSubject
-            .hasConsent.forPersonalData,
-          isProvidedTo: (await mockAccessRequestVc()).credentialSubject.id,
+          forPersonalData:
+            accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+          isProvidedTo: accessRequestVc.credentialSubject.id,
         },
-        inbox: (await mockAccessRequestVc()).credentialSubject.inbox,
+        inbox: accessRequestVc.credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessGrant"],
@@ -794,11 +812,11 @@ describe("approveAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as typeof VcClient,
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(await mockAccessRequestVc());
+    mockedIssue.mockResolvedValueOnce(accessRequestVc);
     await expect(
       approveAccessRequest(
         "https://some.resource.owner",
-        await mockAccessRequestVc(),
+        accessRequestVc,
         undefined,
         {
           fetch: jest.fn(global.fetch),
@@ -835,7 +853,7 @@ describe("approveAccessRequest", () => {
       },
     });
     await expect(
-      approveAccessRequest(await mockAccessRequestVc(), undefined, {
+      approveAccessRequest(accessRequestVc, undefined, {
         fetch: jest.fn(global.fetch),
       }),
     ).resolves.toStrictEqual(normalizedAccessGrant);
