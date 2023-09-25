@@ -1,7 +1,7 @@
 {
   "name": "@inrupt/solid-client-access-grants",
   "description": "A library for managing access grants in Solid",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "license": "MIT",
   "scripts": {
     "build": "rollup --config rollup.config.mjs",
