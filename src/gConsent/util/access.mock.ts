@@ -225,9 +225,9 @@ export const mockAccessGrantVc = async (
 
   if (framingOptions?.expandModeUri) {
     // @ts-ignore
-    accessGrant.credentialSubject?.providedConsent?.mode =
+    accessGrant.credentialSubject?.providedConsent?.mode = // @ts-ignore
       accessGrant.credentialSubject?.providedConsent?.mode.map(
-        (mode) => `http://www.w3.org/ns/auth/acl#${mode}`,
+        (mode: string) => `http://www.w3.org/ns/auth/acl#${mode}`,
       );
   }
 
