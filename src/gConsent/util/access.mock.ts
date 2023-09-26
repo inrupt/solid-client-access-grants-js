@@ -19,10 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import {
-  type VerifiableCredential,
-  getVerifiableCredentialFromResponse,
-} from "@inrupt/solid-client-vc";
+import { type VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
 import type { DatasetCore, Quad } from "@rdfjs/types";
 import type {
@@ -30,10 +27,8 @@ import type {
   BaseRequestBody,
 } from "../type/AccessVerifiableCredential";
 import {
-  ACCESS_GRANT_CONTEXT_DEFAULT,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_REQUEST,
-  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   GC_CONSENT_STATUS_REQUESTED,
   MOCK_CONTEXT,
 } from "../constants";
@@ -44,14 +39,7 @@ import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import { normalizeAccessGrant } from "../manage/approveAccessRequest";
 import { isAccessGrant } from "../guard/isAccessGrant";
-import { response } from "../../../mocks/data";
-
-const fetchFn: typeof fetch = async (url) => {
-  if (url.toString() in response) {
-    return response[url.toString() as keyof typeof response]();
-  }
-  throw new Error(`Unexpected URL [${url}]`);
-};
+import { getVerifiableCredentialFromResponse } from "../../parsing";
 
 export const mockAccessRequestVc = async (
   options?: Partial<{
@@ -122,9 +110,6 @@ export const mockAccessRequestVc = async (
     nonNormalizedResponse = await getVerifiableCredentialFromResponse(
       asResponse,
       asObject.id,
-      {
-        fetch: fetchFn,
-      },
     );
     accessRequest = normalizeAccessRequest(nonNormalizedResponse);
   } catch (e) {
@@ -212,9 +197,7 @@ export const mockAccessGrantVc = async (
     headers: new Headers([["content-type", "application/ld+json"]]),
   });
   const accessGrant = normalizeAccessGrant(
-    await getVerifiableCredentialFromResponse(asResponse, asObject.id, {
-      fetch: fetchFn,
-    }),
+    await getVerifiableCredentialFromResponse(asResponse, asObject.id),
   );
 
   // FIXME the type casting ias bad

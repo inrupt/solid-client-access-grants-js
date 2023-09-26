@@ -20,11 +20,11 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
+import type { DatasetCore } from "@rdfjs/types";
 import {
   getVerifiableCredentialFromResponse,
   isVerifiableCredential,
-} from "@inrupt/solid-client-vc";
-import type { DatasetCore } from "@rdfjs/types";
+} from "../../parsing";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrant } from "../type/AccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
@@ -61,7 +61,7 @@ export async function getAccessGrant(
     data = await getVerifiableCredentialFromResponse(
       response,
       accessGrantVcUrl.toString(),
-      { fetch: sessionFetch },
+      { fetch: sessionFetch, baseIRI: accessGrantVcUrl.toString() },
     );
   } catch (e) {
     throw new Error(

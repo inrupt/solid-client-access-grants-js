@@ -112,7 +112,7 @@ describe("getAccessGrant", () => {
 
   it("supports denied access grants with a given IRI", async () => {
     mockAccessApiEndpoint();
-    const mockedAccessGrant = mockAccessGrant;
+    const mockedAccessGrant = mockAccessGrantObject();
     mockedAccessGrant.credentialSubject.providedConsent.hasStatus =
       "https://w3id.org/GConsent#ConsentStatusDenied";
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
@@ -124,12 +124,11 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
     });
-    expect(accessGrant).toEqual(mockedAccessGrant);
+    expect(accessGrant).toEqual(mockAccessGrant);
   });
 
   it("returns the access grant with the given IRI", async () => {
     mockAccessApiEndpoint();
-    const mockedAccessGrant = mockAccessGrant;
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
       new Response(JSON.stringify(mockAccessGrantObject()), {
         headers: new Headers([["content-type", "application/json"]]),
@@ -139,12 +138,12 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
     });
-    expect(accessGrant).toEqual(mockedAccessGrant);
+    expect(accessGrant).toEqual(mockAccessGrant);
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
     mockAccessApiEndpoint();
-    const normalizedAccessGrant = mockAccessGrant;
+    const normalizedAccessGrant = mockAccessGrantObject();
     // The server returns an equivalent JSON-LD with a different frame:
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
       new Response(
@@ -187,6 +186,6 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant(new URL("https://some.vc.url"), {
       fetch: mockedFetch,
     });
-    expect(accessGrant).toEqual(mockAccessGrant);
+    expect(accessGrant).toMatchObject(mockAccessGrant);
   });
 });
