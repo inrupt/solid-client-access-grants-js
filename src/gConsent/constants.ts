@@ -117,6 +117,7 @@ export const ACCESS_GRANT_STATUS = Object.freeze(
     GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
     GC_CONSENT_STATUS_DENIED_ABBREV,
     "gc:ConsentStatusDenied",
+    "Consent:StatusDenied",
     GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV,
   ]),
 );

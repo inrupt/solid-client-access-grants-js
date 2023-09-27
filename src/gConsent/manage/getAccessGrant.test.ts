@@ -141,7 +141,16 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
     });
-    expect(withoutDataset(accessGrant)).toEqual(withoutDataset(mockAccessGrant));
+    expect(withoutDataset(accessGrant)).toEqual({
+      ...withoutDataset(mockAccessGrant),
+      credentialSubject: {
+        ...withoutDataset(mockAccessGrant).credentialSubject,
+        providedConsent: {
+          ...withoutDataset(mockAccessGrant).credentialSubject.providedConsent,
+          hasStatus: 'Consent:StatusDenied'
+        }
+      }
+    });
   });
 
   it("returns the access grant with the given IRI", async () => {
