@@ -18,17 +18,17 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-import { getVerifiableCredential } from "@inrupt/solid-client-vc";
+
 import vc from "./vc";
 import integrity from "./data-integrity";
 import ed25519 from "./ed25519-2020";
 import revocation from "./revocation-list";
-import status from "./status-list";
+import statusList from "./status-list";
 
 export const data = {
   "https://vc.inrupt.com/credentials/v1": vc,
   "https://w3id.org/security/data-integrity/v1": integrity,
   "https://w3id.org/vc-revocation-list-2020/v1": revocation,
-  "https://w3id.org/vc/status-list/2021/v1": status,
+  "https://w3id.org/vc/status-list/2021/v1": statusList,
   "https://w3id.org/security/suites/ed25519-2020/v1": ed25519,
 };

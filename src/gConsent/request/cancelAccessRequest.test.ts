@@ -20,7 +20,6 @@
 //
 
 import { jest, describe, it, expect } from "@jest/globals";
-import type { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { Response } from "@inrupt/universal-fetch";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 import { cancelAccessRequest } from "./cancelAccessRequest";
@@ -50,7 +49,7 @@ jest.mock("@inrupt/solid-client-vc", () => {
 describe("cancelAccessRequest", () => {
   it("uses the provided fetch if any", async () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      revokeVerifiableCredential: typeof revokeVerifiableCredential;
+      revokeVerifiableCredential: typeof VcLibrary.revokeVerifiableCredential;
     };
     const spiedRevoke = jest.spyOn(
       mockedVcModule,
@@ -75,7 +74,7 @@ describe("cancelAccessRequest", () => {
 
   it("looks up the VC if provided as an IRI", async () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      revokeVerifiableCredential: typeof revokeVerifiableCredential;
+      revokeVerifiableCredential: typeof VcLibrary.revokeVerifiableCredential;
     };
     const spiedRevoke = jest.spyOn(
       mockedVcModule,
@@ -111,7 +110,7 @@ describe("cancelAccessRequest", () => {
 
   it("gets the VC identifier if provided as a full credential", async () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      revokeVerifiableCredential: typeof revokeVerifiableCredential;
+      revokeVerifiableCredential: typeof VcLibrary.revokeVerifiableCredential;
     };
     const spiedRevoke = jest.spyOn(
       mockedVcModule,

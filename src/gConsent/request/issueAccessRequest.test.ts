@@ -20,11 +20,6 @@
 //
 
 import { jest, describe, it, expect, beforeAll } from "@jest/globals";
-import type {
-  issueVerifiableCredential,
-  JsonLd,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
 import type * as CrossFetch from "@inrupt/universal-fetch";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 
@@ -163,7 +158,7 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
@@ -202,7 +197,7 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
@@ -229,7 +224,7 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
@@ -254,7 +249,7 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
@@ -273,9 +268,10 @@ describe("issueAccessRequest", () => {
     );
 
     // Casting is required because TS picks up the deprecated signature.
-    const subjectClaims = mockedIssue.mock.calls[0][1] as unknown as JsonLd;
+    const subjectClaims = mockedIssue.mock
+      .calls[0][1] as unknown as VcLibrary.JsonLd;
     const credentialClaims = mockedIssue.mock.calls[0][2] as unknown as
-      | JsonLd
+      | VcLibrary.JsonLd
       | undefined;
 
     expect(subjectClaims).toStrictEqual(
@@ -300,7 +296,7 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
@@ -345,7 +341,7 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
@@ -381,7 +377,7 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
@@ -411,7 +407,7 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
@@ -441,7 +437,7 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
@@ -490,7 +486,7 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
@@ -519,7 +515,7 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
@@ -545,7 +541,7 @@ describe("issueAccessRequest", () => {
     ).resolves.toStrictEqual(normalizedAccessRequest);
   });
 
-  const mockCredentialProof = (): VerifiableCredential["proof"] => {
+  const mockCredentialProof = (): VcLibrary.VerifiableCredential["proof"] => {
     return {
       created: "some date",
       proofPurpose: "some purpose",

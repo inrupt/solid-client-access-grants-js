@@ -76,7 +76,10 @@ export const ACCESS_GRANT_CONTEXT_DEFAULT = [
   instanciateContextVcEssTemplate("vc.inrupt.com"),
 ] as const;
 
-export const MOCK_CONTEXT = [...ACCESS_GRANT_CONTEXT_DEFAULT, ...extraContext];
+export const MOCK_CONTEXT = [
+  ...ACCESS_GRANT_CONTEXT_DEFAULT,
+  ...extraContext,
+] as const;
 
 // When issuing a VC using a given service,"https://schema.inrupt.com/credentials/v1.jsonld" be sure to set the context using the following.
 export const instanciateEssAccessGrantContext = (

@@ -65,6 +65,8 @@ export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
     hasConsent.isConsentForDataSubject = options?.resourceOwner;
   }
 
+  // We want to be able to mutate the record so we cannot set as a const
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const asObject: Record<string, any> = {
     "@context": MOCK_CONTEXT,
     id: "https://some.credential",
@@ -113,7 +115,9 @@ export const mockAccessRequestVc = async (
   });
 
   let accessRequest: VerifiableCredential & DatasetCore;
-  let nonNormalizedResponse: any;
+  let nonNormalizedResponse:
+    | Awaited<ReturnType<typeof getVerifiableCredentialFromResponse>>
+    | undefined;
   try {
     nonNormalizedResponse = await getVerifiableCredentialFromResponse(
       asResponse,
@@ -215,11 +219,14 @@ export const mockAccessGrantVc = async (
   }
 
   if (framingOptions?.expandModeUri) {
-    // @ts-ignore
-    accessGrant.credentialSubject?.providedConsent?.mode = // @ts-ignore
-      accessGrant.credentialSubject?.providedConsent?.mode.map(
+    const providedConsent = accessGrant.credentialSubject?.providedConsent as
+      | { mode?: string[] | undefined }
+      | undefined;
+    if (providedConsent) {
+      providedConsent.mode = providedConsent.mode?.map(
         (mode: string) => `http://www.w3.org/ns/auth/acl#${mode}`,
       );
+    }
   }
 
   // FIXME type casting is bad
