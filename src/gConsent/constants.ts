@@ -62,7 +62,6 @@ export const CONTEXT_ESS_DEFAULT =
 const instanciateContextVcEssTemplate = (essVcDomain: string): string =>
   `https://${essVcDomain}/credentials/v1`;
 
-// FIXME: Make sure these are cached
 const extraContext = [
   "https://w3id.org/security/data-integrity/v1",
   "https://w3id.org/vc-revocation-list-2020/v1",
