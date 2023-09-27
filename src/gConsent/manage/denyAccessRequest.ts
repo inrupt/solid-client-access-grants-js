@@ -85,12 +85,13 @@ async function denyAccessRequest(
   vcOrOptions?: VerifiableCredential | URL | UrlString | AccessBaseOptions,
   options?: AccessBaseOptions,
 ): Promise<VerifiableCredential> {
-  console.log(options, resourceOwnerOrVc, vcOrOptions)
   if (
     typeof options !== "undefined" ||
     (typeof resourceOwnerOrVc === "string" &&
       typeof vcOrOptions === "string") ||
-    isVerifiableCredential(vcOrOptions)
+      // FIXME: Understand why adding this typeof vcOrOptions === "object" && was necessary before
+      // making a release. Without it we were passing undefined to isVerifiableCredential
+    (typeof vcOrOptions === "object" && isVerifiableCredential(vcOrOptions))
   ) {
     // The deprecated signature is being used: ignore the first parameter
     return internal_denyAccessRequest(

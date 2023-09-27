@@ -86,7 +86,6 @@ describe("denyAccessRequest", () => {
 
   it("throws if there is no well known access endpoint", async () => {
     mockAccessApiEndpoint(false);
-    console.log('the access request vc is', accessRequestVc)
     await expect(denyAccessRequest(accessRequestVc)).rejects.toThrow(
       "No access issuer listed for property [verifiable_credential_issuer] in",
     );
