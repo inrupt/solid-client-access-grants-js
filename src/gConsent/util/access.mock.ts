@@ -47,11 +47,9 @@ type RequestVcOptions = Partial<{
   resourceOwner: string | null;
   inherit: boolean;
   purpose: UrlString[];
-}>
+}>;
 
-export const mockAccessRequestVcObject = (
-  options?: RequestVcOptions
-) => {
+export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
   const hasConsent = {
     forPersonalData: options?.resources ?? ["https://some.resource"],
     hasStatus: GC_CONSENT_STATUS_REQUESTED,
@@ -96,8 +94,8 @@ export const mockAccessRequestVcObject = (
     asObject.credentialSubject.hasConsent.forPurpose = options.purpose;
   }
 
-  return asObject
-}
+  return asObject;
+};
 
 export const mockAccessRequestVc = async (
   options?: RequestVcOptions,
@@ -228,17 +226,13 @@ export const mockAccessGrantVc = async (
   return accessGrant as unknown as AccessGrant & DatasetCore<Quad, Quad>;
 };
 
-
-export const mockConsentRequestObject = (
-  options?: RequestVcOptions,
-) => {
+export const mockConsentRequestObject = (options?: RequestVcOptions) => {
   const requestVc = mockAccessRequestVcObject(options);
   requestVc.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
   requestVc.expirationDate = new Date(2021, 8, 14).toISOString();
   requestVc.issuanceDate = new Date(2021, 8, 13).toISOString();
   return requestVc;
 };
-
 
 export const mockConsentRequestVc = async (
   options?: RequestVcOptions,

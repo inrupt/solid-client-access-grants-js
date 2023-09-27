@@ -89,8 +89,8 @@ async function denyAccessRequest(
     typeof options !== "undefined" ||
     (typeof resourceOwnerOrVc === "string" &&
       typeof vcOrOptions === "string") ||
-      // FIXME: Understand why adding this typeof vcOrOptions === "object" && was necessary before
-      // making a release. Without it we were passing undefined to isVerifiableCredential
+    // FIXME: Understand why adding this typeof vcOrOptions === "object" && was necessary before
+    // making a release. Without it we were passing undefined to isVerifiableCredential
     (typeof vcOrOptions === "object" && isVerifiableCredential(vcOrOptions))
   ) {
     // The deprecated signature is being used: ignore the first parameter

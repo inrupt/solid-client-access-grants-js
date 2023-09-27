@@ -69,7 +69,10 @@ describe("denyAccessRequest", () => {
 
   beforeAll(async () => {
     accessRequestVc = await mockAccessRequestVc();
-    accessRequestVcExpanded = await mockAccessRequestVc({}, { expandModeUri: true });
+    accessRequestVcExpanded = await mockAccessRequestVc(
+      {},
+      { expandModeUri: true },
+    );
   });
 
   it("throws if the provided VC isn't a Solid access request", async () => {
@@ -197,7 +200,8 @@ describe("denyAccessRequest", () => {
           mode: accessRequestVcExpanded.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-          accessRequestVcExpanded.credentialSubject.hasConsent.forPersonalData,
+            accessRequestVcExpanded.credentialSubject.hasConsent
+              .forPersonalData,
         }),
         inbox: accessRequestVcExpanded.credentialSubject.inbox,
       }),
@@ -232,7 +236,8 @@ describe("denyAccessRequest", () => {
           mode: accessRequestVcExpanded.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-          accessRequestVcExpanded.credentialSubject.hasConsent.forPersonalData,
+            accessRequestVcExpanded.credentialSubject.hasConsent
+              .forPersonalData,
         }),
         inbox: accessRequestVcExpanded.credentialSubject.inbox,
       }),
@@ -264,7 +269,8 @@ describe("denyAccessRequest", () => {
           mode: accessRequestVcExpanded.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-          accessRequestVcExpanded.credentialSubject.hasConsent.forPersonalData,
+            accessRequestVcExpanded.credentialSubject.hasConsent
+              .forPersonalData,
           isProvidedTo: "https://some.requestor",
         },
         inbox: accessRequestVcExpanded.credentialSubject.inbox,

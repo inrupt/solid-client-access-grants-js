@@ -35,12 +35,9 @@ import { mockAccessGrantVc } from "../util/access.mock";
 const otherFetch = jest.fn(global.fetch);
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const {
-    getVerifiableCredentialFromResponse,
-    getVerifiableCredentialAllFromShape,
-  } = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
-    typeof VcLibrary
-  >;
+  const { getVerifiableCredentialFromResponse } = jest.requireActual(
+    "@inrupt/solid-client-vc",
+  ) as jest.Mocked<typeof VcLibrary>;
   return {
     getVerifiableCredentialFromResponse,
     issueVerifiableCredential: jest.fn(),

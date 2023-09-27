@@ -19,7 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
 import { jest, describe, it, expect } from "@jest/globals";
 import { Response } from "@inrupt/universal-fetch";
 
@@ -41,7 +40,7 @@ jest.mock("@inrupt/solid-client-vc", () => {
 describe("revokeAccessGrant", () => {
   it("uses the provided fetch if any", async () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      revokeVerifiableCredential: typeof revokeVerifiableCredential;
+      revokeVerifiableCredential: (typeof VcLibrary)["revokeVerifiableCredential"];
     };
     const spiedRevoke = jest.spyOn(
       mockedVcModule,
@@ -66,7 +65,7 @@ describe("revokeAccessGrant", () => {
 
   it("looks up the VC if provided as an IRI", async () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      revokeVerifiableCredential: typeof revokeVerifiableCredential;
+      revokeVerifiableCredential: (typeof VcLibrary)["revokeVerifiableCredential"];
     };
     const spiedRevoke = jest.spyOn(
       mockedVcModule,
@@ -110,7 +109,7 @@ describe("revokeAccessGrant", () => {
 
   it("gets the VC identifier if provided as a full credential", async () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      revokeVerifiableCredential: typeof revokeVerifiableCredential;
+      revokeVerifiableCredential: (typeof VcLibrary)["revokeVerifiableCredential"];
     };
     const spiedRevoke = jest.spyOn(
       mockedVcModule,

@@ -28,7 +28,6 @@ import {
   mockAccessGrantObject,
   mockAccessGrantVc,
   mockConsentRequestObject,
-  mockConsentRequestVc,
 } from "../util/access.mock";
 import { getAccessGrant } from "./getAccessGrant";
 
@@ -45,7 +44,7 @@ function withoutDataset(data: any) {
     has: undefined,
     [Symbol.iterator]: undefined,
     delete: undefined,
-  }
+  };
 }
 
 jest.mock("@inrupt/universal-fetch", () => {
@@ -147,9 +146,9 @@ describe("getAccessGrant", () => {
         ...withoutDataset(mockAccessGrant).credentialSubject,
         providedConsent: {
           ...withoutDataset(mockAccessGrant).credentialSubject.providedConsent,
-          hasStatus: 'Consent:StatusDenied'
-        }
-      }
+          hasStatus: "Consent:StatusDenied",
+        },
+      },
     });
   });
 
@@ -164,7 +163,9 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
     });
-    expect(withoutDataset(accessGrant)).toEqual(withoutDataset(mockAccessGrant));
+    expect(withoutDataset(accessGrant)).toEqual(
+      withoutDataset(mockAccessGrant),
+    );
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
@@ -196,9 +197,11 @@ describe("getAccessGrant", () => {
     );
 
     expect(
-      withoutDataset(await getAccessGrant("https://some.vc.url", {
-        fetch: mockedFetch,
-      })),
+      withoutDataset(
+        await getAccessGrant("https://some.vc.url", {
+          fetch: mockedFetch,
+        }),
+      ),
     ).toEqual(withoutDataset(mockAccessGrant));
   });
 
@@ -213,6 +216,8 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant(new URL("https://some.vc.url"), {
       fetch: mockedFetch,
     });
-    expect(withoutDataset(accessGrant)).toMatchObject(withoutDataset(mockAccessGrant));
+    expect(withoutDataset(accessGrant)).toMatchObject(
+      withoutDataset(mockAccessGrant),
+    );
   });
 });
