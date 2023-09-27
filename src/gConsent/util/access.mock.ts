@@ -41,20 +41,17 @@ import { normalizeAccessGrant } from "../manage/approveAccessRequest";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { getVerifiableCredentialFromResponse } from "../../parsing";
 
-export const mockAccessRequestVc = async (
-  options?: Partial<{
-    resources: UrlString[];
-    modes: ResourceAccessMode[];
-    resourceOwner: string | null;
-    inherit: boolean;
-    purpose: UrlString[];
-  }>,
-  framingOptions?: {
-    // This should only be used for testing /issue calls
-    expandModeUri?: boolean;
-    skipValidation?: boolean;
-  },
-): Promise<AccessRequest & DatasetCore<Quad, Quad>> => {
+type RequestVcOptions = Partial<{
+  resources: UrlString[];
+  modes: ResourceAccessMode[];
+  resourceOwner: string | null;
+  inherit: boolean;
+  purpose: UrlString[];
+}>
+
+export const mockAccessRequestVcObject = (
+  options?: RequestVcOptions
+) => {
   const hasConsent = {
     forPersonalData: options?.resources ?? ["https://some.resource"],
     hasStatus: GC_CONSENT_STATUS_REQUESTED,
@@ -98,6 +95,19 @@ export const mockAccessRequestVc = async (
   if (options?.purpose) {
     asObject.credentialSubject.hasConsent.forPurpose = options.purpose;
   }
+
+  return asObject
+}
+
+export const mockAccessRequestVc = async (
+  options?: RequestVcOptions,
+  framingOptions?: {
+    // This should only be used for testing /issue calls
+    expandModeUri?: boolean;
+    skipValidation?: boolean;
+  },
+): Promise<AccessRequest & DatasetCore<Quad, Quad>> => {
+  const asObject = mockAccessRequestVcObject(options);
 
   const asString = JSON.stringify(asObject, null, 2);
   const asResponse = new Response(asString, {
@@ -219,12 +229,7 @@ export const mockAccessGrantVc = async (
 };
 
 export const mockConsentRequestVc = async (
-  options?: Partial<{
-    issuer: string;
-    subjectId: string;
-    inherit: boolean;
-    resources: string[];
-  }>,
+  options?: RequestVcOptions,
   framingOptions?: {
     // This should only be used for testing /issue calls
     expandModeUri?: boolean;
