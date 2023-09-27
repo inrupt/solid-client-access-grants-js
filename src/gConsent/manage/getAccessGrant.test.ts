@@ -31,6 +31,22 @@ import {
 } from "../util/access.mock";
 import { getAccessGrant } from "./getAccessGrant";
 
+/**
+ * Remove the properties of an RDF.DatasetCore from an object so that
+ * we can do equality matches in jest without those functions causing
+ * problems
+ */
+function withoutDataset(data: any) {
+  return {
+    ...data,
+    add: undefined,
+    match: undefined,
+    has: undefined,
+    [Symbol.iterator]: undefined,
+    delete: undefined,
+  }
+}
+
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
     "@inrupt/universal-fetch",
@@ -124,7 +140,7 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
     });
-    expect(accessGrant).toEqual(mockAccessGrant);
+    expect(withoutDataset(accessGrant)).toEqual(withoutDataset(mockAccessGrant));
   });
 
   it("returns the access grant with the given IRI", async () => {
@@ -138,7 +154,7 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
     });
-    expect(accessGrant).toEqual(mockAccessGrant);
+    expect(withoutDataset(accessGrant)).toEqual(withoutDataset(mockAccessGrant));
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
@@ -168,11 +184,12 @@ describe("getAccessGrant", () => {
         },
       ),
     );
-    await expect(
-      getAccessGrant("https://some.vc.url", {
+
+    expect(
+      withoutDataset(await getAccessGrant("https://some.vc.url", {
         fetch: mockedFetch,
-      }),
-    ).resolves.toEqual(normalizedAccessGrant);
+      })),
+    ).toEqual(withoutDataset(mockAccessGrant));
   });
 
   it("returns the access grant with the given URL object", async () => {
@@ -186,6 +203,6 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant(new URL("https://some.vc.url"), {
       fetch: mockedFetch,
     });
-    expect(accessGrant).toMatchObject(mockAccessGrant);
+    expect(withoutDataset(accessGrant)).toMatchObject(withoutDataset(mockAccessGrant));
   });
 });

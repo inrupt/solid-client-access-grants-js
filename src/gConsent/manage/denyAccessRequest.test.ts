@@ -65,9 +65,11 @@ jest.mock("@inrupt/universal-fetch", () => {
 // TODO: Extract the fetch VC function and related tests
 describe("denyAccessRequest", () => {
   let accessRequestVc: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+  let accessRequestVcExpanded: Awaited<ReturnType<typeof mockAccessRequestVc>>;
 
   beforeAll(async () => {
-    accessRequestVc = await mockAccessRequestVc({}, { expandModeUri: true });
+    accessRequestVc = await mockAccessRequestVc();
+    accessRequestVcExpanded = await mockAccessRequestVc({}, { expandModeUri: true });
   });
 
   it("throws if the provided VC isn't a Solid access request", async () => {
@@ -84,6 +86,7 @@ describe("denyAccessRequest", () => {
 
   it("throws if there is no well known access endpoint", async () => {
     mockAccessApiEndpoint(false);
+    console.log('the access request vc is', accessRequestVc)
     await expect(denyAccessRequest(accessRequestVc)).rejects.toThrow(
       "No access issuer listed for property [verifiable_credential_issuer] in",
     );
@@ -192,12 +195,12 @@ describe("denyAccessRequest", () => {
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: expect.objectContaining({
-          mode: accessRequestVc.credentialSubject.hasConsent.mode,
+          mode: accessRequestVcExpanded.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-            accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+          accessRequestVcExpanded.credentialSubject.hasConsent.forPersonalData,
         }),
-        inbox: accessRequestVc.credentialSubject.inbox,
+        inbox: accessRequestVcExpanded.credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessDenial"],
@@ -227,12 +230,12 @@ describe("denyAccessRequest", () => {
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: expect.objectContaining({
-          mode: accessRequestVc.credentialSubject.hasConsent.mode,
+          mode: accessRequestVcExpanded.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-            accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+          accessRequestVcExpanded.credentialSubject.hasConsent.forPersonalData,
         }),
-        inbox: accessRequestVc.credentialSubject.inbox,
+        inbox: accessRequestVcExpanded.credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessDenial"],
@@ -259,13 +262,13 @@ describe("denyAccessRequest", () => {
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: {
-          mode: accessRequestVc.credentialSubject.hasConsent.mode,
+          mode: accessRequestVcExpanded.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-            accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+          accessRequestVcExpanded.credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: "https://some.requestor",
         },
-        inbox: accessRequestVc.credentialSubject.inbox,
+        inbox: accessRequestVcExpanded.credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessDenial"],

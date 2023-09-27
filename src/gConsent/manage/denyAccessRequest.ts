@@ -85,6 +85,7 @@ async function denyAccessRequest(
   vcOrOptions?: VerifiableCredential | URL | UrlString | AccessBaseOptions,
   options?: AccessBaseOptions,
 ): Promise<VerifiableCredential> {
+  console.log(options, resourceOwnerOrVc, vcOrOptions)
   if (
     typeof options !== "undefined" ||
     (typeof resourceOwnerOrVc === "string" &&
