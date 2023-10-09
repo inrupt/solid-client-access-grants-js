@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@inrupt/internal-playwright-testids": "^2.4.0",
-    "@inrupt/solid-client": "^1.30.1",
+    "@inrupt/solid-client": "^1.30.2",
     "@inrupt/solid-client-access-grants": "file:../../../",
     "@inrupt/solid-client-authn-browser": "^1.17.2",
     "@inrupt/solid-client-authn-node": "^1.17.2",
