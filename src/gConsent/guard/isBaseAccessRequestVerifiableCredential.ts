@@ -42,6 +42,12 @@ function isRequestCredentialSubject(
 export function isBaseAccessRequestVerifiableCredential(
   x: unknown,
 ): x is BaseRequestBody {
+  console.log(
+    x,
+    isBaseAccessVcBody(x),
+    isBaseAccessVcBody(x) && isRequestCredentialSubject(x.credentialSubject),
+    isBaseAccessVcBody(x) && isRequestCredentialSubject(x.credentialSubject) && isGConsentAttributes(x.credentialSubject.hasConsent)
+  );
   return (
     isBaseAccessVcBody(x) &&
     isRequestCredentialSubject(x.credentialSubject) &&

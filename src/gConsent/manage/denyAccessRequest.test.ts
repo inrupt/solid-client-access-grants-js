@@ -41,12 +41,12 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { getVerifiableCredentialFromResponse, isVerifiableCredential } =
+  const { verifiableCredentialToDataset, isVerifiableCredential } =
     jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
       typeof VcLibrary
     >;
   return {
-    getVerifiableCredentialFromResponse,
+    verifiableCredentialToDataset,
     isVerifiableCredential,
     issueVerifiableCredential: jest.fn(),
   };

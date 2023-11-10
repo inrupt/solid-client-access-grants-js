@@ -19,21 +19,22 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { it, describe, expect } from "@jest/globals";
+import { it, describe, expect, beforeAll } from "@jest/globals";
 import type {
   AccessGrantOdrl,
   OdrlConstraint,
   OdrlPermission,
 } from "./AccessGrant";
 import { isCredentialAccessGrantOdrl } from "./AccessGrant";
+import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 
-const mockAccessGrantOdrl: AccessGrantOdrl = {
+const mockAccessGrantOdrlBase = {
   "@context": [
     "https://www.w3.org/2018/credentials/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1",
-    "https://www.w3.org/ns/odrl.jsonld",
-    "https://www.w3.org/ns/dpv.jsonld",
-    "https://www.w3.org/ns/solid/access.jsonld",
+    // "https://www.w3.org/ns/odrl.jsonld",
+    // "https://www.w3.org/ns/dpv.jsonld",
+    // "https://www.w3.org/ns/solid/access.jsonld",
   ],
   id: "https://vc.inrupt.com/credentials/{UUID}",
   type: ["VerifiableCredential", "SolidAccessGrant"],
@@ -81,13 +82,20 @@ const mockAccessGrantOdrl: AccessGrantOdrl = {
   },
 };
 
+
 const mockConstraint = (
-  mockAccessGrantOdrl.credentialSubject.permission[0]
+  mockAccessGrantOdrlBase.credentialSubject.permission[0]
     .constraint as OdrlConstraint[]
 )[0];
 
 describe("Valid Access Grants are recognized", () => {
-  it("Validates a full ODRL-based Access Grant VC", () => {
+  let mockAccessGrantOdrl: AccessGrantOdrl;
+
+  beforeAll(async () => {
+    mockAccessGrantOdrl = await verifiableCredentialToDataset(mockAccessGrantOdrlBase) as AccessGrantOdrl
+  });
+
+  it("Validates a full ODRL-based Access Grant VC", async () => {
     expect(isCredentialAccessGrantOdrl(mockAccessGrantOdrl)).toBe(true);
   });
 
@@ -122,6 +130,12 @@ describe("Valid Access Grants are recognized", () => {
 });
 
 describe("Invalid Access Grants are rejected", () => {
+  let mockAccessGrantOdrl: AccessGrantOdrl;
+
+  beforeAll(async () => {
+    mockAccessGrantOdrl = await verifiableCredentialToDataset(mockAccessGrantOdrlBase) as AccessGrantOdrl
+  });
+
   it("Rejects an ODRL-based Access Grant missing the SolidAccessGrant type", () => {
     expect(
       isCredentialAccessGrantOdrl({

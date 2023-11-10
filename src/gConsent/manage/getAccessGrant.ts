@@ -61,7 +61,6 @@ export async function getAccessGrant(
     data = await getVerifiableCredentialFromResponse(
       response,
       accessGrantVcUrl.toString(),
-      { fetch: sessionFetch, baseIRI: accessGrantVcUrl.toString() },
     );
   } catch (e) {
     throw new Error(

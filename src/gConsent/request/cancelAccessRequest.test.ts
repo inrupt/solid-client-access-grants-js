@@ -18,7 +18,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-
 import { jest, describe, it, expect } from "@jest/globals";
 import { Response } from "@inrupt/universal-fetch";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
@@ -36,11 +35,11 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { getVerifiableCredentialFromResponse } = jest.requireActual(
+  const { verifiableCredentialToDataset } = jest.requireActual(
     "@inrupt/solid-client-vc",
   ) as jest.Mocked<typeof VcLibrary>;
   return {
-    getVerifiableCredentialFromResponse,
+    verifiableCredentialToDataset,
     issueVerifiableCredential: jest.fn(),
     revokeVerifiableCredential: jest.fn(),
   };

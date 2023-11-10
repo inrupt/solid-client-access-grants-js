@@ -216,8 +216,8 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant(new URL("https://some.vc.url"), {
       fetch: mockedFetch,
     });
-    expect(withoutDataset(accessGrant)).toMatchObject(
-      withoutDataset(mockAccessGrant),
+    expect(JSON.parse(JSON.stringify(accessGrant))).toEqual(
+      JSON.parse(JSON.stringify(mockAccessGrant))
     );
   });
 });

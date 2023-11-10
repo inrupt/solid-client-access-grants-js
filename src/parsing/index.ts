@@ -20,7 +20,7 @@
 //
 import {
   getVerifiableCredential as $getVerifiableCredential,
-  getVerifiableCredentialFromResponse as $getVerifiableCredentialFromResponse,
+  verifiableCredentialToDataset,
 } from "@inrupt/solid-client-vc";
 import { data as contexts } from "./contexts";
 
@@ -34,11 +34,12 @@ export function getVerifiableCredential(
   });
 }
 
-export function getVerifiableCredentialFromResponse(
-  ...args: Parameters<typeof $getVerifiableCredentialFromResponse>
+export async function getVerifiableCredentialFromResponse(
+  response: Response,
+  vcUrl: string,
 ) {
-  return $getVerifiableCredentialFromResponse(args[0], args[1], {
-    ...args[2],
+  return verifiableCredentialToDataset(await response.json(), {
+    baseIRI: vcUrl,
     contexts,
     allowContextFetching: false,
   });
