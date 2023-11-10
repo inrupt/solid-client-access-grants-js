@@ -25,6 +25,12 @@ import type { AccessModes } from "../type/AccessModes";
 import { resourceAccessToAccessMode } from "../type/AccessModes";
 import type { AccessGrantOdrl } from "../odrl";
 import { isCredentialAccessGrantOdrl } from "../odrl";
+import { DataFactory } from "n3";
+import { NamedNode, DatasetCore, Quad_Subject, Quad_Predicate, Quad_Object, Term, BlankNode, Literal } from "@rdfjs/types";
+import { CREDENTIAL_SUBJECT, READ, WRITE, APPEND, PERMISSION, ACTION, PROVIDED_CONSENT, MODE, HAS_CONSENT, ISSUANCE_DATE, EXPIRATION_DATE, ISSUER, INHERIT, XSD_BOOLEAN, ASSIGNEE, IS_PROVIDED_TO } from "./constants";
+import { assertTermType, getSingleQuad } from "./constants";
+import { GC_IS_PROVIDED_TO } from "../gConsent/constants";
+const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
 /**
  * Get the resources to which an Access Grant/Request applies.
@@ -94,13 +100,22 @@ export function getResourceOwner(
 export function getRequestor(
   vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): string {
+  const credentialSubject = getSingleObject(vc, namedNode(vc.id), CREDENTIAL_SUBJECT);
   if (isCredentialAccessGrantOdrl(vc)) {
-    return vc.credentialSubject.assignee;
+    return getSingleObject(vc, credentialSubject, ASSIGNEE).value;
   }
   if (isGConsentAccessGrant(vc)) {
-    return vc.credentialSubject.providedConsent.isProvidedTo;
+    const providedConsent = getSingleObject(vc, credentialSubject, PROVIDED_CONSENT);
+    return getSingleObject(vc, providedConsent, IS_PROVIDED_TO).value;
   }
-  return vc.credentialSubject.id;
+  return credentialSubject.value;
+}
+
+function getSingleObject<T extends Term['termType']>(vc: DatasetCore, subject: Term, predicate: Term): NamedNode;
+function getSingleObject<T extends Term['termType']>(vc: DatasetCore, subject: Term, predicate: Term, type: 'BlankNode'): BlankNode;
+function getSingleObject<T extends Term['termType']>(vc: DatasetCore, subject: Term, predicate: Term, type: 'Literal'): Literal;
+function getSingleObject<T extends Term['termType']>(vc: DatasetCore, subject: Term, predicate: Term, type?: T) {
+  return assertTermType(getSingleQuad([...vc.match(subject, predicate, null, defaultGraph())]).object, type);
 }
 
 /**
@@ -118,18 +133,23 @@ export function getRequestor(
 export function getAccessModes(
   vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): AccessModes {
+  const credentialSubject = getSingleObject(vc, namedNode(vc.id), CREDENTIAL_SUBJECT);
+
   if (isCredentialAccessGrantOdrl(vc)) {
-    const modes = vc.credentialSubject.permission
-      .map((permission) => permission.action)
-      .flat();
-    return resourceAccessToAccessMode(modes);
+    const permissions = [...vc.match(credentialSubject, PERMISSION, null, defaultGraph())];
+    return {
+      read:  permissions.some((permission) => vc.has(quad(permission.object as Quad_Subject, ACTION, READ, defaultGraph()))),
+      write: permissions.some((permission) => vc.has(quad(permission.object as Quad_Subject, ACTION, WRITE, defaultGraph()))),
+      append: permissions.some((permission) => vc.has(quad(permission.object as Quad_Subject, ACTION, APPEND, defaultGraph()))),
+    };
   }
-  if (isGConsentAccessGrant(vc)) {
-    return resourceAccessToAccessMode(
-      vc.credentialSubject.providedConsent.mode,
-    );
-  }
-  return resourceAccessToAccessMode(vc.credentialSubject.hasConsent.mode);
+
+  const consent = getSingleObject(vc, credentialSubject, isGConsentAccessGrant(vc) ? PROVIDED_CONSENT : HAS_CONSENT);
+  return {
+    read: vc.has(quad(consent, MODE, READ, defaultGraph())),
+    write: vc.has(quad(consent, MODE, WRITE, defaultGraph())),
+    append: vc.has(quad(consent, MODE, APPEND, defaultGraph())),
+  };
 }
 
 /**
@@ -168,6 +188,13 @@ export function getTypes(
   return vc.type;
 }
 
+function wrapDate(date: Literal) {
+  if (!date.datatype.equals(literal('http://www.w3.org/2001/XMLSchema#dateTime'))) {
+    throw new Error(`Expected date to be a dateTime; recieved [${date.datatype.value}]`);
+  }
+  return new Date(date.value); 
+}
+
 /**
  * Get the issuance date of an Access Grant/Request.
  *
@@ -183,7 +210,7 @@ export function getTypes(
 export function getIssuanceDate(
   vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): Date {
-  return new Date(vc.issuanceDate);
+  return wrapDate(getSingleObject(vc, namedNode(vc.id), ISSUANCE_DATE, 'Literal'));
 }
 
 /**
@@ -201,9 +228,17 @@ export function getIssuanceDate(
 export function getExpirationDate(
   vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): Date | undefined {
-  return typeof vc.expirationDate === "string"
-    ? new Date(vc.expirationDate)
-    : undefined;
+  const expirationDate = [...vc.match(namedNode(vc.id), EXPIRATION_DATE, null, defaultGraph())];
+
+  if (expirationDate.length > 1) {
+    throw new Error(`Expected at most one expiration date. Found ${expirationDate.length}`);
+  }
+
+  if (expirationDate.length === 1) {
+    return wrapDate(assertTermType(expirationDate[0].object, 'Literal'));
+  }
+
+  return undefined;
 }
 
 /**
@@ -221,7 +256,7 @@ export function getExpirationDate(
 export function getIssuer(
   vc: AccessGrantGConsent | AccessRequestGConsent | AccessGrantOdrl,
 ): string {
-  return vc.issuer;
+  return getSingleObject(vc, namedNode(vc.id), ISSUER).value;
 }
 
 /**
@@ -242,11 +277,9 @@ export function getInherit(
   if (isCredentialAccessGrantOdrl(vc)) {
     return true;
   }
-  if (isGConsentAccessGrant(vc)) {
-    // Inherit defaults to true.
-    return vc.credentialSubject.providedConsent.inherit ?? true;
-  }
-  return vc.credentialSubject.hasConsent.inherit ?? true;
+  const credentialSubject = getSingleObject(vc, namedNode(vc.id), CREDENTIAL_SUBJECT);
+  const consent = getSingleObject(vc, credentialSubject, isGConsentAccessGrant(vc) ? PROVIDED_CONSENT : HAS_CONSENT);
+  return !vc.has(quad(consent, INHERIT, literal('false', XSD_BOOLEAN), defaultGraph()));
 }
 
 /**
