@@ -100,14 +100,13 @@ describe("denyAccessRequest", () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => Promise<AccessGrant>;
     };
-
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(mockAccessGrantVc());
+      .mockResolvedValueOnce(await mockAccessGrantVc());
 
-    await denyAccessRequest(mockAccessRequestVc, {
+    await denyAccessRequest(accessRequestVc, {
       accessEndpoint: "https://some.access-endpoint.override/",
-      fetch: jest.fn<typeof fetch>(),
+      fetch: jest.fn<typeof fetch>() as typeof fetch,
     });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       "https://some.access-endpoint.override/".concat("issue"),
@@ -123,14 +122,12 @@ describe("denyAccessRequest", () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => Promise<AccessGrant>;
     };
-
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
       .mockResolvedValueOnce(await mockAccessGrantVc());
 
     await denyAccessRequest(accessRequestVc, {
-
-      fetch: mockedFetch,
+      fetch: mockedFetch as typeof fetch,
     });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       expect.anything(),
@@ -145,17 +142,17 @@ describe("denyAccessRequest", () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => Promise<AccessGrant>;
     };
-
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
       .mockResolvedValueOnce(await mockAccessGrantVc());
-    const accessRequestWithPurpose = mockAccessRequestVc({
-      purpose: ["https://example.org/some-purpose"],
+    const accessRequestWithPurpose = await mockAccessRequestVc(
+      {
+        purpose: ["https://example.org/some-purpose"],
+      },
       { expandModeUri: true },
-    });
-
+    );
     await denyAccessRequest(accessRequestWithPurpose, {
-      fetch: jest.fn(global.fetch),
+      fetch: jest.fn(global.fetch) as typeof fetch,
     });
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
@@ -188,12 +185,14 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(mockAccessGrantVc());
+      .mockResolvedValueOnce(await mockAccessGrantVc());
     const mockedFetch = jest
       .fn(global.fetch)
-      .mockResolvedValueOnce(new Response(JSON.stringify(accessRequestVc)));
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(await mockAccessRequestVc())),
+      );
     await denyAccessRequest("https://some.credential", {
-      fetch: mockedFetch,
+      fetch: mockedFetch as typeof fetch,
     });
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -222,13 +221,15 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(mockAccessGrantVc());
+      .mockResolvedValueOnce(await mockAccessGrantVc());
 
     const mockedFetch = jest
       .fn(global.fetch)
-      .mockResolvedValueOnce(new Response(JSON.stringify(accessRequestVc)));
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(await mockAccessRequestVc())),
+      );
     await denyAccessRequest(new URL("https://some.credential"), {
-      fetch: mockedFetch,
+      fetch: mockedFetch as typeof fetch,
     });
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
@@ -256,19 +257,14 @@ describe("denyAccessRequest", () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => Promise<AccessGrant>;
     };
-
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
       .mockResolvedValueOnce(await mockAccessGrantVc());
 
     // This explicitly tests the deprecated signature.
-    await denyAccessRequest(
-      "https://some.resource.owner",
-      accessRequestVc,
-      {
-        fetch: jest.fn(global.fetch),
-      },
-    );
+    await denyAccessRequest("https://some.resource.owner", accessRequestVc, {
+      fetch: jest.fn(global.fetch) as typeof fetch,
+    });
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -296,14 +292,18 @@ describe("denyAccessRequest", () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       issueVerifiableCredential: () => Promise<AccessGrant>;
     };
-
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
       .mockResolvedValueOnce(await mockAccessGrantVc());
 
-    const accessRequestWithPurpose = mockAccessRequestVc({
-      purpose: ["https://example.org/some-purpose"],
-    });
+    const accessRequestWithPurpose = await mockAccessRequestVc(
+      {
+        purpose: ["https://example.org/some-purpose"],
+      },
+      {
+        expandModeUri: true,
+      },
+    );
 
     const mockedFetch = jest
       .fn(global.fetch)
@@ -311,7 +311,7 @@ describe("denyAccessRequest", () => {
         new Response(JSON.stringify(accessRequestWithPurpose)),
       );
     await denyAccessRequest("https://some.resource.owner", "https://some.vc", {
-      fetch: mockedFetch,
+      fetch: mockedFetch as typeof fetch,
     });
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
