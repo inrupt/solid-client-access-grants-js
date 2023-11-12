@@ -7,7 +7,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   lint:
-    uses: inrupt/typescript-sdk-tools/.github/workflows/reusable-lint.yml@v2.2.0
+    uses: inrupt/typescript-sdk-tools/.github/workflows/reusable-lint.yml@v2
 
   unit-tests:
     continue-on-error: ${{ matrix.experimental }}
@@ -21,7 +21,7 @@ jobs:
         experimental: [false]
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm

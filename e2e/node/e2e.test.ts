@@ -48,6 +48,7 @@ import {
   createContainerInContainer,
   denyAccessRequest,
   getAccessApiEndpoint,
+  getAccessGrant,
   getAccessGrantAll,
   getFile,
   getResources,
@@ -527,14 +528,10 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
   describe("access request, deny flow", () => {
     it("can issue an access grant denying an access request", async () => {
-      const grant = await denyAccessRequest(
-        resourceOwnerSession.info.webId as string,
-        sharedRequest,
-        {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          accessEndpoint: vcProvider,
-        },
-      );
+      const grant = await denyAccessRequest(sharedRequest, {
+        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+        accessEndpoint: vcProvider,
+      });
 
       await expect(
         isValidAccessGrant(grant, {
@@ -564,6 +561,12 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
         TEST_USER_AGENT,
       )(sharedFileIri);
       expect(fileResponse.status).toBe(403);
+
+      // Retrieving the grant should still be possible:
+      const retrievedGrant = await getAccessGrant(grant.id, {
+        fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+      });
+      expect(retrievedGrant).toStrictEqual(grant);
     });
   });
 
@@ -624,8 +627,10 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
     it("can filter VCs held by the service based on requestor", async () => {
       const allGrants = getAccessGrantAll(
-        sharedFilterTestIri,
-        { requestor: requestorSession.info.webId as string },
+        {
+          requestor: requestorSession.info.webId as string,
+          resource: sharedFilterTestIri,
+        },
         {
           fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
           accessEndpoint: vcProvider,
@@ -647,8 +652,10 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
 
       await expect(
         getAccessGrantAll(
-          sharedFilterTestIri,
-          { requestor: "https://some.unknown.requestor" },
+          {
+            requestor: "https://some.unknown.requestor",
+            resource: sharedFilterTestIri,
+          },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
@@ -675,19 +682,22 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
         ),
       ).resolves.toHaveLength(1);
       await expect(
-        getAccessGrantAll("https://some.unkown.resource", undefined, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          accessEndpoint: vcProvider,
-        }),
+        getAccessGrantAll(
+          { resource: "https://some.unkown.resource" },
+          {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            accessEndpoint: vcProvider,
+          },
+        ),
       ).resolves.toHaveLength(0);
     });
 
     it("can filter VCs held by the service based on status", async () => {
       const [granted, denied, both, unspecified] = await Promise.all([
         getAccessGrantAll(
-          sharedFilterTestIri,
           {
             status: "granted",
+            resource: sharedFilterTestIri,
           },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -695,9 +705,9 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
           },
         ),
         getAccessGrantAll(
-          sharedFilterTestIri,
           {
             status: "denied",
+            resource: sharedFilterTestIri,
           },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -705,16 +715,14 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
           },
         ),
         getAccessGrantAll(
-          sharedFilterTestIri,
-          { status: "all" },
+          { status: "all", resource: sharedFilterTestIri },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
           },
         ),
         getAccessGrantAll(
-          sharedFilterTestIri,
-          {},
+          { resource: sharedFilterTestIri },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
@@ -746,10 +754,9 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
             ...denyGrant.credentialSubject,
             providedConsent: {
               ...(denyGrant.credentialSubject.providedConsent as any),
-              forPersonalData: [
-                (denyGrant.credentialSubject.providedConsent as any)
-                  .forPersonalData,
-              ],
+              forPersonalData: (
+                denyGrant.credentialSubject.providedConsent as any
+              ).forPersonalData,
             },
           },
         },
@@ -764,33 +771,40 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
         bothPurposeFilter,
         unknownPurposeFilter,
       ] = await Promise.all([
-        getAccessGrantAll(sharedFilterTestIri, undefined, {
-          fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          accessEndpoint: vcProvider,
-        }),
         getAccessGrantAll(
-          sharedFilterTestIri,
-          { purpose: ["https://some.purpose/not-a-nefarious-one/i-promise"] },
+          { resource: sharedFilterTestIri },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
           },
         ),
         getAccessGrantAll(
-          sharedFilterTestIri,
-          { purpose: ["https://some.other.purpose/"] },
+          {
+            purpose: ["https://some.purpose/not-a-nefarious-one/i-promise"],
+            resource: sharedFilterTestIri,
+          },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
           },
         ),
         getAccessGrantAll(
-          sharedFilterTestIri,
+          {
+            purpose: ["https://some.other.purpose/"],
+            resource: sharedFilterTestIri,
+          },
+          {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            accessEndpoint: vcProvider,
+          },
+        ),
+        getAccessGrantAll(
           {
             purpose: [
               "https://some.purpose/not-a-nefarious-one/i-promise",
               "https://some.other.purpose/",
             ],
+            resource: sharedFilterTestIri,
           },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -798,8 +812,10 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
           },
         ),
         getAccessGrantAll(
-          sharedFilterTestIri,
-          { purpose: ["https://some.unknown.purpose/"] },
+          {
+            purpose: ["https://some.unknown.purpose/"],
+            resource: sharedFilterTestIri,
+          },
           {
             fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,

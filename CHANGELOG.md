@@ -10,6 +10,18 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+## [2.6.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.6.1) - 2023-09-25
+
+### Bugfixes
+
+- `denyAccessRequest` didn't normalize the returned denied Access Grant, resulting in it having a
+  JSON-LD frame different from the value returned by `approveAccessRequest`. The value is now normalized,
+  and both functions return a similarly shaped object. This also fixes the return type of `denyAccessRequest`,
+  which now returns the more strict `AccessGrant` type rather than the `VerifiableCredential` type.
+- add `types` entry in the package.json exports so that bundlers such as esbuild can discover type definitions.
+
+## [2.6.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.6.0) - 2023-09-18
+
 ### New feature
 
 - Export `getAccessGrantAll` has a new `status` parameter which allows selection of `granted`, `denied` or `all` access grants.
