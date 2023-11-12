@@ -62,11 +62,11 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { getVerifiableCredentialFromResponse } = jest.requireActual(
+  const { verifiableCredentialToDataset } = jest.requireActual(
     "@inrupt/solid-client-vc",
   ) as jest.Mocked<typeof VcClient>;
   return {
-    getVerifiableCredentialFromResponse,
+    verifiableCredentialToDataset,
     issueVerifiableCredential: jest.fn(),
   };
 });
@@ -760,8 +760,6 @@ describe("approveAccessRequest", () => {
   });
 
   it("issues a proper access grant from a request VC using the deprecated signature", async () => {
-    // console.log('calling issue request with', accessRequestVc)
-
     mockAcpClient();
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(

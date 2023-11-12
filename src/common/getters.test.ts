@@ -143,7 +143,7 @@ describe("getAccessModes", () => {
       const gConsentGrant = await mockGConsentGrant();
       expect(
         gConsentGrant.credentialSubject.providedConsent.mode,
-      ).toStrictEqual(["Read"]);
+      ).toStrictEqual(["http://www.w3.org/ns/auth/acl#Read"]);
       expect(getAccessModes(gConsentGrant)).toStrictEqual({
         read: true,
         append: false,

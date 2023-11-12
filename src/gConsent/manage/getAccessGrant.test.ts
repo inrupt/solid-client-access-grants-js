@@ -37,14 +37,7 @@ import { getAccessGrant } from "./getAccessGrant";
  * problems
  */
 function withoutDataset(data: any) {
-  return {
-    ...data,
-    add: undefined,
-    match: undefined,
-    has: undefined,
-    [Symbol.iterator]: undefined,
-    delete: undefined,
-  };
+  return JSON.parse(JSON.stringify(data));
 }
 
 jest.mock("@inrupt/universal-fetch", () => {
@@ -140,16 +133,7 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
     });
-    expect(withoutDataset(accessGrant)).toEqual({
-      ...withoutDataset(mockAccessGrant),
-      credentialSubject: {
-        ...withoutDataset(mockAccessGrant).credentialSubject,
-        providedConsent: {
-          ...withoutDataset(mockAccessGrant).credentialSubject.providedConsent,
-          hasStatus: "Consent:StatusDenied",
-        },
-      },
-    });
+    expect(withoutDataset(accessGrant)).toEqual(withoutDataset(mockedAccessGrant));
   });
 
   it("returns the access grant with the given IRI", async () => {

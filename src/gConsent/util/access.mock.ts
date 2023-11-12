@@ -106,8 +106,10 @@ export const mockAccessRequestVc = async (
     expandModeUri?: boolean;
     skipValidation?: boolean;
   },
+  modify?: (asObject: Record<string, any>) => void
 ): Promise<AccessRequest & DatasetCore<Quad, Quad>> => {
   const asObject = mockAccessRequestVcObject(options);
+  modify?.(asObject)
 
   const asString = JSON.stringify(asObject, null, 2);
   const asResponse = new Response(asString, {
@@ -149,7 +151,7 @@ export const mockAccessRequestVc = async (
   if (framingOptions?.expandModeUri) {
     accessRequest.credentialSubject.hasConsent.mode =
       accessRequest.credentialSubject.hasConsent.mode.map(
-        (mode) => `http://www.w3.org/ns/auth/acl#${mode}`,
+        (mode) => mode.startsWith('http') ? mode : `http://www.w3.org/ns/auth/acl#${mode}`,
       );
   }
 
@@ -201,8 +203,10 @@ export const mockAccessGrantVc = async (
     // This should only be used for testing /issue calls
     expandModeUri?: boolean;
   },
+  modify?: (asObject: Record<string, any>) => void
 ): Promise<AccessGrant & DatasetCore<Quad, Quad>> => {
   const asObject = mockAccessGrantObject(options);
+  modify?.(asObject);
 
   const asString = JSON.stringify(asObject);
   const asResponse = new Response(asString, {
@@ -224,7 +228,7 @@ export const mockAccessGrantVc = async (
       | undefined;
     if (providedConsent) {
       providedConsent.mode = providedConsent.mode?.map(
-        (mode: string) => `http://www.w3.org/ns/auth/acl#${mode}`,
+        (mode: string) => mode.startsWith('http') ? mode : `http://www.w3.org/ns/auth/acl#${mode}`,
       );
     }
   }
@@ -250,10 +254,11 @@ export const mockConsentRequestVc = async (
 ): Promise<
   VerifiableCredential & BaseRequestBody & DatasetCore<Quad, Quad>
 > => {
-  const requestVc = await mockAccessRequestVc(options, framingOptions);
-  requestVc.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
-  requestVc.expirationDate = new Date(2021, 8, 14).toISOString();
-  requestVc.issuanceDate = new Date(2021, 8, 13).toISOString();
+  const requestVc = await mockAccessRequestVc(options, framingOptions, object => {
+    object.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
+    object.expirationDate = new Date(2021, 8, 14).toISOString();
+    object.issuanceDate = new Date(2021, 8, 13).toISOString();
+  });
   return requestVc;
 };
 
@@ -269,11 +274,12 @@ export const mockConsentGrantVc = async (
     expandModeUri?: boolean;
   },
 ): Promise<VerifiableCredential & BaseGrantBody & DatasetCore<Quad, Quad>> => {
-  const requestVc = await mockAccessGrantVc(options, framingOptions);
-  requestVc.credentialSubject.providedConsent.forPurpose = [
-    "https://some.purpose",
-  ];
-  requestVc.expirationDate = new Date(2021, 8, 14).toISOString();
-  requestVc.issuanceDate = new Date(2021, 8, 13).toISOString();
+  const requestVc = await mockAccessGrantVc(options, framingOptions, object => {
+    object.credentialSubject.providedConsent.forPurpose = [
+      "https://some.purpose",
+    ];
+    object.expirationDate = new Date(2021, 8, 14).toISOString();
+    object.issuanceDate = new Date(2021, 8, 13).toISOString();
+  });
   return requestVc;
 };
