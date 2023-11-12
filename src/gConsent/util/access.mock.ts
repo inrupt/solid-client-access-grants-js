@@ -18,7 +18,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-
+/* eslint-disable no-param-reassign */
 import { type VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
 import type { DatasetCore, Quad } from "@rdfjs/types";
@@ -106,10 +106,11 @@ export const mockAccessRequestVc = async (
     expandModeUri?: boolean;
     skipValidation?: boolean;
   },
-  modify?: (asObject: Record<string, any>) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  modify?: (asObject: Record<string, any>) => void,
 ): Promise<AccessRequest & DatasetCore<Quad, Quad>> => {
   const asObject = mockAccessRequestVcObject(options);
-  modify?.(asObject)
+  modify?.(asObject);
 
   const asString = JSON.stringify(asObject, null, 2);
   const asResponse = new Response(asString, {
@@ -150,8 +151,10 @@ export const mockAccessRequestVc = async (
 
   if (framingOptions?.expandModeUri) {
     accessRequest.credentialSubject.hasConsent.mode =
-      accessRequest.credentialSubject.hasConsent.mode.map(
-        (mode) => mode.startsWith('http') ? mode : `http://www.w3.org/ns/auth/acl#${mode}`,
+      accessRequest.credentialSubject.hasConsent.mode.map((mode) =>
+        mode.startsWith("http")
+          ? mode
+          : `http://www.w3.org/ns/auth/acl#${mode}`,
       );
   }
 
@@ -203,7 +206,8 @@ export const mockAccessGrantVc = async (
     // This should only be used for testing /issue calls
     expandModeUri?: boolean;
   },
-  modify?: (asObject: Record<string, any>) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  modify?: (asObject: Record<string, any>) => void,
 ): Promise<AccessGrant & DatasetCore<Quad, Quad>> => {
   const asObject = mockAccessGrantObject(options);
   modify?.(asObject);
@@ -227,8 +231,10 @@ export const mockAccessGrantVc = async (
       | { mode?: string[] | undefined }
       | undefined;
     if (providedConsent) {
-      providedConsent.mode = providedConsent.mode?.map(
-        (mode: string) => mode.startsWith('http') ? mode : `http://www.w3.org/ns/auth/acl#${mode}`,
+      providedConsent.mode = providedConsent.mode?.map((mode: string) =>
+        mode.startsWith("http")
+          ? mode
+          : `http://www.w3.org/ns/auth/acl#${mode}`,
       );
     }
   }
@@ -254,11 +260,15 @@ export const mockConsentRequestVc = async (
 ): Promise<
   VerifiableCredential & BaseRequestBody & DatasetCore<Quad, Quad>
 > => {
-  const requestVc = await mockAccessRequestVc(options, framingOptions, object => {
-    object.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
-    object.expirationDate = new Date(2021, 8, 14).toISOString();
-    object.issuanceDate = new Date(2021, 8, 13).toISOString();
-  });
+  const requestVc = await mockAccessRequestVc(
+    options,
+    framingOptions,
+    (object) => {
+      object.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
+      object.expirationDate = new Date(2021, 8, 14).toISOString();
+      object.issuanceDate = new Date(2021, 8, 13).toISOString();
+    },
+  );
   return requestVc;
 };
 
@@ -274,12 +284,16 @@ export const mockConsentGrantVc = async (
     expandModeUri?: boolean;
   },
 ): Promise<VerifiableCredential & BaseGrantBody & DatasetCore<Quad, Quad>> => {
-  const requestVc = await mockAccessGrantVc(options, framingOptions, object => {
-    object.credentialSubject.providedConsent.forPurpose = [
-      "https://some.purpose",
-    ];
-    object.expirationDate = new Date(2021, 8, 14).toISOString();
-    object.issuanceDate = new Date(2021, 8, 13).toISOString();
-  });
+  const requestVc = await mockAccessGrantVc(
+    options,
+    framingOptions,
+    (object) => {
+      object.credentialSubject.providedConsent.forPurpose = [
+        "https://some.purpose",
+      ];
+      object.expirationDate = new Date(2021, 8, 14).toISOString();
+      object.issuanceDate = new Date(2021, 8, 13).toISOString();
+    },
+  );
   return requestVc;
 };

@@ -25,7 +25,7 @@ import type * as CrossFetch from "@inrupt/universal-fetch";
 import {
   isVerifiableCredential,
   getVerifiableCredentialApiConfiguration,
-  verifiableCredentialToDataset
+  verifiableCredentialToDataset,
 } from "@inrupt/solid-client-vc";
 
 import type * as VcLibrary from "@inrupt/solid-client-vc";
@@ -94,10 +94,12 @@ describe("isValidAccessGrant", () => {
   const MOCK_ACCESS_ENDPOINT = "https://consent.example.com";
   const MOCK_VERIFY_RESPONSE = { checks: [], warning: [], errors: [] };
 
-  let MOCK_ACCESS_GRANT: VcLibrary.VerifiableCredential
+  let MOCK_ACCESS_GRANT: VcLibrary.VerifiableCredential;
 
   beforeAll(async () => {
-    MOCK_ACCESS_GRANT = await verifiableCredentialToDataset(MOCK_ACCESS_GRANT_BASE)
+    MOCK_ACCESS_GRANT = await verifiableCredentialToDataset(
+      MOCK_ACCESS_GRANT_BASE,
+    );
   });
 
   it("uses the provided fetch if any", async () => {

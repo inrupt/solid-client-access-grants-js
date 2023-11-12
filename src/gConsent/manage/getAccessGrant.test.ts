@@ -133,7 +133,9 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
     });
-    expect(withoutDataset(accessGrant)).toEqual(withoutDataset(mockedAccessGrant));
+    expect(withoutDataset(accessGrant)).toEqual(
+      withoutDataset(mockedAccessGrant),
+    );
   });
 
   it("returns the access grant with the given IRI", async () => {
