@@ -20,7 +20,11 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import { isVerifiableCredential } from "@inrupt/solid-client-vc";
+import type { DatasetCore } from "@rdfjs/types";
+import {
+  getVerifiableCredentialFromResponse,
+  isVerifiableCredential,
+} from "../../parsing";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrant } from "../type/AccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
@@ -39,7 +43,7 @@ import { normalizeAccessGrant } from "./approveAccessRequest";
 export async function getAccessGrant(
   accessGrantVcUrl: UrlString | URL,
   options?: AccessBaseOptions,
-): Promise<AccessGrant> {
+): Promise<AccessGrant & DatasetCore> {
   const sessionFetch = await getSessionFetch(options ?? {});
   const vcUrl =
     typeof accessGrantVcUrl === "string"
@@ -54,10 +58,13 @@ export async function getAccessGrant(
   const responseErrorClone = response.clone();
   let data;
   try {
-    data = await response.json();
+    data = await getVerifiableCredentialFromResponse(
+      response,
+      accessGrantVcUrl.toString(),
+    );
   } catch (e) {
     throw new Error(
-      `Unexpected response when resolving [${vcUrl}], the result is not a Verifiable Credential: ${await responseErrorClone.text()}`,
+      `Unexpected response when resolving [${vcUrl}], the result is not a Verifiable Credential: ${await responseErrorClone.text()}.\n\nError details: ${e}`,
     );
   }
   data = normalizeAccessGrant(data);

@@ -42,12 +42,17 @@ describe("getAccessRequestFromRedirectUrl", () => {
     getVerifiableCredential: typeof getVerifiableCredential;
   }>;
   let redirectedToUrl: URL;
-  beforeEach(() => {
+  let accessRequestVc: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+  let accessGrantVc: Awaited<ReturnType<typeof mockAccessGrantVc>>;
+
+  beforeEach(async () => {
     mockedFetch = jest.fn(fetch);
     embeddedFetch = jest.requireMock("../../common/util/getSessionFetch");
     embeddedFetch.getSessionFetch.mockResolvedValueOnce(mockedFetch);
     vcModule = jest.requireMock("@inrupt/solid-client-vc");
-    vcModule.getVerifiableCredential.mockResolvedValue(mockAccessRequestVc());
+    accessRequestVc = await mockAccessRequestVc();
+    accessGrantVc = await mockAccessGrantVc();
+    vcModule.getVerifiableCredential.mockResolvedValue(accessRequestVc);
 
     redirectedToUrl = new URL("https://redirect.url");
     redirectedToUrl.searchParams.append(
@@ -115,19 +120,19 @@ describe("getAccessRequestFromRedirectUrl", () => {
 
     const { accessRequest, requestorRedirectUrl } = accessRequestFromUrl;
 
-    expect(accessRequest).toStrictEqual(mockAccessRequestVc());
+    expect(accessRequest).toStrictEqual(accessRequestVc);
     expect(requestorRedirectUrl).toBe("https://requestor.redirect.url");
   });
 
   it("throws if the fetched VC is not an Access Request", async () => {
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(accessGrantVc);
     await expect(
       getAccessRequestFromRedirectUrl(redirectedToUrl.href),
     ).rejects.toThrow();
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
-    const normalizedAccessRequest = mockAccessRequestVc();
+    const normalizedAccessRequest = accessRequestVc;
     // The server returns an equivalent JSON-LD with a different frame:
     vcModule.getVerifiableCredential.mockResolvedValueOnce({
       ...normalizedAccessRequest,
@@ -145,6 +150,6 @@ describe("getAccessRequestFromRedirectUrl", () => {
     });
     const { accessRequest } =
       await getAccessRequestFromRedirectUrl(redirectedToUrl);
-    expect(accessRequest).toStrictEqual(mockAccessRequestVc());
+    expect(accessRequest).toStrictEqual(accessRequestVc);
   });
 });

@@ -48,7 +48,7 @@ describe("redirectToAccessManagementUi", () => {
 
       await expect(
         redirectToAccessManagementUi(
-          mockAccessRequestVc(),
+          await mockAccessRequestVc(),
           "https://some.redirect.iri",
         ),
       ).rejects.toThrow(

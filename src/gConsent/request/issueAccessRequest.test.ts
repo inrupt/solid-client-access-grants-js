@@ -19,13 +19,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { jest, describe, it, expect } from "@jest/globals";
-import type {
-  issueVerifiableCredential,
-  JsonLd,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
+import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import type * as CrossFetch from "@inrupt/universal-fetch";
+import type * as VcLibrary from "@inrupt/solid-client-vc";
 
 import { issueAccessRequest } from "./issueAccessRequest";
 import { getRequestBody } from "../util/issueAccessVc";
@@ -55,7 +51,15 @@ jest.mock("@inrupt/solid-client", () => {
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
 });
-jest.mock("@inrupt/solid-client-vc");
+jest.mock("@inrupt/solid-client-vc", () => {
+  const { verifiableCredentialToDataset } = jest.requireActual(
+    "@inrupt/solid-client-vc",
+  ) as jest.Mocked<typeof VcLibrary>;
+  return {
+    verifiableCredentialToDataset,
+    issueVerifiableCredential: jest.fn(),
+  };
+});
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
     "@inrupt/universal-fetch",
@@ -142,15 +146,23 @@ describe("getRequestBody", () => {
 });
 
 describe("issueAccessRequest", () => {
+  let mockAccessRequest: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+  let mockAccessGrant: Awaited<ReturnType<typeof mockAccessGrantVc>>;
+
+  beforeAll(async () => {
+    mockAccessRequest = await mockAccessRequestVc();
+    mockAccessGrant = await mockAccessGrantVc();
+  });
+
   it("sends a proper access request", async () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+    mockedIssue.mockResolvedValueOnce(mockAccessRequest);
 
     await issueAccessRequest(
       {
@@ -185,14 +197,13 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
-    const mockedVc = mockAccessRequestVc();
-    mockedVc.credentialSubject.hasConsent.hasStatus =
+    mockAccessRequest.credentialSubject.hasConsent.hasStatus =
       GC_CONSENT_STATUS_REQUESTED_ABBREV;
-    mockedIssue.mockResolvedValueOnce(mockedVc);
+    mockedIssue.mockResolvedValueOnce(mockAccessRequest);
 
     await expect(
       issueAccessRequest(
@@ -213,11 +224,11 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
+    mockedIssue.mockResolvedValueOnce(mockAccessGrant);
 
     await expect(
       issueAccessRequest(
@@ -238,11 +249,11 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+    mockedIssue.mockResolvedValueOnce(mockAccessRequest);
 
     await issueAccessRequest(
       {
@@ -257,9 +268,10 @@ describe("issueAccessRequest", () => {
     );
 
     // Casting is required because TS picks up the deprecated signature.
-    const subjectClaims = mockedIssue.mock.calls[0][1] as unknown as JsonLd;
+    const subjectClaims = mockedIssue.mock
+      .calls[0][1] as unknown as VcLibrary.JsonLd;
     const credentialClaims = mockedIssue.mock.calls[0][2] as unknown as
-      | JsonLd
+      | VcLibrary.JsonLd
       | undefined;
 
     expect(subjectClaims).toStrictEqual(
@@ -284,11 +296,11 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+    mockedIssue.mockResolvedValueOnce(mockAccessRequest);
 
     await issueAccessRequest(
       {
@@ -329,11 +341,11 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+    mockedIssue.mockResolvedValueOnce(mockAccessRequest);
 
     await issueAccessRequest({
       access: { read: true },
@@ -365,11 +377,11 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+    mockedIssue.mockResolvedValueOnce(mockAccessRequest);
 
     await issueAccessRequest(
       {
@@ -395,11 +407,11 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+    mockedIssue.mockResolvedValueOnce(mockAccessRequest);
 
     await issueAccessRequest(
       {
@@ -425,11 +437,11 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+    mockedIssue.mockResolvedValueOnce(mockAccessRequest);
 
     await issueAccessRequest(
       {
@@ -474,11 +486,13 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
-    const normalizedAccessRequest = mockAccessRequestVc({ inherit: true });
+    const normalizedAccessRequest = await mockAccessRequestVc({
+      inherit: true,
+    });
     mockedIssue.mockResolvedValueOnce(
       jsonLdEquivalent(normalizedAccessRequest, { inherit: "true" }),
     );
@@ -501,12 +515,14 @@ describe("issueAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedIssue = jest.spyOn(
       jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
+        issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
       },
       "issueVerifiableCredential",
     );
     // Test for a different "inherit" value
-    const normalizedAccessRequest = mockAccessRequestVc({ inherit: false });
+    const normalizedAccessRequest = await mockAccessRequestVc({
+      inherit: false,
+    });
     mockedIssue.mockResolvedValueOnce(
       jsonLdEquivalent(normalizedAccessRequest, { inherit: "false" }),
     );
@@ -525,13 +541,13 @@ describe("issueAccessRequest", () => {
     ).resolves.toStrictEqual(normalizedAccessRequest);
   });
 
-  const mockCredentialProof = (): VerifiableCredential["proof"] => {
+  const mockCredentialProof = (): VcLibrary.VerifiableCredential["proof"] => {
     return {
       created: "some date",
       proofPurpose: "some purpose",
       proofValue: "some value",
       type: "some type",
-      verificationMethod: "some method",
+      verificationMethod: "https://example.org/some/verification/method",
     };
   };
 

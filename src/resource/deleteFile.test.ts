@@ -19,8 +19,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { it, jest, describe, expect } from "@jest/globals";
+import { it, jest, describe, expect, beforeAll } from "@jest/globals";
 import type SolidClientCore from "@inrupt/solid-client";
+import { fetch } from "@inrupt/universal-fetch";
 import { mockAccessGrantVc } from "../gConsent/util/access.mock";
 import { deleteFile } from "./deleteFile";
 import { fetchWithVc } from "../fetch";
@@ -33,19 +34,22 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 describe("deleteSolidDataset", () => {
+  let mockVc: Awaited<ReturnType<typeof mockAccessGrantVc>>;
+  beforeAll(async () => {
+    mockVc = await mockAccessGrantVc();
+  });
+
   it("authenticates using the provided VC", async () => {
     const solidClientModule = jest.requireMock(
       "@inrupt/solid-client",
     ) as jest.Mocked<typeof SolidClientCore>;
-    const mockedFetch = jest.fn<typeof fetch>();
-    await deleteFile("https://some.file.url", mockAccessGrantVc(), {
+    const mockedFetch = jest.fn<typeof fetch>(fetch);
+    await deleteFile("https://some.file.url", mockVc, {
       fetch: mockedFetch,
     });
-    expect(fetchWithVc).toHaveBeenCalledWith(
-      expect.anything(),
-      mockAccessGrantVc(),
-      { fetch: mockedFetch },
-    );
+    expect(fetchWithVc).toHaveBeenCalledWith(expect.anything(), mockVc, {
+      fetch: mockedFetch,
+    });
     expect(solidClientModule.deleteFile).toHaveBeenCalledWith(
       "https://some.file.url",
       expect.anything(),

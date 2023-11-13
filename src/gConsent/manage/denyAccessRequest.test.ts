@@ -19,10 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { jest, it, describe, expect } from "@jest/globals";
+import { jest, it, describe, expect, beforeAll } from "@jest/globals";
 import { Response } from "@inrupt/universal-fetch";
 import type * as CrossFetch from "@inrupt/universal-fetch";
 
+import type * as VcLibrary from "@inrupt/solid-client-vc";
 import { denyAccessRequest } from "./denyAccessRequest";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import {
@@ -39,7 +40,18 @@ jest.mock("@inrupt/solid-client", () => {
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
 });
-jest.mock("@inrupt/solid-client-vc");
+
+jest.mock("@inrupt/solid-client-vc", () => {
+  const { verifiableCredentialToDataset, isVerifiableCredential } =
+    jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
+      typeof VcLibrary
+    >;
+  return {
+    verifiableCredentialToDataset,
+    isVerifiableCredential,
+    issueVerifiableCredential: jest.fn(),
+  };
+});
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
     "@inrupt/universal-fetch",
@@ -53,11 +65,22 @@ jest.mock("@inrupt/universal-fetch", () => {
 
 // TODO: Extract the fetch VC function and related tests
 describe("denyAccessRequest", () => {
+  let accessRequestVc: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+  let accessRequestVcExpanded: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+
+  beforeAll(async () => {
+    accessRequestVc = await mockAccessRequestVc();
+    accessRequestVcExpanded = await mockAccessRequestVc(
+      {},
+      { expandModeUri: true },
+    );
+  });
+
   it("throws if the provided VC isn't a Solid access request", async () => {
     mockAccessApiEndpoint();
     await expect(
       denyAccessRequest({
-        ...mockAccessRequestVc(),
+        ...accessRequestVc,
         type: ["NotASolidAccessRequest"],
       }),
     ).rejects.toThrow(
@@ -67,7 +90,7 @@ describe("denyAccessRequest", () => {
 
   it("throws if there is no well known access endpoint", async () => {
     mockAccessApiEndpoint(false);
-    await expect(denyAccessRequest(mockAccessRequestVc())).rejects.toThrow(
+    await expect(denyAccessRequest(accessRequestVc)).rejects.toThrow(
       "No access issuer listed for property [verifiable_credential_issuer] in",
     );
   });
@@ -79,11 +102,11 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(mockAccessGrantVc());
+      .mockResolvedValueOnce(await mockAccessGrantVc());
 
-    await denyAccessRequest(mockAccessRequestVc(), {
+    await denyAccessRequest(accessRequestVc, {
       accessEndpoint: "https://some.access-endpoint.override/",
-      fetch: jest.fn<typeof fetch>(),
+      fetch: jest.fn<typeof fetch>() as typeof fetch,
     });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       "https://some.access-endpoint.override/".concat("issue"),
@@ -101,10 +124,10 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(mockAccessGrantVc());
+      .mockResolvedValueOnce(await mockAccessGrantVc());
 
-    await denyAccessRequest(mockAccessRequestVc(), {
-      fetch: mockedFetch,
+    await denyAccessRequest(accessRequestVc, {
+      fetch: mockedFetch as typeof fetch,
     });
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       expect.anything(),
@@ -121,12 +144,15 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(mockAccessGrantVc());
-    const accessRequestWithPurpose = mockAccessRequestVc({
-      purpose: ["https://example.org/some-purpose"],
-    });
+      .mockResolvedValueOnce(await mockAccessGrantVc());
+    const accessRequestWithPurpose = await mockAccessRequestVc(
+      {
+        purpose: ["https://example.org/some-purpose"],
+      },
+      { expandModeUri: true },
+    );
     await denyAccessRequest(accessRequestWithPurpose, {
-      fetch: jest.fn(global.fetch),
+      fetch: jest.fn(global.fetch) as typeof fetch,
     });
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
@@ -159,26 +185,27 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(mockAccessGrantVc());
+      .mockResolvedValueOnce(await mockAccessGrantVc());
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(mockAccessRequestVc())),
+        new Response(JSON.stringify(await mockAccessRequestVc())),
       );
     await denyAccessRequest("https://some.credential", {
-      fetch: mockedFetch,
+      fetch: mockedFetch as typeof fetch,
     });
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: expect.objectContaining({
-          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
+          mode: accessRequestVcExpanded.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
+            accessRequestVcExpanded.credentialSubject.hasConsent
+              .forPersonalData,
         }),
-        inbox: mockAccessRequestVc().credentialSubject.inbox,
+        inbox: accessRequestVcExpanded.credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessDenial"],
@@ -194,15 +221,15 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(mockAccessGrantVc());
+      .mockResolvedValueOnce(await mockAccessGrantVc());
 
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(mockAccessRequestVc())),
+        new Response(JSON.stringify(await mockAccessRequestVc())),
       );
     await denyAccessRequest(new URL("https://some.credential"), {
-      fetch: mockedFetch,
+      fetch: mockedFetch as typeof fetch,
     });
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
@@ -210,12 +237,13 @@ describe("denyAccessRequest", () => {
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: expect.objectContaining({
-          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
+          mode: accessRequestVcExpanded.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
+            accessRequestVcExpanded.credentialSubject.hasConsent
+              .forPersonalData,
         }),
-        inbox: mockAccessRequestVc().credentialSubject.inbox,
+        inbox: accessRequestVcExpanded.credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessDenial"],
@@ -231,29 +259,26 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(mockAccessGrantVc());
+      .mockResolvedValueOnce(await mockAccessGrantVc());
 
     // This explicitly tests the deprecated signature.
-    await denyAccessRequest(
-      "https://some.resource.owner",
-      mockAccessRequestVc(),
-      {
-        fetch: jest.fn(global.fetch),
-      },
-    );
+    await denyAccessRequest("https://some.resource.owner", accessRequestVc, {
+      fetch: jest.fn(global.fetch) as typeof fetch,
+    });
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: {
-          mode: mockAccessRequestVc().credentialSubject.hasConsent.mode,
+          mode: accessRequestVcExpanded.credentialSubject.hasConsent.mode,
           hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
           forPersonalData:
-            mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData,
+            accessRequestVcExpanded.credentialSubject.hasConsent
+              .forPersonalData,
           isProvidedTo: "https://some.requestor",
         },
-        inbox: mockAccessRequestVc().credentialSubject.inbox,
+        inbox: accessRequestVcExpanded.credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessDenial"],
@@ -269,11 +294,16 @@ describe("denyAccessRequest", () => {
     };
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(mockAccessGrantVc());
+      .mockResolvedValueOnce(await mockAccessGrantVc());
 
-    const accessRequestWithPurpose = mockAccessRequestVc({
-      purpose: ["https://example.org/some-purpose"],
-    });
+    const accessRequestWithPurpose = await mockAccessRequestVc(
+      {
+        purpose: ["https://example.org/some-purpose"],
+      },
+      {
+        expandModeUri: true,
+      },
+    );
 
     const mockedFetch = jest
       .fn(global.fetch)
@@ -281,7 +311,7 @@ describe("denyAccessRequest", () => {
         new Response(JSON.stringify(accessRequestWithPurpose)),
       );
     await denyAccessRequest("https://some.resource.owner", "https://some.vc", {
-      fetch: mockedFetch,
+      fetch: mockedFetch as typeof fetch,
     });
 
     // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?

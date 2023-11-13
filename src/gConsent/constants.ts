@@ -62,11 +62,23 @@ export const CONTEXT_ESS_DEFAULT =
 const instanciateContextVcEssTemplate = (essVcDomain: string): string =>
   `https://${essVcDomain}/credentials/v1`;
 
+const extraContext = [
+  "https://w3id.org/security/data-integrity/v1",
+  "https://w3id.org/vc-revocation-list-2020/v1",
+  "https://w3id.org/vc/status-list/2021/v1",
+  "https://w3id.org/security/suites/ed25519-2020/v1",
+];
+
 // A default context value is provided for mocking purpose accross the codebase.
 export const ACCESS_GRANT_CONTEXT_DEFAULT = [
   CONTEXT_VC_W3C,
   CONTEXT_ESS_DEFAULT,
   instanciateContextVcEssTemplate("vc.inrupt.com"),
+] as const;
+
+export const MOCK_CONTEXT = [
+  ...ACCESS_GRANT_CONTEXT_DEFAULT,
+  ...extraContext,
 ] as const;
 
 // When issuing a VC using a given service,"https://schema.inrupt.com/credentials/v1.jsonld" be sure to set the context using the following.
@@ -108,6 +120,7 @@ export const ACCESS_GRANT_STATUS = Object.freeze(
     GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
     GC_CONSENT_STATUS_DENIED_ABBREV,
     "gc:ConsentStatusDenied",
+    "Consent:StatusDenied",
     GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV,
   ]),
 );

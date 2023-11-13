@@ -18,11 +18,31 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+import {
+  getVerifiableCredential as $getVerifiableCredential,
+  verifiableCredentialToDataset,
+} from "@inrupt/solid-client-vc";
+import { data as contexts } from "./contexts";
 
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import type { AccessRequestBody } from "./AccessVerifiableCredential";
+export function getVerifiableCredential(
+  ...args: Parameters<typeof $getVerifiableCredential>
+) {
+  return $getVerifiableCredential(args[0], {
+    ...args[1],
+    contexts,
+    allowContextFetching: false,
+  });
+}
 
-export type AccessRequest = VerifiableCredential & AccessRequestBody;
-// Alias with the explicit GConsent suffix, to be used in functions accepting both
-// gConsent-based grants.
-export type AccessRequestGConsent = AccessRequest;
+export async function getVerifiableCredentialFromResponse(
+  response: Response,
+  vcUrl: string,
+) {
+  return verifiableCredentialToDataset(await response.json(), {
+    baseIRI: vcUrl,
+    contexts,
+    allowContextFetching: false,
+  });
+}
+
+export { isVerifiableCredential } from "@inrupt/solid-client-vc";

@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { it, jest, describe, expect } from "@jest/globals";
+import { it, jest, describe, expect, beforeAll } from "@jest/globals";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import { mockAccessRequestVc } from "../gConsent/util/access.mock";
 import { getSolidDataset } from "./getSolidDataset";
@@ -33,6 +33,12 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 describe("getSolidDataset", () => {
+  let accessRequestVc: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+
+  beforeAll(async () => {
+    accessRequestVc = await mockAccessRequestVc();
+  });
+
   it("authenticates using the provided VC", async () => {
     const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
     const mockedDataset = mockSolidDatasetFrom("https://some.url");
@@ -41,12 +47,12 @@ describe("getSolidDataset", () => {
     // TODO: change to mockAccessGrantVc when rebasing
     const resultDataset = await getSolidDataset(
       "https://some.dataset.url",
-      mockAccessRequestVc(),
+      accessRequestVc,
       { fetch: mockedFetch },
     );
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
-      mockAccessRequestVc(),
+      accessRequestVc,
       { fetch: mockedFetch },
     );
     expect(solidClientModule.getSolidDataset).toHaveBeenCalledWith(

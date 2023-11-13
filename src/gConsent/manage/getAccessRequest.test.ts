@@ -20,7 +20,7 @@
 //
 
 import { describe, it, jest, expect, beforeEach } from "@jest/globals";
-import type { getVerifiableCredential } from "@inrupt/solid-client-vc";
+import * as VcModule from "@inrupt/solid-client-vc";
 import { fetch } from "@inrupt/universal-fetch";
 import { getAccessRequest } from "./getAccessRequest";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
@@ -28,7 +28,9 @@ import type { getSessionFetch } from "../../common/util/getSessionFetch";
 
 jest.mock("../../common/util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {
-  const vcModule = jest.requireActual("@inrupt/solid-client-vc") as any;
+  const vcModule = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
+    typeof VcModule
+  >;
   return {
     ...vcModule,
     getVerifiableCredential: jest.fn(),
@@ -38,37 +40,38 @@ jest.mock("@inrupt/solid-client-vc", () => {
 describe("getAccessRequest", () => {
   let mockedFetch: jest.MockedFunction<typeof fetch>;
   let embeddedFetch: jest.Mocked<{ getSessionFetch: typeof getSessionFetch }>;
-  let vcModule: jest.Mocked<{
-    getVerifiableCredential: typeof getVerifiableCredential;
-  }>;
-  beforeEach(() => {
+  let accessRequestVc: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+  let accessGrantVc: Awaited<ReturnType<typeof mockAccessGrantVc>>;
+
+  beforeEach(async () => {
     mockedFetch = jest.fn(fetch);
     embeddedFetch = jest.requireMock("../../common/util/getSessionFetch");
     embeddedFetch.getSessionFetch.mockResolvedValueOnce(mockedFetch);
-    vcModule = jest.requireMock("@inrupt/solid-client-vc");
-    vcModule.getVerifiableCredential.mockResolvedValue(mockAccessRequestVc());
+    accessRequestVc = await mockAccessRequestVc();
+    accessGrantVc = await mockAccessGrantVc();
+    (
+      VcModule as jest.Mocked<typeof VcModule>
+    ).getVerifiableCredential.mockResolvedValue(accessRequestVc);
   });
 
   it("uses the default fetch if none is provided", async () => {
     await getAccessRequest("https://some.vc");
-    expect(vcModule.getVerifiableCredential).toHaveBeenCalledWith(
-      "https://some.vc",
-      {
-        fetch: mockedFetch,
-      },
-    );
+    expect(
+      (VcModule as jest.Mocked<typeof VcModule>).getVerifiableCredential,
+    ).toHaveBeenCalledWith("https://some.vc", {
+      fetch: mockedFetch,
+    });
   });
 
   it("uses the provided fetch if any", async () => {
     await getAccessRequest("https://some.vc", {
       fetch: mockedFetch,
     });
-    expect(vcModule.getVerifiableCredential).toHaveBeenCalledWith(
-      "https://some.vc",
-      {
-        fetch: mockedFetch,
-      },
-    );
+    expect(
+      (VcModule as jest.Mocked<typeof VcModule>).getVerifiableCredential,
+    ).toHaveBeenCalledWith("https://some.vc", {
+      fetch: mockedFetch,
+    });
   });
 
   it("returns the fetched VC and the redirect URL", async () => {
@@ -79,18 +82,22 @@ describe("getAccessRequest", () => {
     );
 
     expect(accessRequestFromString).toStrictEqual(accessRequestFromUrl);
-    expect(accessRequestFromString).toStrictEqual(mockAccessRequestVc());
+    expect(accessRequestFromString).toStrictEqual(accessRequestVc);
   });
 
   it("throws if the fetched VC is not an Access Request", async () => {
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
+    (
+      VcModule as jest.Mocked<typeof VcModule>
+    ).getVerifiableCredential.mockResolvedValueOnce(accessGrantVc);
     await expect(getAccessRequest("https://some.vc")).rejects.toThrow();
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
-    const normalizedAccessRequest = mockAccessRequestVc();
+    const normalizedAccessRequest = accessRequestVc;
     // The server returns an equivalent JSON-LD with a different frame:
-    vcModule.getVerifiableCredential.mockResolvedValueOnce({
+    (
+      VcModule as jest.Mocked<typeof VcModule>
+    ).getVerifiableCredential.mockResolvedValueOnce({
       ...normalizedAccessRequest,
       credentialSubject: {
         ...normalizedAccessRequest.credentialSubject,
@@ -103,8 +110,8 @@ describe("getAccessRequest", () => {
           mode: normalizedAccessRequest.credentialSubject.hasConsent.mode[0],
         },
       },
-    });
+    } as any);
     const accessRequest = await getAccessRequest("https://some.vc");
-    expect(accessRequest).toStrictEqual(mockAccessRequestVc());
+    expect(accessRequest).toStrictEqual(accessRequestVc);
   });
 });
