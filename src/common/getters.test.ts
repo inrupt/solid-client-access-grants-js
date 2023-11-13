@@ -62,8 +62,8 @@ describe("getResources", () => {
     });
   });
   describe("ODRL data model", () => {
-    it("gets the resources from an ODRL access grant", () => {
-      const odrlGrant = mockOdrlGrant();
+    it("gets the resources from an ODRL access grant", async () => {
+      const odrlGrant = await mockOdrlGrant();
       expect(getResources(odrlGrant)).toEqual([
         odrlGrant.credentialSubject.permission[0].target,
       ]);
@@ -104,8 +104,8 @@ describe("getResourceOwner", () => {
   });
 
   describe("ODRL data model", () => {
-    it("gets the resource owner from an ODRL access grant", () => {
-      const odrlGrant = mockOdrlGrant();
+    it("gets the resource owner from an ODRL access grant", async () => {
+      const odrlGrant = await mockOdrlGrant();
       expect(getResourceOwner(odrlGrant)).toBe(odrlGrant.credentialSubject.id);
     });
   });
@@ -128,8 +128,8 @@ describe("getRequestor", () => {
     });
   });
   describe("ODRL data model", () => {
-    it("gets the recipient of an ODRL access grant", () => {
-      const odrlGrant = mockOdrlGrant();
+    it("gets the recipient of an ODRL access grant", async () => {
+      const odrlGrant = await mockOdrlGrant();
       expect(getRequestor(odrlGrant)).toBe(
         odrlGrant.credentialSubject.assignee,
       );
@@ -163,8 +163,8 @@ describe("getAccessModes", () => {
     });
   });
   describe("ODRL data model", () => {
-    it("gets the access modes of an ODRL access grant", () => {
-      const odrlGrant = mockOdrlGrant();
+    it("gets the access modes of an ODRL access grant", async () => {
+      const odrlGrant = await mockOdrlGrant();
       expect(odrlGrant.credentialSubject.permission[0].action).toStrictEqual([
         "http://www.w3.org/ns/auth/acl#Read",
         "http://www.w3.org/ns/auth/acl#Write",
@@ -191,8 +191,8 @@ describe("getId", () => {
     });
   });
   describe("ODRL data model", () => {
-    it("gets the ODRL access grant id", () => {
-      const odrlGrant = mockOdrlGrant();
+    it("gets the ODRL access grant id", async () => {
+      const odrlGrant = await mockOdrlGrant();
       expect(getId(odrlGrant)).toBe(odrlGrant.id);
     });
   });
@@ -211,8 +211,8 @@ describe("getTypes", () => {
     });
   });
   describe("ODRL data model", () => {
-    it("gets the ODRL access grant types", () => {
-      const odrlGrant = mockOdrlGrant();
+    it("gets the ODRL access grant types", async () => {
+      const odrlGrant = await mockOdrlGrant();
       expect(getTypes(odrlGrant)).toBe(odrlGrant.type);
     });
   });
@@ -221,27 +221,33 @@ describe("getTypes", () => {
 describe("getIssuanceDate", () => {
   describe("gConsent data model", () => {
     it("gets the gConsent access issuance date", async () => {
-      const gConsentGrant = await mockGConsentGrant();
-      gConsentGrant.issuanceDate = new Date().toString();
+      const issuanceDate = new Date().toString();
+      const gConsentGrant = await mockGConsentGrant(undefined, undefined, o => {
+        o.issuanceDate = issuanceDate;
+      });
       expect(getIssuanceDate(gConsentGrant)).toStrictEqual(
-        new Date(gConsentGrant.issuanceDate),
+        new Date(issuanceDate),
       );
     });
 
     it("gets the gConsent access request issuance date", async () => {
-      const gConsentRequest = await mockGConsentRequest();
-      gConsentRequest.issuanceDate = new Date().toString();
+      const issuanceDate = new Date().toString();
+      const gConsentRequest = await mockGConsentRequest(undefined, undefined, o => {
+        o.issuanceDate = issuanceDate;
+      });
       expect(getIssuanceDate(gConsentRequest)).toStrictEqual(
-        new Date(gConsentRequest.issuanceDate),
+        new Date(issuanceDate),
       );
     });
   });
   describe("ODRL data model", () => {
-    it("gets the ODRL access issuance date", () => {
-      const odrlGrant = mockOdrlGrant();
-      odrlGrant.issuanceDate = new Date().toString();
+    it("gets the ODRL access issuance date", async () => {
+      const issuanceDate = new Date().toString();;
+      const odrlGrant = await mockOdrlGrant(undefined, undefined, {
+        issuanceDate
+      });
       expect(getIssuanceDate(odrlGrant)).toStrictEqual(
-        new Date(odrlGrant.issuanceDate),
+        new Date(issuanceDate),
       );
     });
   });
@@ -250,24 +256,28 @@ describe("getIssuanceDate", () => {
 describe("getExpirationDate", () => {
   describe("gConsent data model", () => {
     it("gets the gConsent access expiration date", async () => {
-      const gConsentGrant = await mockGConsentGrant();
-      gConsentGrant.expirationDate = new Date().toString();
+      const expirationDate = new Date().toString();
+      const gConsentGrant = await mockGConsentGrant(undefined, undefined, o => {
+        o.expirationDate = expirationDate;
+      });
       expect(getExpirationDate(gConsentGrant)).toStrictEqual(
-        new Date(gConsentGrant.expirationDate),
+        new Date(expirationDate),
       );
     });
 
     it("gets the gConsent access request expiration date", async () => {
-      const gConsentRequest = await mockGConsentRequest();
-      gConsentRequest.expirationDate = new Date().toString();
+      const expirationDate = new Date().toString();
+      const gConsentRequest = await mockGConsentRequest(undefined, undefined, o => {
+        o.expirationDate = expirationDate;
+      });
       expect(getExpirationDate(gConsentRequest)).toStrictEqual(
-        new Date(gConsentRequest.expirationDate),
+        new Date(expirationDate),
       );
     });
   });
   describe("ODRL data model", () => {
-    it("gets the ODRL access expiration date", () => {
-      const odrlGrant = mockOdrlGrant();
+    it("gets the ODRL access expiration date", async () => {
+      const odrlGrant = await mockOdrlGrant();
       expect(getExpirationDate(odrlGrant)).toStrictEqual(
         new Date(odrlGrant.expirationDate as string),
       );
@@ -288,8 +298,8 @@ describe("getIssuer", () => {
     });
   });
   describe("ODRL data model", () => {
-    it("gets the ODRL access grant issuer", () => {
-      const odrlGrant = mockOdrlGrant();
+    it("gets the ODRL access grant issuer", async () => {
+      const odrlGrant = await mockOdrlGrant();
       expect(getIssuer(odrlGrant)).toStrictEqual(odrlGrant.issuer);
     });
   });
@@ -319,8 +329,8 @@ describe("getInherit", () => {
   });
 
   describe("ODRL data model", () => {
-    it("gets the recursive nature of an ODRL access grant", () => {
-      const odrlGrant = mockOdrlGrant();
+    it("gets the recursive nature of an ODRL access grant", async () => {
+      const odrlGrant = await mockOdrlGrant();
       expect(getInherit(odrlGrant)).toBe(true);
     });
   });

@@ -21,7 +21,11 @@
 
 import type { Iri, VerifiableCredential } from "@inrupt/solid-client-vc";
 import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
-import { RESOURCE_ACCESS_MODE } from "../../type/ResourceAccessMode";
+import { DataFactory } from "n3";
+import { ACCESS, ACTION, AGREEMENT, APPEND, ASSIGNEE, ASSIGNER, CONSTRAINT, CREDENTIAL_SUBJECT, LEFT_OPERAND, OPERATOR, PERMISSION, PROFILE, PROHIBITION, READ, RIGHT_OPERAND, SOLID_ACCESS_GRANT, TARGET, TYPE, WRITE, assertTermType, getSingleQuad } from "../../common/constants";
+import { defaultGraph } from "@rdfjs/dataset";
+import { BlankNode, DatasetCore, Quad } from "@rdfjs/types";
+const { namedNode, quad, literal } = DataFactory;
 
 const ODRL_ACCESS = "https://www.w3.org/ns/solid/odrl/access";
 
@@ -63,54 +67,31 @@ export type AccessGrantOdrl = VerifiableCredential & {
   credentialSubject: CredentialSubjectOdrl;
 };
 
-function isOdrlConstraint(constraint: unknown): constraint is OdrlConstraint {
-  if (
-    typeof (constraint as OdrlConstraint).leftOperand !== "string" ||
-    !ODRL_CONSTRAINTS.includes((constraint as OdrlConstraint).leftOperand)
-  ) {
-    return false;
-  }
-  if (
-    typeof (constraint as OdrlConstraint).operator !== "string" ||
-    !ODRL_OPERATORS.includes((constraint as OdrlConstraint).operator)
-  ) {
-    return false;
-  }
-  if (typeof (constraint as OdrlConstraint).rightOperand !== "string") {
-    return false;
+function _isOdrlConstraint(vc: VerifiableCredential, constraint: BlankNode): boolean {
+  const leftOperand = [...vc.match(constraint, LEFT_OPERAND, null, defaultGraph())];
+  const rightOperand = [...vc.match(constraint, RIGHT_OPERAND, null, defaultGraph())];
+  const operator = [...vc.match(constraint, OPERATOR, null, defaultGraph())];
+
+  return operator.length === 1 && operator[0].equals(literal('eq'))
+    && [leftOperand, rightOperand].every(operand => operand.length === 1 && (operator[0].equals(literal('application')) || operator[0].equals(literal('purpose'))));
+}
+
+function every(store: DatasetCore, cb: (store: Quad) => boolean) {
+  for (const q of store) {
+    if (!cb(q))
+      return false;
   }
   return true;
 }
 
-function isOdrlPermission(permission: unknown): permission is OdrlPermission {
-  if (typeof (permission as OdrlPermission).target !== "string") {
-    return false;
-  }
-  if (
-    !Array.isArray((permission as OdrlPermission).action) ||
-    (permission as OdrlPermission).action.some(
-      (mode) => !RESOURCE_ACCESS_MODE.has(mode),
-    )
-  ) {
-    return false;
-  }
+function _isOdrlPermission(vc: VerifiableCredential, permission: BlankNode) {
+  const target = [...vc.match(permission, TARGET, null, defaultGraph())];
+  const actions = [...vc.match(permission, ACTION, null, defaultGraph())];
 
-  // permission.constraint is either undefined or a constraint array.
-  if (
-    typeof (permission as OdrlPermission).constraint !== "undefined" &&
-    !Array.isArray((permission as OdrlPermission).constraint)
-  ) {
-    return false;
-  }
-  if (
-    (permission as OdrlPermission).constraint?.some(
-      (constraint) => !isOdrlConstraint(constraint),
-    )
-  ) {
-    return false;
-  }
-
-  return true;
+  return target.length === 1 && target[0].object.termType === 'NamedNode'
+    && actions.length > 0 && actions.every(action => [READ, WRITE, APPEND].some(a => a.equals(action.object)))
+    && every(vc.match(permission, CONSTRAINT, null, defaultGraph()), (constraint) => constraint.object.termType === "BlankNode" && _isOdrlConstraint(vc, constraint.object));
+  
 }
 
 /**
@@ -145,57 +126,20 @@ function isOdrlPermission(permission: unknown): permission is OdrlPermission {
 export function isCredentialAccessGrantOdrl(
   vc: VerifiableCredential,
 ): vc is AccessGrantOdrl {
-  if (!vc.type.includes("SolidAccessGrant")) {
-    return false;
+  try {
+    const credentialSubject = assertTermType(getSingleQuad([...vc.match(namedNode(vc.id), CREDENTIAL_SUBJECT, null, defaultGraph())]).object, 'NamedNode');
+    const assigner = [...vc.match(credentialSubject, ASSIGNER, null, defaultGraph())];
+    const assignee = [...vc.match(credentialSubject, ASSIGNEE, null, defaultGraph())];
+  
+    return vc.has(quad(namedNode(vc.id), TYPE, SOLID_ACCESS_GRANT))
+      && vc.has(quad(credentialSubject, TYPE, AGREEMENT))
+      && vc.has(quad(credentialSubject, PROFILE, ACCESS))
+      && assigner.length === 1 && assigner[0].object.termType === 'NamedNode'
+      && assignee.length === 1 && assignee[0].object.termType === 'NamedNode'
+      && every(vc.match(credentialSubject, PERMISSION, null, defaultGraph()), (permission) => permission.object.termType === "BlankNode" && _isOdrlPermission(vc, permission.object))
+      && every(vc.match(credentialSubject, PROHIBITION, null, defaultGraph()), (prohibition) => prohibition.object.termType === "BlankNode" && _isOdrlPermission(vc, prohibition.object));
+  } catch (e) {
+    // return false
+    throw e;
   }
-  if (
-    typeof vc.credentialSubject.type !== "string" ||
-    vc.credentialSubject.type !== "Agreement"
-  ) {
-    return false;
-  }
-  if (
-    typeof vc.credentialSubject.profile !== "string" ||
-    vc.credentialSubject.profile !== ODRL_ACCESS
-  ) {
-    return false;
-  }
-  if (typeof vc.credentialSubject.assigner !== "string") {
-    return false;
-  }
-
-  if (typeof vc.credentialSubject.assignee !== "string") {
-    return false;
-  }
-
-  if (
-    !Array.isArray(
-      (vc.credentialSubject as CredentialSubjectOdrl).permission,
-    ) ||
-    (vc.credentialSubject as CredentialSubjectOdrl).permission.some(
-      (permission) => !isOdrlPermission(permission),
-    )
-  ) {
-    return false;
-  }
-
-  // vc.credentialSubject.prohibition is either undefined or an array of prohibitions.
-  if (
-    !Array.isArray(
-      (vc.credentialSubject as CredentialSubjectOdrl).prohibition,
-    ) &&
-    typeof (vc.credentialSubject as CredentialSubjectOdrl).prohibition !==
-      "undefined"
-  ) {
-    return false;
-  }
-
-  if (
-    (vc.credentialSubject as CredentialSubjectOdrl).prohibition?.some(
-      (permission) => !isOdrlPermission(permission),
-    )
-  ) {
-    return false;
-  }
-  return true;
 }

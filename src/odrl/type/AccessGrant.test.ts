@@ -19,21 +19,22 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { it, describe, expect } from "@jest/globals";
+import { it, describe, expect, beforeAll } from "@jest/globals";
 import type {
   AccessGrantOdrl,
   OdrlConstraint,
   OdrlPermission,
 } from "./AccessGrant";
+import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 import { isCredentialAccessGrantOdrl } from "./AccessGrant";
 
-const mockAccessGrantOdrl: AccessGrantOdrl = {
+const mockAccessGrantOdrlBase = {
   "@context": [
     "https://www.w3.org/2018/credentials/v1",
     "https://w3id.org/security/suites/ed25519-2020/v1",
     "https://www.w3.org/ns/odrl.jsonld",
-    "https://www.w3.org/ns/dpv.jsonld",
-    "https://www.w3.org/ns/solid/access.jsonld",
+    // "https://www.w3.org/ns/dpv.jsonld",
+    // "https://www.w3.org/ns/solid/access.jsonld",
   ],
   id: "https://vc.inrupt.com/credentials/{UUID}",
   type: ["VerifiableCredential", "SolidAccessGrant"],
@@ -81,12 +82,17 @@ const mockAccessGrantOdrl: AccessGrantOdrl = {
   },
 };
 
-const mockConstraint = (
-  mockAccessGrantOdrl.credentialSubject.permission[0]
-    .constraint as OdrlConstraint[]
-)[0];
-
 describe("Valid Access Grants are recognized", () => {
+  let mockAccessGrantOdrl: AccessGrantOdrl;
+  let mockConstraint: OdrlConstraint;
+  beforeAll(async () => {
+    mockAccessGrantOdrl = await verifiableCredentialToDataset(mockAccessGrantOdrlBase) as AccessGrantOdrl;
+    mockConstraint = (
+      mockAccessGrantOdrl.credentialSubject.permission[0]
+        .constraint as OdrlConstraint[]
+    )[0];
+  })
+
   it("Validates a full ODRL-based Access Grant VC", () => {
     expect(isCredentialAccessGrantOdrl(mockAccessGrantOdrl)).toBe(true);
   });
@@ -122,93 +128,103 @@ describe("Valid Access Grants are recognized", () => {
 });
 
 describe("Invalid Access Grants are rejected", () => {
-  it("Rejects an ODRL-based Access Grant missing the SolidAccessGrant type", () => {
+  let mockAccessGrantOdrl: AccessGrantOdrl;
+  let mockConstraint: OdrlConstraint;
+  beforeAll(async () => {
+    mockAccessGrantOdrl = await verifiableCredentialToDataset(mockAccessGrantOdrlBase) as AccessGrantOdrl;
+    mockConstraint = (
+      mockAccessGrantOdrl.credentialSubject.permission[0]
+        .constraint as OdrlConstraint[]
+    )[0];
+  })
+
+  it("Rejects an ODRL-based Access Grant missing the SolidAccessGrant type", async () => {
     expect(
-      isCredentialAccessGrantOdrl({
+      isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
         ...mockAccessGrantOdrl,
         type: [],
-      }),
+      })),
     ).toBe(false);
   });
 
   describe("Rejects ODRL-based Access Grant with an invalid credentialSubject", () => {
-    it("Rejects an ODRL-based Access Grant subject missing the SolidAccessGrant type", () => {
+    it("Rejects an ODRL-based Access Grant subject missing the SolidAccessGrant type", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
             type: "InvalidType",
           },
-        }),
+        })),
       ).toBe(false);
     });
 
-    it("Rejects an ODRL-based Access Grant subject without the Agreement type", () => {
+    it("Rejects an ODRL-based Access Grant subject without the Agreement type", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
             type: "InvalidType",
           },
-        }),
+        })),
       ).toBe(false);
     });
 
-    it("Rejects an ODRL-based Access Grant subject without the odrl:access profile", () => {
+    it("Rejects an ODRL-based Access Grant subject without the odrl:access profile", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
             profile: "https://some.invalid/profile",
           },
-        }),
+        })),
       ).toBe(false);
     });
 
-    it("Rejects an ODRL-based Access Grant subject without an assigner", () => {
+    it("Rejects an ODRL-based Access Grant subject without an assigner", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
             assigner: undefined,
           },
-        }),
+        })),
       ).toBe(false);
     });
 
-    it("Rejects an ODRL-based Access Grant subject without an assignee", () => {
+    it("Rejects an ODRL-based Access Grant subject without an assignee", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
             assignee: undefined,
           },
-        }),
+        })),
       ).toBe(false);
     });
 
-    it("Rejects an ODRL-based Access Grant subject without a permission array", () => {
+    it("Rejects an ODRL-based Access Grant subject without a permission array", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
             permission: undefined,
           },
-        }),
+        })),
       ).toBe(false);
     });
   });
 
   describe("Rejects ODRL-based Access Grant with invalid permissions", () => {
-    it("Rejects an ODRL-based Access Grant permission without a target", () => {
+    it("Rejects an ODRL-based Access Grant permission without a target", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
@@ -219,13 +235,13 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        }),
+        })),
       ).toBe(false);
     });
 
-    it("Rejects an ODRL-based Access Grant permission without an action array", () => {
+    it("Rejects an ODRL-based Access Grant permission without an action array", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
@@ -236,13 +252,13 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        }),
+        })),
       ).toBe(false);
     });
 
-    it("Rejects an ODRL-based Access Grant permission with unknown actions", () => {
+    it("Rejects an ODRL-based Access Grant permission with unknown actions", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
@@ -253,13 +269,13 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        }),
+        })),
       ).toBe(false);
     });
 
-    it("Rejects an ODRL-based Access Grant permission with unknown constraints", () => {
+    it("Rejects an ODRL-based Access Grant permission with unknown constraints", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
@@ -270,15 +286,15 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        }),
+        })),
       ).toBe(false);
     });
   });
 
   describe("Rejects ODRL-based Access Grant with invalid constraints", () => {
-    it("Rejects an ODRL-based Access Grant permission with an unknown left operand", () => {
+    it("Rejects an ODRL-based Access Grant permission with an unknown left operand", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
@@ -294,13 +310,13 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        }),
+        })),
       ).toBe(false);
     });
 
-    it("Rejects an ODRL-based Access Grant permission with an unknown operator", () => {
+    it("Rejects an ODRL-based Access Grant permission with an unknown operator", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
@@ -316,13 +332,13 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        }),
+        })),
       ).toBe(false);
     });
 
-    it("Rejects an ODRL-based Access Grant permission without a right operand", () => {
+    it("Rejects an ODRL-based Access Grant permission without a right operand", async () => {
       expect(
-        isCredentialAccessGrantOdrl({
+        isCredentialAccessGrantOdrl(await verifiableCredentialToDataset({
           ...mockAccessGrantOdrl,
           credentialSubject: {
             ...mockAccessGrantOdrl.credentialSubject,
@@ -338,7 +354,7 @@ describe("Invalid Access Grants are rejected", () => {
               },
             ],
           },
-        }),
+        })),
       ).toBe(false);
     });
   });

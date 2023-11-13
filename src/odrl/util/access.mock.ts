@@ -20,18 +20,20 @@
 //
 
 import type { AccessGrantOdrl } from "../type/AccessGrant";
+import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 
 export const mockOdrlGrant = (
   issuer = "https://some.issuer",
   subjectId = "https://some.resource.owner",
-): AccessGrantOdrl => {
-  return {
+  overrides: Partial<AccessGrantOdrl> = {}
+): Promise<AccessGrantOdrl> => {
+  return verifiableCredentialToDataset({
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
       "https://w3id.org/security/suites/ed25519-2020/v1",
       "https://www.w3.org/ns/odrl.jsonld",
-      "https://www.w3.org/ns/dpv.jsonld",
-      "https://www.w3.org/ns/solid/access.jsonld",
+      // "https://www.w3.org/ns/dpv.jsonld",
+      // "https://www.w3.org/ns/solid/access.jsonld",
     ],
     id: "https://some.credential",
     type: ["VerifiableCredential", "SolidAccessGrant"],
@@ -74,5 +76,6 @@ export const mockOdrlGrant = (
       proofPurpose: "assertionMethod",
       verificationMethod: "https://issuer.example/key-1",
     },
-  };
+    ...overrides
+  }) as Promise<AccessGrantOdrl>;
 };
