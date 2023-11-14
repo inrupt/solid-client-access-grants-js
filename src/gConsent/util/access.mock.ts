@@ -19,7 +19,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 /* eslint-disable no-param-reassign */
-import { type VerifiableCredential, verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
+import {
+  type VerifiableCredential,
+  verifiableCredentialToDataset,
+} from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
 import type { DatasetCore, Quad } from "@rdfjs/types";
 import type {
@@ -111,10 +114,9 @@ export const mockAccessRequestVc = async (
   const asObject = mockAccessRequestVcObject(options) as VerifiableCredential;
   modify?.(asObject);
 
-  const accessRequest = normalizeAccessRequest(await verifiableCredentialToDataset(
-    asObject,
-    { baseIRI: asObject.id },
-  ));
+  const accessRequest = normalizeAccessRequest(
+    await verifiableCredentialToDataset(asObject, { baseIRI: asObject.id }),
+  );
 
   if (framingOptions?.skipValidation) {
     return accessRequest as unknown as AccessRequest & DatasetCore;
@@ -126,9 +128,11 @@ export const mockAccessRequestVc = async (
         accessRequest,
         null,
         2,
-      )} is not an Access Request. Trying to reframe [${JSON.stringify(asObject, null, 2)}] [${JSON.stringify(
-        framingOptions,
-      )}]`,
+      )} is not an Access Request. Trying to reframe [${JSON.stringify(
+        asObject,
+        null,
+        2,
+      )}] [${JSON.stringify(framingOptions)}]`,
     );
   }
 
@@ -195,11 +199,9 @@ export const mockAccessGrantVc = async (
   const asObject = mockAccessGrantObject(options);
   modify?.(asObject);
 
-  const accessGrant = normalizeAccessGrant(await verifiableCredentialToDataset(
-    asObject,
-    { baseIRI: asObject.id },
-  ));
-
+  const accessGrant = normalizeAccessGrant(
+    await verifiableCredentialToDataset(asObject, { baseIRI: asObject.id }),
+  );
 
   // FIXME the type casting ias bad
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

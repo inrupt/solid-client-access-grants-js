@@ -25,7 +25,7 @@ import type * as CrossFetch from "@inrupt/universal-fetch";
 import {
   isVerifiableCredential,
   getVerifiableCredentialApiConfiguration,
-  verifiableCredentialToDataset,
+  // verifiableCredentialToDataset,
 } from "@inrupt/solid-client-vc";
 
 import type * as VcLibrary from "@inrupt/solid-client-vc";
@@ -41,9 +41,9 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { verifiableCredentialToDataset } = jest.requireActual(
-    "@inrupt/solid-client-vc",
-  ) as jest.Mocked<typeof VcLibrary>;
+  const { verifiableCredentialToDataset } = jest.requireActual<
+    typeof VcLibrary
+  >("@inrupt/solid-client-vc");
   return {
     verifiableCredentialToDataset,
     isVerifiableCredential: jest.fn(),
@@ -97,6 +97,9 @@ describe("isValidAccessGrant", () => {
   let MOCK_ACCESS_GRANT: VcLibrary.VerifiableCredential;
 
   beforeAll(async () => {
+    const { verifiableCredentialToDataset } = jest.requireActual<
+      typeof VcLibrary
+    >("@inrupt/solid-client-vc");
     MOCK_ACCESS_GRANT = await verifiableCredentialToDataset(
       MOCK_ACCESS_GRANT_BASE,
     );

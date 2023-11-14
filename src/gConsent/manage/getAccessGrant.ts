@@ -21,13 +21,16 @@
 
 import type { UrlString } from "@inrupt/solid-client";
 import type { DatasetCore } from "@rdfjs/types";
+import {
+  verifiableCredentialToDataset,
+  isVerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrant } from "../type/AccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { normalizeAccessGrant } from "./approveAccessRequest";
-import { verifiableCredentialToDataset, isVerifiableCredential } from "@inrupt/solid-client-vc";
 
 /**
  * Retrieve the Access Grant associated to the given URL.

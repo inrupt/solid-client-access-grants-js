@@ -172,9 +172,14 @@ describe("getIssuanceDate", () => {
   describe("gConsent data model", () => {
     it("gets the gConsent access issuance date", async () => {
       const issuanceDate = new Date().toString();
-      const gConsentGrant = await mockGConsentGrant(undefined, undefined, o => {
-        o.issuanceDate = issuanceDate;
-      });
+      const gConsentGrant = await mockGConsentGrant(
+        undefined,
+        undefined,
+        (obj) => {
+          // eslint-disable-next-line no-param-reassign
+          obj.issuanceDate = issuanceDate;
+        },
+      );
       expect(getIssuanceDate(gConsentGrant)).toStrictEqual(
         new Date(issuanceDate),
       );
@@ -182,9 +187,14 @@ describe("getIssuanceDate", () => {
 
     it("gets the gConsent access request issuance date", async () => {
       const issuanceDate = new Date().toString();
-      const gConsentRequest = await mockGConsentRequest(undefined, undefined, o => {
-        o.issuanceDate = issuanceDate;
-      });
+      const gConsentRequest = await mockGConsentRequest(
+        undefined,
+        undefined,
+        (obj) => {
+          // eslint-disable-next-line no-param-reassign
+          obj.issuanceDate = issuanceDate;
+        },
+      );
       expect(getIssuanceDate(gConsentRequest)).toStrictEqual(
         new Date(issuanceDate),
       );
@@ -196,9 +206,14 @@ describe("getExpirationDate", () => {
   describe("gConsent data model", () => {
     it("gets the gConsent access expiration date", async () => {
       const expirationDate = new Date().toString();
-      const gConsentGrant = await mockGConsentGrant(undefined, undefined, o => {
-        o.expirationDate = expirationDate;
-      });
+      const gConsentGrant = await mockGConsentGrant(
+        undefined,
+        undefined,
+        (obj) => {
+          // eslint-disable-next-line no-param-reassign
+          obj.expirationDate = expirationDate;
+        },
+      );
       expect(getExpirationDate(gConsentGrant)).toStrictEqual(
         new Date(expirationDate),
       );
@@ -206,9 +221,14 @@ describe("getExpirationDate", () => {
 
     it("gets the gConsent access request expiration date", async () => {
       const expirationDate = new Date().toString();
-      const gConsentRequest = await mockGConsentRequest(undefined, undefined, o => {
-        o.expirationDate = expirationDate;
-      });
+      const gConsentRequest = await mockGConsentRequest(
+        undefined,
+        undefined,
+        (obj) => {
+          // eslint-disable-next-line no-param-reassign
+          obj.expirationDate = expirationDate;
+        },
+      );
       expect(getExpirationDate(gConsentRequest)).toStrictEqual(
         new Date(expirationDate),
       );

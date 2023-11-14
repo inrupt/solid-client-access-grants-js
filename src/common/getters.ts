@@ -18,13 +18,36 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-import { BlankNode, DatasetCore, Literal, NamedNode, Quad_Subject, Term } from "@rdfjs/types";
+import type {
+  BlankNode,
+  DatasetCore,
+  Literal,
+  NamedNode,
+  Term,
+} from "@rdfjs/types";
 import { DataFactory } from "n3";
 import { isAccessGrant as isGConsentAccessGrant } from "../gConsent/guard/isAccessGrant";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessRequestGConsent } from "../gConsent/type/AccessRequest";
 import type { AccessModes } from "../type/AccessModes";
-import { APPEND, CREDENTIAL_SUBJECT, EXPIRATION_DATE, HAS_CONSENT, INHERIT, ISSUANCE_DATE, ISSUER, IS_PROVIDED_TO, MODE, PROVIDED_CONSENT, READ, WRITE, XSD_BOOLEAN, assertTermType, getSingleQuad } from "./constants";
+import {
+  APPEND,
+  CREDENTIAL_SUBJECT,
+  EXPIRATION_DATE,
+  HAS_CONSENT,
+  INHERIT,
+  ISSUANCE_DATE,
+  ISSUER,
+  IS_PROVIDED_TO,
+  MODE,
+  PROVIDED_CONSENT,
+  READ,
+  WRITE,
+  XSD_BOOLEAN,
+  assertTermType,
+  getSingleQuad,
+} from "./constants";
+
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
 /**
@@ -60,9 +83,7 @@ export function getResources(
  * @param vc The Access Grant/Request
  * @returns The resource owner WebID
  */
-export function getResourceOwner(
-  vc: AccessGrantGConsent,
-): string;
+export function getResourceOwner(vc: AccessGrantGConsent): string;
 export function getResourceOwner(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): string | undefined;
@@ -90,19 +111,51 @@ export function getResourceOwner(
 export function getRequestor(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): string {
-  const credentialSubject = getSingleObject(vc, namedNode(vc.id), CREDENTIAL_SUBJECT);
+  const credentialSubject = getSingleObject(
+    vc,
+    namedNode(vc.id),
+    CREDENTIAL_SUBJECT,
+  );
   if (isGConsentAccessGrant(vc)) {
-    const providedConsent = getSingleObject(vc, credentialSubject, PROVIDED_CONSENT, 'BlankNode');
+    const providedConsent = getSingleObject(
+      vc,
+      credentialSubject,
+      PROVIDED_CONSENT,
+      "BlankNode",
+    );
     return getSingleObject(vc, providedConsent, IS_PROVIDED_TO).value;
   }
   return credentialSubject.value;
 }
 
-function getSingleObject<T extends Term['termType']>(vc: DatasetCore, subject: Term, predicate: Term): NamedNode;
-function getSingleObject<T extends Term['termType']>(vc: DatasetCore, subject: Term, predicate: Term, type: 'BlankNode'): BlankNode;
-function getSingleObject<T extends Term['termType']>(vc: DatasetCore, subject: Term, predicate: Term, type: 'Literal'): Literal;
-function getSingleObject<T extends Term['termType']>(vc: DatasetCore, subject: Term, predicate: Term, type?: T) {
-  return assertTermType(getSingleQuad([...vc.match(subject, predicate, null, defaultGraph())]).object, type);
+function getSingleObject(
+  vc: DatasetCore,
+  subject: Term,
+  predicate: Term,
+): NamedNode;
+function getSingleObject(
+  vc: DatasetCore,
+  subject: Term,
+  predicate: Term,
+  type: "BlankNode",
+): BlankNode;
+function getSingleObject(
+  vc: DatasetCore,
+  subject: Term,
+  predicate: Term,
+  type: "Literal",
+): Literal;
+function getSingleObject(
+  vc: DatasetCore,
+  subject: Term,
+  predicate: Term,
+  type?: Term["termType"],
+) {
+  return assertTermType(
+    getSingleQuad([...vc.match(subject, predicate, null, defaultGraph())])
+      .object,
+    type,
+  );
 }
 
 /**
@@ -120,8 +173,17 @@ function getSingleObject<T extends Term['termType']>(vc: DatasetCore, subject: T
 export function getAccessModes(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): AccessModes {
-  const credentialSubject = getSingleObject(vc, namedNode(vc.id), CREDENTIAL_SUBJECT);
-  const consent = getSingleObject(vc, credentialSubject, isGConsentAccessGrant(vc) ? PROVIDED_CONSENT : HAS_CONSENT, 'BlankNode');
+  const credentialSubject = getSingleObject(
+    vc,
+    namedNode(vc.id),
+    CREDENTIAL_SUBJECT,
+  );
+  const consent = getSingleObject(
+    vc,
+    credentialSubject,
+    isGConsentAccessGrant(vc) ? PROVIDED_CONSENT : HAS_CONSENT,
+    "BlankNode",
+  );
   return {
     read: vc.has(quad(consent, MODE, READ, defaultGraph())),
     write: vc.has(quad(consent, MODE, WRITE, defaultGraph())),
@@ -141,9 +203,7 @@ export function getAccessModes(
  * @param vc The Access Grant/Request
  * @returns The VC ID URL
  */
-export function getId(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
-): string {
+export function getId(vc: AccessGrantGConsent | AccessRequestGConsent): string {
   return vc.id;
 }
 
@@ -166,10 +226,16 @@ export function getTypes(
 }
 
 function wrapDate(date: Literal) {
-  if (!date.datatype.equals(namedNode('http://www.w3.org/2001/XMLSchema#dateTime'))) {
-    throw new Error(`Expected date to be a dateTime; recieved [${date.datatype.value}]`);
+  if (
+    !date.datatype.equals(
+      namedNode("http://www.w3.org/2001/XMLSchema#dateTime"),
+    )
+  ) {
+    throw new Error(
+      `Expected date to be a dateTime; recieved [${date.datatype.value}]`,
+    );
   }
-  return new Date(date.value); 
+  return new Date(date.value);
 }
 
 /**
@@ -187,7 +253,9 @@ function wrapDate(date: Literal) {
 export function getIssuanceDate(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): Date {
-  return wrapDate(getSingleObject(vc, namedNode(vc.id), ISSUANCE_DATE, 'Literal'));
+  return wrapDate(
+    getSingleObject(vc, namedNode(vc.id), ISSUANCE_DATE, "Literal"),
+  );
 }
 
 /**
@@ -205,14 +273,18 @@ export function getIssuanceDate(
 export function getExpirationDate(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): Date | undefined {
-  const expirationDate = [...vc.match(namedNode(vc.id), EXPIRATION_DATE, null, defaultGraph())];
+  const expirationDate = [
+    ...vc.match(namedNode(vc.id), EXPIRATION_DATE, null, defaultGraph()),
+  ];
 
   if (expirationDate.length > 1) {
-    throw new Error(`Expected at most one expiration date. Found ${expirationDate.length}`);
+    throw new Error(
+      `Expected at most one expiration date. Found ${expirationDate.length}`,
+    );
   }
 
   if (expirationDate.length === 1) {
-    return wrapDate(assertTermType(expirationDate[0].object, 'Literal'));
+    return wrapDate(assertTermType(expirationDate[0].object, "Literal"));
   }
 
   return undefined;
@@ -251,9 +323,20 @@ export function getIssuer(
 export function getInherit(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): boolean {
-  const credentialSubject = getSingleObject(vc, namedNode(vc.id), CREDENTIAL_SUBJECT);
-  const consent = getSingleObject(vc, credentialSubject, isGConsentAccessGrant(vc) ? PROVIDED_CONSENT : HAS_CONSENT, 'BlankNode');
-  return !vc.has(quad(consent, INHERIT, literal('false', XSD_BOOLEAN), defaultGraph()));
+  const credentialSubject = getSingleObject(
+    vc,
+    namedNode(vc.id),
+    CREDENTIAL_SUBJECT,
+  );
+  const consent = getSingleObject(
+    vc,
+    credentialSubject,
+    isGConsentAccessGrant(vc) ? PROVIDED_CONSENT : HAS_CONSENT,
+    "BlankNode",
+  );
+  return !vc.has(
+    quad(consent, INHERIT, literal("false", XSD_BOOLEAN), defaultGraph()),
+  );
 }
 
 /**

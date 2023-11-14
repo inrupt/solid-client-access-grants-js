@@ -21,7 +21,8 @@
 
 import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import { fetch as crossFetch, Response } from "@inrupt/universal-fetch";
-import { VerifiableCredential, verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 
 import base64url from "base64url";
 import {
@@ -77,11 +78,6 @@ const mockFetch = (response: Response) => {
 };
 
 describe("parseUMAAuthTicket", () => {
-  let MOCK_VC: VerifiableCredential;
-  beforeAll(async () => {
-    MOCK_VC = await verifiableCredentialToDataset(MOCK_VC_BASE, { baseIRI: MOCK_VC_BASE.id })
-  })
-
   it("parses and returns the ticket from a string", () => {
     const header =
       'UMA realm="test" as_uri="https://fake.url" ticket="some_value"';
@@ -142,8 +138,10 @@ describe("getUmaConfiguration", () => {
 describe("exchangeTicketForAccessToken", () => {
   let MOCK_VC: VerifiableCredential;
   beforeAll(async () => {
-    MOCK_VC = await verifiableCredentialToDataset(MOCK_VC_BASE, { baseIRI: MOCK_VC_BASE.id })
-  })
+    MOCK_VC = await verifiableCredentialToDataset(MOCK_VC_BASE, {
+      baseIRI: MOCK_VC_BASE.id,
+    });
+  });
 
   it("posts to the token endpoint and parses the resulting access token", async () => {
     const tokenEndpoint = "https://fake.url/token";
@@ -263,8 +261,10 @@ describe("boundFetch", () => {
 describe("fetchWithVc", () => {
   let MOCK_VC: VerifiableCredential;
   beforeAll(async () => {
-    MOCK_VC = await verifiableCredentialToDataset(MOCK_VC_BASE, { baseIRI: MOCK_VC_BASE.id })
-  })
+    MOCK_VC = await verifiableCredentialToDataset(MOCK_VC_BASE, {
+      baseIRI: MOCK_VC_BASE.id,
+    });
+  });
 
   // These tests may be fairly brittle due to the nature of the mocked calls.
   it("throws an error if no www-authentication header is found", async () => {
