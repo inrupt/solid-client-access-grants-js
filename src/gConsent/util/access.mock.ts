@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 /* eslint-disable no-param-reassign */
-import { type VerifiableCredential } from "@inrupt/solid-client-vc";
+import { type VerifiableCredential, verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
 import type { DatasetCore, Quad } from "@rdfjs/types";
 import type {
@@ -39,7 +39,6 @@ import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import { isAccessRequest } from "../guard/isAccessRequest";
 import { normalizeAccessGrant } from "../manage/approveAccessRequest";
 import { isAccessGrant } from "../guard/isAccessGrant";
-import { getVerifiableCredentialFromResponse } from "../../parsing";
 
 type RequestVcOptions = Partial<{
   resources: UrlString[];
@@ -109,29 +108,13 @@ export const mockAccessRequestVc = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   modify?: (asObject: Record<string, any>) => void,
 ): Promise<AccessRequest & DatasetCore<Quad, Quad>> => {
-  const asObject = mockAccessRequestVcObject(options);
+  const asObject = mockAccessRequestVcObject(options) as VerifiableCredential;
   modify?.(asObject);
 
-  const asString = JSON.stringify(asObject, null, 2);
-  const asResponse = new Response(asString, {
-    headers: new Headers([["content-type", "application/ld+json"]]),
-  });
-
-  let accessRequest: VerifiableCredential & DatasetCore;
-  let nonNormalizedResponse:
-    | Awaited<ReturnType<typeof getVerifiableCredentialFromResponse>>
-    | undefined;
-  try {
-    nonNormalizedResponse = await getVerifiableCredentialFromResponse(
-      asResponse,
-      asObject.id,
-    );
-    accessRequest = normalizeAccessRequest(nonNormalizedResponse);
-  } catch (e) {
-    throw new Error(
-      `Error [${e}] for [${asString}] with nonNormalizedResponse [${nonNormalizedResponse}]`,
-    );
-  }
+  const accessRequest = normalizeAccessRequest(await verifiableCredentialToDataset(
+    asObject,
+    { baseIRI: asObject.id },
+  ));
 
   if (framingOptions?.skipValidation) {
     return accessRequest as unknown as AccessRequest & DatasetCore;
@@ -143,7 +126,7 @@ export const mockAccessRequestVc = async (
         accessRequest,
         null,
         2,
-      )} is not an Access Request. Trying to reframe [${asString}] [${JSON.stringify(
+      )} is not an Access Request. Trying to reframe [${JSON.stringify(asObject, null, 2)}] [${JSON.stringify(
         framingOptions,
       )}]`,
     );
@@ -212,13 +195,11 @@ export const mockAccessGrantVc = async (
   const asObject = mockAccessGrantObject(options);
   modify?.(asObject);
 
-  const asString = JSON.stringify(asObject);
-  const asResponse = new Response(asString, {
-    headers: new Headers([["content-type", "application/ld+json"]]),
-  });
-  const accessGrant = normalizeAccessGrant(
-    await getVerifiableCredentialFromResponse(asResponse, asObject.id),
-  );
+  const accessGrant = normalizeAccessGrant(await verifiableCredentialToDataset(
+    asObject,
+    { baseIRI: asObject.id },
+  ));
+
 
   // FIXME the type casting ias bad
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
