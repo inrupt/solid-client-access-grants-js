@@ -41,7 +41,7 @@ async function isValidAccessGrant(
   options: {
     verificationEndpoint?: UrlString;
     fetch?: typeof fetch;
-  } = {}
+  } = {},
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
   const fetcher = await getSessionFetch(options);
 
@@ -60,8 +60,8 @@ async function isValidAccessGrant(
       `The request to [${vc}] returned an unexpected response: ${JSON.stringify(
         vcObject,
         null,
-        "  "
-      )}`
+        "  ",
+      )}`,
     );
   }
 
@@ -73,7 +73,7 @@ async function isValidAccessGrant(
 
   if (verifierEndpoint === undefined) {
     throw new Error(
-      `The VC service provider ${vcObject.issuer} does not advertize for a verifier service in its .well-known/vc-configuration document`
+      `The VC service provider ${vcObject.issuer} does not advertize for a verifier service in its .well-known/vc-configuration document`,
     );
   }
 

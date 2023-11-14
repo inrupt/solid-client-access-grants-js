@@ -34,13 +34,13 @@ const accessGrantUrl =
 // Construct the backend resource fetch URL
 const accessGrantFetcherUrl = new URL(
   ACCESS_GRANT_FETCHER_PATHNAME,
-  document.location.href
+  document.location.href,
 );
 accessGrantFetcherUrl.searchParams.append(accessGrantParam, accessGrantUrl);
 
 // Display the issued Access Grant in an iframe
 const access_grant_object_url = URL.createObjectURL(
-  await (await fetch(accessGrantFetcherUrl)).blob()
+  await (await fetch(accessGrantFetcherUrl)).blob(),
 );
 
 document
@@ -52,14 +52,14 @@ URL.revokeObjectURL(access_grant_object_url);
 // Construct the backend resource fetch URL
 const resourceFetcherUrl = new URL(
   RESOURCE_FETCHER_PATHNAME,
-  document.location.href
+  document.location.href,
 );
 
 resourceFetcherUrl.searchParams.append(accessGrantParam, accessGrantUrl);
 
 // Display the fetched resource in an iframe
 const resource_object_url = URL.createObjectURL(
-  await (await fetch(resourceFetcherUrl)).blob()
+  await (await fetch(resourceFetcherUrl)).blob(),
 );
 
 document

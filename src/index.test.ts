@@ -41,11 +41,12 @@ import {
   overwriteFile,
   getSolidDataset,
   createContainerInContainer,
+  deleteFile,
+  deleteSolidDataset,
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
   GRANT_VC_URL_PARAM_NAME,
   gConsent,
-  odrl,
   AccessGrantWrapper,
   getAccessModes,
   getExpirationDate,
@@ -80,11 +81,12 @@ describe("Index exports", () => {
     expect(saveFileInContainer).toBeDefined();
     expect(createContainerInContainer).toBeDefined();
     expect(getSolidDataset).toBeDefined();
+    expect(deleteFile).toBeDefined();
+    expect(deleteSolidDataset).toBeDefined();
     expect(saveSolidDatasetAt).toBeDefined();
     expect(saveSolidDatasetInContainer).toBeDefined();
     expect(GRANT_VC_URL_PARAM_NAME).toBeDefined();
     expect(gConsent).toBeDefined();
-    expect(odrl).toBeDefined();
     expect(AccessGrantWrapper).toBeDefined();
     expect(getAccessModes).toBeDefined();
     expect(getExpirationDate).toBeDefined();

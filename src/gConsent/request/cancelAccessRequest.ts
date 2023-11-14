@@ -36,7 +36,7 @@ import { revokeAccessGrant } from "../manage/revokeAccessGrant";
  */
 async function cancelAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
-  options: AccessBaseOptions = {}
+  options: AccessBaseOptions = {},
 ): Promise<void> {
   return revokeAccessGrant(vc, options);
 }

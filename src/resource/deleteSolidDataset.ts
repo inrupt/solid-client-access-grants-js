@@ -19,34 +19,28 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { UrlString, SolidDataset } from "@inrupt/solid-client";
-import { saveSolidDatasetAt as coreSaveSolidDatasetAt } from "@inrupt/solid-client";
+import type { UrlString } from "@inrupt/solid-client";
+import { deleteSolidDataset as coreDeleteSolidDataset } from "@inrupt/solid-client";
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
 import type { FetchOptions } from "../type/FetchOptions";
 
 /**
- * Saves a Dataset in a Solid Pod using an Access Grant to prove the caller is
- * authorized to write or append to the dataset at the given dataset URL.
- *
- * ```{note} This function does not support saving a dataset if the
- * dataset does not yet exist, unlike its `@inrupt/solid-client`
- * counterpart.
- * ```
+ * Delete a Dataset from a Solid Pod using an Access Grant to prove the caller
+ * is authorized to overwrite the target dataset.
  *
  * @see [@inrupt/solid-client's
- * saveSolidDatasetAt](https://docs.inrupt.com/developer-tools/api/javascript/solid-client/modules/resource_solidDataset.html#savesoliddatasetat)
+ * deleteSolidDataset](https://docs.inrupt.com/developer-tools/api/javascript/solid-client/modules/resource_solidDataset.html#deletesoliddataset)
  *
- * @param datasetUrl The URL of the dataset to save.
+ * @param datasetUrl The URL of the target dataset.
  * @param accessGrant The Access Grant VC proving the caller is authorized.
  * @param options Optional properties to customise the request behaviour.
  * @returns A promise that resolves to a SolidDataset if successful, and that
  * rejects otherwise.
- * @since 0.4.0
+ * @since unreleased
  */
-export async function saveSolidDatasetAt<Dataset extends SolidDataset>(
+export async function deleteSolidDataset(
   datasetUrl: UrlString,
-  solidDataset: Dataset,
   accessGrant: VerifiableCredential,
   options?: FetchOptions,
 ) {
@@ -61,7 +55,7 @@ export async function saveSolidDatasetAt<Dataset extends SolidDataset>(
     fetchOptions,
   );
 
-  return await coreSaveSolidDatasetAt(datasetUrl, solidDataset, {
+  return await coreDeleteSolidDataset(datasetUrl, {
     ...options,
     fetch: authenticatedFetch,
   });

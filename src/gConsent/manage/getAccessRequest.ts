@@ -18,37 +18,39 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-
 import type { UrlString } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { revokeVerifiableCredential } from "@inrupt/solid-client-vc";
-import type { AccessBaseOptions } from "../type/AccessBaseOptions";
-import { getBaseAccessGrantVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
+import { getVerifiableCredential } from "@inrupt/solid-client-vc";
+import { isAccessRequest } from "../guard/isAccessRequest";
+import type { AccessRequest } from "../type/AccessRequest";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
+import { normalizeAccessRequest } from "../request/issueAccessRequest";
 
 /**
- * Makes a request to the access server to revoke a given Verifiable Credential (VC).
+ * Fetch the Access Request from the given URL.
  *
- * @param vc Either a VC, or a URL to a VC, to be revoked.
- * @param options Optional properties to customise the request behaviour.
- * @returns A void promise.
- * @since 0.4.0
+ * @param url The URL of the Access Request.
+ * @param options Optional properties to customise the behaviour:
+ * - fetch: an authenticated fetch function. If not provided, the default session
+ * from @inrupt/solid-client-authn-browser will be used if available.
+ * @returns An Access Request.
+ * @since 2.4.0
  */
-async function revokeAccessGrant(
-  vc: VerifiableCredential | URL | UrlString,
-  options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
-): Promise<void> {
-  const credential = await getBaseAccessGrantVerifiableCredential(vc, options);
-
-  return revokeVerifiableCredential(
-    new URL("status", credential.issuer).href,
-    credential.id,
-    {
-      fetch: await getSessionFetch(options),
-    },
+export async function getAccessRequest(
+  url: UrlString | URL,
+  options: { fetch?: typeof fetch } = {},
+): Promise<AccessRequest> {
+  const accessRequest = normalizeAccessRequest(
+    await getVerifiableCredential(url.toString(), {
+      fetch: options.fetch ?? (await getSessionFetch(options)),
+    }),
   );
+
+  if (!isAccessRequest(accessRequest)) {
+    throw new Error(
+      `${JSON.stringify(accessRequest)} is not an Access Request`,
+    );
+  }
+  return accessRequest;
 }
 
-export { revokeAccessGrant };
-export default revokeAccessGrant;
-export type { UrlString, VerifiableCredential };
+export default getAccessRequest;

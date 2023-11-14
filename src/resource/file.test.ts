@@ -27,7 +27,7 @@ import { fetchWithVc } from "../fetch";
 jest.mock("../fetch");
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual(
-    "@inrupt/solid-client"
+    "@inrupt/solid-client",
   ) as Record<string, unknown>;
 
   solidClientModule.getFile = jest.fn();
@@ -82,7 +82,7 @@ describe("overwriteFile", () => {
       fileUrl,
       mockedFile,
       mockedAccessGrant,
-      { fetch: mockedFetch }
+      { fetch: mockedFetch },
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(fileUrl, mockedAccessGrant, {
@@ -92,7 +92,7 @@ describe("overwriteFile", () => {
     expect(solidClientModule.overwriteFile).toHaveBeenCalledWith(
       fileUrl,
       mockedFile,
-      { fetch: authenticatedFetch }
+      { fetch: authenticatedFetch },
     );
 
     expect(resultFile).toBe(mockedFile);
@@ -109,7 +109,7 @@ describe("overwriteFile", () => {
       fileUrl,
       mockedFile,
       mockedAccessGrant,
-      { fetch: mockedFetch, contentType: "text/plain" }
+      { fetch: mockedFetch, contentType: "text/plain" },
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(fileUrl, mockedAccessGrant, {
@@ -119,7 +119,7 @@ describe("overwriteFile", () => {
     expect(solidClientModule.overwriteFile).toHaveBeenCalledWith(
       fileUrl,
       mockedFile,
-      { fetch: authenticatedFetch, contentType: "text/plain" }
+      { fetch: authenticatedFetch, contentType: "text/plain" },
     );
 
     expect(resultFile).toBe(mockedFile);
@@ -143,7 +143,7 @@ describe("saveFileInContainer", () => {
         fetch: mockedFetch,
         slug: fileNameSuggestion,
         contentType: "text/plain",
-      }
+      },
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(containerUrl, mockedAccessGrant, {
@@ -157,7 +157,7 @@ describe("saveFileInContainer", () => {
         fetch: authenticatedFetch,
         slug: fileNameSuggestion,
         contentType: "text/plain",
-      }
+      },
     );
 
     expect(resultFile).toBe(mockedFile);

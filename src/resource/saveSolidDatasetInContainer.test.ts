@@ -41,7 +41,7 @@ describe("saveSolidDatasetInContainer", () => {
     const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
     const mockedDataset = mockSolidDatasetFrom("https://some.url");
     solidClientModule.saveSolidDatasetInContainer.mockResolvedValueOnce(
-      mockedDataset
+      mockedDataset,
     );
     const mockedFetch = jest.fn() as typeof fetch;
 
@@ -50,19 +50,19 @@ describe("saveSolidDatasetInContainer", () => {
       TEST_CONTAINER_URL,
       MOCKED_DATASET,
       mockAccessRequestVc(),
-      { fetch: mockedFetch, slugSuggestion: "test" }
+      { fetch: mockedFetch, slugSuggestion: "test" },
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(
       TEST_CONTAINER_URL,
       mockAccessRequestVc(),
-      { fetch: mockedFetch }
+      { fetch: mockedFetch },
     );
 
     expect(solidClientModule.saveSolidDatasetInContainer).toHaveBeenCalledWith(
       TEST_CONTAINER_URL,
       MOCKED_DATASET,
-      expect.objectContaining({ slugSuggestion: "test" })
+      expect.objectContaining({ slugSuggestion: "test" }),
     );
 
     expect(resultDataset).toStrictEqual(MOCKED_DATASET);

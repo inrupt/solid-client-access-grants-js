@@ -19,21 +19,36 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { it, describe, expect } from "@jest/globals";
+import { it, jest, describe, expect } from "@jest/globals";
+import type SolidClientCore from "@inrupt/solid-client";
+import { mockAccessGrantVc } from "../gConsent/util/access.mock";
+import { deleteFile } from "./deleteFile";
+import { fetchWithVc } from "../fetch";
 
-import { redirectToRequestor } from "./redirectToRequestor";
+jest.mock("../fetch");
+jest.mock("@inrupt/solid-client", () => {
+  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
+  solidClientModule.deleteFile = jest.fn();
+  return solidClientModule;
+});
 
-describe("redirectToRequestor", () => {
-  describe("in a Node environment", () => {
-    it("throws if the callback is undefined", async () => {
-      await expect(
-        redirectToRequestor(
-          "https://some.grant-vc.iri",
-          "https://some.redirect.iri",
-        ),
-      ).rejects.toThrow(
-        `In a non-browser environment, a redirectCallback must be provided by the user.`,
-      );
+describe("deleteSolidDataset", () => {
+  it("authenticates using the provided VC", async () => {
+    const solidClientModule = jest.requireMock(
+      "@inrupt/solid-client",
+    ) as jest.Mocked<typeof SolidClientCore>;
+    const mockedFetch = jest.fn<typeof fetch>();
+    await deleteFile("https://some.file.url", mockAccessGrantVc(), {
+      fetch: mockedFetch,
     });
+    expect(fetchWithVc).toHaveBeenCalledWith(
+      expect.anything(),
+      mockAccessGrantVc(),
+      { fetch: mockedFetch },
+    );
+    expect(solidClientModule.deleteFile).toHaveBeenCalledWith(
+      "https://some.file.url",
+      expect.anything(),
+    );
   });
 });

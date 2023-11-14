@@ -28,7 +28,7 @@ import {
 } from "../../type/ResourceAccessMode";
 
 export function accessToResourceAccessModeArray(
-  desiredAccess: AccessModes
+  desiredAccess: AccessModes,
 ): ResourceAccessMode[] {
   const modes: ResourceAccessMode[] = [];
 

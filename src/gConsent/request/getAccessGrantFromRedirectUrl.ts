@@ -41,25 +41,25 @@ import { normalizeAccessGrant } from "../manage/approveAccessRequest";
  */
 export async function getAccessGrantFromRedirectUrl(
   redirectUrl: UrlString | URL,
-  options: { fetch?: typeof fetch } = {}
+  options: { fetch?: typeof fetch } = {},
 ): Promise<AccessGrant> {
   const redirectUrlObj =
     typeof redirectUrl === "string" ? new URL(redirectUrl) : redirectUrl;
   const authFetch = options.fetch ?? (await getSessionFetch(options));
 
   const accessGrantIri = redirectUrlObj.searchParams.get(
-    GRANT_VC_URL_PARAM_NAME
+    GRANT_VC_URL_PARAM_NAME,
   );
   if (accessGrantIri === null) {
     throw new Error(
-      `The provided redirect URL [${redirectUrl}] is missing the expected [${GRANT_VC_URL_PARAM_NAME}] query parameter`
+      `The provided redirect URL [${redirectUrl}] is missing the expected [${GRANT_VC_URL_PARAM_NAME}] query parameter`,
     );
   }
 
   const accessGrant = normalizeAccessGrant(
     await getVerifiableCredential(accessGrantIri, {
       fetch: authFetch,
-    })
+    }),
   );
 
   if (!isBaseAccessVcBody(accessGrant) || !isAccessGrant(accessGrant)) {

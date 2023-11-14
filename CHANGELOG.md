@@ -2,7 +2,50 @@
 
 This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Deprecation notice]
+
+The following changes are pending, and will be applied on the next major release:
+
+- The `status` parameter for `getAccessGrantAll` will default to `all` rather than `granted`.
+
 ## Unreleased
+
+### Removed features
+
+- Support for `odrl` access grants has been removed.
+
+## [2.6.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.6.1) - 2023-09-25
+
+### Bugfixes
+
+- `denyAccessRequest` didn't normalize the returned denied Access Grant, resulting in it having a
+  JSON-LD frame different from the value returned by `approveAccessRequest`. The value is now normalized,
+  and both functions return a similarly shaped object. This also fixes the return type of `denyAccessRequest`,
+  which now returns the more strict `AccessGrant` type rather than the `VerifiableCredential` type.
+- add `types` entry in the package.json exports so that bundlers such as esbuild can discover type definitions.
+
+## [2.6.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.6.0) - 2023-09-18
+
+### New feature
+
+- Export `getAccessGrantAll` has a new `status` parameter which allows selection of `granted`, `denied` or `all` access grants.
+  By default only `granted` access grants are returned as this is the existing behavior. In the next major version of this
+  library the default will be to return `all` access grants.
+
+## [2.5.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.5.0) - 2023-08-11
+
+### New feature
+
+- Export `CredentialIsAccessGrantAny` which checks if a `VerifiableCredential` is an `AccessGrantAny`.
+
+## [2.4.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.4.0) - 2023-07-24
+
+### New feature
+
+- `deleteSolidDataset` and `deleteFile`: Add functions to the `resource` module
+  to delete resources, following the interface of `@inrupt/solid-client`.
+- `getAccessRequest`: a function exported by the `./manage` module to
+  get the Access Request from the Access Request URL.
 
 ## [2.3.2](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.3.2) - 2023-06-05
 

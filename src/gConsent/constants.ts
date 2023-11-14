@@ -71,7 +71,7 @@ export const ACCESS_GRANT_CONTEXT_DEFAULT = [
 
 // When issuing a VC using a given service,"https://schema.inrupt.com/credentials/v1.jsonld" be sure to set the context using the following.
 export const instanciateEssAccessGrantContext = (
-  essVcDomain: string
+  essVcDomain: string,
 ): typeof ACCESS_GRANT_CONTEXT_DEFAULT =>
   [
     CONTEXT_VC_W3C,
@@ -98,6 +98,7 @@ export const ACCESS_CREDENTIAL_TYPE = new Set([
   CREDENTIAL_TYPE_ACCESS_REQUEST,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_DENIAL,
+  "vc:SolidAccessDenial",
   CREDENTIAL_TYPE_LEGACY_CONSENT_REQUEST,
 ]);
 
@@ -106,14 +107,15 @@ export const ACCESS_GRANT_STATUS = Object.freeze(
     GC_CONSENT_STATUS_DENIED,
     GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
     GC_CONSENT_STATUS_DENIED_ABBREV,
+    "gc:ConsentStatusDenied",
     GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV,
-  ])
+  ]),
 );
 
 export const ACCESS_REQUEST_STATUS = Object.freeze(
-  new Set([GC_CONSENT_STATUS_REQUESTED, GC_CONSENT_STATUS_REQUESTED_ABBREV])
+  new Set([GC_CONSENT_STATUS_REQUESTED, GC_CONSENT_STATUS_REQUESTED_ABBREV]),
 );
 
 export const ACCESS_STATUS = Object.freeze(
-  new Set([...ACCESS_GRANT_STATUS, ...ACCESS_REQUEST_STATUS])
+  new Set([...ACCESS_GRANT_STATUS, ...ACCESS_REQUEST_STATUS]),
 );

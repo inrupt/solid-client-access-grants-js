@@ -26,12 +26,12 @@ import type {
 } from "../type/AccessVerifiableCredential";
 
 export function isAccessGrant(
-  vc: BaseAccessVcBody
+  vc: BaseAccessVcBody,
 ): vc is BaseAccessVcBody & AccessGrantBody {
   return (
     (vc as AccessGrantBody).credentialSubject.providedConsent !== undefined &&
     ACCESS_GRANT_STATUS.has(
-      (vc as AccessGrantBody).credentialSubject.providedConsent.hasStatus
+      (vc as AccessGrantBody).credentialSubject.providedConsent.hasStatus,
     ) &&
     typeof (vc as AccessGrantBody).credentialSubject.providedConsent
       .isProvidedTo === "string"

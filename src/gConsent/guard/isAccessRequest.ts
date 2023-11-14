@@ -24,7 +24,7 @@ import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import { isBaseAccessRequestVerifiableCredential } from "./isBaseAccessRequestVerifiableCredential";
 
 export function isAccessRequest(
-  x: unknown
+  x: unknown,
 ): x is AccessRequestBody & { issuanceDate: string } {
   return (
     isBaseAccessRequestVerifiableCredential(x) &&

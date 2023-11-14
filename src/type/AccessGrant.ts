@@ -20,19 +20,14 @@
 //
 
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import type { AccessGrantOdrl } from "../odrl/type/AccessGrant";
-import { isCredentialAccessGrantOdrl } from "../odrl/type/AccessGrant";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import { CredentialIsAccessGrantGConsent } from "../gConsent/guard/isAccessGrant";
 import { isBaseAccessVcBody } from "../gConsent/guard/isBaseAccessVcBody";
 
-export type AccessGrantAny = AccessGrantOdrl | AccessGrantGConsent;
+export type AccessGrantAny = AccessGrantGConsent;
 
 export function CredentialIsAccessGrantAny(
-  vc: VerifiableCredential
+  vc: VerifiableCredential,
 ): vc is AccessGrantAny {
-  return (
-    isCredentialAccessGrantOdrl(vc) ||
-    (isBaseAccessVcBody(vc) && CredentialIsAccessGrantGConsent(vc))
-  );
+  return isBaseAccessVcBody(vc) && CredentialIsAccessGrantGConsent(vc);
 }

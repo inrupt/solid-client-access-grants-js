@@ -61,7 +61,7 @@ export async function saveSolidDatasetInContainer(
   containerUrl: UrlString,
   solidDataset: SolidDataset,
   accessGrant: VerifiableCredential,
-  options: SaveInContainerOptions
+  options: SaveInContainerOptions,
 ) {
   const fetchOptions: FetchOptions = {};
 
@@ -72,7 +72,7 @@ export async function saveSolidDatasetInContainer(
   const authenticatedFetch = await fetchWithVc(
     containerUrl,
     accessGrant,
-    fetchOptions
+    fetchOptions,
   );
 
   const containerOptions: { slugSuggestion?: string } = {};

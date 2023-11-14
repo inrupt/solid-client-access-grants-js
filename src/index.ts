@@ -35,6 +35,7 @@ export type { AccessModes } from "./type/AccessModes";
 export type { FetchOptions } from "./type/FetchOptions";
 export type { RedirectOptions } from "./type/RedirectOptions";
 export type { SaveInContainerOptions } from "./type/SaveInContainerOptions";
+export { CredentialIsAccessGrantAny } from "./type/AccessGrant";
 
 export {
   approveAccessRequest,
@@ -44,6 +45,7 @@ export {
   getAccessGrant,
   getAccessGrantAll,
   getAccessGrantFromRedirectUrl,
+  getAccessRequest,
   getAccessManagementUi,
   getAccessRequestFromRedirectUrl,
   issueAccessRequest,
@@ -57,14 +59,6 @@ export {
 // functions even when not relying on named exports.
 export * as gConsent from "./gConsent";
 
-// For backwards compatibility, all the functions handling odrl-based Access Grants
-// are exported from an API object to avoid clashes with the gConsent ones.
-/**
- * @unstable
- * @from unreleased
- */
-export * as odrl from "./odrl";
-
 export { isValidAccessGrant } from "./common/verify";
 
 export * as common from "./common";
@@ -73,6 +67,8 @@ export { fetchWithVc } from "./fetch";
 
 export {
   createContainerInContainer,
+  deleteFile,
+  deleteSolidDataset,
   getFile,
   getSolidDataset,
   overwriteFile,

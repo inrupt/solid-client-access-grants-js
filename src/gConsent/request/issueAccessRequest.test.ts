@@ -50,7 +50,7 @@ jest.mock("@inrupt/solid-client", () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
   solidClientModule.getSolidDataset = jest.fn(
-    solidClientModule.getSolidDataset
+    solidClientModule.getSolidDataset,
   );
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
@@ -58,7 +58,7 @@ jest.mock("@inrupt/solid-client", () => {
 jest.mock("@inrupt/solid-client-vc");
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch"
+    "@inrupt/universal-fetch",
   ) as jest.Mocked<typeof CrossFetch>;
   return {
     // Do no mock the globals such as Response.
@@ -148,7 +148,7 @@ describe("issueAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
 
@@ -161,7 +161,7 @@ describe("issueAccessRequest", () => {
       },
       {
         fetch: jest.fn<typeof fetch>(),
-      }
+      },
     );
 
     expect(mockedIssue).toHaveBeenCalledWith(
@@ -177,7 +177,7 @@ describe("issueAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessRequest"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -187,7 +187,7 @@ describe("issueAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     const mockedVc = mockAccessRequestVc();
     mockedVc.credentialSubject.hasConsent.hasStatus =
@@ -204,8 +204,8 @@ describe("issueAccessRequest", () => {
         },
         {
           fetch: jest.fn<typeof fetch>(),
-        }
-      )
+        },
+      ),
     ).resolves.not.toThrow();
   });
 
@@ -215,7 +215,7 @@ describe("issueAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
 
@@ -229,8 +229,8 @@ describe("issueAccessRequest", () => {
         },
         {
           fetch: jest.fn<typeof fetch>(),
-        }
-      )
+        },
+      ),
     ).rejects.toThrow();
   });
 
@@ -240,7 +240,7 @@ describe("issueAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
 
@@ -253,7 +253,7 @@ describe("issueAccessRequest", () => {
       },
       {
         fetch: jest.fn<typeof fetch>(),
-      }
+      },
     );
 
     // Casting is required because TS picks up the deprecated signature.
@@ -267,16 +267,16 @@ describe("issueAccessRequest", () => {
         "@context": expect.arrayContaining([
           "https://access-issuer.iri/credentials/v1",
         ]),
-      })
+      }),
     );
 
     // Ensure that the default context has been removed
     expect(subjectClaims["@context"]).not.toContain(
-      ACCESS_GRANT_CONTEXT_DEFAULT
+      ACCESS_GRANT_CONTEXT_DEFAULT,
     );
 
     expect(credentialClaims?.["@context"]).not.toContain(
-      ACCESS_GRANT_CONTEXT_DEFAULT
+      ACCESS_GRANT_CONTEXT_DEFAULT,
     );
   });
 
@@ -286,7 +286,7 @@ describe("issueAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
 
@@ -302,7 +302,7 @@ describe("issueAccessRequest", () => {
       },
       {
         fetch: jest.fn<typeof fetch>(),
-      }
+      },
     );
 
     expect(mockedIssue).toHaveBeenCalledWith(
@@ -321,7 +321,7 @@ describe("issueAccessRequest", () => {
         issuanceDate: "1955-06-08T13:37:42.042Z",
         expirationDate: "1990-11-12T13:37:42.042Z",
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -331,7 +331,7 @@ describe("issueAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
 
@@ -357,7 +357,7 @@ describe("issueAccessRequest", () => {
       expect.objectContaining({
         type: ["SolidAccessRequest"],
       }),
-      expect.anything()
+      expect.anything(),
     );
   });
 
@@ -367,7 +367,7 @@ describe("issueAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
 
@@ -381,7 +381,7 @@ describe("issueAccessRequest", () => {
       },
       {
         fetch: jest.fn<typeof fetch>(),
-      }
+      },
     );
 
     expect(mockedIssue.mock.lastCall?.[1]).toMatchObject({
@@ -397,7 +397,7 @@ describe("issueAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
 
@@ -411,7 +411,7 @@ describe("issueAccessRequest", () => {
       },
       {
         fetch: jest.fn<typeof fetch>(),
-      }
+      },
     );
 
     expect(mockedIssue.mock.lastCall?.[1]).toMatchObject({
@@ -427,7 +427,7 @@ describe("issueAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
 
@@ -441,20 +441,20 @@ describe("issueAccessRequest", () => {
       },
       {
         fetch: jest.fn<typeof fetch>(),
-      }
+      },
     );
 
     expect(
       (
         mockedIssue.mock
           .lastCall?.[1] as unknown as AccessRequestBody["credentialSubject"]
-      ).hasConsent.inherit
+      ).hasConsent.inherit,
     ).toBeUndefined();
   });
 
   const jsonLdEquivalent = (
     request: AccessRequest,
-    options: { inherit?: "true" | "false" }
+    options: { inherit?: "true" | "false" },
   ) => ({
     ...request,
     credentialSubject: {
@@ -476,11 +476,11 @@ describe("issueAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     const normalizedAccessRequest = mockAccessRequestVc({ inherit: true });
     mockedIssue.mockResolvedValueOnce(
-      jsonLdEquivalent(normalizedAccessRequest, { inherit: "true" })
+      jsonLdEquivalent(normalizedAccessRequest, { inherit: "true" }),
     );
     await expect(
       issueAccessRequest(
@@ -492,8 +492,8 @@ describe("issueAccessRequest", () => {
         },
         {
           fetch: jest.fn<typeof fetch>(),
-        }
-      )
+        },
+      ),
     ).resolves.toStrictEqual(normalizedAccessRequest);
   });
 
@@ -503,12 +503,12 @@ describe("issueAccessRequest", () => {
       jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: typeof issueVerifiableCredential;
       },
-      "issueVerifiableCredential"
+      "issueVerifiableCredential",
     );
     // Test for a different "inherit" value
     const normalizedAccessRequest = mockAccessRequestVc({ inherit: false });
     mockedIssue.mockResolvedValueOnce(
-      jsonLdEquivalent(normalizedAccessRequest, { inherit: "false" })
+      jsonLdEquivalent(normalizedAccessRequest, { inherit: "false" }),
     );
     await expect(
       issueAccessRequest(
@@ -520,8 +520,8 @@ describe("issueAccessRequest", () => {
         },
         {
           fetch: jest.fn<typeof fetch>(),
-        }
-      )
+        },
+      ),
     ).resolves.toStrictEqual(normalizedAccessRequest);
   });
 
@@ -549,7 +549,7 @@ describe("issueAccessRequest", () => {
           issuer: "https://some.issuer",
           issuanceDate: "some date",
           type: ["SolidAccessRequest"],
-        })
+        }),
       ).toBe(false);
     });
 
@@ -571,7 +571,7 @@ describe("issueAccessRequest", () => {
           issuer: "https://some.issuer",
           issuanceDate: "some date",
           type: ["SolidAccessRequest"],
-        })
+        }),
       ).toBe(false);
     });
 
@@ -593,7 +593,7 @@ describe("issueAccessRequest", () => {
           issuer: "https://some.issuer",
           issuanceDate: "some date",
           type: ["SolidAccessRequest"],
-        })
+        }),
       ).toBe(false);
     });
 
@@ -615,7 +615,7 @@ describe("issueAccessRequest", () => {
           issuer: "https://some.issuer",
           issuanceDate: "some date",
           type: ["SolidAccessRequest"],
-        })
+        }),
       ).toBe(false);
     });
 
@@ -637,7 +637,7 @@ describe("issueAccessRequest", () => {
           issuer: "https://some.issuer",
           issuanceDate: "some date",
           type: ["SolidAccessRequest"],
-        })
+        }),
       ).toBe(false);
     });
 
@@ -659,7 +659,7 @@ describe("issueAccessRequest", () => {
           issuer: "https://some.issuer",
           issuanceDate: "some date",
           type: ["SolidAccessRequest"],
-        })
+        }),
       ).toBe(false);
     });
 
@@ -682,7 +682,7 @@ describe("issueAccessRequest", () => {
           issuer: "https://some.issuer",
           issuanceDate: "some date",
           type: ["Some other type"],
-        })
+        }),
       ).toBe(false);
     });
 
@@ -705,7 +705,7 @@ describe("issueAccessRequest", () => {
           issuer: "https://some.issuer",
           issuanceDate: "some date",
           type: ["SolidAccessRequest"],
-        })
+        }),
       ).toBe(true);
     });
   });

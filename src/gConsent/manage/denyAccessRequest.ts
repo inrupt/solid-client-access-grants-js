@@ -31,18 +31,20 @@ import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
+import { normalizeAccessGrant } from "./approveAccessRequest";
+import type { AccessGrant } from "../type/AccessGrant";
 
 // Merge back in denyAccessRequest after the deprecated signature has been removed.
 // eslint-disable-next-line camelcase
 async function internal_denyAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
-  options: AccessBaseOptions
+  options: AccessBaseOptions,
 ): Promise<VerifiableCredential> {
   const baseAccessVerifiableCredential =
     await getBaseAccessRequestVerifiableCredential(vc, options);
 
   const internalOptions = initializeGrantParameters(
-    baseAccessVerifiableCredential
+    baseAccessVerifiableCredential,
   );
   const denialBody = getGrantBody({
     access: internalOptions.access,
@@ -70,20 +72,20 @@ async function internal_denyAccessRequest(
  */
 async function denyAccessRequest(
   vc: VerifiableCredential | URL | UrlString,
-  options?: AccessBaseOptions
-): Promise<VerifiableCredential>;
+  options?: AccessBaseOptions,
+): Promise<AccessGrant>;
 /**
  * @deprecated Please remove the `resourceOwner` parameter.
  */
 async function denyAccessRequest(
   resourceOwner: WebId,
   vc: VerifiableCredential | URL | UrlString,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<VerifiableCredential>;
 async function denyAccessRequest(
   resourceOwnerOrVc: WebId | VerifiableCredential | URL | UrlString,
   vcOrOptions?: VerifiableCredential | URL | UrlString | AccessBaseOptions,
-  options?: AccessBaseOptions
+  options?: AccessBaseOptions,
 ): Promise<VerifiableCredential> {
   if (
     typeof options !== "undefined" ||
@@ -94,13 +96,13 @@ async function denyAccessRequest(
     // The deprecated signature is being used: ignore the first parameter
     return internal_denyAccessRequest(
       vcOrOptions as VerifiableCredential | URL | UrlString,
-      options ?? {}
-    );
+      options ?? {},
+    ).then(normalizeAccessGrant);
   }
   return internal_denyAccessRequest(
     resourceOwnerOrVc,
-    (vcOrOptions as AccessBaseOptions) ?? {}
-  );
+    (vcOrOptions as AccessBaseOptions) ?? {},
+  ).then(normalizeAccessGrant);
 }
 
 export { denyAccessRequest };

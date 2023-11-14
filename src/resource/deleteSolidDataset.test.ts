@@ -20,39 +20,35 @@
 //
 
 import { it, jest, describe, expect } from "@jest/globals";
-import { mockSolidDatasetFrom } from "@inrupt/solid-client";
-import { mockAccessRequestVc } from "../gConsent/util/access.mock";
-import { getSolidDataset } from "./getSolidDataset";
+import type SolidClientCore from "@inrupt/solid-client";
+import { mockAccessGrantVc } from "../gConsent/util/access.mock";
+import { deleteSolidDataset } from "./deleteSolidDataset";
 import { fetchWithVc } from "../fetch";
 
 jest.mock("../fetch");
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
-  solidClientModule.getSolidDataset = jest.fn();
+  solidClientModule.deleteSolidDataset = jest.fn();
   return solidClientModule;
 });
 
-describe("getSolidDataset", () => {
+describe("deleteSolidDataset", () => {
   it("authenticates using the provided VC", async () => {
-    const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
-    const mockedDataset = mockSolidDatasetFrom("https://some.url");
-    solidClientModule.getSolidDataset.mockResolvedValueOnce(mockedDataset);
-    const mockedFetch = jest.fn() as typeof fetch;
-    // TODO: change to mockAccessGrantVc when rebasing
-    const resultDataset = await getSolidDataset(
-      "https://some.dataset.url",
-      mockAccessRequestVc(),
-      { fetch: mockedFetch },
-    );
+    const solidClientModule = jest.requireMock(
+      "@inrupt/solid-client",
+    ) as jest.Mocked<typeof SolidClientCore>;
+    const mockedFetch = jest.fn<typeof fetch>();
+    await deleteSolidDataset("https://some.dataset.url", mockAccessGrantVc(), {
+      fetch: mockedFetch,
+    });
     expect(fetchWithVc).toHaveBeenCalledWith(
       expect.anything(),
-      mockAccessRequestVc(),
+      mockAccessGrantVc(),
       { fetch: mockedFetch },
     );
-    expect(solidClientModule.getSolidDataset).toHaveBeenCalledWith(
+    expect(solidClientModule.deleteSolidDataset).toHaveBeenCalledWith(
       "https://some.dataset.url",
       expect.anything(),
     );
-    expect(resultDataset).toBe(mockedDataset);
   });
 });

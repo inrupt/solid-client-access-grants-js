@@ -46,25 +46,25 @@ export const MOCKED_ACCESS_UI_IRI = "https://some-consent.app";
 export const MOCKED_STORAGE = "https://pod-provider.iri";
 
 export const mockWellKnownWithAccess = (
-  hasUi = true
+  hasUi = true,
 ): SolidDataset & WithServerResourceInfo => {
   const wellKnown = buildThing().addIri(
     "http://www.w3.org/ns/solid/terms#accessIssuer",
-    MOCKED_ACCESS_ISSUER
+    MOCKED_ACCESS_ISSUER,
   );
   if (hasUi) {
     wellKnown.addIri(PREFERRED_CONSENT_MANAGEMENT_UI, MOCKED_ACCESS_UI_IRI);
   }
   return setThing(
     mockSolidDatasetFrom("https://pod-provider.iri/resource/.well-known/solid"),
-    wellKnown.build()
+    wellKnown.build(),
   );
 };
 
 export const mockWebIdWithUi = (
   webId: UrlString,
   hasUi = true,
-  hasStorage = true
+  hasStorage = true,
 ): SolidDataset & WithServerResourceInfo => {
   const profile = buildThing({ url: webId });
   if (hasStorage) {
@@ -86,7 +86,7 @@ export const mockAccessApiEndpoint = (withCredentialIssuer = true) => {
         headers: {
           "WWW-Authenticate": `UMA realm="Solid Pod", as_uri="https://uma.inrupt.com", ticket="some UMA ticket`,
         },
-      })
+      }),
     )
     .mockResolvedValueOnce(
       new Response(
@@ -95,9 +95,9 @@ export const mockAccessApiEndpoint = (withCredentialIssuer = true) => {
             ? {
                 verifiable_credential_issuer: MOCKED_ACCESS_ISSUER,
               }
-            : {}
-        )
-      )
+            : {},
+        ),
+      ),
     );
   const crossFetchModule = jest.requireMock("@inrupt/universal-fetch") as {
     fetch: typeof global.fetch;

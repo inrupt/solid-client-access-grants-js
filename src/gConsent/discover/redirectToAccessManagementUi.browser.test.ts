@@ -39,7 +39,7 @@ jest.mock("./getAccessManagementUi");
 
 const mockAccessManagementUiDiscovery = (url: string | undefined) => {
   const accessUiDiscoveryModule = jest.requireMock(
-    "./getAccessManagementUi"
+    "./getAccessManagementUi",
   ) as any;
   accessUiDiscoveryModule.getAccessManagementUiFromWellKnown = jest
     .fn(getAccessManagementUiFromWellKnown)
@@ -74,12 +74,12 @@ describe("redirectToAccessManagementUi", () => {
       await expect(
         redirectToAccessManagementUi(
           mockAccessRequestVc(),
-          "https://some.redirect.iri"
-        )
+          "https://some.redirect.iri",
+        ),
       ).rejects.toThrow(
         `Cannot discover access management UI URL for [${
           mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData[0]
-        }]`
+        }]`,
       );
     });
 
@@ -92,12 +92,12 @@ describe("redirectToAccessManagementUi", () => {
           "https://some.redirect.iri",
           {
             resourceOwner,
-          }
-        )
+          },
+        ),
       ).rejects.toThrow(
         `Cannot discover access management UI URL for [${
           mockAccessRequestVc().credentialSubject.hasConsent.forPersonalData[0]
-        }], neither from [${resourceOwner}]`
+        }], neither from [${resourceOwner}]`,
       );
     });
 
@@ -112,7 +112,7 @@ describe("redirectToAccessManagementUi", () => {
         "https://some.redirect.iri",
         {
           resourceOwner,
-        }
+        },
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
@@ -132,7 +132,7 @@ describe("redirectToAccessManagementUi", () => {
         "https://some.redirect.iri",
         {
           fallbackAccessManagementUi: "https://some.app",
-        }
+        },
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
@@ -152,7 +152,7 @@ describe("redirectToAccessManagementUi", () => {
         "https://some.redirect.iri",
         {
           fallbackAccessManagementUi: "https://some.app",
-        }
+        },
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
@@ -170,7 +170,7 @@ describe("redirectToAccessManagementUi", () => {
       // eslint-disable-next-line no-void
       void redirectToAccessManagementUi(
         mockAccessRequestVc(),
-        "https://some.redirect.iri"
+        "https://some.redirect.iri",
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
@@ -187,7 +187,7 @@ describe("redirectToAccessManagementUi", () => {
       // eslint-disable-next-line no-void
       void redirectToAccessManagementUi(
         mockAccessRequestVc(),
-        "https://some.redirect.iri"
+        "https://some.redirect.iri",
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
@@ -198,7 +198,7 @@ describe("redirectToAccessManagementUi", () => {
       const encodedVc = targetIri.searchParams.get("requestVcUrl") as string;
       expect(decodeURI(encodedVc)).toEqual(mockAccessRequestVc().id);
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
-        "https://some.redirect.iri"
+        "https://some.redirect.iri",
       );
     });
 
@@ -207,7 +207,7 @@ describe("redirectToAccessManagementUi", () => {
       const mockedFetch = jest
         .fn(global.fetch)
         .mockResolvedValueOnce(
-          new Response(JSON.stringify(mockAccessRequestVc()))
+          new Response(JSON.stringify(mockAccessRequestVc())),
         );
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
@@ -217,7 +217,7 @@ describe("redirectToAccessManagementUi", () => {
         new URL("https://some.redirect.iri"),
         {
           fetch: mockedFetch,
-        }
+        },
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
@@ -226,7 +226,7 @@ describe("redirectToAccessManagementUi", () => {
       });
       const targetIri = new URL(window.location.href);
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
-        "https://some.redirect.iri/"
+        "https://some.redirect.iri/",
       );
     });
 
@@ -237,7 +237,7 @@ describe("redirectToAccessManagementUi", () => {
       // eslint-disable-next-line no-void
       void redirectToAccessManagementUi(
         mockAccessRequestVc(),
-        new URL("https://some.redirect.iri")
+        new URL("https://some.redirect.iri"),
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
@@ -246,7 +246,7 @@ describe("redirectToAccessManagementUi", () => {
       });
       const targetIri = new URL(window.location.href);
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
-        "https://some.redirect.iri/"
+        "https://some.redirect.iri/",
       );
     });
 
@@ -261,7 +261,7 @@ describe("redirectToAccessManagementUi", () => {
         "https://some.redirect.iri",
         {
           redirectCallback,
-        }
+        },
       );
       // Yield the event loop to make sure the blocking promises completes.
       // FIXME: Why is setImmediate undefined in this context ?
@@ -271,10 +271,10 @@ describe("redirectToAccessManagementUi", () => {
       const redirectIri = new URL(redirectCallback.mock.calls[0][0] as string);
       expect(redirectIri.origin).toBe("https://some.access.ui");
       expect(redirectIri.searchParams.get("requestVcUrl")).toBe(
-        mockAccessRequestVc().id
+        mockAccessRequestVc().id,
       );
       expect(redirectIri.searchParams.get("redirectUrl")).toBe(
-        "https://some.redirect.iri"
+        "https://some.redirect.iri",
       );
       expect(window.location.href).toBe("https://some.site");
     });

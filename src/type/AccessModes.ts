@@ -41,17 +41,17 @@ export interface AccessModes {
  * @internal
  */
 export function resourceAccessToAccessMode(
-  access: ResourceAccessMode[]
+  access: ResourceAccessMode[],
 ): AccessModes {
   const result: Required<AccessModes> = {
     read: (["http://www.w3.org/ns/auth/acl#Read", "Read"] as const).some(
-      (mode) => access.includes(mode)
+      (mode) => access.includes(mode),
     ),
     write: (["http://www.w3.org/ns/auth/acl#Write", "Write"] as const).some(
-      (mode) => access.includes(mode)
+      (mode) => access.includes(mode),
     ),
     append: (["http://www.w3.org/ns/auth/acl#Append", "Append"] as const).some(
-      (mode) => access.includes(mode)
+      (mode) => access.includes(mode),
     ),
   };
   return result;

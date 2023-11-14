@@ -44,14 +44,14 @@ export const GRANT_VC_PARAM_NAME = "accessGrant";
 export async function redirectToRequestor(
   accessGrantVcId: UrlString | URL,
   redirectUrl: UrlString | URL,
-  options: RedirectOptions = {}
+  options: RedirectOptions = {},
 ): Promise<void> {
   return redirectWithParameters(
     redirectUrl.toString(),
     {
       [`${GRANT_VC_URL_PARAM_NAME}`]: encodeURI(accessGrantVcId.toString()),
     },
-    options
+    options,
   );
 }
 

@@ -7,7 +7,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   lint:
-    uses: inrupt/typescript-sdk-tools/.github/workflows/reusable-lint.yml@v1.7.0
+    uses: inrupt/typescript-sdk-tools/.github/workflows/reusable-lint.yml@v2
 
   unit-tests:
     continue-on-error: ${{ matrix.experimental }}
@@ -17,11 +17,11 @@ jobs:
       matrix:
         # Available OS's: https://help.github.com/en/actions/reference/virtual-environments-for-github-hosted-runners
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node-version: ["20.x", "18.x", "16.x", "14.x"]
+        node-version: ["20.x", "18.x", "16.x"]
         experimental: [false]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # Sonar analysis needs the full history for features like automatic assignment of bugs. If the following step
           # is not included the project will show a warning about incomplete information.
