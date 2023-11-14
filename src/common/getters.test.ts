@@ -24,7 +24,6 @@ import {
   mockAccessGrantVc as mockGConsentGrant,
   mockAccessRequestVc as mockGConsentRequest,
 } from "../gConsent/util/access.mock";
-import { mockOdrlGrant } from "../odrl/util/access.mock";
 import {
   AccessGrantWrapper,
   getAccessModes,
@@ -55,14 +54,6 @@ describe("getResources", () => {
       );
     });
   });
-  describe("ODRL data model", () => {
-    it("gets the resources from an ODRL access grant", () => {
-      const odrlGrant = mockOdrlGrant();
-      expect(getResources(odrlGrant)).toEqual([
-        odrlGrant.credentialSubject.permission[0].target,
-      ]);
-    });
-  });
 });
 
 describe("getResourceOwner", () => {
@@ -88,13 +79,6 @@ describe("getResourceOwner", () => {
       expect(getResourceOwner(gConsentRequest)).toBeUndefined();
     });
   });
-
-  describe("ODRL data model", () => {
-    it("gets the resource owner from an ODRL access grant", () => {
-      const odrlGrant = mockOdrlGrant();
-      expect(getResourceOwner(odrlGrant)).toBe(odrlGrant.credentialSubject.id);
-    });
-  });
 });
 
 describe("getRequestor", () => {
@@ -110,14 +94,6 @@ describe("getRequestor", () => {
       const gConsentRequest = mockGConsentRequest();
       expect(getRequestor(gConsentRequest)).toBe(
         gConsentRequest.credentialSubject.id,
-      );
-    });
-  });
-  describe("ODRL data model", () => {
-    it("gets the recipient of an ODRL access grant", () => {
-      const odrlGrant = mockOdrlGrant();
-      expect(getRequestor(odrlGrant)).toBe(
-        odrlGrant.credentialSubject.assignee,
       );
     });
   });
@@ -152,20 +128,6 @@ describe("getAccessModes", () => {
       });
     });
   });
-  describe("ODRL data model", () => {
-    it("gets the access modes of an ODRL access grant", () => {
-      const odrlGrant = mockOdrlGrant();
-      expect(odrlGrant.credentialSubject.permission[0].action).toStrictEqual([
-        "http://www.w3.org/ns/auth/acl#Read",
-        "http://www.w3.org/ns/auth/acl#Write",
-      ]);
-      expect(getAccessModes(odrlGrant)).toStrictEqual({
-        read: true,
-        append: false,
-        write: true,
-      });
-    });
-  });
 });
 
 describe("getId", () => {
@@ -180,12 +142,6 @@ describe("getId", () => {
       expect(getId(gConsentRequest)).toBe(gConsentRequest.id);
     });
   });
-  describe("ODRL data model", () => {
-    it("gets the ODRL access grant id", () => {
-      const odrlGrant = mockOdrlGrant();
-      expect(getId(odrlGrant)).toBe(odrlGrant.id);
-    });
-  });
 });
 
 describe("getTypes", () => {
@@ -198,12 +154,6 @@ describe("getTypes", () => {
     it("gets the gConsent access request id", () => {
       const gConsentRequest = mockGConsentRequest();
       expect(getTypes(gConsentRequest)).toBe(gConsentRequest.type);
-    });
-  });
-  describe("ODRL data model", () => {
-    it("gets the ODRL access grant types", () => {
-      const odrlGrant = mockOdrlGrant();
-      expect(getTypes(odrlGrant)).toBe(odrlGrant.type);
     });
   });
 });
@@ -223,15 +173,6 @@ describe("getIssuanceDate", () => {
       gConsentRequest.issuanceDate = new Date().toString();
       expect(getIssuanceDate(gConsentRequest)).toStrictEqual(
         new Date(gConsentRequest.issuanceDate),
-      );
-    });
-  });
-  describe("ODRL data model", () => {
-    it("gets the ODRL access issuance date", () => {
-      const odrlGrant = mockOdrlGrant();
-      odrlGrant.issuanceDate = new Date().toString();
-      expect(getIssuanceDate(odrlGrant)).toStrictEqual(
-        new Date(odrlGrant.issuanceDate),
       );
     });
   });
@@ -255,14 +196,6 @@ describe("getExpirationDate", () => {
       );
     });
   });
-  describe("ODRL data model", () => {
-    it("gets the ODRL access expiration date", () => {
-      const odrlGrant = mockOdrlGrant();
-      expect(getExpirationDate(odrlGrant)).toStrictEqual(
-        new Date(odrlGrant.expirationDate as string),
-      );
-    });
-  });
 });
 
 describe("getIssuer", () => {
@@ -275,12 +208,6 @@ describe("getIssuer", () => {
     it("gets the gConsent access request issuer", () => {
       const gConsentRequest = mockGConsentRequest();
       expect(getIssuer(gConsentRequest)).toStrictEqual(gConsentRequest.issuer);
-    });
-  });
-  describe("ODRL data model", () => {
-    it("gets the ODRL access grant issuer", () => {
-      const odrlGrant = mockOdrlGrant();
-      expect(getIssuer(odrlGrant)).toStrictEqual(odrlGrant.issuer);
     });
   });
 });
@@ -305,13 +232,6 @@ describe("getInherit", () => {
     it("defaults the recursive nature from a gConsent access request to true", () => {
       const gConsentRequest = mockGConsentRequest({ inherit: undefined });
       expect(getInherit(gConsentRequest)).toBe(true);
-    });
-  });
-
-  describe("ODRL data model", () => {
-    it("gets the recursive nature of an ODRL access grant", () => {
-      const odrlGrant = mockOdrlGrant();
-      expect(getInherit(odrlGrant)).toBe(true);
     });
   });
 });
