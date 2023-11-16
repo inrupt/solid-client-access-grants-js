@@ -10,9 +10,18 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
-### Removed features
+## [2.6.2](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.6.2) - 2023-11-16
 
-- Support for `odrl` access grants has been removed.
+### Removed features (non-breaking)
+
+- Support for `odrl` access grants has been removed. The ODRL data model was in as an experimental feature,
+  and wasn't deployed in any supported Access Grant issuers. Removing it will not break apps using the currently
+  supported gConsent-based Access Grants.
+
+### Bugfixes
+
+- Denied Access Grant expiration date: When denying an access grant based on an access request, the exipration
+  date of the access request wasn't being picked up as the expiration date for the denied grant.
 
 ## [2.6.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.6.1) - 2023-09-25
 
