@@ -543,10 +543,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
         }),
       ).resolves.toMatchObject({ errors: [] });
 
-      if (env.environment !== "ESS Dev-2-2") {
-        // eslint-disable-next-line jest/no-conditional-expect
-        expect(grant.expirationDate).toBeUndefined();
-      }
+      expect(grant.expirationDate).toBeDefined();
 
       const filePromise = getFile(sharedFileIri, grant, {
         fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
