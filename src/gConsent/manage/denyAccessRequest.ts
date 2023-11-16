@@ -53,6 +53,9 @@ async function internal_denyAccessRequest(
     requestorInboxUrl: internalOptions.requestorInboxUrl,
     status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
     purpose: internalOptions.purpose,
+    // denyAccessRequest doesn't take an override, so the expiration date
+    // cannot be null.
+    expirationDate: internalOptions.expirationDate as Date | undefined,
   });
   denialBody.type = [CREDENTIAL_TYPE_ACCESS_DENIAL];
   denialBody.credentialSubject.providedConsent.hasStatus =

@@ -147,6 +147,7 @@ describe("denyAccessRequest", () => {
       }),
       expect.objectContaining({
         type: ["SolidAccessDenial"],
+        expirationDate: accessRequestWithPurpose.expirationDate,
       }),
       expect.anything(),
     );
