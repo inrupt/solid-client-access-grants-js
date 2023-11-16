@@ -10,6 +10,10 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### Removed features
+
+- Support for `odrl` access grants has been removed.
+
 ## [2.6.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.6.1) - 2023-09-25
 
 ### Bugfixes

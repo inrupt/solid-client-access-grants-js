@@ -24,5 +24,5 @@ import type { AccessGrantBody } from "./AccessVerifiableCredential";
 
 export type AccessGrant = VerifiableCredential & AccessGrantBody;
 // Alias with the explicit GConsent suffix, to be used in functions accepting both
-// gConsent-based and ODRL-based grants.
+// gConsent-based.
 export type AccessGrantGConsent = AccessGrant;

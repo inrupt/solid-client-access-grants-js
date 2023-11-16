@@ -47,7 +47,6 @@ import {
   saveSolidDatasetInContainer,
   GRANT_VC_URL_PARAM_NAME,
   gConsent,
-  odrl,
   AccessGrantWrapper,
   getAccessModes,
   getExpirationDate,
@@ -88,7 +87,6 @@ describe("Index exports", () => {
     expect(saveSolidDatasetInContainer).toBeDefined();
     expect(GRANT_VC_URL_PARAM_NAME).toBeDefined();
     expect(gConsent).toBeDefined();
-    expect(odrl).toBeDefined();
     expect(AccessGrantWrapper).toBeDefined();
     expect(getAccessModes).toBeDefined();
     expect(getExpirationDate).toBeDefined();

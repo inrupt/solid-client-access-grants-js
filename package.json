@@ -51,8 +51,7 @@
     "./gConsent": "./dist/gConsent/index.mjs",
     "./gConsent/discover": "./dist/gConsent/discover/index.mjs",
     "./gConsent/manage": "./dist/gConsent/manage/index.mjs",
-    "./gConsent/request": "./dist/gConsent/request/index.mjs",
-    "./odrl": "./dist/odrl/index.mjs"
+    "./gConsent/request": "./dist/gConsent/request/index.mjs"
   },
   "typesVersions": {
     "*": {
