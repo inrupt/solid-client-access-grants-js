@@ -19,11 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-export const AS_ACTOR = "https://www.w3.org/ns/activitystreams#actor";
-export const AS_ANNOUNCE = "https://www.w3.org/ns/activitystreams#Announce";
-export const AS_OBJECT = "https://www.w3.org/ns/activitystreams#object";
-export const AS_SUMMARY = "https://www.w3.org/ns/activitystreams#summary";
-
 export const GC_CONSENT = "https://w3id.org/GConsent#Consent";
 export const GC_FOR_PERSONAL_DATA = "https://w3id.org/GConsent#forPersonalData";
 export const GC_FOR_PURPOSE = "https://w3id.org/GConsent#forPurpose";
@@ -91,18 +86,9 @@ export const instanciateEssAccessGrantContext = (
     instanciateContextVcEssTemplate(essVcDomain),
   ] as const;
 
-export const WELL_KNOWN_SOLID = ".well-known/solid";
-
-export const INRUPT_CONSENT_SERVICE_LEGACY =
-  "http://inrupt.com/ns/ess#consentIssuer";
-
-export const SOLID_CONSENT_SERVICE =
-  "http://www.w3.org/ns/solid/terms#accessIssuer";
-
 export const CREDENTIAL_TYPE_ACCESS_REQUEST = "SolidAccessRequest";
 export const CREDENTIAL_TYPE_ACCESS_GRANT = "SolidAccessGrant";
 export const CREDENTIAL_TYPE_ACCESS_DENIAL = "SolidAccessDenial";
-export const CREDENTIAL_TYPE_LEGACY_CONSENT_REQUEST = "SolidConsentRequest";
 export const CREDENTIAL_TYPE_BASE = "VerifiableCredential";
 export const PRESENTATION_TYPE_BASE = "VerifiablePresentation";
 
@@ -111,7 +97,6 @@ export const ACCESS_CREDENTIAL_TYPE = new Set([
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_DENIAL,
   "vc:SolidAccessDenial",
-  CREDENTIAL_TYPE_LEGACY_CONSENT_REQUEST,
 ]);
 
 export const ACCESS_GRANT_STATUS = Object.freeze(

@@ -29,18 +29,7 @@ import { DataFactory } from "n3";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessRequestGConsent } from "../gConsent/type/AccessRequest";
 import type { AccessModes } from "../type/AccessModes";
-import {
-  CREDENTIAL_SUBJECT,
-  EXPIRATION_DATE,
-  INHERIT,
-  ISSUANCE_DATE,
-  ISSUER,
-  XSD_BOOLEAN,
-  assertTermType,
-  getSingleQuad,
-  gc,
-  acl,
-} from "./constants";
+import { INHERIT, XSD_BOOLEAN, gc, acl, cred, TYPE } from "./constants";
 import {
   GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
@@ -88,34 +77,32 @@ export function isGConsentAccessGrant(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): boolean {
   const credentialSubject = getCredentialSubject(vc);
-  try {
-    const providedConsent = getSingleObject(
-      vc,
-      credentialSubject,
-      gc.providedConsent,
-      "BlankNode",
-    );
-    return (
-      (vc.has(
-        quad(
-          providedConsent,
-          namedNode(GC_HAS_STATUS),
-          namedNode(GC_CONSENT_STATUS_DENIED),
-        ),
-      ) ||
-        vc.has(
-          quad(
-            providedConsent,
-            namedNode(GC_HAS_STATUS),
-            namedNode(GC_CONSENT_STATUS_EXPLICITLY_GIVEN),
-          ),
-        )) &&
-      // Because of the getSingleObject the try / catch is also needed to wrap this as well as getting the provided consent
-      !!getSingleObject(vc, providedConsent, gc.isProvidedTo)
-    );
-  } catch (e) {
-    return false;
-  }
+  const providedConsent = getSingleObject(
+    vc,
+    credentialSubject,
+    gc.providedConsent,
+    undefined,
+    false,
+  );
+
+  if (!providedConsent) return false;
+
+  const gcStatus = getSingleObject(
+    vc,
+    credentialSubject,
+    namedNode(GC_HAS_STATUS),
+    undefined,
+    false,
+  );
+
+  return (
+    gcStatus !== undefined &&
+    [GC_CONSENT_STATUS_DENIED, GC_CONSENT_STATUS_EXPLICITLY_GIVEN].includes(
+      gcStatus?.value,
+    ) &&
+    getSingleObject(vc, providedConsent, gc.isProvidedTo, undefined, false)
+      ?.termType === "NamedNode"
+  );
 }
 
 /**
@@ -137,24 +124,26 @@ export function getResourceOwner(
 export function getResourceOwner(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): string | undefined {
-  try {
-    const credentialSubject = getCredentialSubject(vc);
-    if (isGConsentAccessGrant(vc)) {
-      return credentialSubject.value;
-    }
-    return getSingleObject(
-      vc,
-      // We should probably allow this to be Blank or Named Node
-      getSingleObject(vc, credentialSubject, gc.hasConsent, "BlankNode"),
-      gc.isConsentForDataSubject,
-    ).value;
-  } catch (e) {
-    return undefined;
+  const credentialSubject = getCredentialSubject(vc);
+  if (isGConsentAccessGrant(vc)) {
+    return credentialSubject.value;
   }
+  return getSingleObject(
+    vc,
+    getSingleObject(vc, credentialSubject, gc.hasConsent),
+    gc.isConsentForDataSubject,
+    "NamedNode",
+    false,
+  )?.value;
 }
 
 function getCredentialSubject(vc: AccessGrantGConsent | AccessRequestGConsent) {
-  return getSingleObject(vc, namedNode(getId(vc)), CREDENTIAL_SUBJECT);
+  return getSingleObject(
+    vc,
+    namedNode(getId(vc)),
+    cred.credentialSubject,
+    "NamedNode",
+  );
 }
 
 function getConsent(vc: AccessGrantGConsent | AccessRequestGConsent) {
@@ -193,26 +182,40 @@ export function getRequestor(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): string {
   const credentialSubject = getCredentialSubject(vc);
-  try {
-    const providedConsent = getSingleObject(
-      vc,
-      credentialSubject,
-      gc.providedConsent,
-      "BlankNode",
-    );
-    return getSingleObject(vc, providedConsent, gc.isProvidedTo).value;
-  } catch (e) {
-    // noop
-  }
+  const providedConsent = getSingleObject(
+    vc,
+    credentialSubject,
+    gc.providedConsent,
+    undefined,
+    false,
+  );
 
-  return credentialSubject.value;
+  if (!providedConsent) return credentialSubject.value;
+
+  return getSingleObject(vc, providedConsent, gc.isProvidedTo, "NamedNode")
+    .value;
 }
 
 function getSingleObject(
   vc: DatasetCore,
   subject: Term,
   predicate: Term,
+  type: "NamedNode",
 ): NamedNode;
+function getSingleObject(
+  vc: DatasetCore,
+  subject: Term,
+  predicate: Term,
+  type: "NamedNode",
+  required: false,
+): NamedNode | undefined;
+function getSingleObject(
+  vc: DatasetCore,
+  subject: Term,
+  predicate: Term,
+  type: "Literal",
+  required: false,
+): Literal | undefined;
 function getSingleObject(
   vc: DatasetCore,
   subject: Term,
@@ -229,13 +232,42 @@ function getSingleObject(
   vc: DatasetCore,
   subject: Term,
   predicate: Term,
+): NamedNode | BlankNode;
+function getSingleObject(
+  vc: DatasetCore,
+  subject: Term,
+  predicate: Term,
+  type: undefined,
+  required: false,
+): NamedNode | BlankNode | undefined;
+function getSingleObject(
+  vc: DatasetCore,
+  subject: Term,
+  predicate: Term,
   type?: Term["termType"],
-) {
-  return assertTermType(
-    getSingleQuad([...vc.match(subject, predicate, null, defaultGraph())])
-      .object,
-    type,
-  );
+  required = true,
+): Term | undefined {
+  const results = [...vc.match(subject, predicate, null, defaultGraph())];
+
+  if (results.length === 0 && !required) {
+    return undefined;
+  }
+
+  if (results.length !== 1) {
+    throw new Error(`Expected exactly one result. Found ${results.length}.`);
+  }
+
+  const [{ object }] = results;
+  const expectedTypes = type ? [type] : ["NamedNode", "BlankNode"];
+  if (!expectedTypes.includes(object.termType)) {
+    throw new Error(
+      `Expected [${object.value}] to be a ${expectedTypes.join(
+        " or ",
+      )}. Found [${object.termType}]`,
+    );
+  }
+
+  return object;
 }
 
 /**
@@ -292,8 +324,33 @@ export function getId(vc: AccessGrantGConsent | AccessRequestGConsent): string {
 export function getTypes(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): string[] {
-  return vc.type;
+  const results = [
+    ...vc.match(namedNode(getId(vc)), TYPE, undefined, defaultGraph()),
+  ].map((res) => res.object);
+
+  const types: string[] = [];
+
+  for (const result of results) {
+    if (result.termType !== "NamedNode") {
+      throw new Error(
+        `Expected every type to be a Named Node, but found [${result.value}] with term type [${result.termType}]`,
+      );
+    }
+    types.push(result.value);
+    if (result.value in shorthand) {
+      types.push(shorthand[result.value as keyof typeof shorthand]);
+    }
+  }
+
+  return types;
 }
+
+const shorthand = {
+  "http://www.w3.org/ns/solid/vc#SolidAccessRequest": "SolidAccessRequest",
+  "http://www.w3.org/ns/solid/vc#SolidAccessGrant": "SolidAccessGrant",
+  "https://www.w3.org/2018/credentials#VerifiableCredential":
+    "VerifiableCredential",
+};
 
 function wrapDate(date: Literal) {
   if (
@@ -324,7 +381,7 @@ export function getIssuanceDate(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): Date {
   return wrapDate(
-    getSingleObject(vc, namedNode(getId(vc)), ISSUANCE_DATE, "Literal"),
+    getSingleObject(vc, namedNode(getId(vc)), cred.issuanceDate, "Literal"),
   );
 }
 
@@ -343,21 +400,14 @@ export function getIssuanceDate(
 export function getExpirationDate(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): Date | undefined {
-  const expirationDate = [
-    ...vc.match(namedNode(getId(vc)), EXPIRATION_DATE, null, defaultGraph()),
-  ];
-
-  if (expirationDate.length > 1) {
-    throw new Error(
-      `Expected at most one expiration date. Found ${expirationDate.length}`,
-    );
-  }
-
-  if (expirationDate.length === 1) {
-    return wrapDate(assertTermType(expirationDate[0].object, "Literal"));
-  }
-
-  return undefined;
+  const expirationDate = getSingleObject(
+    vc,
+    namedNode(getId(vc)),
+    cred.expirationDate,
+    "Literal",
+    false,
+  );
+  return expirationDate && wrapDate(expirationDate);
 }
 
 /**
@@ -375,7 +425,8 @@ export function getExpirationDate(
 export function getIssuer(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): string {
-  return getSingleObject(vc, namedNode(getId(vc)), ISSUER).value;
+  return getSingleObject(vc, namedNode(getId(vc)), cred.issuer, "NamedNode")
+    .value;
 }
 
 /**

@@ -18,7 +18,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-import type { Term, Quad, NamedNode, BlankNode, Literal } from "@rdfjs/types";
 import { DataFactory } from "n3";
 import { rdf, acl as _acl } from "rdf-namespaces";
 
@@ -49,34 +48,13 @@ export const acl = {
   mode: namedNode(_acl.mode),
 };
 
-export const ISSUANCE_DATE = namedNode(`${CRED}issuanceDate`);
-export const EXPIRATION_DATE = namedNode(`${CRED}expirationDate`);
-export const ISSUER = namedNode(`${CRED}issuer`);
+export const cred = {
+  issuanceDate: namedNode(`${CRED}issuanceDate`),
+  expirationDate: namedNode(`${CRED}expirationDate`),
+  issuer: namedNode(`${CRED}issuer`),
+  credentialSubject: namedNode(`${CRED}credentialSubject`),
+};
 
-export const CREDENTIAL_SUBJECT = namedNode(`${CRED}credentialSubject`);
 export const INHERIT = namedNode(
   "urn:uuid:71ab2f68-a68b-4452-b968-dd23e0570227",
 );
-
-export function assertTermType(term: Term): NamedNode;
-export function assertTermType(term: Term, type: "NamedNode"): NamedNode;
-export function assertTermType(term: Term, type: "BlankNode"): BlankNode;
-export function assertTermType(term: Term, type: "Literal"): Literal;
-export function assertTermType(term: Term, type?: Term["termType"]): Term;
-export function assertTermType(
-  term: Term,
-  type: Term["termType"] = "NamedNode",
-): Term {
-  if (term.termType !== type) {
-    throw new Error(
-      `Expected [${term.value}] to be a ${type}. Found ${term.termType}`,
-    );
-  }
-  return term;
-}
-export function getSingleQuad(quads: Quad[]): Quad {
-  if (quads.length !== 1) {
-    throw new Error(`Expected exactly one result. Found ${quads.length}`);
-  }
-  return quads[0];
-}

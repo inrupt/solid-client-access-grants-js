@@ -158,12 +158,16 @@ describe("getTypes", () => {
   describe("gConsent data model", () => {
     it("gets the gConsent access grant types", async () => {
       const gConsentGrant = await mockGConsentGrant();
-      expect(getTypes(gConsentGrant)).toBe(gConsentGrant.type);
+      for (const type of gConsentGrant.type) {
+        expect(getTypes(gConsentGrant)).toContainEqual(type);
+      }
     });
 
     it("gets the gConsent access request id", async () => {
       const gConsentRequest = await mockGConsentRequest();
-      expect(getTypes(gConsentRequest)).toBe(gConsentRequest.type);
+      for (const type of gConsentRequest.type) {
+        expect(getTypes(gConsentRequest)).toContainEqual(type);
+      }
     });
   });
 });
