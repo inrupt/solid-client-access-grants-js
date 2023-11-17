@@ -89,7 +89,7 @@ export function isGConsentAccessGrant(
 
   const gcStatus = getSingleObject(
     vc,
-    credentialSubject,
+    providedConsent,
     namedNode(GC_HAS_STATUS),
     undefined,
     false,
@@ -347,9 +347,12 @@ export function getTypes(
 
 const shorthand = {
   "http://www.w3.org/ns/solid/vc#SolidAccessRequest": "SolidAccessRequest",
+  "http://www.w3.org/ns/solid/vc#SolidAccessDenial": "SolidAccessDenial",
   "http://www.w3.org/ns/solid/vc#SolidAccessGrant": "SolidAccessGrant",
   "https://www.w3.org/2018/credentials#VerifiableCredential":
     "VerifiableCredential",
+  "https://www.w3.org/2018/credentials#VerifiablePresentation":
+    "VerifiablePresentation",
 };
 
 function wrapDate(date: Literal) {
