@@ -20,7 +20,7 @@
 //
 import type { Term, Quad, NamedNode, BlankNode, Literal } from "@rdfjs/types";
 import { DataFactory } from "n3";
-import { rdf } from "rdf-namespaces";
+import { rdf, acl as _acl } from "rdf-namespaces";
 
 const { namedNode } = DataFactory;
 
@@ -40,15 +40,15 @@ export const gc = {
   hasConsent: namedNode(`${GC}hasConsent`),
   isProvidedTo: namedNode(`${GC}isProvidedTo`),
   isConsentForDataSubject: namedNode(`${GC}isConsentForDataSubject`),
-}
+};
 
+export const acl = {
+  Read: namedNode(_acl.Read),
+  Write: namedNode(_acl.Write),
+  Append: namedNode(_acl.Append),
+  mode: namedNode(_acl.mode),
+};
 
-
-
-export const MODE = namedNode(`${ACL}mode`);
-export const READ = namedNode(`${ACL}Read`);
-export const WRITE = namedNode(`${ACL}Write`);
-export const APPEND = namedNode(`${ACL}Append`);
 export const ISSUANCE_DATE = namedNode(`${CRED}issuanceDate`);
 export const EXPIRATION_DATE = namedNode(`${CRED}expirationDate`);
 export const ISSUER = namedNode(`${CRED}issuer`);
