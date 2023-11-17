@@ -19,6 +19,14 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+export const GC_CONSENT_STATUS_DENIED =
+  "https://w3id.org/GConsent#ConsentStatusDenied";
+export const GC_CONSENT_STATUS_EXPLICITLY_GIVEN =
+  "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven";
+export const GC_CONSENT_STATUS_REQUESTED =
+  "https://w3id.org/GConsent#ConsentStatusRequested";
+
+
 import { ACCESS_GRANT_STATUS } from "../constants";
 import type {
   AccessGrantBody,

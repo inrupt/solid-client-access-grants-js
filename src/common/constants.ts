@@ -24,27 +24,36 @@ import { rdf } from "rdf-namespaces";
 
 const { namedNode } = DataFactory;
 
-export const cred = "https://www.w3.org/2018/credentials#";
-export const gc = "https://w3id.org/GConsent#";
-export const acl = "http://www.w3.org/ns/auth/acl#";
-export const vc = "http://www.w3.org/ns/solid/vc#";
-export const xsd = "http://www.w3.org/2001/XMLSchema#";
+export const CRED = "https://www.w3.org/2018/credentials#";
+export const GC = "https://w3id.org/GConsent#";
+export const ACL = "http://www.w3.org/ns/auth/acl#";
+export const VC = "http://www.w3.org/ns/solid/vc#";
+export const XSD = "http://www.w3.org/2001/XMLSchema#";
 
-export const XSD_BOOLEAN = namedNode(`${xsd}boolean`);
+export const XSD_BOOLEAN = namedNode(`${XSD}boolean`);
 
-export const SOLID_ACCESS_GRANT = namedNode(`${vc}SolidAccessGrant`);
-export const CREDENTIAL_SUBJECT = namedNode(`${cred}credentialSubject`);
+export const SOLID_ACCESS_GRANT = namedNode(`${VC}SolidAccessGrant`);
 export const TYPE = namedNode(rdf.type);
-export const PROVIDED_CONSENT = namedNode(`${gc}providedConsent`);
-export const HAS_CONSENT = namedNode(`${gc}hasConsent`);
-export const IS_PROVIDED_TO = namedNode(`${gc}isProvidedTo`);
-export const MODE = namedNode(`${acl}mode`);
-export const READ = namedNode(`${acl}Read`);
-export const WRITE = namedNode(`${acl}Write`);
-export const APPEND = namedNode(`${acl}Append`);
-export const ISSUANCE_DATE = namedNode(`${cred}issuanceDate`);
-export const EXPIRATION_DATE = namedNode(`${cred}expirationDate`);
-export const ISSUER = namedNode(`${cred}issuer`);
+
+export const gc = {
+  providedConsent: namedNode(`${GC}providedConsent`),
+  hasConsent: namedNode(`${GC}hasConsent`),
+  isProvidedTo: namedNode(`${GC}isProvidedTo`),
+  isConsentForDataSubject: namedNode(`${GC}isConsentForDataSubject`),
+}
+
+
+
+
+export const MODE = namedNode(`${ACL}mode`);
+export const READ = namedNode(`${ACL}Read`);
+export const WRITE = namedNode(`${ACL}Write`);
+export const APPEND = namedNode(`${ACL}Append`);
+export const ISSUANCE_DATE = namedNode(`${CRED}issuanceDate`);
+export const EXPIRATION_DATE = namedNode(`${CRED}expirationDate`);
+export const ISSUER = namedNode(`${CRED}issuer`);
+
+export const CREDENTIAL_SUBJECT = namedNode(`${CRED}credentialSubject`);
 export const INHERIT = namedNode(
   "urn:uuid:71ab2f68-a68b-4452-b968-dd23e0570227",
 );

@@ -48,14 +48,14 @@ describe("getResources", () => {
   describe("gConsent data model", () => {
     it("gets the resources from a gConsent access grant", async () => {
       const gConsentGrant = await mockGConsentGrant();
-      expect(getResources(gConsentGrant)).toBe(
+      expect(getResources(gConsentGrant)).toEqual(
         gConsentGrant.credentialSubject.providedConsent.forPersonalData,
       );
     });
 
     it("gets the resources from a gConsent access request", async () => {
       const gConsentRequest = await mockGConsentRequest();
-      expect(getResources(gConsentRequest)).toBe(
+      expect(getResources(gConsentRequest)).toEqual(
         gConsentRequest.credentialSubject.hasConsent.forPersonalData,
       );
     });

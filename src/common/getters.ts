@@ -26,7 +26,6 @@ import type {
   Term,
 } from "@rdfjs/types";
 import { DataFactory } from "n3";
-import { isAccessGrant as isGConsentAccessGrant } from "../gConsent/guard/isAccessGrant";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessRequestGConsent } from "../gConsent/type/AccessRequest";
 import type { AccessModes } from "../type/AccessModes";
@@ -34,19 +33,18 @@ import {
   APPEND,
   CREDENTIAL_SUBJECT,
   EXPIRATION_DATE,
-  HAS_CONSENT,
   INHERIT,
   ISSUANCE_DATE,
   ISSUER,
-  IS_PROVIDED_TO,
   MODE,
-  PROVIDED_CONSENT,
   READ,
   WRITE,
   XSD_BOOLEAN,
   assertTermType,
   getSingleQuad,
+  gc
 } from "./constants";
+import { GC_CONSENT_STATUS_DENIED, GC_CONSENT_STATUS_EXPLICITLY_GIVEN, GC_FOR_PERSONAL_DATA, GC_HAS_STATUS } from "../gConsent/constants";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
@@ -65,10 +63,34 @@ const { namedNode, defaultGraph, quad, literal } = DataFactory;
 export function getResources(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): string[] {
-  if (isGConsentAccessGrant(vc)) {
-    return vc.credentialSubject.providedConsent.forPersonalData;
+  const resources: string[] = [];
+
+  for (const { object } of vc.match(getConsent(vc), namedNode(GC_FOR_PERSONAL_DATA), null, defaultGraph())) {
+    if (object.termType !== 'NamedNode') {
+      throw new Error(`Expected resource to be a Named Node. Instead got [${object.value}] with term type [${object.termType}]`)
+    }
+    resources.push(object.value);
   }
-  return vc.credentialSubject.hasConsent.forPersonalData;
+
+  return resources;
+}
+
+export function isGConsentAccessGrant(
+  vc: AccessGrantGConsent | AccessRequestGConsent,
+): boolean {
+  const credentialSubject = getCredentialSubject(vc);
+  try {
+    const providedConsent = getSingleObject(vc, credentialSubject, gc.providedConsent, 'BlankNode');
+    return (
+      (
+        vc.has(quad(providedConsent, namedNode(GC_HAS_STATUS), namedNode(GC_CONSENT_STATUS_DENIED)))
+        || vc.has(quad(providedConsent, namedNode(GC_HAS_STATUS), namedNode(GC_CONSENT_STATUS_EXPLICITLY_GIVEN)))
+        // Because of the getSingleObject the try / catch is also needed to wrap this as well as getting the provided consent
+      ) && !!getSingleObject(vc, providedConsent, gc.isProvidedTo)
+    )
+  } catch (e) {
+    return false;
+  }
 }
 
 /**
@@ -90,10 +112,40 @@ export function getResourceOwner(
 export function getResourceOwner(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): string | undefined {
-  if (isGConsentAccessGrant(vc)) {
-    return vc.credentialSubject.id;
+  try {
+    const credentialSubject = getCredentialSubject(vc);
+    if (isGConsentAccessGrant(vc)) {
+      return credentialSubject.value;
+    }
+    return getSingleObject(
+      vc,
+      // We should probably allow this to be Blank or Named Node
+      getSingleObject(vc, credentialSubject, gc.hasConsent, 'BlankNode'),
+      gc.isConsentForDataSubject
+    ).value
+  } catch (e) {
+    return undefined;
   }
-  return vc.credentialSubject.hasConsent.isConsentForDataSubject;
+}
+
+function getCredentialSubject(vc: AccessGrantGConsent | AccessRequestGConsent) {
+  return getSingleObject(vc, namedNode(getId(vc)), CREDENTIAL_SUBJECT);
+}
+
+function getConsent(vc: AccessGrantGConsent | AccessRequestGConsent) {
+  const credentialSubject = getCredentialSubject(vc);
+  const consents = [
+    ...vc.match(credentialSubject, gc.providedConsent, null, defaultGraph()),
+    ...vc.match(credentialSubject, gc.hasConsent, null, defaultGraph())
+  ];
+  if (consents.length !== 1) {
+    throw new Error(`Expected exactly 1 consent value. Found ${consents.length}.`)
+  }
+  const [{ object }] = consents;
+  if (object.termType !== "BlankNode" && object.termType !== "NamedNode") {
+    throw new Error(`Expected consent to be a Named Node or Blank Node, instead got ${object.termType}`)
+  }
+  return object
 }
 
 /**
@@ -111,20 +163,19 @@ export function getResourceOwner(
 export function getRequestor(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): string {
-  const credentialSubject = getSingleObject(
-    vc,
-    namedNode(vc.id),
-    CREDENTIAL_SUBJECT,
-  );
-  if (isGConsentAccessGrant(vc)) {
+  const credentialSubject = getCredentialSubject(vc);
+  try {
     const providedConsent = getSingleObject(
       vc,
       credentialSubject,
-      PROVIDED_CONSENT,
+      gc.providedConsent,
       "BlankNode",
     );
-    return getSingleObject(vc, providedConsent, IS_PROVIDED_TO).value;
+    return getSingleObject(vc, providedConsent, gc.isProvidedTo).value;
+  } catch (e) {
+    // noop
   }
+
   return credentialSubject.value;
 }
 
@@ -173,17 +224,7 @@ function getSingleObject(
 export function getAccessModes(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): AccessModes {
-  const credentialSubject = getSingleObject(
-    vc,
-    namedNode(vc.id),
-    CREDENTIAL_SUBJECT,
-  );
-  const consent = getSingleObject(
-    vc,
-    credentialSubject,
-    isGConsentAccessGrant(vc) ? PROVIDED_CONSENT : HAS_CONSENT,
-    "BlankNode",
-  );
+  const consent = getConsent(vc);
   return {
     read: vc.has(quad(consent, MODE, READ, defaultGraph())),
     write: vc.has(quad(consent, MODE, WRITE, defaultGraph())),
@@ -254,7 +295,7 @@ export function getIssuanceDate(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): Date {
   return wrapDate(
-    getSingleObject(vc, namedNode(vc.id), ISSUANCE_DATE, "Literal"),
+    getSingleObject(vc, namedNode(getId(vc)), ISSUANCE_DATE, "Literal"),
   );
 }
 
@@ -274,7 +315,7 @@ export function getExpirationDate(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): Date | undefined {
   const expirationDate = [
-    ...vc.match(namedNode(vc.id), EXPIRATION_DATE, null, defaultGraph()),
+    ...vc.match(namedNode(getId(vc)), EXPIRATION_DATE, null, defaultGraph()),
   ];
 
   if (expirationDate.length > 1) {
@@ -305,7 +346,7 @@ export function getExpirationDate(
 export function getIssuer(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): string {
-  return getSingleObject(vc, namedNode(vc.id), ISSUER).value;
+  return getSingleObject(vc, namedNode(getId(vc)), ISSUER).value;
 }
 
 /**
@@ -323,20 +364,7 @@ export function getIssuer(
 export function getInherit(
   vc: AccessGrantGConsent | AccessRequestGConsent,
 ): boolean {
-  const credentialSubject = getSingleObject(
-    vc,
-    namedNode(vc.id),
-    CREDENTIAL_SUBJECT,
-  );
-  const consent = getSingleObject(
-    vc,
-    credentialSubject,
-    isGConsentAccessGrant(vc) ? PROVIDED_CONSENT : HAS_CONSENT,
-    "BlankNode",
-  );
-  return !vc.has(
-    quad(consent, INHERIT, literal("false", XSD_BOOLEAN), defaultGraph()),
-  );
+  return !vc.has(quad(getConsent(vc), INHERIT, literal("false", XSD_BOOLEAN), defaultGraph()));
 }
 
 /**
