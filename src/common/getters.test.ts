@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { it, expect, describe, jest } from "@jest/globals";
+import { it, expect, describe, jest, beforeAll } from "@jest/globals";
 import {
   mockAccessGrantVc as mockGConsentGrant,
   mockAccessRequestVc as mockGConsentRequest,
@@ -37,6 +37,7 @@ import {
   getResources,
   getTypes,
 } from "./getters";
+import { AccessGrant, AccessRequest } from "../gConsent";
 
 jest.mock("@inrupt/universal-fetch", () => ({
   fetch: (async (...args) => {
@@ -44,28 +45,31 @@ jest.mock("@inrupt/universal-fetch", () => ({
   }) as typeof fetch,
 }));
 
-describe("getResources", () => {
-  describe("gConsent data model", () => {
+describe('getters', () => {
+  let gConsentGrant: AccessGrant;
+  let gConsentRequest: AccessRequest;
+
+  beforeAll(async () => {
+    gConsentGrant = await mockGConsentGrant();
+    gConsentRequest = await mockGConsentRequest();
+  });
+
+  describe("getResources", () => {
     it("gets the resources from a gConsent access grant", async () => {
-      const gConsentGrant = await mockGConsentGrant();
       expect(getResources(gConsentGrant)).toEqual(
         gConsentGrant.credentialSubject.providedConsent.forPersonalData,
       );
     });
 
     it("gets the resources from a gConsent access request", async () => {
-      const gConsentRequest = await mockGConsentRequest();
       expect(getResources(gConsentRequest)).toEqual(
         gConsentRequest.credentialSubject.hasConsent.forPersonalData,
       );
     });
   });
-});
 
-describe("getResourceOwner", () => {
-  describe("gConsent data model", () => {
+  describe("getResourceOwner", () => {
     it("gets the resource owner from a gConsent access grant", async () => {
-      const gConsentGrant = await mockGConsentGrant();
       expect(getResourceOwner(gConsentGrant)).toBe(
         gConsentGrant.credentialSubject.id,
       );
@@ -93,30 +97,23 @@ describe("getResourceOwner", () => {
       expect(getResourceOwner(gConsentRequest)).toBeUndefined();
     });
   });
-});
 
-describe("getRequestor", () => {
-  describe("gConsent data model", () => {
+  describe("getRequestor", () => {
     it("gets the recipient of a gConsent access grant", async () => {
-      const gConsentGrant = await mockGConsentGrant();
       expect(getRequestor(gConsentGrant)).toBe(
         gConsentGrant.credentialSubject.providedConsent.isProvidedTo,
       );
     });
 
     it("gets the resource owner from a gConsent access request", async () => {
-      const gConsentRequest = await mockGConsentRequest();
       expect(getRequestor(gConsentRequest)).toBe(
         gConsentRequest.credentialSubject.id,
       );
     });
   });
-});
 
-describe("getAccessModes", () => {
-  describe("gConsent data model", () => {
+  describe("getAccessModes", () => {
     it("gets the access modes of a gConsent access grant", async () => {
-      const gConsentGrant = await mockGConsentGrant();
       expect(
         gConsentGrant.credentialSubject.providedConsent.mode,
       ).toStrictEqual(["http://www.w3.org/ns/auth/acl#Read"]);
@@ -138,42 +135,32 @@ describe("getAccessModes", () => {
       });
     });
   });
-});
 
-describe("getId", () => {
-  describe("gConsent data model", () => {
+  describe("getId", () => {
     it("gets the gConsent access grant id", async () => {
-      const gConsentGrant = await mockGConsentGrant();
       expect(getId(gConsentGrant)).toBe(gConsentGrant.id);
     });
 
     it("gets the gConsent access request id", async () => {
-      const gConsentRequest = await mockGConsentRequest();
       expect(getId(gConsentRequest)).toBe(gConsentRequest.id);
     });
   });
-});
 
-describe("getTypes", () => {
-  describe("gConsent data model", () => {
+  describe("getTypes", () => {
     it("gets the gConsent access grant types", async () => {
-      const gConsentGrant = await mockGConsentGrant();
       for (const type of gConsentGrant.type) {
         expect(getTypes(gConsentGrant)).toContainEqual(type);
       }
     });
 
     it("gets the gConsent access request id", async () => {
-      const gConsentRequest = await mockGConsentRequest();
       for (const type of gConsentRequest.type) {
         expect(getTypes(gConsentRequest)).toContainEqual(type);
       }
     });
   });
-});
 
-describe("getIssuanceDate", () => {
-  describe("gConsent data model", () => {
+  describe("getIssuanceDate", () => {
     it("gets the gConsent access issuance date", async () => {
       const issuanceDate = new Date().toString();
       const gConsentGrant = await mockGConsentGrant(
@@ -204,10 +191,8 @@ describe("getIssuanceDate", () => {
       );
     });
   });
-});
 
-describe("getExpirationDate", () => {
-  describe("gConsent data model", () => {
+  describe("getExpirationDate", () => {
     it("gets the gConsent access expiration date", async () => {
       const expirationDate = new Date().toString();
       const gConsentGrant = await mockGConsentGrant(
@@ -238,24 +223,18 @@ describe("getExpirationDate", () => {
       );
     });
   });
-});
 
-describe("getIssuer", () => {
-  describe("gConsent data model", () => {
+  describe("getIssuer", () => {
     it("gets the gConsent access grant issuer", async () => {
-      const gConsentGrant = await mockGConsentGrant();
       expect(getIssuer(gConsentGrant)).toStrictEqual(gConsentGrant.issuer);
     });
 
     it("gets the gConsent access request issuer", async () => {
-      const gConsentRequest = await mockGConsentRequest();
       expect(getIssuer(gConsentRequest)).toStrictEqual(gConsentRequest.issuer);
     });
   });
-});
 
-describe("getInherit", () => {
-  describe("gConsent data model", () => {
+  describe("getInherit", () => {
     it("gets the gConsent access grant issuer", async () => {
       const gConsentGrant = await mockGConsentGrant({ inherit: false });
       expect(getIssuer(gConsentGrant)).toStrictEqual(gConsentGrant.issuer);
@@ -276,36 +255,57 @@ describe("getInherit", () => {
       expect(getInherit(gConsentRequest)).toBe(true);
     });
   });
-});
 
-describe("AccessGrant", () => {
-  it("wraps calls to the underlying functions", async () => {
-    const gConsentRequest = await mockGConsentRequest();
-    const wrappedConsentRequest = new AccessGrantWrapper(gConsentRequest);
-    expect(wrappedConsentRequest.getAccessModes()).toStrictEqual(
-      getAccessModes(gConsentRequest),
-    );
-    expect(wrappedConsentRequest.getExpirationDate()).toStrictEqual(
-      getExpirationDate(gConsentRequest),
-    );
-    expect(wrappedConsentRequest.getId()).toStrictEqual(getId(gConsentRequest));
-    expect(wrappedConsentRequest.getIssuanceDate()).toStrictEqual(
-      getIssuanceDate(gConsentRequest),
-    );
-    expect(wrappedConsentRequest.getIssuer()).toStrictEqual(
-      getIssuer(gConsentRequest),
-    );
-    expect(wrappedConsentRequest.getRequestor()).toStrictEqual(
-      getRequestor(gConsentRequest),
-    );
-    expect(wrappedConsentRequest.getResourceOwner()).toStrictEqual(
-      getResourceOwner(gConsentRequest),
-    );
-    expect(wrappedConsentRequest.getResources()).toStrictEqual(
-      getResources(gConsentRequest),
-    );
-    expect(wrappedConsentRequest.getTypes()).toStrictEqual(
-      getTypes(gConsentRequest),
-    );
+  describe("getExpirationDate", () => {
+    it("gets the gConsent access grant issuer", async () => {
+      const gConsentGrant = await mockGConsentGrant({ inherit: false });
+      expect(getIssuer(gConsentGrant)).toStrictEqual(gConsentGrant.issuer);
+    });
+
+    it("defaults the recursive nature from a gConsent access grant to true", async () => {
+      const gConsentGrant = await mockGConsentGrant({ inherit: undefined });
+      expect(getInherit(gConsentGrant)).toBe(true);
+    });
+
+    it("gets the recursive nature from a gConsent access request", async () => {
+      const gConsentRequest = await mockGConsentRequest({ inherit: false });
+      expect(getInherit(gConsentRequest)).toBe(false);
+    });
+
+    it("defaults the recursive nature from a gConsent access request to true", async () => {
+      const gConsentRequest = await mockGConsentRequest({ inherit: undefined });
+      expect(getInherit(gConsentRequest)).toBe(true);
+    });
   });
-});
+
+  describe("AccessGrant", () => {
+    it("wraps calls to the underlying functions", async () => {
+      const wrappedConsentRequest = new AccessGrantWrapper(gConsentRequest);
+      expect(wrappedConsentRequest.getAccessModes()).toStrictEqual(
+        getAccessModes(gConsentRequest),
+      );
+      expect(wrappedConsentRequest.getExpirationDate()).toStrictEqual(
+        getExpirationDate(gConsentRequest),
+      );
+      expect(wrappedConsentRequest.getId()).toStrictEqual(getId(gConsentRequest));
+      expect(wrappedConsentRequest.getIssuanceDate()).toStrictEqual(
+        getIssuanceDate(gConsentRequest),
+      );
+      expect(wrappedConsentRequest.getIssuer()).toStrictEqual(
+        getIssuer(gConsentRequest),
+      );
+      expect(wrappedConsentRequest.getRequestor()).toStrictEqual(
+        getRequestor(gConsentRequest),
+      );
+      expect(wrappedConsentRequest.getResourceOwner()).toStrictEqual(
+        getResourceOwner(gConsentRequest),
+      );
+      expect(wrappedConsentRequest.getResources()).toStrictEqual(
+        getResources(gConsentRequest),
+      );
+      expect(wrappedConsentRequest.getTypes()).toStrictEqual(
+        getTypes(gConsentRequest),
+      );
+    });
+  });
+})

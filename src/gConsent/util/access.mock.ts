@@ -196,7 +196,7 @@ export const mockAccessGrantVc = async (
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   modify?: (asObject: Record<string, any>) => void,
-): Promise<AccessGrant & DatasetCore<Quad, Quad>> => {
+): Promise<AccessGrant> => {
   const asObject = mockAccessGrantObject(options);
   modify?.(asObject);
 
@@ -224,7 +224,7 @@ export const mockAccessGrantVc = async (
   }
 
   // FIXME type casting is bad
-  return accessGrant as unknown as AccessGrant & DatasetCore<Quad, Quad>;
+  return accessGrant as unknown as AccessGrant;
 };
 
 export const mockConsentRequestObject = (options?: RequestVcOptions) => {

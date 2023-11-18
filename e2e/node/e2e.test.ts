@@ -50,9 +50,16 @@ import {
   getAccessApiEndpoint,
   getAccessGrant,
   getAccessGrantAll,
+  getAccessModes,
+  getExpirationDate,
   getFile,
+  getIssuanceDate,
+  getIssuer,
+  getRequestor,
+  getResourceOwner,
   getResources,
   getSolidDataset,
+  getTypes,
   isValidAccessGrant,
   issueAccessRequest,
   overwriteFile,
@@ -61,6 +68,7 @@ import {
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
 } from "../../src/index";
+import { getInherit, getPurposes } from "../../src/common/getters";
 
 async function retryAsync<T>(
   callback: () => Promise<T>,
@@ -368,9 +376,29 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       expect(grant.expirationDate && Date.parse(grant.expirationDate)).toEqual(
         expirationMs,
       );
+      expect(getExpirationDate(grant)).toEqual(new Date(expirationMs));
       expect(["http://www.w3.org/ns/auth/acl#Read", "Read"]).toContain(
         grant.credentialSubject.providedConsent.mode[0],
       );
+      expect(getAccessModes(grant)).toEqual({
+        read: true,
+        append: false,
+        write: false,
+      });
+      expect(getResources(grant)).toEqual([
+        sharedFileIri
+      ])
+      expect(getRequestor(grant)).toEqual(requestorSession.info.webId);
+      expect(getResourceOwner(grant)).toEqual(resourceOwnerSession.info.webId);
+      expect(getTypes(grant)).toContain("https://w3id.org/GConsent#ConsentStatusExplicitlyGiven")
+      expect(getTypes(grant)).toContain("ConsentStatusExplicitlyGiven")
+      // expect(getIssuanceDate(grant)).toContain("ConsentStatusExplicitlyGiven")
+      // expect(getIssuer(grant)).toContain("ConsentStatusExplicitlyGiven")
+      expect(getInherit(grant)).toEqual(true);
+      expect(getPurposes(grant)).toEqual([
+        "https://some.purpose/not-a-nefarious-one/i-promise",
+        "https://some.other.purpose/"
+      ]);
     });
 
     it("can issue a non-recursive access grant", async () => {
@@ -563,6 +591,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       const retrievedGrant = await getAccessGrant(grant.id, {
         fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
       });
+      expect(JSON.parse(JSON.stringify(retrievedGrant))).toStrictEqual(JSON.parse(JSON.stringify(grant)));
       expect(retrievedGrant).toStrictEqual(grant);
     });
   });

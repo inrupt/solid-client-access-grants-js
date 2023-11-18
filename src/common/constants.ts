@@ -39,6 +39,7 @@ export const gc = {
   hasConsent: namedNode(`${GC}hasConsent`),
   isProvidedTo: namedNode(`${GC}isProvidedTo`),
   isConsentForDataSubject: namedNode(`${GC}isConsentForDataSubject`),
+  forPurpose: namedNode(`${GC}forPurpose`),
 };
 
 export const acl = {

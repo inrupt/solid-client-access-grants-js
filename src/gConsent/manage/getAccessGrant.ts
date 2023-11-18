@@ -43,7 +43,7 @@ import { normalizeAccessGrant } from "./approveAccessRequest";
 export async function getAccessGrant(
   accessGrantVcUrl: UrlString | URL,
   options?: AccessBaseOptions,
-): Promise<AccessGrant & DatasetCore> {
+): Promise<AccessGrant> {
   const sessionFetch = await getSessionFetch(options ?? {});
   const vcUrl =
     typeof accessGrantVcUrl === "string"

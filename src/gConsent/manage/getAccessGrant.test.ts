@@ -30,15 +30,8 @@ import {
   mockConsentRequestObject,
 } from "../util/access.mock";
 import { getAccessGrant } from "./getAccessGrant";
-
-/**
- * Remove the properties of an RDF.DatasetCore from an object so that
- * we can do equality matches in jest without those functions causing
- * problems
- */
-function withoutDataset(data: any) {
-  return JSON.parse(JSON.stringify(data));
-}
+import { DatasetCore } from "@rdfjs/types";
+import { toBeEqual } from "../util/toBeEqual.mock";
 
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
@@ -133,9 +126,7 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
     });
-    expect(withoutDataset(accessGrant)).toEqual(
-      withoutDataset(mockedAccessGrant),
-    );
+    toBeEqual(accessGrant, mockedAccessGrant);
   });
 
   it("returns the access grant with the given IRI", async () => {
@@ -149,9 +140,7 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: mockedFetch,
     });
-    expect(withoutDataset(accessGrant)).toEqual(
-      withoutDataset(mockAccessGrant),
-    );
+    toBeEqual(accessGrant, mockAccessGrant);
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
@@ -182,13 +171,12 @@ describe("getAccessGrant", () => {
       ),
     );
 
-    expect(
-      withoutDataset(
-        await getAccessGrant("https://some.vc.url", {
+    toBeEqual(
+      await getAccessGrant("https://some.vc.url", {
           fetch: mockedFetch,
         }),
-      ),
-    ).toEqual(withoutDataset(mockAccessGrant));
+        mockAccessGrant
+    )
   });
 
   it("returns the access grant with the given URL object", async () => {
@@ -202,8 +190,6 @@ describe("getAccessGrant", () => {
     const accessGrant = await getAccessGrant(new URL("https://some.vc.url"), {
       fetch: mockedFetch,
     });
-    expect(withoutDataset(accessGrant)).toMatchObject(
-      withoutDataset(mockAccessGrant),
-    );
+    toBeEqual(accessGrant, mockAccessGrant);
   });
 });
