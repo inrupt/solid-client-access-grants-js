@@ -32,6 +32,7 @@ import {
   getInherit,
   getIssuanceDate,
   getIssuer,
+  getPurposes,
   getRequestor,
   getResourceOwner,
   getResources,
@@ -64,6 +65,21 @@ describe('getters', () => {
     it("gets the resources from a gConsent access request", async () => {
       expect(getResources(gConsentRequest)).toEqual(
         gConsentRequest.credentialSubject.hasConsent.forPersonalData,
+      );
+    });
+  });
+
+  // FIXME: Add some checks where purposes are actually present
+  describe("getPurposes", () => {
+    it("gets the purposes from a gConsent access grant", async () => {
+      expect(getPurposes(gConsentGrant)).toEqual(
+        gConsentGrant.credentialSubject.providedConsent.forPurpose ?? [],
+      );
+    });
+
+    it("gets the purposes from a gConsent access request", async () => {
+      expect(getPurposes(gConsentRequest)).toEqual(
+        gConsentRequest.credentialSubject.hasConsent.forPurpose ?? [],
       );
     });
   });
