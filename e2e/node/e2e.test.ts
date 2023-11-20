@@ -69,6 +69,7 @@ import {
   saveSolidDatasetInContainer,
 } from "../../src/index";
 import { getInherit, getPurposes } from "../../src/common/getters";
+import { toBeEqual } from "../../src/gConsent/util/toBeEqual.mock";
 
 async function retryAsync<T>(
   callback: () => Promise<T>,
@@ -605,10 +606,7 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       const retrievedGrant = await getAccessGrant(grant.id, {
         fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
       });
-      expect(JSON.parse(JSON.stringify(retrievedGrant))).toStrictEqual(
-        JSON.parse(JSON.stringify(grant)),
-      );
-      expect(retrievedGrant).toStrictEqual(grant);
+      toBeEqual(retrievedGrant, grant);
     });
   });
 
