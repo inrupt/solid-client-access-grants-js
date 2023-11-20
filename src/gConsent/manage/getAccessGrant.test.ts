@@ -27,7 +27,7 @@ import { mockAccessApiEndpoint } from "../request/request.mock";
 import {
   mockAccessGrantObject,
   mockAccessGrantVc,
-  mockConsentRequestObject,
+  mockAccessRequestVc,
 } from "../util/access.mock";
 import { toBeEqual } from "../util/toBeEqual.mock";
 import { getAccessGrant } from "./getAccessGrant";
@@ -99,7 +99,7 @@ describe("getAccessGrant", () => {
   it("throws if the given IRI does not resolve to a access grant Verifiable Credential", async () => {
     mockAccessApiEndpoint();
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
-      new Response(JSON.stringify(mockConsentRequestObject()), {
+      new Response(JSON.stringify(await mockAccessRequestVc()), {
         headers: new Headers([["content-type", "application/json"]]),
       }),
     );

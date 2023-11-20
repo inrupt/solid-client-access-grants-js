@@ -227,14 +227,6 @@ export const mockAccessGrantVc = async (
   return accessGrant as unknown as AccessGrant;
 };
 
-export const mockConsentRequestObject = (options?: RequestVcOptions) => {
-  const requestVc = mockAccessRequestVcObject(options);
-  requestVc.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
-  requestVc.expirationDate = new Date(2021, 8, 14).toISOString();
-  requestVc.issuanceDate = new Date(2021, 8, 13).toISOString();
-  return requestVc;
-};
-
 export const mockConsentRequestVc = async (
   options?: RequestVcOptions,
   framingOptions?: {
