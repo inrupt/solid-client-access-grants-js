@@ -90,15 +90,22 @@ export function getPurposes(
 ): string[] {
   const consent = getConsent(vc);
   const purposes: string[] = [];
-  
-  for (const { object } of vc.match(consent, gc.forPurpose, null, defaultGraph())) {
-    if (object.termType !== 'NamedNode') {
-      throw new Error(`Expected all purposes to be Named Nodes. Found [${object.value}] of type [${object.termType}]`);
+
+  for (const { object } of vc.match(
+    consent,
+    gc.forPurpose,
+    null,
+    defaultGraph(),
+  )) {
+    if (object.termType !== "NamedNode") {
+      throw new Error(
+        `Expected all purposes to be Named Nodes. Found [${object.value}] of type [${object.termType}]`,
+      );
     }
     purposes.push(object.value);
   }
-  
- return purposes;
+
+  return purposes;
 }
 
 export function isGConsentAccessGrant(

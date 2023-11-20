@@ -19,9 +19,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { jest, it, describe, expect, beforeAll } from "@jest/globals";
-import { Response } from "@inrupt/universal-fetch";
 import type * as CrossFetch from "@inrupt/universal-fetch";
+import { Response } from "@inrupt/universal-fetch";
+import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 
 import { mockAccessApiEndpoint } from "../request/request.mock";
 import {
@@ -29,9 +29,8 @@ import {
   mockAccessGrantVc,
   mockConsentRequestObject,
 } from "../util/access.mock";
-import { getAccessGrant } from "./getAccessGrant";
-import { DatasetCore } from "@rdfjs/types";
 import { toBeEqual } from "../util/toBeEqual.mock";
+import { getAccessGrant } from "./getAccessGrant";
 
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
@@ -173,10 +172,10 @@ describe("getAccessGrant", () => {
 
     toBeEqual(
       await getAccessGrant("https://some.vc.url", {
-          fetch: mockedFetch,
-        }),
-        mockAccessGrant
-    )
+        fetch: mockedFetch,
+      }),
+      mockAccessGrant,
+    );
   });
 
   it("returns the access grant with the given URL object", async () => {

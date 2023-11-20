@@ -38,7 +38,7 @@ import {
   getResources,
   getTypes,
 } from "./getters";
-import { AccessGrant, AccessRequest } from "../gConsent";
+import type { AccessGrant, AccessRequest } from "../gConsent";
 
 jest.mock("@inrupt/universal-fetch", () => ({
   fetch: (async (...args) => {
@@ -46,7 +46,7 @@ jest.mock("@inrupt/universal-fetch", () => ({
   }) as typeof fetch,
 }));
 
-describe('getters', () => {
+describe("getters", () => {
   let gConsentGrant: AccessGrant;
   let gConsentRequest: AccessRequest;
 
@@ -272,28 +272,6 @@ describe('getters', () => {
     });
   });
 
-  describe("getExpirationDate", () => {
-    it("gets the gConsent access grant issuer", async () => {
-      const gConsentGrant = await mockGConsentGrant({ inherit: false });
-      expect(getIssuer(gConsentGrant)).toStrictEqual(gConsentGrant.issuer);
-    });
-
-    it("defaults the recursive nature from a gConsent access grant to true", async () => {
-      const gConsentGrant = await mockGConsentGrant({ inherit: undefined });
-      expect(getInherit(gConsentGrant)).toBe(true);
-    });
-
-    it("gets the recursive nature from a gConsent access request", async () => {
-      const gConsentRequest = await mockGConsentRequest({ inherit: false });
-      expect(getInherit(gConsentRequest)).toBe(false);
-    });
-
-    it("defaults the recursive nature from a gConsent access request to true", async () => {
-      const gConsentRequest = await mockGConsentRequest({ inherit: undefined });
-      expect(getInherit(gConsentRequest)).toBe(true);
-    });
-  });
-
   describe("AccessGrant", () => {
     it("wraps calls to the underlying functions", async () => {
       const wrappedConsentRequest = new AccessGrantWrapper(gConsentRequest);
@@ -303,7 +281,9 @@ describe('getters', () => {
       expect(wrappedConsentRequest.getExpirationDate()).toStrictEqual(
         getExpirationDate(gConsentRequest),
       );
-      expect(wrappedConsentRequest.getId()).toStrictEqual(getId(gConsentRequest));
+      expect(wrappedConsentRequest.getId()).toStrictEqual(
+        getId(gConsentRequest),
+      );
       expect(wrappedConsentRequest.getIssuanceDate()).toStrictEqual(
         getIssuanceDate(gConsentRequest),
       );
@@ -324,4 +304,4 @@ describe('getters', () => {
       );
     });
   });
-})
+});

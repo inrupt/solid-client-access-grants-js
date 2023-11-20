@@ -20,16 +20,15 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import type { DatasetCore } from "@rdfjs/types";
 import {
-  verifiableCredentialToDataset,
   isVerifiableCredential,
+  verifiableCredentialToDataset,
 } from "@inrupt/solid-client-vc";
+import { getSessionFetch } from "../../common/util/getSessionFetch";
+import { isAccessGrant } from "../guard/isAccessGrant";
+import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrant } from "../type/AccessGrant";
-import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
-import { isAccessGrant } from "../guard/isAccessGrant";
-import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 
 /**

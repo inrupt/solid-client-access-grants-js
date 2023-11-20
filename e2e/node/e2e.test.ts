@@ -109,7 +109,6 @@ custom.setHttpOptionsDefaults({
 });
 
 const env = getNodeTestingEnvironment({
-  vcProvider: true,
   clientCredentials: {
     owner: { id: true, secret: true },
     requestor: { id: true, secret: true },
@@ -347,7 +346,8 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
     });
 
     it("can issue an access grant overriding an access request", async () => {
-      const expirationMs = Date.now() + 25 * 60 * 1000;
+      const startTime = Date.now();
+      const expirationMs = startTime + 25 * 60 * 1000;
       const grant = await approveAccessRequest(
         sharedRequest,
         {
@@ -385,19 +385,33 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
         append: false,
         write: false,
       });
-      expect(getResources(grant)).toEqual([
-        sharedFileIri
-      ])
+      expect(getResources(grant)).toEqual([sharedFileIri]);
       expect(getRequestor(grant)).toEqual(requestorSession.info.webId);
       expect(getResourceOwner(grant)).toEqual(resourceOwnerSession.info.webId);
-      expect(getTypes(grant)).toContain("https://w3id.org/GConsent#ConsentStatusExplicitlyGiven")
-      expect(getTypes(grant)).toContain("ConsentStatusExplicitlyGiven")
-      // expect(getIssuanceDate(grant)).toContain("ConsentStatusExplicitlyGiven")
-      // expect(getIssuer(grant)).toContain("ConsentStatusExplicitlyGiven")
-      expect(getInherit(grant)).toEqual(true);
+
+      for (const type of [
+        "http://www.w3.org/ns/solid/vc#SolidAccessGrant",
+        "SolidAccessGrant",
+        "https://www.w3.org/2018/credentials#VerifiableCredential",
+        "VerifiableCredential",
+      ]) {
+        expect(getTypes(grant)).toContain(type);
+      }
+
+      // Check the issuance date is within 2 minutes of the start of this test
+      expect(getIssuanceDate(grant).valueOf()).toBeGreaterThan(
+        startTime -
+          1000 /* subtract 1000ms to allow for clock drift in testing infrastructure */,
+      );
+      expect(getIssuanceDate(grant).valueOf()).toBeLessThan(
+        startTime + 2 * 60 * 1000,
+      );
+
+      expect(getIssuer(grant)).toEqual(vcProvider);
+      expect(getInherit(grant)).toBe(true);
       expect(getPurposes(grant)).toEqual([
         "https://some.purpose/not-a-nefarious-one/i-promise",
-        "https://some.other.purpose/"
+        "https://some.other.purpose/",
       ]);
     });
 
@@ -591,7 +605,9 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       const retrievedGrant = await getAccessGrant(grant.id, {
         fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
       });
-      expect(JSON.parse(JSON.stringify(retrievedGrant))).toStrictEqual(JSON.parse(JSON.stringify(grant)));
+      expect(JSON.parse(JSON.stringify(retrievedGrant))).toStrictEqual(
+        JSON.parse(JSON.stringify(grant)),
+      );
       expect(retrievedGrant).toStrictEqual(grant);
     });
   });
