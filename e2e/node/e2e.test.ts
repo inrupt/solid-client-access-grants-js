@@ -787,20 +787,18 @@ describe(`End-to-end access grant tests for environment [${environment}]`, () =>
       expect(denied).toHaveLength(1);
       expect(both).toHaveLength(granted.length + denied.length);
 
-      expect(denied).toMatchObject([
-        {
-          ...denyGrant,
-          credentialSubject: {
-            ...denyGrant.credentialSubject,
-            providedConsent: {
-              ...(denyGrant.credentialSubject.providedConsent as any),
-              forPersonalData: (
-                denyGrant.credentialSubject.providedConsent as any
-              ).forPersonalData,
-            },
+      toBeEqual(denied[0], {
+        ...denyGrant,
+        credentialSubject: {
+          ...denyGrant.credentialSubject,
+          providedConsent: {
+            ...(denyGrant.credentialSubject.providedConsent as any),
+            forPersonalData: (
+              denyGrant.credentialSubject.providedConsent as any
+            ).forPersonalData,
           },
         },
-      ]);
+      });
     });
 
     it("can filter VCs held by the service based on purpose", async () => {
