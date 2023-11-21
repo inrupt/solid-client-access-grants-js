@@ -111,6 +111,9 @@ describe("getAccessGrant", () => {
     ).rejects.toThrow(/not an Access Grant/);
   });
 
+  // There is an expect call in the `toBeEqual` function,
+  // but the linter doesn't pick up on this.
+  // eslint-disable-next-line jest/expect-expect
   it("supports denied access grants with a given IRI", async () => {
     mockAccessApiEndpoint();
     const mockedAccessGrant = mockAccessGrantObject();
@@ -128,6 +131,9 @@ describe("getAccessGrant", () => {
     toBeEqual(accessGrant, mockedAccessGrant);
   });
 
+  // There is an expect call in the `toBeEqual` function,
+  // but the linter doesn't pick up on this.
+  // eslint-disable-next-line jest/expect-expect
   it("returns the access grant with the given IRI", async () => {
     mockAccessApiEndpoint();
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
@@ -142,6 +148,9 @@ describe("getAccessGrant", () => {
     toBeEqual(accessGrant, mockAccessGrant);
   });
 
+  // There is an expect call in the `toBeEqual` function,
+  // but the linter doesn't pick up on this.
+  // eslint-disable-next-line jest/expect-expect
   it("normalizes equivalent JSON-LD VCs", async () => {
     mockAccessApiEndpoint();
     const normalizedAccessGrant = mockAccessGrantObject();
@@ -178,6 +187,9 @@ describe("getAccessGrant", () => {
     );
   });
 
+  // There is an expect call in the `toBeEqual` function,
+  // but the linter doesn't pick up on this.
+  // eslint-disable-next-line jest/expect-expect
   it("returns the access grant with the given URL object", async () => {
     mockAccessApiEndpoint();
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(

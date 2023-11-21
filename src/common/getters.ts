@@ -40,197 +40,8 @@ import {
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
 /**
- * Get the resources to which an Access Grant/Request applies.
- *
- * @example
- *
- * ```
- * const resources = getResources(accessGrant);
- * ```
- *
- * @param vc The Access Grant/Request
- * @returns The resources IRIs
+ * @internal
  */
-export function getResources(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
-): string[] {
-  const resources: string[] = [];
-
-  for (const { object } of vc.match(
-    getConsent(vc),
-    namedNode(GC_FOR_PERSONAL_DATA),
-    null,
-    defaultGraph(),
-  )) {
-    if (object.termType !== "NamedNode") {
-      throw new Error(
-        `Expected resource to be a Named Node. Instead got [${object.value}] with term type [${object.termType}]`,
-      );
-    }
-    resources.push(object.value);
-  }
-
-  return resources;
-}
-
-/**
- * Get the purposes for which an Access Grant/Request applies.
- *
- * @example
- *
- * ```
- * const purposes = getPurposes(accessGrant);
- * ```
- *
- * @param vc The Access Grant/Request
- * @returns The purpose IRIs
- */
-export function getPurposes(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
-): string[] {
-  const consent = getConsent(vc);
-  const purposes: string[] = [];
-
-  for (const { object } of vc.match(
-    consent,
-    gc.forPurpose,
-    null,
-    defaultGraph(),
-  )) {
-    if (object.termType !== "NamedNode") {
-      throw new Error(
-        `Expected all purposes to be Named Nodes. Found [${object.value}] of type [${object.termType}]`,
-      );
-    }
-    purposes.push(object.value);
-  }
-
-  return purposes;
-}
-
-export function isGConsentAccessGrant(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
-): boolean {
-  const credentialSubject = getCredentialSubject(vc);
-  const providedConsent = getSingleObject(
-    vc,
-    credentialSubject,
-    gc.providedConsent,
-    undefined,
-    false,
-  );
-
-  if (!providedConsent) return false;
-
-  const gcStatus = getSingleObject(
-    vc,
-    providedConsent,
-    namedNode(GC_HAS_STATUS),
-    undefined,
-    false,
-  );
-
-  return (
-    gcStatus !== undefined &&
-    [GC_CONSENT_STATUS_DENIED, GC_CONSENT_STATUS_EXPLICITLY_GIVEN].includes(
-      gcStatus?.value,
-    ) &&
-    getSingleObject(vc, providedConsent, gc.isProvidedTo, undefined, false)
-      ?.termType === "NamedNode"
-  );
-}
-
-/**
- * Get the resource owner granting access to their resources from an Access Grant/Request.
- *
- * @example
- *
- * ```
- * const ownerWebId = getResourceOwner(accessGrant);
- * ```
- *
- * @param vc The Access Grant/Request
- * @returns The resource owner WebID
- */
-export function getResourceOwner(vc: AccessGrantGConsent): string;
-export function getResourceOwner(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
-): string | undefined;
-export function getResourceOwner(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
-): string | undefined {
-  const credentialSubject = getCredentialSubject(vc);
-  if (isGConsentAccessGrant(vc)) {
-    return credentialSubject.value;
-  }
-  return getSingleObject(
-    vc,
-    getSingleObject(vc, credentialSubject, gc.hasConsent),
-    gc.isConsentForDataSubject,
-    "NamedNode",
-    false,
-  )?.value;
-}
-
-function getCredentialSubject(vc: AccessGrantGConsent | AccessRequestGConsent) {
-  return getSingleObject(
-    vc,
-    namedNode(getId(vc)),
-    cred.credentialSubject,
-    "NamedNode",
-  );
-}
-
-function getConsent(vc: AccessGrantGConsent | AccessRequestGConsent) {
-  const credentialSubject = getCredentialSubject(vc);
-  const consents = [
-    ...vc.match(credentialSubject, gc.providedConsent, null, defaultGraph()),
-    ...vc.match(credentialSubject, gc.hasConsent, null, defaultGraph()),
-  ];
-  if (consents.length !== 1) {
-    throw new Error(
-      `Expected exactly 1 consent value. Found ${consents.length}.`,
-    );
-  }
-  const [{ object }] = consents;
-  if (object.termType !== "BlankNode" && object.termType !== "NamedNode") {
-    throw new Error(
-      `Expected consent to be a Named Node or Blank Node, instead got ${object.termType}`,
-    );
-  }
-  return object;
-}
-
-/**
- * Get the requestor asking for access to a resources with an Access Grant/Request.
- *
- * @example
- *
- * ```
- * const requestorWebId = getRequestor(accessGrant);
- * ```
- *
- * @param vc The Access Grant/Request
- * @returns The requestor WebID
- */
-export function getRequestor(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
-): string {
-  const credentialSubject = getCredentialSubject(vc);
-  const providedConsent = getSingleObject(
-    vc,
-    credentialSubject,
-    gc.providedConsent,
-    undefined,
-    false,
-  );
-
-  if (!providedConsent) return credentialSubject.value;
-
-  return getSingleObject(vc, providedConsent, gc.isProvidedTo, "NamedNode")
-    .value;
-}
-
 function getSingleObject(
   vc: DatasetCore,
   subject: Term,
@@ -306,6 +117,222 @@ function getSingleObject(
 }
 
 /**
+ * Get the ID (URL) of an Access Grant/Request.
+ *
+ * @example
+ *
+ * ```
+ * const id = getId(accessGrant);
+ * ```
+ *
+ * @param vc The Access Grant/Request
+ * @returns The VC ID URL
+ */
+export function getId(vc: AccessGrantGConsent | AccessRequestGConsent): string {
+  return vc.id;
+}
+
+/**
+ * @internal
+ */
+export function getCredentialSubject(
+  vc: AccessGrantGConsent | AccessRequestGConsent,
+) {
+  return getSingleObject(
+    vc,
+    namedNode(getId(vc)),
+    cred.credentialSubject,
+    "NamedNode",
+  );
+}
+
+/**
+ * @internal
+ */
+export function getConsent(vc: AccessGrantGConsent | AccessRequestGConsent) {
+  const credentialSubject = getCredentialSubject(vc);
+  const consents = [
+    ...vc.match(credentialSubject, gc.providedConsent, null, defaultGraph()),
+    ...vc.match(credentialSubject, gc.hasConsent, null, defaultGraph()),
+  ];
+  if (consents.length !== 1) {
+    throw new Error(
+      `Expected exactly 1 consent value. Found ${consents.length}.`,
+    );
+  }
+  const [{ object }] = consents;
+  if (object.termType !== "BlankNode" && object.termType !== "NamedNode") {
+    throw new Error(
+      `Expected consent to be a Named Node or Blank Node, instead got [${object.termType}].`,
+    );
+  }
+  return object;
+}
+
+/**
+ * Get the resources to which an Access Grant/Request applies.
+ *
+ * @example
+ *
+ * ```
+ * const resources = getResources(accessGrant);
+ * ```
+ *
+ * @param vc The Access Grant/Request
+ * @returns The resources IRIs
+ */
+export function getResources(
+  vc: AccessGrantGConsent | AccessRequestGConsent,
+): string[] {
+  const resources: string[] = [];
+
+  for (const { object } of vc.match(
+    getConsent(vc),
+    namedNode(GC_FOR_PERSONAL_DATA),
+    null,
+    defaultGraph(),
+  )) {
+    if (object.termType !== "NamedNode") {
+      throw new Error(
+        `Expected resource to be a Named Node. Instead got [${object.value}] with term type [${object.termType}]`,
+      );
+    }
+    resources.push(object.value);
+  }
+
+  return resources;
+}
+
+/**
+ * Get the purposes for which an Access Grant/Request applies.
+ *
+ * @example
+ *
+ * ```
+ * const purposes = getPurposes(accessGrant);
+ * ```
+ *
+ * @param vc The Access Grant/Request
+ * @returns The purpose IRIs
+ */
+export function getPurposes(
+  vc: AccessGrantGConsent | AccessRequestGConsent,
+): string[] {
+  const consent = getConsent(vc);
+  const purposes: string[] = [];
+
+  for (const { object } of vc.match(
+    consent,
+    gc.forPurpose,
+    null,
+    defaultGraph(),
+  )) {
+    if (object.termType !== "NamedNode") {
+      throw new Error(
+        `Expected purpose to be Named Node. Instead got [${object.value}] with term type [${object.termType}]`,
+      );
+    }
+    purposes.push(object.value);
+  }
+
+  return purposes;
+}
+
+export function isGConsentAccessGrant(
+  vc: AccessGrantGConsent | AccessRequestGConsent,
+): boolean {
+  const credentialSubject = getCredentialSubject(vc);
+  const providedConsent = getSingleObject(
+    vc,
+    credentialSubject,
+    gc.providedConsent,
+    undefined,
+    false,
+  );
+
+  if (!providedConsent) return false;
+
+  const gcStatus = getSingleObject(
+    vc,
+    providedConsent,
+    namedNode(GC_HAS_STATUS),
+    undefined,
+    false,
+  );
+
+  return (
+    gcStatus !== undefined &&
+    [GC_CONSENT_STATUS_DENIED, GC_CONSENT_STATUS_EXPLICITLY_GIVEN].includes(
+      gcStatus?.value,
+    ) &&
+    getSingleObject(vc, providedConsent, gc.isProvidedTo, undefined, false)
+      ?.termType === "NamedNode"
+  );
+}
+
+/**
+ * Get the resource owner granting access to their resources from an Access Grant/Request.
+ *
+ * @example
+ *
+ * ```
+ * const ownerWebId = getResourceOwner(accessGrant);
+ * ```
+ *
+ * @param vc The Access Grant/Request
+ * @returns The resource owner WebID
+ */
+export function getResourceOwner(vc: AccessGrantGConsent): string;
+export function getResourceOwner(
+  vc: AccessGrantGConsent | AccessRequestGConsent,
+): string | undefined;
+export function getResourceOwner(
+  vc: AccessGrantGConsent | AccessRequestGConsent,
+): string | undefined {
+  const credentialSubject = getCredentialSubject(vc);
+  if (isGConsentAccessGrant(vc)) {
+    return credentialSubject.value;
+  }
+  return getSingleObject(
+    vc,
+    getSingleObject(vc, credentialSubject, gc.hasConsent),
+    gc.isConsentForDataSubject,
+    "NamedNode",
+    false,
+  )?.value;
+}
+
+/**
+ * Get the requestor asking for access to a resources with an Access Grant/Request.
+ *
+ * @example
+ *
+ * ```
+ * const requestorWebId = getRequestor(accessGrant);
+ * ```
+ *
+ * @param vc The Access Grant/Request
+ * @returns The requestor WebID
+ */
+export function getRequestor(
+  vc: AccessGrantGConsent | AccessRequestGConsent,
+): string {
+  const credentialSubject = getCredentialSubject(vc);
+  const providedConsent = getSingleObject(
+    vc,
+    credentialSubject,
+    gc.providedConsent,
+    undefined,
+    false,
+  );
+
+  if (!providedConsent) return credentialSubject.value;
+
+  return getSingleObject(vc, providedConsent, gc.isProvidedTo, "NamedNode")
+    .value;
+}
+
+/**
  * Get the access modes granted to a resources via an Access Grant/Request.
  *
  * @example
@@ -328,21 +355,15 @@ export function getAccessModes(
   };
 }
 
-/**
- * Get the ID (URL) of an Access Grant/Request.
- *
- * @example
- *
- * ```
- * const id = getId(accessGrant);
- * ```
- *
- * @param vc The Access Grant/Request
- * @returns The VC ID URL
- */
-export function getId(vc: AccessGrantGConsent | AccessRequestGConsent): string {
-  return vc.id;
-}
+const shorthand = {
+  "http://www.w3.org/ns/solid/vc#SolidAccessRequest": "SolidAccessRequest",
+  "http://www.w3.org/ns/solid/vc#SolidAccessDenial": "SolidAccessDenial",
+  "http://www.w3.org/ns/solid/vc#SolidAccessGrant": "SolidAccessGrant",
+  "https://www.w3.org/2018/credentials#VerifiableCredential":
+    "VerifiableCredential",
+  "https://www.w3.org/2018/credentials#VerifiablePresentation":
+    "VerifiablePresentation",
+};
 
 /**
  * Get the VC types of an Access Grant/Request.
@@ -379,16 +400,6 @@ export function getTypes(
 
   return types;
 }
-
-const shorthand = {
-  "http://www.w3.org/ns/solid/vc#SolidAccessRequest": "SolidAccessRequest",
-  "http://www.w3.org/ns/solid/vc#SolidAccessDenial": "SolidAccessDenial",
-  "http://www.w3.org/ns/solid/vc#SolidAccessGrant": "SolidAccessGrant",
-  "https://www.w3.org/2018/credentials#VerifiableCredential":
-    "VerifiableCredential",
-  "https://www.w3.org/2018/credentials#VerifiablePresentation":
-    "VerifiablePresentation",
-};
 
 function wrapDate(date: Literal) {
   if (
@@ -510,6 +521,9 @@ export class AccessGrantWrapper {
   constructor(vc: AccessGrantGConsent | AccessRequestGConsent) {
     this.vc = vc;
   }
+
+  // FIXME: Make sure we have full coverage of public exported
+  // functions in this file
 
   getResources(): ReturnType<typeof getResources> {
     return getResources(this.vc);

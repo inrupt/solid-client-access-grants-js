@@ -19,29 +19,27 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 /* eslint-disable no-param-reassign */
-import {
-  type VerifiableCredential,
-  verifiableCredentialToDataset,
-} from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
+import {
+  verifiableCredentialToDataset,
+  type VerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import type { DatasetCore, Quad } from "@rdfjs/types";
-import type {
-  BaseGrantBody,
-  BaseRequestBody,
-} from "../type/AccessVerifiableCredential";
+import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import {
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_REQUEST,
   GC_CONSENT_STATUS_REQUESTED,
   MOCK_CONTEXT,
 } from "../constants";
-import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
+import { normalizeAccessGrant } from "../manage/approveAccessRequest";
+import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import type { AccessGrant } from "../type/AccessGrant";
 import type { AccessRequest } from "../type/AccessRequest";
-import { normalizeAccessRequest } from "../request/issueAccessRequest";
-import { isAccessRequest } from "../guard/isAccessRequest";
-import { normalizeAccessGrant } from "../manage/approveAccessRequest";
-import { isAccessGrant } from "../guard/isAccessGrant";
+import type {
+  BaseGrantBody,
+  BaseRequestBody,
+} from "../type/AccessVerifiableCredential";
 
 type RequestVcOptions = Partial<{
   resources: UrlString[];
@@ -64,7 +62,7 @@ export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
   if (options?.resourceOwner === null) {
     delete hasConsent.isConsentForDataSubject;
   } else if (options?.resourceOwner) {
-    hasConsent.isConsentForDataSubject = options?.resourceOwner;
+    hasConsent.isConsentForDataSubject = options.resourceOwner;
   }
 
   // We want to be able to mutate the record so we cannot set as a const
@@ -104,49 +102,15 @@ export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
 
 export const mockAccessRequestVc = async (
   options?: RequestVcOptions,
-  framingOptions?: {
-    // This should only be used for testing /issue calls
-    expandModeUri?: boolean;
-    skipValidation?: boolean;
-  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   modify?: (asObject: Record<string, any>) => void,
 ): Promise<AccessRequest & DatasetCore<Quad, Quad>> => {
   const asObject = mockAccessRequestVcObject(options) as VerifiableCredential;
   modify?.(asObject);
 
-  const accessRequest = normalizeAccessRequest(
+  return normalizeAccessRequest(
     await verifiableCredentialToDataset(asObject, { baseIRI: asObject.id }),
-  );
-
-  if (framingOptions?.skipValidation) {
-    return accessRequest as unknown as AccessRequest & DatasetCore;
-  }
-
-  if (!isAccessRequest(accessRequest)) {
-    throw new Error(
-      `${JSON.stringify(
-        accessRequest,
-        null,
-        2,
-      )} is not an Access Request. Trying to reframe [${JSON.stringify(
-        asObject,
-        null,
-        2,
-      )}] [${JSON.stringify(framingOptions)}]`,
-    );
-  }
-
-  if (framingOptions?.expandModeUri) {
-    accessRequest.credentialSubject.hasConsent.mode =
-      accessRequest.credentialSubject.hasConsent.mode.map((mode) =>
-        mode.startsWith("http")
-          ? mode
-          : `http://www.w3.org/ns/auth/acl#${mode}`,
-      );
-  }
-
-  return accessRequest;
+  ) as AccessRequest;
 };
 
 export const mockAccessGrantObject = (
@@ -189,62 +153,29 @@ export const mockAccessGrantVc = async (
     subjectId: string;
     inherit: boolean;
     resources: string[];
+    purposes: string[];
   }>,
-  framingOptions?: {
-    // This should only be used for testing /issue calls
-    expandModeUri?: boolean;
-  },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   modify?: (asObject: Record<string, any>) => void,
 ): Promise<AccessGrant> => {
   const asObject = mockAccessGrantObject(options);
   modify?.(asObject);
 
-  const accessGrant = normalizeAccessGrant(
+  return normalizeAccessGrant(
     await verifiableCredentialToDataset(asObject, { baseIRI: asObject.id }),
-  );
-
-  // FIXME the type casting ias bad
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (!isAccessGrant(accessGrant as any)) {
-    throw new Error("Not an access grant");
-  }
-
-  if (framingOptions?.expandModeUri) {
-    const providedConsent = accessGrant.credentialSubject?.providedConsent as
-      | { mode?: string[] | undefined }
-      | undefined;
-    if (providedConsent) {
-      providedConsent.mode = providedConsent.mode?.map((mode: string) =>
-        mode.startsWith("http")
-          ? mode
-          : `http://www.w3.org/ns/auth/acl#${mode}`,
-      );
-    }
-  }
-
-  // FIXME type casting is bad
-  return accessGrant as unknown as AccessGrant;
+  ) as unknown as AccessGrant;
 };
 
 export const mockConsentRequestVc = async (
   options?: RequestVcOptions,
-  framingOptions?: {
-    // This should only be used for testing /issue calls
-    expandModeUri?: boolean;
-  },
 ): Promise<
   VerifiableCredential & BaseRequestBody & DatasetCore<Quad, Quad>
 > => {
-  const requestVc = await mockAccessRequestVc(
-    options,
-    framingOptions,
-    (object) => {
-      object.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
-      object.expirationDate = new Date(2021, 8, 14).toISOString();
-      object.issuanceDate = new Date(2021, 8, 13).toISOString();
-    },
-  );
+  const requestVc = await mockAccessRequestVc(options, (object) => {
+    object.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
+    object.expirationDate = new Date(2021, 8, 14).toISOString();
+    object.issuanceDate = new Date(2021, 8, 13).toISOString();
+  });
   return requestVc;
 };
 
@@ -255,21 +186,13 @@ export const mockConsentGrantVc = async (
     inherit: boolean;
     resources: string[];
   }>,
-  framingOptions?: {
-    // This should only be used for testing /issue calls
-    expandModeUri?: boolean;
-  },
 ): Promise<VerifiableCredential & BaseGrantBody & DatasetCore<Quad, Quad>> => {
-  const requestVc = await mockAccessGrantVc(
-    options,
-    framingOptions,
-    (object) => {
-      object.credentialSubject.providedConsent.forPurpose = [
-        "https://some.purpose",
-      ];
-      object.expirationDate = new Date(2021, 8, 14).toISOString();
-      object.issuanceDate = new Date(2021, 8, 13).toISOString();
-    },
-  );
+  const requestVc = await mockAccessGrantVc(options, (object) => {
+    object.credentialSubject.providedConsent.forPurpose = [
+      "https://some.purpose",
+    ];
+    object.expirationDate = new Date(2021, 8, 14).toISOString();
+    object.issuanceDate = new Date(2021, 8, 13).toISOString();
+  });
   return requestVc;
 };

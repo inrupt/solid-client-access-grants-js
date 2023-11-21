@@ -136,10 +136,10 @@ describe("approveAccessRequest", () => {
   let consentGrantVc: Awaited<ReturnType<typeof mockConsentGrantVc>>;
 
   beforeAll(async () => {
-    accessRequestVc = await mockAccessRequestVc({}, { expandModeUri: true });
+    accessRequestVc = await mockAccessRequestVc();
     accessGrantVc = await mockAccessGrantVc();
-    consentRequestVc = await mockConsentRequestVc({}, { expandModeUri: true });
-    consentGrantVc = await mockConsentGrantVc({}, { expandModeUri: true });
+    consentRequestVc = await mockConsentRequestVc();
+    consentGrantVc = await mockConsentGrantVc();
   });
 
   // FIXME: This test must run before the other tests mocking the ACP client.
@@ -396,9 +396,7 @@ describe("approveAccessRequest", () => {
       mockedVcModule,
       "issueVerifiableCredential",
     );
-    spiedIssueRequest.mockResolvedValueOnce(
-      await mockAccessGrantVc({}, { expandModeUri: true }),
-    );
+    spiedIssueRequest.mockResolvedValueOnce(await mockAccessGrantVc());
     await approveAccessRequest(consentRequestVc, undefined, {
       fetch: jest.fn(global.fetch),
     });

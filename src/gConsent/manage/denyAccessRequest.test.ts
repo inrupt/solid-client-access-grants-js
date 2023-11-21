@@ -70,10 +70,7 @@ describe("denyAccessRequest", () => {
 
   beforeAll(async () => {
     accessRequestVc = await mockAccessRequestVc();
-    accessRequestVcExpanded = await mockAccessRequestVc(
-      {},
-      { expandModeUri: true },
-    );
+    accessRequestVcExpanded = await mockAccessRequestVc();
   });
 
   it("throws if the provided VC isn't a Solid access request", async () => {
@@ -145,12 +142,9 @@ describe("denyAccessRequest", () => {
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
       .mockResolvedValueOnce(await mockAccessGrantVc());
-    const accessRequestWithPurpose = await mockAccessRequestVc(
-      {
-        purpose: ["https://example.org/some-purpose"],
-      },
-      { expandModeUri: true },
-    );
+    const accessRequestWithPurpose = await mockAccessRequestVc({
+      purpose: ["https://example.org/some-purpose"],
+    });
     await denyAccessRequest(accessRequestWithPurpose, {
       fetch: jest.fn(global.fetch) as typeof fetch,
     });
@@ -297,14 +291,9 @@ describe("denyAccessRequest", () => {
       .spyOn(mockedVcModule, "issueVerifiableCredential")
       .mockResolvedValueOnce(await mockAccessGrantVc());
 
-    const accessRequestWithPurpose = await mockAccessRequestVc(
-      {
-        purpose: ["https://example.org/some-purpose"],
-      },
-      {
-        expandModeUri: true,
-      },
-    );
+    const accessRequestWithPurpose = await mockAccessRequestVc({
+      purpose: ["https://example.org/some-purpose"],
+    });
 
     const mockedFetch = jest
       .fn(global.fetch)
