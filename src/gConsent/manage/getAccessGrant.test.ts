@@ -23,7 +23,11 @@ import type * as CrossFetch from "@inrupt/universal-fetch";
 import { Response } from "@inrupt/universal-fetch";
 import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 
-import { mockAccessGrantObject, mockAccessGrantVc } from "../util/access.mock";
+import {
+  mockAccessGrantObject,
+  mockAccessGrantVc,
+  mockAccessRequestVc,
+} from "../util/access.mock";
 import { toBeEqual } from "../util/toBeEqual.mock";
 import { getAccessGrant } from "./getAccessGrant";
 
@@ -83,7 +87,7 @@ describe("getAccessGrant", () => {
     return expect(
       getAccessGrant("https://some.vc.url", {
         fetch: async () =>
-          new Response(JSON.stringify(mockAccessGrant), {
+          new Response(JSON.stringify(await mockAccessRequestVc()), {
             headers: new Headers([["content-type", "application/json"]]),
           }),
       }),
