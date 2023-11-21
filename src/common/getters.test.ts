@@ -45,7 +45,6 @@ import {
 import type { AccessGrant, AccessRequest } from "../gConsent";
 import { GC_FOR_PERSONAL_DATA } from "../gConsent/constants";
 import { TYPE, cred, gc } from "./constants";
-
 const { quad, namedNode, literal, blankNode } = DataFactory;
 
 jest.mock("@inrupt/universal-fetch", () => ({
