@@ -222,10 +222,10 @@ describe("getters", () => {
       store.addQuad(
         getConsent(mockedGConsentGrant),
         gc.isProvidedTo,
-        namedNode("http://example.org/another/requestor")
-      )
+        namedNode("http://example.org/another/requestor"),
+      );
 
-      expect(() => getRequestor(store as any)).toThrowError(
+      expect(() => getRequestor(store as any)).toThrow(
         "Expected exactly one result. Found 2.",
       );
     });
