@@ -23,14 +23,9 @@ import type * as CrossFetch from "@inrupt/universal-fetch";
 import { Response } from "@inrupt/universal-fetch";
 import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 
-import {
-  mockAccessGrantObject,
-  mockAccessGrantVc,
-  mockAccessRequestVc,
-} from "../util/access.mock";
+import { mockAccessGrantObject, mockAccessGrantVc } from "../util/access.mock";
 import { toBeEqual } from "../util/toBeEqual.mock";
 import { getAccessGrant } from "./getAccessGrant";
-import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
@@ -63,18 +58,19 @@ describe("getAccessGrant", () => {
     expect(mockedFetch).toHaveBeenCalledWith("https://some.vc.url");
   });
 
-  it("throws if resolving the IRI results in an HTTP error", async () => {
-    await expect(
+  it("throws if resolving the IRI results in an HTTP error", () => {
+    return expect(
       getAccessGrant("https://some.vc.url", {
-        fetch: async () => new Response("Not Found", { status: 404, statusText: "Not Found" }),
+        fetch: async () =>
+          new Response("Not Found", { status: 404, statusText: "Not Found" }),
       }),
     ).rejects.toThrow(
       /Could not resolve \[https:\/\/some.vc.url\].*404 Not Found/,
     );
   });
 
-  it("throws if the given IRI does not resolve to a Verifiable Credential", async () => {
-    await expect(
+  it("throws if the given IRI does not resolve to a Verifiable Credential", () => {
+    return expect(
       getAccessGrant("https://some.vc.url", {
         fetch: async () => new Response("{'someKey': 'someValue'}"),
       }),
@@ -83,12 +79,13 @@ describe("getAccessGrant", () => {
     );
   });
 
-  it("throws if the given IRI does not resolve to a access grant Verifiable Credential", async () => {
-    await expect(
+  it("throws if the given IRI does not resolve to a access grant Verifiable Credential", () => {
+    return expect(
       getAccessGrant("https://some.vc.url", {
-        fetch: async () => new Response(JSON.stringify(await mockAccessRequestVc()), {
-          headers: new Headers([["content-type", "application/json"]]),
-        }),
+        fetch: async () =>
+          new Response(JSON.stringify(mockAccessGrant), {
+            headers: new Headers([["content-type", "application/json"]]),
+          }),
       }),
     ).rejects.toThrow(/not an Access Grant/);
   });
@@ -102,9 +99,10 @@ describe("getAccessGrant", () => {
       "https://w3id.org/GConsent#ConsentStatusDenied";
 
     const accessGrant = await getAccessGrant("https://some.vc.url", {
-      fetch: async () => new Response(JSON.stringify(mockedAccessGrant), {
-        headers: new Headers([["content-type", "application/json"]]),
-      }),
+      fetch: async () =>
+        new Response(JSON.stringify(mockedAccessGrant), {
+          headers: new Headers([["content-type", "application/json"]]),
+        }),
     });
     toBeEqual(accessGrant, mockedAccessGrant);
   });
@@ -114,9 +112,10 @@ describe("getAccessGrant", () => {
   // eslint-disable-next-line jest/expect-expect
   it("returns the access grant with the given IRI", async () => {
     const accessGrant = await getAccessGrant("https://some.vc.url", {
-      fetch: async () => new Response(JSON.stringify(mockAccessGrantObject()), {
-        headers: new Headers([["content-type", "application/json"]]),
-      }),
+      fetch: async () =>
+        new Response(JSON.stringify(mockAccessGrantObject()), {
+          headers: new Headers([["content-type", "application/json"]]),
+        }),
     });
     toBeEqual(accessGrant, mockAccessGrant);
   });
@@ -129,27 +128,28 @@ describe("getAccessGrant", () => {
     toBeEqual(
       await getAccessGrant("https://some.vc.url", {
         // The server returns an equivalent JSON-LD with a different frame:
-        fetch: async () => new Response(
-          JSON.stringify({
-            ...normalizedAccessGrant,
-            credentialSubject: {
-              ...normalizedAccessGrant.credentialSubject,
-              providedConsent: {
-                ...normalizedAccessGrant.credentialSubject.providedConsent,
-                // The 1-value array is replaced by the literal value.
-                forPersonalData:
-                  normalizedAccessGrant.credentialSubject.providedConsent
-                    .forPersonalData[0],
-                mode: normalizedAccessGrant.credentialSubject.providedConsent
-                  .mode[0],
-                inherit: "true",
+        fetch: async () =>
+          new Response(
+            JSON.stringify({
+              ...normalizedAccessGrant,
+              credentialSubject: {
+                ...normalizedAccessGrant.credentialSubject,
+                providedConsent: {
+                  ...normalizedAccessGrant.credentialSubject.providedConsent,
+                  // The 1-value array is replaced by the literal value.
+                  forPersonalData:
+                    normalizedAccessGrant.credentialSubject.providedConsent
+                      .forPersonalData[0],
+                  mode: normalizedAccessGrant.credentialSubject.providedConsent
+                    .mode[0],
+                  inherit: "true",
+                },
               },
+            }),
+            {
+              headers: new Headers([["content-type", "application/json"]]),
             },
-          }),
-          {
-            headers: new Headers([["content-type", "application/json"]]),
-          },
-        ),
+          ),
       }),
       mockAccessGrant,
     );
@@ -171,20 +171,28 @@ describe("getAccessGrant", () => {
     toBeEqual(accessGrant, mockAccessGrant);
   });
 
-  it("errors if the response is not a full access grant", async () => {
-    expect(getAccessGrant(new URL("https://some.vc.url"), {
-      fetch: async () => new Response(JSON.stringify({
-        "@context": "https://www.w3.org/2018/credentials/v1",
-        id: "https://some.credential",
-      })),
-    })).rejects.toThrow('the result is not a Verifiable Credential');
+  it("errors if the response is not a full access grant", () => {
+    return expect(
+      getAccessGrant(new URL("https://some.vc.url"), {
+        fetch: async () =>
+          new Response(
+            JSON.stringify({
+              "@context": "https://www.w3.org/2018/credentials/v1",
+              id: "https://some.credential",
+            }),
+          ),
+      }),
+    ).rejects.toThrow("the result is not a Verifiable Credential");
   });
 
-  it("errors if the response is an empty json object", async () => {
-    expect(getAccessGrant(new URL("https://some.vc.url"), {
-      fetch: async () => new Response(JSON.stringify({}), {
-        headers: new Headers([["content-type", "application/json"]]),
+  it("errors if the response is an empty json object", () => {
+    return expect(
+      getAccessGrant(new URL("https://some.vc.url"), {
+        fetch: async () =>
+          new Response(JSON.stringify({}), {
+            headers: new Headers([["content-type", "application/json"]]),
+          }),
       }),
-    })).rejects.toThrow('the result is not a Verifiable Credential');
+    ).rejects.toThrow("the result is not a Verifiable Credential");
   });
 });

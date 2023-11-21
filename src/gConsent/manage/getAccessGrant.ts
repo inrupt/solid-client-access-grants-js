@@ -57,9 +57,12 @@ export async function getAccessGrant(
   const responseErrorClone = await response.text();
   let data;
   try {
-    data = await verifiableCredentialToDataset(normalizeAccessGrant(JSON.parse(responseErrorClone)), {
-      baseIRI: accessGrantVcUrl.toString(),
-    });
+    data = await verifiableCredentialToDataset(
+      normalizeAccessGrant(JSON.parse(responseErrorClone)),
+      {
+        baseIRI: accessGrantVcUrl.toString(),
+      },
+    );
   } catch (e) {
     throw new Error(
       `Unexpected response when resolving [${vcUrl}], the result is not a Verifiable Credential: ${responseErrorClone}.\n\nError details: ${e}`,
