@@ -51,16 +51,6 @@ jest.mock("@inrupt/solid-client-vc", () => {
     getVerifiableCredentialApiConfiguration: jest.fn(),
   };
 });
-jest.mock("@inrupt/universal-fetch", () => {
-  const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch",
-  ) as jest.Mocked<typeof CrossFetch>;
-  return {
-    // Do no mock the globals such as Response.
-    ...crossFetch,
-    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
-  };
-});
 
 describe("isValidAccessGrant", () => {
   const MOCK_ACCESS_GRANT_BASE = {

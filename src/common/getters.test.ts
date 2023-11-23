@@ -44,14 +44,7 @@ import {
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
 import { TYPE, cred, gc } from "./constants";
-
 const { quad, namedNode, literal, blankNode } = DataFactory;
-
-jest.mock("@inrupt/universal-fetch", () => ({
-  fetch: (async (...args) => {
-    throw new Error(`tried to fetch ${args[0]}`);
-  }) as typeof fetch,
-}));
 
 describe("getters", () => {
   let mockedGConsentGrant: AccessGrant;
