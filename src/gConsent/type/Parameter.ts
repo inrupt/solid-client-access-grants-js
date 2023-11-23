@@ -24,12 +24,8 @@
  */
 
 import type { UrlString } from "@inrupt/solid-client";
-
-import type {
-  GC_CONSENT_STATUS_REQUESTED,
-  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-} from "../constants";
 import type { AccessModes } from "../../type/AccessModes";
+import type { gc } from "../../common/constants";
 
 export interface BaseRequestParameters {
   access: AccessModes;
@@ -45,7 +41,7 @@ export interface InputAccessRequestParameters extends BaseRequestParameters {
   resourceOwner: UrlString;
 }
 export interface AccessRequestParameters extends InputAccessRequestParameters {
-  status: typeof GC_CONSENT_STATUS_REQUESTED;
+  status: typeof gc.ConsentStatusRequested.value;
 }
 
 export interface InputAccessGrantParameters extends BaseRequestParameters {
@@ -53,5 +49,5 @@ export interface InputAccessGrantParameters extends BaseRequestParameters {
 }
 
 export interface AccessGrantParameters extends InputAccessGrantParameters {
-  status: typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN;
+  status: typeof gc.ConsentStatusExplicitlyGiven.value;
 }

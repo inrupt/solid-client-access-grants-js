@@ -30,12 +30,6 @@ import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessRequestGConsent } from "../gConsent/type/AccessRequest";
 import type { AccessModes } from "../type/AccessModes";
 import { INHERIT, XSD_BOOLEAN, gc, acl, cred, TYPE } from "./constants";
-import {
-  GC_CONSENT_STATUS_DENIED,
-  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-  GC_FOR_PERSONAL_DATA,
-  GC_HAS_STATUS,
-} from "../gConsent/constants";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
@@ -188,7 +182,7 @@ export function getResources(
 
   for (const { object } of vc.match(
     getConsent(vc),
-    namedNode(GC_FOR_PERSONAL_DATA),
+    gc.forPersonalData,
     null,
     defaultGraph(),
   )) {
@@ -255,16 +249,17 @@ export function isGConsentAccessGrant(
   const gcStatus = getSingleObject(
     vc,
     providedConsent,
-    namedNode(GC_HAS_STATUS),
+    gc.hasStatus,
     undefined,
     false,
   );
 
   return (
     gcStatus !== undefined &&
-    [GC_CONSENT_STATUS_DENIED, GC_CONSENT_STATUS_EXPLICITLY_GIVEN].includes(
-      gcStatus?.value,
-    ) &&
+    (vc.has(quad(providedConsent, gc.hasStatus, gc.ConsentStatusDenied)) ||
+      vc.has(
+        quad(providedConsent, gc.hasStatus, gc.ConsentStatusExplicitlyGiven),
+      )) &&
     getSingleObject(vc, providedConsent, gc.isProvidedTo, undefined, false)
       ?.termType === "NamedNode"
   );

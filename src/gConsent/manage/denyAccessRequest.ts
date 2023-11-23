@@ -22,17 +22,14 @@
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { isVerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString, WebId } from "@inrupt/solid-client";
-import {
-  CREDENTIAL_TYPE_ACCESS_DENIAL,
-  GC_CONSENT_STATUS_DENIED,
-  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-} from "../constants";
+import { CREDENTIAL_TYPE_ACCESS_DENIAL } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import type { AccessGrant } from "../type/AccessGrant";
+import { gc } from "../../common/constants";
 
 // Merge back in denyAccessRequest after the deprecated signature has been removed.
 // eslint-disable-next-line camelcase
@@ -51,7 +48,7 @@ async function internal_denyAccessRequest(
     requestor: internalOptions.requestor,
     resources: internalOptions.resources,
     requestorInboxUrl: internalOptions.requestorInboxUrl,
-    status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+    status: gc.ConsentStatusExplicitlyGiven.value,
     purpose: internalOptions.purpose,
     // denyAccessRequest doesn't take an override, so the expiration date
     // cannot be null.
@@ -59,7 +56,7 @@ async function internal_denyAccessRequest(
   });
   denialBody.type = [CREDENTIAL_TYPE_ACCESS_DENIAL];
   denialBody.credentialSubject.providedConsent.hasStatus =
-    GC_CONSENT_STATUS_DENIED;
+    gc.ConsentStatusDenied.value;
 
   return issueAccessVc(denialBody, options);
 }

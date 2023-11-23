@@ -23,11 +23,10 @@ import { rdf, acl as _acl } from "rdf-namespaces";
 
 const { namedNode } = DataFactory;
 
-export const CRED = "https://www.w3.org/2018/credentials#";
-export const GC = "https://w3id.org/GConsent#";
-export const ACL = "http://www.w3.org/ns/auth/acl#";
-export const VC = "http://www.w3.org/ns/solid/vc#";
-export const XSD = "http://www.w3.org/2001/XMLSchema#";
+const CRED = "https://www.w3.org/2018/credentials#";
+const GC = "https://w3id.org/GConsent#";
+const VC = "http://www.w3.org/ns/solid/vc#";
+const XSD = "http://www.w3.org/2001/XMLSchema#";
 
 export const XSD_BOOLEAN = namedNode(`${XSD}boolean`);
 
@@ -37,9 +36,15 @@ export const TYPE = namedNode(rdf.type);
 export const gc = {
   providedConsent: namedNode(`${GC}providedConsent`),
   hasConsent: namedNode(`${GC}hasConsent`),
+  hasStatus: namedNode(`${GC}hasStatus`),
   isProvidedTo: namedNode(`${GC}isProvidedTo`),
   isConsentForDataSubject: namedNode(`${GC}isConsentForDataSubject`),
   forPurpose: namedNode(`${GC}forPurpose`),
+  forPersonalData: namedNode(`${GC}forPersonalData`),
+
+  ConsentStatusDenied: namedNode(`${GC}ConsentStatusDenied`),
+  ConsentStatusExplicitlyGiven: namedNode(`${GC}ConsentStatusExplicitlyGiven`),
+  ConsentStatusRequested: namedNode(`${GC}ConsentStatusRequested`),
 };
 
 export const acl = {

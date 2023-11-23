@@ -43,7 +43,6 @@ import {
   getTypes,
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
-import { GC_FOR_PERSONAL_DATA } from "../gConsent/constants";
 import { TYPE, cred, gc } from "./constants";
 
 const { quad, namedNode, literal, blankNode } = DataFactory;
@@ -77,7 +76,7 @@ describe("getters", () => {
             ...mockedGConsentGrant,
             quad(
               getConsent(mockedGConsentGrant),
-              namedNode(GC_FOR_PERSONAL_DATA),
+              gc.forPersonalData,
               literal("hello world"),
             ),
           ]) as unknown as AccessGrant,

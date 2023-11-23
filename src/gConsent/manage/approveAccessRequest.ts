@@ -30,7 +30,6 @@ import type { AccessModes } from "../../type/AccessModes";
 import type { AccessGrant } from "../type/AccessGrant";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isAccessRequest } from "../guard/isAccessRequest";
-import { GC_CONSENT_STATUS_EXPLICITLY_GIVEN } from "../constants";
 import {
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_READ,
@@ -41,6 +40,7 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
+import { gc } from "../../common/constants";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
@@ -185,7 +185,7 @@ async function internal_approveAccessRequest(
     purpose: internalGrantOptions.purpose,
     issuanceDate: internalGrantOptions.issuanceDate,
     expirationDate: internalGrantOptions.expirationDate ?? undefined,
-    status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+    status: gc.ConsentStatusExplicitlyGiven.value,
     inherit: internalGrantOptions.inherit,
   });
 

@@ -28,8 +28,6 @@ import {
   CREDENTIAL_TYPE_ACCESS_DENIAL,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_BASE,
-  GC_CONSENT_STATUS_DENIED,
-  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
@@ -42,6 +40,7 @@ import { isAccessGrant } from "../guard/isAccessGrant";
 import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
+import { gc } from "../../common/constants";
 
 export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
@@ -124,8 +123,8 @@ async function internal_getAccessGrantAll(
       credentialSubject: {
         providedConsent: {
           hasStatus: {
-            granted: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-            denied: GC_CONSENT_STATUS_DENIED,
+            granted: gc.ConsentStatusExplicitlyGiven.value,
+            denied: gc.ConsentStatusDenied.value,
             all: undefined,
           }[statusShorthand],
           forPersonalData: url ? [url.href] : undefined,

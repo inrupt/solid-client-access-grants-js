@@ -29,7 +29,6 @@ import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import {
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_REQUEST,
-  GC_CONSENT_STATUS_REQUESTED,
   MOCK_CONTEXT,
 } from "../constants";
 import { normalizeAccessGrant } from "../manage/approveAccessRequest";
@@ -40,6 +39,7 @@ import type {
   BaseGrantBody,
   BaseRequestBody,
 } from "../type/AccessVerifiableCredential";
+import { gc } from "../../common/constants";
 
 type RequestVcOptions = Partial<{
   resources: UrlString[];
@@ -52,7 +52,7 @@ type RequestVcOptions = Partial<{
 export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
   const hasConsent = {
     forPersonalData: options?.resources ?? ["https://some.resource"],
-    hasStatus: GC_CONSENT_STATUS_REQUESTED,
+    hasStatus: gc.ConsentStatusRequested.value,
     mode: options?.modes ?? ["http://www.w3.org/ns/auth/acl#Read"],
     isConsentForDataSubject: "https://some.pod/profile#you" as
       | string

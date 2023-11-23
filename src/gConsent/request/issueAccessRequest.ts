@@ -21,7 +21,6 @@
 
 import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import { getRequestBody, issueAccessVc } from "../util/issueAccessVc";
-import { GC_CONSENT_STATUS_REQUESTED } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type {
   DeprecatedAccessRequestParameters,
@@ -29,6 +28,7 @@ import type {
 } from "../type/IssueAccessRequestParameters";
 import type { AccessRequest } from "../type/AccessRequest";
 import { isAccessRequest } from "../guard/isAccessRequest";
+import { gc } from "../../common/constants";
 
 /**
  * Internal function. This is a stopgap until we have proper JSON-LD parsing.
@@ -91,7 +91,7 @@ async function issueAccessRequest(
 ): Promise<AccessRequest> {
   const requestBody = getRequestBody({
     ...params,
-    status: GC_CONSENT_STATUS_REQUESTED,
+    status: gc.ConsentStatusRequested.value,
   });
   const accessRequest = normalizeAccessRequest(
     await issueAccessVc(requestBody, options),
