@@ -26,10 +26,17 @@ import type {
   Term,
 } from "@rdfjs/types";
 import { DataFactory } from "n3";
+import {
+  getId,
+  getCredentialSubject,
+  getIssuer,
+  getIssuanceDate,
+  getExpirationDate
+} from "@inrupt/solid-client-vc";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessRequestGConsent } from "../gConsent/type/AccessRequest";
 import type { AccessModes } from "../type/AccessModes";
-import { INHERIT, XSD_BOOLEAN, gc, acl, cred, TYPE } from "./constants";
+import { INHERIT, XSD_BOOLEAN, gc, acl, TYPE } from "./constants";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
@@ -109,36 +116,7 @@ function getSingleObject(
 
   return object;
 }
-
-/**
- * Get the ID (URL) of an Access Grant/Request.
- *
- * @example
- *
- * ```
- * const id = getId(accessGrant);
- * ```
- *
- * @param vc The Access Grant/Request
- * @returns The VC ID URL
- */
-export function getId(vc: AccessGrantGConsent | AccessRequestGConsent): string {
-  return vc.id;
-}
-
-/**
- * @internal
- */
-export function getCredentialSubject(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
-) {
-  return getSingleObject(
-    vc,
-    namedNode(getId(vc)),
-    cred.credentialSubject,
-    "NamedNode",
-  );
-}
+export { getId, getIssuer, getIssuanceDate, getCredentialSubject, getExpirationDate };
 
 /**
  * @internal
@@ -394,83 +372,6 @@ export function getTypes(
   }
 
   return types;
-}
-
-function wrapDate(date: Literal) {
-  if (
-    !date.datatype.equals(
-      namedNode("http://www.w3.org/2001/XMLSchema#dateTime"),
-    )
-  ) {
-    throw new Error(
-      `Expected date to be a dateTime; recieved [${date.datatype.value}]`,
-    );
-  }
-  return new Date(date.value);
-}
-
-/**
- * Get the issuance date of an Access Grant/Request.
- *
- * @example
- *
- * ```
- * const date = getIssuanceDate(accessGrant);
- * ```
- *
- * @param vc The Access Grant/Request
- * @returns The issuance date
- */
-export function getIssuanceDate(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
-): Date {
-  return wrapDate(
-    getSingleObject(vc, namedNode(getId(vc)), cred.issuanceDate, "Literal"),
-  );
-}
-
-/**
- * Get the expiration date of an Access Grant/Request.
- *
- * @example
- *
- * ```
- * const date = getExpirationDate(accessGrant);
- * ```
- *
- * @param vc The Access Grant/Request
- * @returns The expiration date
- */
-export function getExpirationDate(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
-): Date | undefined {
-  const expirationDate = getSingleObject(
-    vc,
-    namedNode(getId(vc)),
-    cred.expirationDate,
-    "Literal",
-    false,
-  );
-  return expirationDate && wrapDate(expirationDate);
-}
-
-/**
- * Get the issuer of an Access Grant/Request.
- *
- * @example
- *
- * ```
- * const date = getIssuer(accessGrant);
- * ```
- *
- * @param vc The Access Grant/Request
- * @returns The VC issuer
- */
-export function getIssuer(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
-): string {
-  return getSingleObject(vc, namedNode(getId(vc)), cred.issuer, "NamedNode")
-    .value;
 }
 
 /**

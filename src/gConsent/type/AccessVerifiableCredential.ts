@@ -22,16 +22,14 @@
 import type { UrlString } from "@inrupt/solid-client";
 import type {
   ACCESS_GRANT_CONTEXT_DEFAULT,
-  GC_CONSENT_STATUS_DENIED,
   GC_CONSENT_STATUS_DENIED_ABBREV,
-  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV,
-  GC_CONSENT_STATUS_REQUESTED,
   GC_CONSENT_STATUS_REQUESTED_ABBREV,
 } from "../constants";
 import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import type { GConsentStatus } from "./GConsentStatus";
 import type { AccessCredentialType } from "./AccessCredentialType";
+import type { gc } from "../../common/constants";
 
 export type GConsentAttributes = {
   mode: ResourceAccessMode[];
@@ -106,7 +104,7 @@ export type AccessRequestBody = BaseRequestBody & {
   credentialSubject: {
     hasConsent: {
       hasStatus:
-        | typeof GC_CONSENT_STATUS_REQUESTED
+        | typeof gc.ConsentStatusRequested.value
         // FIXME: This is a stopgap solution, but proper JSON-LD parsing should
         // be implemented to fix this long-term.
         | typeof GC_CONSENT_STATUS_REQUESTED_ABBREV;
@@ -117,7 +115,7 @@ export type AccessRequestBody = BaseRequestBody & {
 export type AccessDeniedBody = BaseGrantBody & {
   credentialSubject: {
     providedConsent: {
-      hasStatus: typeof GC_CONSENT_STATUS_DENIED;
+      hasStatus: typeof gc.ConsentStatusDenied.value;
     };
   };
 };
@@ -126,8 +124,8 @@ export type AccessGrantBody = BaseGrantBody & {
   credentialSubject: {
     providedConsent: {
       hasStatus:
-        | typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN
-        | typeof GC_CONSENT_STATUS_DENIED
+        | typeof gc.ConsentStatusExplicitlyGiven.value
+        | typeof gc.ConsentStatusDenied.value
         // FIXME: This is a stopgap solution, but proper JSON-LD parsing should
         // be implemented to fix this long-term.
         | typeof GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV

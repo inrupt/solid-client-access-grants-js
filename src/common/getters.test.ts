@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { it, expect, describe, jest, beforeAll } from "@jest/globals";
+import { it, expect, describe, beforeAll } from "@jest/globals";
 import { Store, DataFactory } from "n3";
 import { promisifyEventEmitter } from "event-emitter-promisify";
 import {
@@ -43,7 +43,7 @@ import {
   getTypes,
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
-import { TYPE, cred, gc } from "./constants";
+import { TYPE, gc } from "./constants";
 const { quad, namedNode, literal, blankNode } = DataFactory;
 
 describe("getters", () => {
@@ -362,12 +362,12 @@ describe("getters", () => {
 
       store.addQuad(
         namedNode(getId(mockedGConsentGrant)),
-        cred.expirationDate,
+        namedNode('https://www.w3.org/2018/credentials#expirationDate'),
         namedNode("http://example.org/this/is/a/date"),
       );
 
       expect(() => getExpirationDate(store as any)).toThrow(
-        "Expected [http://example.org/this/is/a/date] to be a Literal. Found [NamedNode]",
+        "Expected expiration date to be a Literal. Found [http://example.org/this/is/a/date] of type [NamedNode]."
       );
     });
 
@@ -376,7 +376,7 @@ describe("getters", () => {
 
       store.addQuad(
         namedNode(getId(mockedGConsentGrant)),
-        cred.expirationDate,
+        namedNode('https://www.w3.org/2018/credentials#expirationDate'),
         literal("boo"),
       );
 

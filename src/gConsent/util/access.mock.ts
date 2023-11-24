@@ -25,6 +25,7 @@ import {
   type VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import type { DatasetCore, Quad } from "@rdfjs/types";
+import type { VerifiableCredentialBase } from "@inrupt/solid-client-vc/dist/common/common";
 import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import {
   CREDENTIAL_TYPE_ACCESS_GRANT,
@@ -162,7 +163,9 @@ export const mockAccessGrantVc = async (
   modify?.(asObject);
 
   return normalizeAccessGrant(
-    await verifiableCredentialToDataset(asObject, { baseIRI: asObject.id }),
+    await verifiableCredentialToDataset<VerifiableCredentialBase>(asObject, {
+      baseIRI: asObject.id,
+    }),
   ) as unknown as AccessGrant;
 };
 

@@ -20,6 +20,7 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   isVerifiableCredential,
   verifiableCredentialToDataset,
@@ -57,7 +58,7 @@ export async function getAccessGrant(
   const responseErrorClone = await response.text();
   let data;
   try {
-    data = await verifiableCredentialToDataset(
+    data = await verifiableCredentialToDataset<VerifiableCredential>(
       normalizeAccessGrant(JSON.parse(responseErrorClone)),
       {
         baseIRI: accessGrantVcUrl.toString(),

@@ -32,9 +32,9 @@ export const GC_CONSENT_STATUS_EXPLICITLY_GIVEN =
 export const GC_CONSENT_STATUS_REQUESTED =
   "https://w3id.org/GConsent#ConsentStatusRequested";
 
-export function isAccessGrant(
-  vc: BaseAccessVcBody,
-): vc is BaseAccessVcBody & AccessGrantBody {
+export function isAccessGrant<T extends BaseAccessVcBody>(
+  vc: T,
+): vc is T & AccessGrantBody {
   return (
     (vc as AccessGrantBody).credentialSubject.providedConsent !== undefined &&
     ACCESS_GRANT_STATUS.has(

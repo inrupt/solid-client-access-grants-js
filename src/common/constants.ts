@@ -23,7 +23,6 @@ import { rdf, acl as _acl } from "rdf-namespaces";
 
 const { namedNode } = DataFactory;
 
-const CRED = "https://www.w3.org/2018/credentials#";
 const GC = "https://w3id.org/GConsent#";
 const VC = "http://www.w3.org/ns/solid/vc#";
 const XSD = "http://www.w3.org/2001/XMLSchema#";
@@ -52,13 +51,6 @@ export const acl = {
   Write: namedNode(_acl.Write),
   Append: namedNode(_acl.Append),
   mode: namedNode(_acl.mode),
-};
-
-export const cred = {
-  issuanceDate: namedNode(`${CRED}issuanceDate`),
-  expirationDate: namedNode(`${CRED}expirationDate`),
-  issuer: namedNode(`${CRED}issuer`),
-  credentialSubject: namedNode(`${CRED}credentialSubject`),
 };
 
 export const INHERIT = namedNode(
