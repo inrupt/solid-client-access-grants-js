@@ -843,7 +843,7 @@ describe("approveAccessRequest", () => {
           inherit: "true",
         },
       },
-    });
+    } as VcClient.VerifiableCredential);
     await expect(
       approveAccessRequest(accessRequestVc, undefined, {
         fetch: jest.fn(global.fetch),

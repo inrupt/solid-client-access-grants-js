@@ -56,10 +56,10 @@ describe("getAccessGrant", () => {
       }),
     );
 
-    await getAccessGrant("https://some.vc.url", {
+    await getAccessGrant("https://some.credential", {
       fetch: mockedFetch,
     });
-    expect(mockedFetch).toHaveBeenCalledWith("https://some.vc.url");
+    expect(mockedFetch).toHaveBeenCalledWith("https://some.credential");
   });
 
   it("throws if resolving the IRI results in an HTTP error", () => {

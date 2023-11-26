@@ -32,6 +32,7 @@ export const GC_CONSENT_STATUS_EXPLICITLY_GIVEN =
 export const GC_CONSENT_STATUS_REQUESTED =
   "https://w3id.org/GConsent#ConsentStatusRequested";
 
+// Implemented as isGConsentAccessGrant in src/common/getters
 export function isAccessGrant<T extends BaseAccessVcBody>(
   vc: T,
 ): vc is T & AccessGrantBody {

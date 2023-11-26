@@ -90,9 +90,13 @@ describe("isValidAccessGrant", () => {
     const { verifiableCredentialToDataset } = jest.requireActual<
       typeof VcLibrary
     >("@inrupt/solid-client-vc");
-    MOCK_ACCESS_GRANT = await verifiableCredentialToDataset(
-      MOCK_ACCESS_GRANT_BASE,
-    );
+    MOCK_ACCESS_GRANT =
+      await verifiableCredentialToDataset<VcLibrary.VerifiableCredentialBase>(
+        MOCK_ACCESS_GRANT_BASE,
+        {
+          includeVcProperties: true,
+        },
+      );
   });
 
   it("uses the provided fetch if any", async () => {

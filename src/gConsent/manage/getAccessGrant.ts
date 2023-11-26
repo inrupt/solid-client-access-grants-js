@@ -62,6 +62,7 @@ export async function getAccessGrant(
       normalizeAccessGrant(JSON.parse(responseErrorClone)),
       {
         baseIRI: accessGrantVcUrl.toString(),
+        includeVcProperties: true,
       },
     );
   } catch (e) {

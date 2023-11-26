@@ -20,12 +20,18 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
+import { DataFactory } from "n3";
+// eslint-disable-next-line camelcase
+import type { DatasetCore, Quad_Subject } from "@rdfjs/types";
 import { ACCESS_STATUS } from "../constants";
 import type { GConsentRequestAttributes } from "../type/AccessVerifiableCredential";
 import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import { RESOURCE_ACCESS_MODE } from "../../type/ResourceAccessMode";
 import { isUnknownObject } from "./isUnknownObject";
 import type { GConsentStatus } from "../type/GConsentStatus";
+import { acl, gc } from "../../common/constants";
+
+const { defaultGraph } = DataFactory;
 
 function isResourceAccessModeArray(x: unknown): x is Array<ResourceAccessMode> {
   return Array.isArray(x) && x.every((y) => RESOURCE_ACCESS_MODE.has(y));
@@ -49,4 +55,52 @@ export function isGConsentAttributes(
     isGConsentStatus(x.hasStatus) &&
     isStringArray(x.forPersonalData)
   );
+}
+
+export function isRdfjsGConsentAttributes(
+  dataset: DatasetCore,
+  // eslint-disable-next-line camelcase
+  consent: Quad_Subject,
+) {
+  // isResourceAccessModeArray
+  for (const { object } of dataset.match(
+    consent,
+    acl.mode,
+    null,
+    defaultGraph(),
+  )) {
+    if (
+      ![acl.Append, acl.Read, acl.Write].some((mode) => mode.equals(object))
+    ) {
+      return false;
+    }
+  }
+
+  // isGConsentStatus
+  const statuses = [
+    ...dataset.match(consent, gc.hasStatus, null, defaultGraph()),
+  ];
+  if (
+    statuses.length !== 1 ||
+    [
+      gc.ConsentStatusDenied,
+      gc.ConsentStatusExplicitlyGiven,
+      gc.ConsentStatusRequested,
+    ].some((e) => e.equals(statuses[0].object))
+  ) {
+    return false;
+  }
+
+  for (const { object } of dataset.match(
+    consent,
+    gc.forPersonalData,
+    null,
+    defaultGraph(),
+  )) {
+    if (object.termType === "NamedNode") {
+      return false;
+    }
+  }
+
+  return true;
 }

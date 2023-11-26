@@ -31,7 +31,7 @@ import {
   getCredentialSubject,
   getIssuer,
   getIssuanceDate,
-  getExpirationDate
+  getExpirationDate,
 } from "@inrupt/solid-client-vc";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessRequestGConsent } from "../gConsent/type/AccessRequest";
@@ -116,7 +116,13 @@ function getSingleObject(
 
   return object;
 }
-export { getId, getIssuer, getIssuanceDate, getCredentialSubject, getExpirationDate };
+export {
+  getId,
+  getIssuer,
+  getIssuanceDate,
+  getCredentialSubject,
+  getExpirationDate,
+};
 
 /**
  * @internal

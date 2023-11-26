@@ -19,7 +19,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { getVerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  VerifiableCredential,
+  getVerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import { fetch } from "@inrupt/universal-fetch";
 import { describe, expect, it, jest, beforeEach } from "@jest/globals";
 import type { getSessionFetch } from "../../common/util/getSessionFetch";
@@ -147,7 +150,7 @@ describe("getAccessRequestFromRedirectUrl", () => {
           mode: normalizedAccessRequest.credentialSubject.hasConsent.mode[0],
         },
       },
-    });
+    } as VerifiableCredential);
     const { accessRequest } =
       await getAccessRequestFromRedirectUrl(redirectedToUrl);
     expect(accessRequest).toStrictEqual(accessRequestVc);

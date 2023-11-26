@@ -20,7 +20,10 @@
 //
 
 import { describe, it, jest, expect, beforeAll } from "@jest/globals";
-import type { getVerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  VerifiableCredential,
+  getVerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import { fetch } from "@inrupt/universal-fetch";
 import { getAccessGrantFromRedirectUrl } from "./getAccessGrantFromRedirectUrl";
 import type { getSessionFetch } from "../../common/util/getSessionFetch";
@@ -149,7 +152,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
           mode: normalizedAccessGrant.credentialSubject.providedConsent.mode[0],
         },
       },
-    });
+    } as VerifiableCredential);
 
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.set(

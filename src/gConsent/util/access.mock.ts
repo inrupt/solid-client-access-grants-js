@@ -110,7 +110,10 @@ export const mockAccessRequestVc = async (
   modify?.(asObject);
 
   return normalizeAccessRequest(
-    await verifiableCredentialToDataset(asObject, { baseIRI: asObject.id }),
+    await verifiableCredentialToDataset(asObject, {
+      baseIRI: asObject.id,
+      includeVcProperties: true,
+    }),
   ) as unknown as AccessRequest;
 };
 
@@ -165,6 +168,7 @@ export const mockAccessGrantVc = async (
   return normalizeAccessGrant(
     await verifiableCredentialToDataset<VerifiableCredentialBase>(asObject, {
       baseIRI: asObject.id,
+      includeVcProperties: true,
     }),
   ) as unknown as AccessGrant;
 };

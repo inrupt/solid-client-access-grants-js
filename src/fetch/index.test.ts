@@ -21,7 +21,10 @@
 
 import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import { fetch as crossFetch, Response } from "@inrupt/universal-fetch";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  VerifiableCredential,
+  VerifiableCredentialBase,
+} from "@inrupt/solid-client-vc";
 import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 
 import base64url from "base64url";
@@ -138,9 +141,13 @@ describe("getUmaConfiguration", () => {
 describe("exchangeTicketForAccessToken", () => {
   let MOCK_VC: VerifiableCredential;
   beforeAll(async () => {
-    MOCK_VC = await verifiableCredentialToDataset(MOCK_VC_BASE, {
-      baseIRI: MOCK_VC_BASE.id,
-    });
+    MOCK_VC = await verifiableCredentialToDataset<VerifiableCredentialBase>(
+      MOCK_VC_BASE,
+      {
+        baseIRI: MOCK_VC_BASE.id,
+        includeVcProperties: true,
+      },
+    );
   });
 
   it("posts to the token endpoint and parses the resulting access token", async () => {
@@ -261,9 +268,13 @@ describe("boundFetch", () => {
 describe("fetchWithVc", () => {
   let MOCK_VC: VerifiableCredential;
   beforeAll(async () => {
-    MOCK_VC = await verifiableCredentialToDataset(MOCK_VC_BASE, {
-      baseIRI: MOCK_VC_BASE.id,
-    });
+    MOCK_VC = await verifiableCredentialToDataset<VerifiableCredentialBase>(
+      MOCK_VC_BASE,
+      {
+        baseIRI: MOCK_VC_BASE.id,
+        includeVcProperties: true,
+      },
+    );
   });
 
   // These tests may be fairly brittle due to the nature of the mocked calls.
