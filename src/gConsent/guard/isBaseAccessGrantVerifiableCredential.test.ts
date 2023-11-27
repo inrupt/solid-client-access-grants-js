@@ -20,7 +20,8 @@
 //
 
 import { it, describe, expect } from "@jest/globals";
-import { isBaseAccessGrantVerifiableCredential } from "./isBaseAccessGrantVerifiableCredential";
+import { isBaseAccessGrantVerifiableCredential, isRdfjsBaseAccessGrantVerifiableCredential } from "./isBaseAccessGrantVerifiableCredential";
+import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 
 const validAccessGrantVerifiableCredential = {
   "@context": [
@@ -55,45 +56,70 @@ const validAccessGrantVerifiableCredential = {
 };
 
 describe("isBaseAccessGrantVerifiableCredential", () => {
-  it("Returns true on valid Access Grant VC", () => {
+  it("Returns true on valid Access Grant VC", async () => {
     expect(
       isBaseAccessGrantVerifiableCredential(
         validAccessGrantVerifiableCredential,
       ),
     ).toBe(true);
+    expect(
+      isRdfjsBaseAccessGrantVerifiableCredential(
+        await verifiableCredentialToDataset(validAccessGrantVerifiableCredential),
+      ),
+    ).toBe(true);
   });
 
-  it("Returns false on invalid Access Grant VC", () => {
-    expect(
-      isBaseAccessGrantVerifiableCredential({
-        ...validAccessGrantVerifiableCredential,
-        credentialSubject: {
-          ...validAccessGrantVerifiableCredential.credentialSubject,
-          providedConsent: {
-            ...validAccessGrantVerifiableCredential.credentialSubject
-              .providedConsent,
-            forPersonalData: ["https://example.pod/resourceX", {}],
-          },
+  it("Returns false on invalid Access Grant VC", async () => {
+    const vc = {
+      ...validAccessGrantVerifiableCredential,
+      credentialSubject: {
+        ...validAccessGrantVerifiableCredential.credentialSubject,
+        providedConsent: {
+          ...validAccessGrantVerifiableCredential.credentialSubject
+            .providedConsent,
+          forPersonalData: ["https://example.pod/resourceX", {}],
         },
-      }),
+      },
+    }
+    expect(
+      isBaseAccessGrantVerifiableCredential(vc),
+    ).toBe(false);
+    expect(
+      isRdfjsBaseAccessGrantVerifiableCredential(await verifiableCredentialToDataset(vc)),
     ).toBe(false);
   });
 
-  it("Returns false on invalid issuance date", () => {
+  it("Returns false on invalid issuance date", async () => {
+    const vc = {
+      ...validAccessGrantVerifiableCredential,
+      issuanceDate: [],
+    };
     expect(
-      isBaseAccessGrantVerifiableCredential({
-        ...validAccessGrantVerifiableCredential,
-        issuanceDate: [],
-      }),
+      isBaseAccessGrantVerifiableCredential(vc),
+    ).toBe(false);
+    expect(
+      isRdfjsBaseAccessGrantVerifiableCredential(await verifiableCredentialToDataset(vc)),
     ).toBe(false);
   });
 
-  it("Returns true on undefined issuance date", () => {
+  it("Returns true on undefined issuance date", async () => {
+    const vc = {
+      ...validAccessGrantVerifiableCredential,
+      issuanceDate: undefined,
+    }
     expect(
-      isBaseAccessGrantVerifiableCredential({
-        ...validAccessGrantVerifiableCredential,
-        issuanceDate: undefined,
-      }),
+      isBaseAccessGrantVerifiableCredential(vc),
+    ).toBe(true);
+  });
+
+  // FIXME: Work out why undefined issuance dates are allowed when they are required in the VC type
+  it.skip("Returns true on undefined issuance date in RDFJS", async () => {
+    const vc = {
+      ...validAccessGrantVerifiableCredential,
+      issuanceDate: undefined,
+    }
+    expect(
+      isRdfjsBaseAccessGrantVerifiableCredential(await verifiableCredentialToDataset(vc)),
     ).toBe(true);
   });
 });

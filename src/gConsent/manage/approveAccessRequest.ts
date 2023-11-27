@@ -22,7 +22,7 @@
 import type { UrlString, WebId } from "@inrupt/solid-client";
 // eslint-disable-next-line camelcase
 import { acp_ess_2 } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { VerifiableCredential, VerifiableCredentialBase } from "@inrupt/solid-client-vc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
 import type { AccessGrantParameters } from "../type/Parameter";
@@ -58,7 +58,7 @@ export type ApproveAccessRequestOverrides = Omit<
  * @param accessGrant The grant returned by the VC issuer
  * @returns An equivalent JSON-LD document framed according to our typing.
  */
-export function normalizeAccessGrant<T extends VerifiableCredential>(
+export function normalizeAccessGrant<T extends VerifiableCredentialBase>(
   accessGrant: T,
 ): T {
   // Proper type checking is performed after normalization, so casting here is fine.

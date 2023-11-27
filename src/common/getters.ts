@@ -32,6 +32,7 @@ import {
   getIssuer,
   getIssuanceDate,
   getExpirationDate,
+  DatasetWithId,
 } from "@inrupt/solid-client-vc";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessRequestGConsent } from "../gConsent/type/AccessRequest";
@@ -127,7 +128,7 @@ export {
 /**
  * @internal
  */
-export function getConsent(vc: AccessGrantGConsent | AccessRequestGConsent) {
+export function getConsent(vc: DatasetWithId) {
   const credentialSubject = getCredentialSubject(vc);
   const consents = [
     ...vc.match(credentialSubject, gc.providedConsent, null, defaultGraph()),
@@ -160,7 +161,7 @@ export function getConsent(vc: AccessGrantGConsent | AccessRequestGConsent) {
  * @returns The resources IRIs
  */
 export function getResources(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
+  vc: DatasetWithId,
 ): string[] {
   const resources: string[] = [];
 
@@ -194,7 +195,7 @@ export function getResources(
  * @returns The purpose IRIs
  */
 export function getPurposes(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
+  vc: DatasetWithId,
 ): string[] {
   const consent = getConsent(vc);
   const purposes: string[] = [];
@@ -217,7 +218,7 @@ export function getPurposes(
 }
 
 export function isGConsentAccessGrant(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
+  vc: DatasetWithId,
 ): boolean {
   const credentialSubject = getCredentialSubject(vc);
   const providedConsent = getSingleObject(
@@ -263,10 +264,10 @@ export function isGConsentAccessGrant(
  */
 export function getResourceOwner(vc: AccessGrantGConsent): string;
 export function getResourceOwner(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
+  vc: DatasetWithId,
 ): string | undefined;
 export function getResourceOwner(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
+  vc: DatasetWithId,
 ): string | undefined {
   const credentialSubject = getCredentialSubject(vc);
   if (isGConsentAccessGrant(vc)) {
@@ -294,7 +295,7 @@ export function getResourceOwner(
  * @returns The requestor WebID
  */
 export function getRequestor(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
+  vc: DatasetWithId,
 ): string {
   const credentialSubject = getCredentialSubject(vc);
   const providedConsent = getSingleObject(
@@ -324,7 +325,7 @@ export function getRequestor(
  * @returns The access modes the grant recipient can exercise.
  */
 export function getAccessModes(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
+  vc: DatasetWithId,
 ): AccessModes {
   const consent = getConsent(vc);
   return {
@@ -357,7 +358,7 @@ const shorthand = {
  * @returns The VC types
  */
 export function getTypes(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
+  vc: DatasetWithId,
 ): string[] {
   const results = [
     ...vc.match(namedNode(getId(vc)), TYPE, undefined, defaultGraph()),
@@ -393,7 +394,7 @@ export function getTypes(
  * @returns true if the Grant applies to contained resources, false otherwise.
  */
 export function getInherit(
-  vc: AccessGrantGConsent | AccessRequestGConsent,
+  vc: DatasetWithId,
 ): boolean {
   return !vc.has(
     quad(
@@ -418,9 +419,9 @@ export function getInherit(
  * ```
  */
 export class AccessGrantWrapper {
-  private vc: AccessGrantGConsent | AccessRequestGConsent;
+  private vc: DatasetWithId;
 
-  constructor(vc: AccessGrantGConsent | AccessRequestGConsent) {
+  constructor(vc: DatasetWithId) {
     this.vc = vc;
   }
 

@@ -72,6 +72,7 @@ export function isRdfjsGConsentAttributes(
     if (
       ![acl.Append, acl.Read, acl.Write].some((mode) => mode.equals(object))
     ) {
+      console.log('mode issue')
       return false;
     }
   }
@@ -82,7 +83,7 @@ export function isRdfjsGConsentAttributes(
   ];
   if (
     statuses.length !== 1 ||
-    [
+    ![
       gc.ConsentStatusDenied,
       gc.ConsentStatusExplicitlyGiven,
       gc.ConsentStatusRequested,
@@ -97,7 +98,7 @@ export function isRdfjsGConsentAttributes(
     null,
     defaultGraph(),
   )) {
-    if (object.termType === "NamedNode") {
+    if (object.termType !== "NamedNode") {
       return false;
     }
   }

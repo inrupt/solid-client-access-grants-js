@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { VerifiableCredential, VerifiableCredentialBase } from "@inrupt/solid-client-vc";
 import { getRequestBody, issueAccessVc } from "../util/issueAccessVc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type {
@@ -41,7 +41,7 @@ import { gc } from "../../common/constants";
  * @param accessRequest The grant returned by the VC issuer
  * @returns An equivalent JSON-LD document framed according to our typing.
  */
-export function normalizeAccessRequest<T extends VerifiableCredential>(
+export function normalizeAccessRequest<T extends VerifiableCredentialBase>(
   accessRequest: T,
 ): T {
   // Proper type checking is performed after normalization, so casting here is fine.

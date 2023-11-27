@@ -26,8 +26,15 @@ import type {
   RequestCredentialSubject,
   RequestCredentialSubjectPayload,
 } from "../type/AccessVerifiableCredential";
-import { isGConsentAttributes } from "./isGConsentAttributes";
+import { isGConsentAttributes, isRdfjsGConsentAttributes } from "./isGConsentAttributes";
 import { isBaseAccessVcBody } from "./isBaseAccessVcBody";
+import { DatasetWithId, getCredentialSubject, getExpirationDate, getId, getIssuanceDate, getIssuer } from "@inrupt/solid-client-vc";
+import { TYPE, gc, solidVc } from "../../common/constants";
+import { DataFactory } from "n3";
+import { NamedNode } from "@rdfjs/types";
+import { getAccessModes, getResources } from "../../common";
+import { getConsent, getPurposes } from "../../common/getters";
+const { namedNode, quad } = DataFactory;
 
 function isGrantCredentialSubject(
   x:
@@ -47,4 +54,19 @@ export function isBaseAccessGrantVerifiableCredential(
     isGrantCredentialSubject(x.credentialSubject) &&
     isGConsentAttributes(x.credentialSubject.providedConsent)
   );
+}
+
+export function isRdfjsBaseAccessGrantVerifiableCredential(data: DatasetWithId) {
+  const s = namedNode(getId(data));
+  if(!data.has(quad(s, TYPE, solidVc.SolidAccessDenial)) && !data.has(quad(s, TYPE, solidVc.SolidAccessGrant)) && !data.has(quad(s, TYPE, solidVc.SolidAccessRequest))) {
+    return false;
+  }
+
+  // getConsent and getIssuanceDate can error
+  try {
+    getIssuanceDate(data);
+    return isRdfjsGConsentAttributes(data, getConsent(data))
+  } catch (e) {
+    return false;
+  }
 }

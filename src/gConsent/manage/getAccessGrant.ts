@@ -20,18 +20,31 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import {
-  isVerifiableCredential,
-  verifiableCredentialToDataset,
-} from "@inrupt/solid-client-vc";
-import { getSessionFetch } from "../../common/util/getSessionFetch";
+import { DatasetWithId, getVerifiableCredential } from "@inrupt/solid-client-vc";
+import { DataFactory } from "n3";
+import { isGConsentAccessGrant } from "../../common/getters";
 import { isAccessGrant } from "../guard/isAccessGrant";
-import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
+import { isBaseAccessGrantVerifiableCredential, isRdfjsBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrant } from "../type/AccessGrant";
 import { normalizeAccessGrant } from "./approveAccessRequest";
+const { namedNode } = DataFactory;
 
+/**
+ * Retrieve the Access Grant associated to the given URL.
+ *
+ * @param accessGrantVcUrl The URL of an access grant, with or without consent.
+ * @param options Optional properties to customise the request behaviour.
+ * @returns The Verifiable Credential associated to the given IRI, if it is an access grant. Throws otherwise.
+ * @since 0.4.0
+ * @deprecated set returnLegacyJsonld: false and use RDFJS API
+ */
+export async function getAccessGrant(
+  accessGrantVcUrl: UrlString | URL,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: true;
+  },
+): Promise<AccessGrant>
 /**
  * Retrieve the Access Grant associated to the given URL.
  *
@@ -42,38 +55,51 @@ import { normalizeAccessGrant } from "./approveAccessRequest";
  */
 export async function getAccessGrant(
   accessGrantVcUrl: UrlString | URL,
-  options?: AccessBaseOptions,
-): Promise<AccessGrant> {
-  const sessionFetch = await getSessionFetch(options ?? {});
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+  },
+): Promise<DatasetWithId>
+/**
+ * Retrieve the Access Grant associated to the given URL.
+ *
+ * @param accessGrantVcUrl The URL of an access grant, with or without consent.
+ * @param options Optional properties to customise the request behaviour.
+ * @returns The Verifiable Credential associated to the given IRI, if it is an access grant. Throws otherwise.
+ * @since 0.4.0
+ */
+export async function getAccessGrant(
+  accessGrantVcUrl: UrlString | URL,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+  },
+): Promise<DatasetWithId> {
   const vcUrl =
     typeof accessGrantVcUrl === "string"
       ? accessGrantVcUrl
       : accessGrantVcUrl.href;
-  const response = await sessionFetch(vcUrl);
-  if (!response.ok) {
-    throw new Error(
-      `Could not resolve [${vcUrl}]: ${response.status} ${response.statusText}`,
-    );
+  
+  if (options?.returnLegacyJsonld === false) {
+    const data = await getVerifiableCredential(vcUrl, {
+      fetch: options?.fetch,
+      returnLegacyJsonld: false
+    });
+
+    if (!isRdfjsBaseAccessGrantVerifiableCredential(data) || !isGConsentAccessGrant(data)) {
+      throw new Error(
+        `Unexpected response when resolving [${vcUrl}], the result is not an Access Grant: ${JSON.stringify(
+          data, null, 2
+        )}`,
+      );
+    }
+    return data;
   }
-  const responseErrorClone = await response.text();
-  let data;
-  try {
-    data = await verifiableCredentialToDataset<VerifiableCredential>(
-      normalizeAccessGrant(JSON.parse(responseErrorClone)),
-      {
-        baseIRI: accessGrantVcUrl.toString(),
-        includeVcProperties: true,
-      },
-    );
-  } catch (e) {
-    throw new Error(
-      `Unexpected response when resolving [${vcUrl}], the result is not a Verifiable Credential: ${responseErrorClone}.\n\nError details: ${e}`,
-    );
-  }
+
+  const data = await getVerifiableCredential(vcUrl, {
+    fetch: options?.fetch,
+    normalize: normalizeAccessGrant
+  });
   if (
-    !isVerifiableCredential(data) ||
-    !isBaseAccessGrantVerifiableCredential(data) ||
-    !isAccessGrant(data)
+    !isBaseAccessGrantVerifiableCredential(data) || !isAccessGrant(data)
   ) {
     throw new Error(
       `Unexpected response when resolving [${vcUrl}], the result is not an Access Grant: ${JSON.stringify(

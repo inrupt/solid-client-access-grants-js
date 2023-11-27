@@ -29,8 +29,13 @@ const XSD = "http://www.w3.org/2001/XMLSchema#";
 
 export const XSD_BOOLEAN = namedNode(`${XSD}boolean`);
 
-export const SOLID_ACCESS_GRANT = namedNode(`${VC}SolidAccessGrant`);
 export const TYPE = namedNode(rdf.type);
+
+export const solidVc = {
+  SolidAccessRequest: namedNode(`${VC}SolidAccessRequest`),
+  SolidAccessGrant: namedNode(`${VC}SolidAccessGrant`),
+  SolidAccessDenial: namedNode(`${VC}SolidAccessDenial`),
+}
 
 export const gc = {
   providedConsent: namedNode(`${GC}providedConsent`),
