@@ -35,7 +35,7 @@ export const solidVc = {
   SolidAccessRequest: namedNode(`${VC}SolidAccessRequest`),
   SolidAccessGrant: namedNode(`${VC}SolidAccessGrant`),
   SolidAccessDenial: namedNode(`${VC}SolidAccessDenial`),
-}
+};
 
 export const gc = {
   providedConsent: namedNode(`${GC}providedConsent`),

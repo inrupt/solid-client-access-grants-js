@@ -20,8 +20,11 @@
 //
 
 import { it, describe, expect } from "@jest/globals";
-import { isBaseAccessGrantVerifiableCredential, isRdfjsBaseAccessGrantVerifiableCredential } from "./isBaseAccessGrantVerifiableCredential";
 import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
+import {
+  isBaseAccessGrantVerifiableCredential,
+  isRdfjsBaseAccessGrantVerifiableCredential,
+} from "./isBaseAccessGrantVerifiableCredential";
 
 const validAccessGrantVerifiableCredential = {
   "@context": [
@@ -64,7 +67,9 @@ describe("isBaseAccessGrantVerifiableCredential", () => {
     ).toBe(true);
     expect(
       isRdfjsBaseAccessGrantVerifiableCredential(
-        await verifiableCredentialToDataset(validAccessGrantVerifiableCredential),
+        await verifiableCredentialToDataset(
+          validAccessGrantVerifiableCredential,
+        ),
       ),
     ).toBe(true);
   });
@@ -80,12 +85,12 @@ describe("isBaseAccessGrantVerifiableCredential", () => {
           forPersonalData: ["https://example.pod/resourceX", {}],
         },
       },
-    }
+    };
+    expect(isBaseAccessGrantVerifiableCredential(vc)).toBe(false);
     expect(
-      isBaseAccessGrantVerifiableCredential(vc),
-    ).toBe(false);
-    expect(
-      isRdfjsBaseAccessGrantVerifiableCredential(await verifiableCredentialToDataset(vc)),
+      isRdfjsBaseAccessGrantVerifiableCredential(
+        await verifiableCredentialToDataset(vc),
+      ),
     ).toBe(false);
   });
 
@@ -94,11 +99,11 @@ describe("isBaseAccessGrantVerifiableCredential", () => {
       ...validAccessGrantVerifiableCredential,
       issuanceDate: [],
     };
+    expect(isBaseAccessGrantVerifiableCredential(vc)).toBe(false);
     expect(
-      isBaseAccessGrantVerifiableCredential(vc),
-    ).toBe(false);
-    expect(
-      isRdfjsBaseAccessGrantVerifiableCredential(await verifiableCredentialToDataset(vc)),
+      isRdfjsBaseAccessGrantVerifiableCredential(
+        await verifiableCredentialToDataset(vc),
+      ),
     ).toBe(false);
   });
 
@@ -106,10 +111,8 @@ describe("isBaseAccessGrantVerifiableCredential", () => {
     const vc = {
       ...validAccessGrantVerifiableCredential,
       issuanceDate: undefined,
-    }
-    expect(
-      isBaseAccessGrantVerifiableCredential(vc),
-    ).toBe(true);
+    };
+    expect(isBaseAccessGrantVerifiableCredential(vc)).toBe(true);
   });
 
   // FIXME: Work out why undefined issuance dates are allowed when they are required in the VC type
@@ -117,9 +120,11 @@ describe("isBaseAccessGrantVerifiableCredential", () => {
     const vc = {
       ...validAccessGrantVerifiableCredential,
       issuanceDate: undefined,
-    }
+    };
     expect(
-      isRdfjsBaseAccessGrantVerifiableCredential(await verifiableCredentialToDataset(vc)),
+      isRdfjsBaseAccessGrantVerifiableCredential(
+        await verifiableCredentialToDataset(vc),
+      ),
     ).toBe(true);
   });
 });

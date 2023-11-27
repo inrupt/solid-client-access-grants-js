@@ -22,7 +22,10 @@
 import type { UrlString, WebId } from "@inrupt/solid-client";
 // eslint-disable-next-line camelcase
 import { acp_ess_2 } from "@inrupt/solid-client";
-import type { VerifiableCredential, VerifiableCredentialBase } from "@inrupt/solid-client-vc";
+import type {
+  VerifiableCredential,
+  VerifiableCredentialBase,
+} from "@inrupt/solid-client-vc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
 import type { AccessGrantParameters } from "../type/Parameter";

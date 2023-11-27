@@ -23,7 +23,7 @@ import type * as CrossFetch from "@inrupt/universal-fetch";
 import { Response } from "@inrupt/universal-fetch";
 import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 import { isomorphic } from "rdf-isomorphic";
-import { getResources } from "../../common/getters"
+import { getResources } from "../../common/getters";
 
 import {
   mockAccessGrantObject,
@@ -77,7 +77,7 @@ describe("getAccessGrant", () => {
       getAccessGrant("https://some.vc.url", {
         fetch: async () =>
           new Response("Not Found", { status: 404, statusText: "Not Found" }),
-          returnLegacyJsonld: false
+        returnLegacyJsonld: false,
       }),
     ).rejects.toThrow(
       "Fetching the Verifiable Credential [https://some.vc.url] failed: 404 Not Found",
@@ -95,7 +95,7 @@ describe("getAccessGrant", () => {
     await expect(
       getAccessGrant("https://some.vc.url", {
         fetch: async () => new Response("{'someKey': 'someValue'}"),
-        returnLegacyJsonld: false
+        returnLegacyJsonld: false,
       }),
     ).rejects.toThrow(
       "Parsing the Verifiable Credential [https://some.vc.url] as JSON failed",
@@ -104,9 +104,9 @@ describe("getAccessGrant", () => {
 
   it("throws if the given IRI does not resolve to a access grant Verifiable Credential", async () => {
     const fetchFn = async () =>
-    new Response(JSON.stringify(await mockAccessRequestVc()), {
-      headers: new Headers([["content-type", "application/json"]]),
-    })
+      new Response(JSON.stringify(await mockAccessRequestVc()), {
+        headers: new Headers([["content-type", "application/json"]]),
+      });
     await expect(
       getAccessGrant("https://some.vc.url", {
         fetch: fetchFn,
@@ -115,7 +115,7 @@ describe("getAccessGrant", () => {
     await expect(
       getAccessGrant("https://some.vc.url", {
         fetch: fetchFn,
-        returnLegacyJsonld: false
+        returnLegacyJsonld: false,
       }),
     ).rejects.toThrow(/not an Access Grant/);
   });
@@ -129,19 +129,24 @@ describe("getAccessGrant", () => {
       "https://w3id.org/GConsent#ConsentStatusDenied";
 
     const fetchFn = async () =>
-    new Response(JSON.stringify(mockedAccessGrant), {
-      headers: new Headers([["content-type", "application/json"]]),
-    });
+      new Response(JSON.stringify(mockedAccessGrant), {
+        headers: new Headers([["content-type", "application/json"]]),
+      });
 
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: fetchFn,
     });
-    const accessGrantNoProperties = await getAccessGrant("https://some.vc.url", {
-      fetch: fetchFn,
-      returnLegacyJsonld: false
-    });
+    const accessGrantNoProperties = await getAccessGrant(
+      "https://some.vc.url",
+      {
+        fetch: fetchFn,
+        returnLegacyJsonld: false,
+      },
+    );
     toBeEqual(accessGrant, mockedAccessGrant);
-    expect(isomorphic([...accessGrant], [...accessGrantNoProperties])).toBe(true);
+    expect(isomorphic([...accessGrant], [...accessGrantNoProperties])).toBe(
+      true,
+    );
   });
 
   // There is an expect call in the `toBeEqual` function,
@@ -163,112 +168,138 @@ describe("getAccessGrant", () => {
   it("normalizes equivalent JSON-LD VCs", async () => {
     const normalizedAccessGrant = mockAccessGrantObject();
     const fetchFn = async () =>
-    new Response(
-      JSON.stringify({
-        ...normalizedAccessGrant,
-        credentialSubject: {
-          ...normalizedAccessGrant.credentialSubject,
-          providedConsent: {
-            ...normalizedAccessGrant.credentialSubject.providedConsent,
-            // The 1-value array is replaced by the literal value.
-            forPersonalData:
-              normalizedAccessGrant.credentialSubject.providedConsent
-                .forPersonalData[0],
-            mode: normalizedAccessGrant.credentialSubject.providedConsent
-              .mode[0],
-            inherit: "true",
+      new Response(
+        JSON.stringify({
+          ...normalizedAccessGrant,
+          credentialSubject: {
+            ...normalizedAccessGrant.credentialSubject,
+            providedConsent: {
+              ...normalizedAccessGrant.credentialSubject.providedConsent,
+              // The 1-value array is replaced by the literal value.
+              forPersonalData:
+                normalizedAccessGrant.credentialSubject.providedConsent
+                  .forPersonalData[0],
+              mode: normalizedAccessGrant.credentialSubject.providedConsent
+                .mode[0],
+              inherit: "true",
+            },
           },
+        }),
+        {
+          headers: new Headers([["content-type", "application/json"]]),
         },
-      }),
-      {
-        headers: new Headers([["content-type", "application/json"]]),
-      },
-    );
-    
+      );
+
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       // The server returns an equivalent JSON-LD with a different frame:
       fetch: fetchFn,
     });
-    toBeEqual(
-      accessGrant,
-      mockAccessGrant,
-    );
-    expect(accessGrant.credentialSubject.providedConsent.forPersonalData).toEqual(["https://some.resource"]);
+    toBeEqual(accessGrant, mockAccessGrant);
+    expect(
+      accessGrant.credentialSubject.providedConsent.forPersonalData,
+    ).toEqual(["https://some.resource"]);
     expect(getResources(accessGrant)).toEqual(["https://some.resource"]);
 
-    const accessGrantNoProperties = await getAccessGrant(new URL("https://some.vc.url"), {
-      fetch: fetchFn,
-      returnLegacyJsonld: false
-    });
+    const accessGrantNoProperties = await getAccessGrant(
+      new URL("https://some.vc.url"),
+      {
+        fetch: fetchFn,
+        returnLegacyJsonld: false,
+      },
+    );
     // @ts-expect-error no object properties should be available
     expect(accessGrantNoProperties.credentialSubject).toBeUndefined();
-    expect(getResources(accessGrantNoProperties)).toEqual(["https://some.resource"]);
+    expect(getResources(accessGrantNoProperties)).toEqual([
+      "https://some.resource",
+    ]);
 
-    expect(isomorphic([...accessGrant], [...accessGrantNoProperties])).toBe(true);
+    expect(isomorphic([...accessGrant], [...accessGrantNoProperties])).toBe(
+      true,
+    );
   });
 
   // There is an expect call in the `toBeEqual` function,
   // but the linter doesn't pick up on this.
   // eslint-disable-next-line jest/expect-expect
   it("returns the access grant with the given URL object", async () => {
-    const mockedFetch = jest.fn<typeof fetch>(async () => new Response(JSON.stringify(mockAccessGrantObject()), {
-      headers: new Headers([["content-type", "application/json"]]),
-    }));
+    const mockedFetch = jest.fn<typeof fetch>(
+      async () =>
+        new Response(JSON.stringify(mockAccessGrantObject()), {
+          headers: new Headers([["content-type", "application/json"]]),
+        }),
+    );
 
     const accessGrant = await getAccessGrant(new URL("https://some.vc.url"), {
       fetch: mockedFetch,
     });
     toBeEqual(accessGrant, mockAccessGrant);
-    expect(accessGrant.credentialSubject.providedConsent.forPersonalData).toEqual(["https://some.resource"]);
+    expect(
+      accessGrant.credentialSubject.providedConsent.forPersonalData,
+    ).toEqual(["https://some.resource"]);
     expect(getResources(accessGrant)).toEqual(["https://some.resource"]);
 
-    const accessGrantNoProperties = await getAccessGrant(new URL("https://some.vc.url"), {
-      fetch: mockedFetch,
-      returnLegacyJsonld: false
-    });
+    const accessGrantNoProperties = await getAccessGrant(
+      new URL("https://some.vc.url"),
+      {
+        fetch: mockedFetch,
+        returnLegacyJsonld: false,
+      },
+    );
     // @ts-expect-error no object properties should be available
     expect(accessGrantNoProperties.credentialSubject).toBeUndefined();
-    expect(getResources(accessGrantNoProperties)).toEqual(["https://some.resource"]);
+    expect(getResources(accessGrantNoProperties)).toEqual([
+      "https://some.resource",
+    ]);
 
-    expect(isomorphic([...accessGrant], [...accessGrantNoProperties])).toBe(true);
+    expect(isomorphic([...accessGrant], [...accessGrantNoProperties])).toBe(
+      true,
+    );
   });
 
   it("errors if the response is not a full access grant", async () => {
     const fetchFn = async () =>
-    new Response(
-      JSON.stringify({
-        "@context": "https://www.w3.org/2018/credentials/v1",
-        id: "https://some.credential",
-      }),
-    )
+      new Response(
+        JSON.stringify({
+          "@context": "https://www.w3.org/2018/credentials/v1",
+          id: "https://some.credential",
+        }),
+      );
     await expect(
       getAccessGrant(new URL("https://some.vc.url"), {
         fetch: fetchFn,
       }),
-    ).rejects.toThrow("The value received from [https://some.vc.url/] is not a Verifiable Credential");
+    ).rejects.toThrow(
+      "The value received from [https://some.vc.url/] is not a Verifiable Credential",
+    );
     await expect(
       getAccessGrant(new URL("https://some.vc.url"), {
         fetch: fetchFn,
-        returnLegacyJsonld: false
+        returnLegacyJsonld: false,
       }),
-    ).rejects.toThrow("The value received from [https://some.vc.url/] is not a Verifiable Credential");
+    ).rejects.toThrow(
+      "The value received from [https://some.vc.url/] is not a Verifiable Credential",
+    );
   });
 
   it("errors if the response is an empty json object", async () => {
     const fetchFn = async () =>
-    new Response(JSON.stringify({}), {
-      headers: new Headers([["content-type", "application/json"]]),
-    });
+      new Response(JSON.stringify({}), {
+        headers: new Headers([["content-type", "application/json"]]),
+      });
     await expect(
       getAccessGrant(new URL("https://some.vc.url"), {
         fetch: fetchFn,
       }),
-    ).rejects.toThrow("The value received from [https://some.vc.url/] is not a Verifiable Credential");
+    ).rejects.toThrow(
+      "The value received from [https://some.vc.url/] is not a Verifiable Credential",
+    );
     await expect(
       getAccessGrant(new URL("https://some.vc.url"), {
         fetch: fetchFn,
-        returnLegacyJsonld: false
+        returnLegacyJsonld: false,
       }),
-    ).rejects.toThrow("Verifiable credential is not an object, or does not have an id");
+    ).rejects.toThrow(
+      "Verifiable credential is not an object, or does not have an id",
+    );
   });
 });

@@ -18,6 +18,14 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+import type { DatasetWithId } from "@inrupt/solid-client-vc";
+import {
+  getCredentialSubject,
+  getExpirationDate,
+  getId,
+  getIssuanceDate,
+  getIssuer,
+} from "@inrupt/solid-client-vc";
 import type {
   BlankNode,
   DatasetCore,
@@ -26,18 +34,9 @@ import type {
   Term,
 } from "@rdfjs/types";
 import { DataFactory } from "n3";
-import {
-  getId,
-  getCredentialSubject,
-  getIssuer,
-  getIssuanceDate,
-  getExpirationDate,
-  DatasetWithId,
-} from "@inrupt/solid-client-vc";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
-import type { AccessRequestGConsent } from "../gConsent/type/AccessRequest";
 import type { AccessModes } from "../type/AccessModes";
-import { INHERIT, XSD_BOOLEAN, gc, acl, TYPE } from "./constants";
+import { INHERIT, TYPE, XSD_BOOLEAN, acl, gc } from "./constants";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
@@ -118,11 +117,11 @@ function getSingleObject(
   return object;
 }
 export {
-  getId,
-  getIssuer,
-  getIssuanceDate,
   getCredentialSubject,
   getExpirationDate,
+  getId,
+  getIssuanceDate,
+  getIssuer,
 };
 
 /**
@@ -160,9 +159,7 @@ export function getConsent(vc: DatasetWithId) {
  * @param vc The Access Grant/Request
  * @returns The resources IRIs
  */
-export function getResources(
-  vc: DatasetWithId,
-): string[] {
+export function getResources(vc: DatasetWithId): string[] {
   const resources: string[] = [];
 
   for (const { object } of vc.match(
@@ -194,9 +191,7 @@ export function getResources(
  * @param vc The Access Grant/Request
  * @returns The purpose IRIs
  */
-export function getPurposes(
-  vc: DatasetWithId,
-): string[] {
+export function getPurposes(vc: DatasetWithId): string[] {
   const consent = getConsent(vc);
   const purposes: string[] = [];
 
@@ -217,9 +212,7 @@ export function getPurposes(
   return purposes;
 }
 
-export function isGConsentAccessGrant(
-  vc: DatasetWithId,
-): boolean {
+export function isGConsentAccessGrant(vc: DatasetWithId): boolean {
   const credentialSubject = getCredentialSubject(vc);
   const providedConsent = getSingleObject(
     vc,
@@ -263,12 +256,8 @@ export function isGConsentAccessGrant(
  * @returns The resource owner WebID
  */
 export function getResourceOwner(vc: AccessGrantGConsent): string;
-export function getResourceOwner(
-  vc: DatasetWithId,
-): string | undefined;
-export function getResourceOwner(
-  vc: DatasetWithId,
-): string | undefined {
+export function getResourceOwner(vc: DatasetWithId): string | undefined;
+export function getResourceOwner(vc: DatasetWithId): string | undefined {
   const credentialSubject = getCredentialSubject(vc);
   if (isGConsentAccessGrant(vc)) {
     return credentialSubject.value;
@@ -294,9 +283,7 @@ export function getResourceOwner(
  * @param vc The Access Grant/Request
  * @returns The requestor WebID
  */
-export function getRequestor(
-  vc: DatasetWithId,
-): string {
+export function getRequestor(vc: DatasetWithId): string {
   const credentialSubject = getCredentialSubject(vc);
   const providedConsent = getSingleObject(
     vc,
@@ -324,9 +311,7 @@ export function getRequestor(
  * @param vc The Access Grant/Request
  * @returns The access modes the grant recipient can exercise.
  */
-export function getAccessModes(
-  vc: DatasetWithId,
-): AccessModes {
+export function getAccessModes(vc: DatasetWithId): AccessModes {
   const consent = getConsent(vc);
   return {
     read: vc.has(quad(consent, acl.mode, acl.Read, defaultGraph())),
@@ -357,9 +342,7 @@ const shorthand = {
  * @param vc The Access Grant/Request
  * @returns The VC types
  */
-export function getTypes(
-  vc: DatasetWithId,
-): string[] {
+export function getTypes(vc: DatasetWithId): string[] {
   const results = [
     ...vc.match(namedNode(getId(vc)), TYPE, undefined, defaultGraph()),
   ].map((res) => res.object);
@@ -393,9 +376,7 @@ export function getTypes(
  * @param vc The Access Grant/Request
  * @returns true if the Grant applies to contained resources, false otherwise.
  */
-export function getInherit(
-  vc: DatasetWithId,
-): boolean {
+export function getInherit(vc: DatasetWithId): boolean {
   return !vc.has(
     quad(
       getConsent(vc),

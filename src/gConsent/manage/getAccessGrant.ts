@@ -20,15 +20,17 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import { DatasetWithId, getVerifiableCredential } from "@inrupt/solid-client-vc";
-import { DataFactory } from "n3";
+import type { DatasetWithId } from "@inrupt/solid-client-vc";
+import { getVerifiableCredential } from "@inrupt/solid-client-vc";
 import { isGConsentAccessGrant } from "../../common/getters";
 import { isAccessGrant } from "../guard/isAccessGrant";
-import { isBaseAccessGrantVerifiableCredential, isRdfjsBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
+import {
+  isBaseAccessGrantVerifiableCredential,
+  isRdfjsBaseAccessGrantVerifiableCredential,
+} from "../guard/isBaseAccessGrantVerifiableCredential";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrant } from "../type/AccessGrant";
 import { normalizeAccessGrant } from "./approveAccessRequest";
-const { namedNode } = DataFactory;
 
 /**
  * Retrieve the Access Grant associated to the given URL.
@@ -44,7 +46,7 @@ export async function getAccessGrant(
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
   },
-): Promise<AccessGrant>
+): Promise<AccessGrant>;
 /**
  * Retrieve the Access Grant associated to the given URL.
  *
@@ -58,7 +60,7 @@ export async function getAccessGrant(
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
   },
-): Promise<DatasetWithId>
+): Promise<DatasetWithId>;
 /**
  * Retrieve the Access Grant associated to the given URL.
  *
@@ -77,17 +79,22 @@ export async function getAccessGrant(
     typeof accessGrantVcUrl === "string"
       ? accessGrantVcUrl
       : accessGrantVcUrl.href;
-  
+
   if (options?.returnLegacyJsonld === false) {
     const data = await getVerifiableCredential(vcUrl, {
       fetch: options?.fetch,
-      returnLegacyJsonld: false
+      returnLegacyJsonld: false,
     });
 
-    if (!isRdfjsBaseAccessGrantVerifiableCredential(data) || !isGConsentAccessGrant(data)) {
+    if (
+      !isRdfjsBaseAccessGrantVerifiableCredential(data) ||
+      !isGConsentAccessGrant(data)
+    ) {
       throw new Error(
         `Unexpected response when resolving [${vcUrl}], the result is not an Access Grant: ${JSON.stringify(
-          data, null, 2
+          data,
+          null,
+          2,
         )}`,
       );
     }
@@ -96,11 +103,9 @@ export async function getAccessGrant(
 
   const data = await getVerifiableCredential(vcUrl, {
     fetch: options?.fetch,
-    normalize: normalizeAccessGrant
+    normalize: normalizeAccessGrant,
   });
-  if (
-    !isBaseAccessGrantVerifiableCredential(data) || !isAccessGrant(data)
-  ) {
+  if (!isBaseAccessGrantVerifiableCredential(data) || !isAccessGrant(data)) {
     throw new Error(
       `Unexpected response when resolving [${vcUrl}], the result is not an Access Grant: ${JSON.stringify(
         data,

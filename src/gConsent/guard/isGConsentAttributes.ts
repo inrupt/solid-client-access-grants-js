@@ -72,7 +72,6 @@ export function isRdfjsGConsentAttributes(
     if (
       ![acl.Append, acl.Read, acl.Write].some((mode) => mode.equals(object))
     ) {
-      console.log('mode issue')
       return false;
     }
   }
