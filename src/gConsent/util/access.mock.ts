@@ -37,6 +37,7 @@ import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import type { AccessGrant } from "../type/AccessGrant";
 import type { AccessRequest } from "../type/AccessRequest";
 import type {
+  AccessRequestBody,
   BaseGrantBody,
   BaseRequestBody,
 } from "../type/AccessVerifiableCredential";
@@ -105,15 +106,15 @@ export const mockAccessRequestVc = async (
   options?: RequestVcOptions,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   modify?: (asObject: Record<string, any>) => void,
-): Promise<AccessRequest & DatasetCore<Quad, Quad>> => {
+): Promise<AccessRequest> => {
   const asObject = mockAccessRequestVcObject(options) as VerifiableCredential;
   modify?.(asObject);
 
-  return normalizeAccessRequest(
-    await verifiableCredentialToDataset(asObject, {
+  return (
+    await verifiableCredentialToDataset(normalizeAccessRequest(asObject), {
       baseIRI: asObject.id,
       includeVcProperties: true,
-    }),
+    })
   ) as unknown as AccessRequest;
 };
 
@@ -165,18 +166,18 @@ export const mockAccessGrantVc = async (
   const asObject = mockAccessGrantObject(options);
   modify?.(asObject);
 
-  return normalizeAccessGrant(
-    await verifiableCredentialToDataset<VerifiableCredentialBase>(asObject, {
+  return (
+    await verifiableCredentialToDataset(normalizeAccessGrant(asObject), {
       baseIRI: asObject.id,
       includeVcProperties: true,
-    }),
+    })
   ) as unknown as AccessGrant;
 };
 
 export const mockConsentRequestVc = async (
   options?: RequestVcOptions,
 ): Promise<
-  VerifiableCredential & BaseRequestBody & DatasetCore<Quad, Quad>
+  AccessRequest
 > => {
   const requestVc = await mockAccessRequestVc(options, (object) => {
     object.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
@@ -193,7 +194,7 @@ export const mockConsentGrantVc = async (
     inherit: boolean;
     resources: string[];
   }>,
-): Promise<VerifiableCredential & BaseGrantBody & DatasetCore<Quad, Quad>> => {
+): Promise<AccessGrant> => {
   const requestVc = await mockAccessGrantVc(options, (object) => {
     object.credentialSubject.providedConsent.forPurpose = [
       "https://some.purpose",

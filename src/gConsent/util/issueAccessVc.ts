@@ -19,7 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  VerifiableCredential,
+  VerifiableCredentialBase,
+  DatasetWithId,
+} from "@inrupt/solid-client-vc";
 import { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   ACCESS_GRANT_CONTEXT_DEFAULT,
@@ -150,10 +154,31 @@ export function getGrantBody(params: AccessGrantParameters): AccessGrantBody {
   return getBaseBody(params, "BaseGrantBody") as AccessGrantBody;
 }
 
+/**
+ * @deprecated Use RDFJS API
+ */
 export async function issueAccessVc(
   vcBody: BaseRequestBody | BaseGrantBody,
-  options: AccessBaseOptions,
-): Promise<VerifiableCredential> {
+  options: AccessBaseOptions & {
+    returnLegacyJsonld?: true;
+    normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
+  },
+): Promise<VerifiableCredential>;
+export async function issueAccessVc(
+  vcBody: BaseRequestBody | BaseGrantBody,
+  // FIXME: Improve the type
+  options: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+    normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
+  },
+): Promise<DatasetWithId>;
+export async function issueAccessVc(
+  vcBody: BaseRequestBody | BaseGrantBody,
+  options: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+    normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
+  },
+): Promise<DatasetWithId> {
   const fetcher = await getSessionFetch(options);
   const targetResourceIri = isBaseRequest(vcBody)
     ? vcBody.credentialSubject.hasConsent.forPersonalData[0]
@@ -188,6 +213,8 @@ export async function issueAccessVc(
     },
     {
       fetch: fetcher,
+      returnLegacyJsonld: options.returnLegacyJsonld,
+      normalize: options.normalize,
     },
   );
 }

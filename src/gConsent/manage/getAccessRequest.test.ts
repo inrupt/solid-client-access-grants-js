@@ -22,9 +22,11 @@
 import { describe, it, jest, expect, beforeEach } from "@jest/globals";
 import * as VcModule from "@inrupt/solid-client-vc";
 import { fetch } from "@inrupt/universal-fetch";
+import { isomorphic } from "rdf-isomorphic";
 import { getAccessRequest } from "./getAccessRequest";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import type { getSessionFetch } from "../../common/util/getSessionFetch";
+import { normalizeAccessRequest } from "../request/issueAccessRequest";
 
 jest.mock("../../common/util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {
@@ -60,6 +62,19 @@ describe("getAccessRequest", () => {
       (VcModule as jest.Mocked<typeof VcModule>).getVerifiableCredential,
     ).toHaveBeenCalledWith("https://some.vc", {
       fetch: mockedFetch,
+      normalize: normalizeAccessRequest,
+    });
+  });
+
+  it("uses the default fetch if none is provided [returnLegacyJsonld: false]", async () => {
+    await getAccessRequest("https://some.vc", {
+      returnLegacyJsonld: false,
+    });
+    expect(
+      (VcModule as jest.Mocked<typeof VcModule>).getVerifiableCredential,
+    ).toHaveBeenCalledWith("https://some.vc", {
+      fetch: mockedFetch,
+      returnLegacyJsonld: false,
     });
   });
 
@@ -71,6 +86,20 @@ describe("getAccessRequest", () => {
       (VcModule as jest.Mocked<typeof VcModule>).getVerifiableCredential,
     ).toHaveBeenCalledWith("https://some.vc", {
       fetch: mockedFetch,
+      normalize: normalizeAccessRequest,
+    });
+  });
+
+  it("uses the provided fetch if any [returnLegacyJsonld: false]", async () => {
+    await getAccessRequest("https://some.vc", {
+      fetch: mockedFetch,
+      returnLegacyJsonld: false,
+    });
+    expect(
+      (VcModule as jest.Mocked<typeof VcModule>).getVerifiableCredential,
+    ).toHaveBeenCalledWith("https://some.vc", {
+      fetch: mockedFetch,
+      returnLegacyJsonld: false,
     });
   });
 
@@ -88,16 +117,18 @@ describe("getAccessRequest", () => {
   it("throws if the fetched VC is not an Access Request", async () => {
     (
       VcModule as jest.Mocked<typeof VcModule>
-    ).getVerifiableCredential.mockResolvedValueOnce(accessGrantVc);
+    ).getVerifiableCredential.mockResolvedValue(accessGrantVc);
     await expect(getAccessRequest("https://some.vc")).rejects.toThrow();
+    await expect(
+      getAccessRequest("https://some.vc", {
+        returnLegacyJsonld: false,
+      }),
+    ).rejects.toThrow();
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
     const normalizedAccessRequest = accessRequestVc;
-    // The server returns an equivalent JSON-LD with a different frame:
-    (
-      VcModule as jest.Mocked<typeof VcModule>
-    ).getVerifiableCredential.mockResolvedValueOnce({
+    const vc = {
       ...normalizedAccessRequest,
       credentialSubject: {
         ...normalizedAccessRequest.credentialSubject,
@@ -110,8 +141,30 @@ describe("getAccessRequest", () => {
           mode: normalizedAccessRequest.credentialSubject.hasConsent.mode[0],
         },
       },
-    } as any);
+    };
+    // The server returns an equivalent JSON-LD with a different frame:
+    (
+      VcModule as jest.Mocked<typeof VcModule>
+    ).getVerifiableCredential.mockImplementation(async (_, opts) =>
+      opts && "normalize" in opts && opts.normalize
+        ? opts.normalize(vc)
+        : (vc as any),
+    );
+
     const accessRequest = await getAccessRequest("https://some.vc");
+    const accessRequestNoProperties = await getAccessRequest("https://some.vc", {
+      returnLegacyJsonld: false,
+    });
     expect(accessRequest).toStrictEqual(accessRequestVc);
+    expect(
+      isomorphic(
+        [...accessRequest],
+        [
+          ...accessRequestNoProperties,
+        ],
+      ),
+    ).toBe(true);
+
+    expect(accessRequest.credentialSubject.providedConsent)
   });
 });

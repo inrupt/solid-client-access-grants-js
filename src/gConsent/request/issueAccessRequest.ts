@@ -22,6 +22,7 @@
 import type {
   VerifiableCredential,
   VerifiableCredentialBase,
+  DatasetWithId,
 } from "@inrupt/solid-client-vc";
 import { getRequestBody, issueAccessVc } from "../util/issueAccessVc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
@@ -76,29 +77,52 @@ export function normalizeAccessRequest<T extends VerifiableCredentialBase>(
  * @param options Optional properties to customize the access request behavior.
  * @returns A signed Verifiable Credential representing the access request.
  * @since 0.4.0
+ * @deprecated Use RDFJS API
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options?: AccessBaseOptions,
+  options?: AccessBaseOptions & { returnLegacyJsonld?: true },
 ): Promise<AccessRequest>;
 /**
  * @deprecated Please remove the `requestor` parameter.
  */
 async function issueAccessRequest(
   params: DeprecatedAccessRequestParameters,
-  options?: AccessBaseOptions,
+  options?: AccessBaseOptions & { returnLegacyJsonld?: boolean },
 ): Promise<AccessRequest>;
+/**
+ * Request access to a given Resource.
+ *
+ * @param params Access to request.
+ * @param options Optional properties to customize the access request behavior.
+ * @returns A signed Verifiable Credential representing the access request.
+ * @since 0.4.0
+ */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options: AccessBaseOptions = {},
-): Promise<AccessRequest> {
+  options?: AccessBaseOptions & { returnLegacyJsonld?: boolean },
+): Promise<DatasetWithId>;
+async function issueAccessRequest(
+  params: IssueAccessRequestParameters,
+  options: AccessBaseOptions & { returnLegacyJsonld?: boolean } = {},
+): Promise<DatasetWithId> {
   const requestBody = getRequestBody({
     ...params,
     status: gc.ConsentStatusRequested.value,
   });
-  const accessRequest = normalizeAccessRequest(
-    await issueAccessVc(requestBody, options),
-  );
+
+  if (options.returnLegacyJsonld === false) {
+    const accessRequest = await issueAccessVc(requestBody, {
+      ...options,
+      returnLegacyJsonld: false,
+    });
+    return accessRequest;
+  }
+
+  const accessRequest = await issueAccessVc(requestBody, {
+    ...options,
+    normalize: normalizeAccessRequest,
+  });
   if (!isAccessRequest(accessRequest)) {
     throw new Error(
       `${JSON.stringify(accessRequest)} is not an Access Request`,

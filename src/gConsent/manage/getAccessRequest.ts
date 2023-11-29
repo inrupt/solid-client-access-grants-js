@@ -19,8 +19,12 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 import type { UrlString } from "@inrupt/solid-client";
+import type { DatasetWithId } from "@inrupt/solid-client-vc";
 import { getVerifiableCredential } from "@inrupt/solid-client-vc";
-import { isAccessRequest } from "../guard/isAccessRequest";
+import {
+  isAccessRequest,
+  isRdfjsAccessRequest,
+} from "../guard/isAccessRequest";
 import type { AccessRequest } from "../type/AccessRequest";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { normalizeAccessRequest } from "../request/issueAccessRequest";
@@ -34,20 +38,62 @@ import { normalizeAccessRequest } from "../request/issueAccessRequest";
  * from @inrupt/solid-client-authn-browser will be used if available.
  * @returns An Access Request.
  * @since 2.4.0
+ * @deprecated Use RDFJS API
  */
 export async function getAccessRequest(
   url: UrlString | URL,
-  options: { fetch?: typeof fetch } = {},
-): Promise<AccessRequest> {
-  const accessRequest = normalizeAccessRequest(
-    await getVerifiableCredential(url.toString(), {
+  options?: { fetch?: typeof fetch; returnLegacyJsonld?: true },
+): Promise<AccessRequest>;
+/**
+ * Fetch the Access Request from the given URL.
+ *
+ * @param url The URL of the Access Request.
+ * @param options Optional properties to customise the behaviour:
+ * - fetch: an authenticated fetch function. If not provided, the default session
+ * from @inrupt/solid-client-authn-browser will be used if available.
+ * @returns An Access Request.
+ * @since 2.4.0
+ */
+export async function getAccessRequest(
+  url: UrlString | URL,
+  options?: { fetch?: typeof fetch; returnLegacyJsonld?: boolean },
+): Promise<DatasetWithId>;
+/**
+ * Fetch the Access Request from the given URL.
+ *
+ * @param url The URL of the Access Request.
+ * @param options Optional properties to customise the behaviour:
+ * - fetch: an authenticated fetch function. If not provided, the default session
+ * from @inrupt/solid-client-authn-browser will be used if available.
+ * @returns An Access Request.
+ * @since 2.4.0
+ */
+export async function getAccessRequest(
+  url: UrlString | URL,
+  options: { fetch?: typeof fetch; returnLegacyJsonld?: boolean } = {},
+): Promise<DatasetWithId> {
+  if (options?.returnLegacyJsonld === false) {
+    const accessRequest = await getVerifiableCredential(url.toString(), {
       fetch: options.fetch ?? (await getSessionFetch(options)),
-    }),
-  );
+      returnLegacyJsonld: false,
+    });
+
+    if (!isRdfjsAccessRequest(accessRequest)) {
+      throw new Error(
+        `${JSON.stringify(accessRequest)} is not an Access Request`,
+      );
+    }
+    return accessRequest;
+  }
+
+  const accessRequest = await getVerifiableCredential(url.toString(), {
+    fetch: options.fetch ?? (await getSessionFetch(options)),
+    normalize: normalizeAccessRequest,
+  });
 
   if (!isAccessRequest(accessRequest)) {
     throw new Error(
-      `${JSON.stringify(accessRequest)} is not an Access Request`,
+      `${JSON.stringify(accessRequest, null, 2)} is not an Access Request`,
     );
   }
   return accessRequest;

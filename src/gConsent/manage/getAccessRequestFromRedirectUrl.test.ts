@@ -19,13 +19,12 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type {
-  VerifiableCredential,
-  getVerifiableCredential,
-} from "@inrupt/solid-client-vc";
+import type { getVerifiableCredential } from "@inrupt/solid-client-vc";
 import { fetch } from "@inrupt/universal-fetch";
-import { describe, expect, it, jest, beforeEach } from "@jest/globals";
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
+import { isomorphic } from "rdf-isomorphic";
 import type { getSessionFetch } from "../../common/util/getSessionFetch";
+import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import { getAccessRequestFromRedirectUrl } from "./getAccessRequestFromRedirectUrl";
 
@@ -73,12 +72,22 @@ describe("getAccessRequestFromRedirectUrl", () => {
     await expect(
       getAccessRequestFromRedirectUrl(redirectedToUrl.href),
     ).rejects.toThrow(/https:\/\/redirect.url.*requestVcUrl/);
+    await expect(
+      getAccessRequestFromRedirectUrl(redirectedToUrl.href, {
+        returnLegacyJsonld: false,
+      }),
+    ).rejects.toThrow(/https:\/\/redirect.url.*requestVcUrl/);
   });
 
   it("throws if the redirectUrl query parameter is missing", async () => {
     redirectedToUrl.searchParams.delete("redirectUrl");
     await expect(
       getAccessRequestFromRedirectUrl(redirectedToUrl.href),
+    ).rejects.toThrow(/https:\/\/redirect.url.*redirectUrl/);
+    await expect(
+      getAccessRequestFromRedirectUrl(redirectedToUrl.href, {
+        returnLegacyJsonld: false,
+      }),
     ).rejects.toThrow(/https:\/\/redirect.url.*redirectUrl/);
   });
 
@@ -90,6 +99,21 @@ describe("getAccessRequestFromRedirectUrl", () => {
       "https://some.vc",
       {
         fetch: mockedFetch,
+        normalize: normalizeAccessRequest,
+      },
+    );
+  });
+
+  it("uses the default fetch if none is provided [returnLegacyJsonld: false]", async () => {
+    await getAccessRequestFromRedirectUrl(redirectedToUrl.href, {
+      fetch: mockedFetch,
+      returnLegacyJsonld: false,
+    });
+    expect(vcModule.getVerifiableCredential).toHaveBeenCalledWith(
+      "https://some.vc",
+      {
+        fetch: mockedFetch,
+        returnLegacyJsonld: false,
       },
     );
   });
@@ -102,6 +126,21 @@ describe("getAccessRequestFromRedirectUrl", () => {
       "https://some.vc",
       {
         fetch: mockedFetch,
+        normalize: normalizeAccessRequest,
+      },
+    );
+  });
+
+  it("uses the provided fetch if any [returnLegacyJsonld: false]", async () => {
+    await getAccessRequestFromRedirectUrl(redirectedToUrl.href, {
+      fetch: mockedFetch,
+      returnLegacyJsonld: false,
+    });
+    expect(vcModule.getVerifiableCredential).toHaveBeenCalledWith(
+      "https://some.vc",
+      {
+        fetch: mockedFetch,
+        returnLegacyJsonld: false,
       },
     );
   });
@@ -127,6 +166,31 @@ describe("getAccessRequestFromRedirectUrl", () => {
     expect(requestorRedirectUrl).toBe("https://requestor.redirect.url");
   });
 
+  it("returns the fetched VC and the redirect URL  [returnLegacyJsonld: false]", async () => {
+    // Check that both URL strings and objects are supported.
+    const accessRequestFromString = await getAccessRequestFromRedirectUrl(
+      redirectedToUrl.href,
+    );
+    const accessRequestFromUrl = await getAccessRequestFromRedirectUrl(
+      redirectedToUrl,
+      {
+        returnLegacyJsonld: false,
+      },
+    );
+
+    expect(accessRequestFromString.accessRequest).toStrictEqual(
+      accessRequestFromUrl.accessRequest,
+    );
+    expect(accessRequestFromString.requestorRedirectUrl).toBe(
+      accessRequestFromUrl.requestorRedirectUrl,
+    );
+
+    const { accessRequest, requestorRedirectUrl } = accessRequestFromUrl;
+
+    expect(accessRequest).toStrictEqual(accessRequestVc);
+    expect(requestorRedirectUrl).toBe("https://requestor.redirect.url");
+  });
+
   it("throws if the fetched VC is not an Access Request", async () => {
     vcModule.getVerifiableCredential.mockResolvedValueOnce(accessGrantVc);
     await expect(
@@ -134,10 +198,18 @@ describe("getAccessRequestFromRedirectUrl", () => {
     ).rejects.toThrow();
   });
 
+  it("throws if the fetched VC is not an Access Request [returnLegacyJsonld: false]", async () => {
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(accessGrantVc);
+    await expect(
+      getAccessRequestFromRedirectUrl(redirectedToUrl.href, {
+        returnLegacyJsonld: false,
+      }),
+    ).rejects.toThrow();
+  });
+
   it("normalizes equivalent JSON-LD VCs", async () => {
     const normalizedAccessRequest = accessRequestVc;
-    // The server returns an equivalent JSON-LD with a different frame:
-    vcModule.getVerifiableCredential.mockResolvedValueOnce({
+    const vc = {
       ...normalizedAccessRequest,
       credentialSubject: {
         ...normalizedAccessRequest.credentialSubject,
@@ -150,9 +222,31 @@ describe("getAccessRequestFromRedirectUrl", () => {
           mode: normalizedAccessRequest.credentialSubject.hasConsent.mode[0],
         },
       },
-    } as VerifiableCredential);
-    const { accessRequest } =
-      await getAccessRequestFromRedirectUrl(redirectedToUrl);
-    expect(accessRequest).toStrictEqual(accessRequestVc);
+    };
+
+    // The server returns an equivalent JSON-LD with a different frame:
+    vcModule.getVerifiableCredential.mockImplementation(async (_, opts) =>
+      opts && "normalize" in opts && opts.normalize
+        ? opts.normalize(vc)
+        : (vc as any),
+    );
+    expect(
+      (await getAccessRequestFromRedirectUrl(redirectedToUrl)).accessRequest,
+    ).toStrictEqual(accessRequestVc);
+    expect(
+      isomorphic(
+        [
+          ...(await getAccessRequestFromRedirectUrl(redirectedToUrl))
+            .accessRequest,
+        ],
+        [
+          ...(
+            await getAccessRequestFromRedirectUrl(redirectedToUrl, {
+              returnLegacyJsonld: false,
+            })
+          ).accessRequest,
+        ],
+      ),
+    ).toBe(true);
   });
 });

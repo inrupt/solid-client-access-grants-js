@@ -28,6 +28,7 @@ import { fetch } from "@inrupt/universal-fetch";
 import { getAccessGrantFromRedirectUrl } from "./getAccessGrantFromRedirectUrl";
 import type { getSessionFetch } from "../../common/util/getSessionFetch";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
+import { normalizeAccessGrant } from "../manage/approveAccessRequest";
 
 jest.mock("../../common/util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {
@@ -68,7 +69,9 @@ describe("getAccessGrantFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(accessGrantVc);
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(
+      normalizeAccessGrant(accessGrantVc),
+    );
 
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.set(
@@ -83,6 +86,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
       "https://some.vc",
       {
         fetch: mockedFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -93,7 +97,9 @@ describe("getAccessGrantFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(accessGrantVc);
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(
+      normalizeAccessGrant(accessGrantVc),
+    );
 
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.set(
@@ -109,6 +115,7 @@ describe("getAccessGrantFromRedirectUrl", () => {
       "https://some.vc",
       {
         fetch: mockedFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -119,7 +126,9 @@ describe("getAccessGrantFromRedirectUrl", () => {
     ) as jest.Mocked<{
       getVerifiableCredential: typeof getVerifiableCredential;
     }>;
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(accessGrantVc);
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(
+      normalizeAccessGrant(accessGrantVc),
+    );
 
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.set(
@@ -129,6 +138,13 @@ describe("getAccessGrantFromRedirectUrl", () => {
 
     const fetchedVc = await getAccessGrantFromRedirectUrl(redirectUrl);
     expect(fetchedVc).toStrictEqual(accessGrantVc);
+    expect(vcModule.getVerifiableCredential).toHaveBeenCalledWith(
+      "https://some.vc",
+      {
+        fetch: undefined,
+        normalize: normalizeAccessGrant,
+      },
+    );
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
@@ -139,20 +155,23 @@ describe("getAccessGrantFromRedirectUrl", () => {
     }>;
     const normalizedAccessGrant = accessGrantVc;
     // The server returns an equivalent JSON-LD with a different frame:
-    vcModule.getVerifiableCredential.mockResolvedValueOnce({
-      ...normalizedAccessGrant,
-      credentialSubject: {
-        ...normalizedAccessGrant.credentialSubject,
-        providedConsent: {
-          ...normalizedAccessGrant.credentialSubject.providedConsent,
-          // The 1-value array is replaced by the literal value.
-          forPersonalData:
-            normalizedAccessGrant.credentialSubject.providedConsent
-              .forPersonalData[0],
-          mode: normalizedAccessGrant.credentialSubject.providedConsent.mode[0],
+    vcModule.getVerifiableCredential.mockResolvedValueOnce(
+      normalizeAccessGrant({
+        ...normalizedAccessGrant,
+        credentialSubject: {
+          ...normalizedAccessGrant.credentialSubject,
+          providedConsent: {
+            ...normalizedAccessGrant.credentialSubject.providedConsent,
+            // The 1-value array is replaced by the literal value.
+            forPersonalData:
+              normalizedAccessGrant.credentialSubject.providedConsent
+                .forPersonalData[0],
+            mode: normalizedAccessGrant.credentialSubject.providedConsent
+              .mode[0],
+          },
         },
-      },
-    } as VerifiableCredential);
+      }) as VerifiableCredential,
+    );
 
     const redirectUrl = new URL("https://redirect.url");
     redirectUrl.searchParams.set(
@@ -162,6 +181,13 @@ describe("getAccessGrantFromRedirectUrl", () => {
 
     const fetchedVc = await getAccessGrantFromRedirectUrl(redirectUrl);
     expect(fetchedVc).toStrictEqual(accessGrantVc);
+    expect(vcModule.getVerifiableCredential).toHaveBeenCalledWith(
+      "https://some.vc",
+      {
+        fetch: undefined,
+        normalize: normalizeAccessGrant,
+      },
+    );
   });
 
   it("throws if the fetched VC is not an Access Grant", async () => {
@@ -181,5 +207,13 @@ describe("getAccessGrantFromRedirectUrl", () => {
     await expect(
       getAccessGrantFromRedirectUrl(redirectUrl.href),
     ).rejects.toThrow();
+
+    expect(vcModule.getVerifiableCredential).toHaveBeenCalledWith(
+      "https://some.vc",
+      {
+        fetch: undefined,
+        normalize: normalizeAccessGrant,
+      },
+    );
   });
 });

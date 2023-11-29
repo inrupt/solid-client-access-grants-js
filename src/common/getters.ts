@@ -43,51 +43,51 @@ const { namedNode, defaultGraph, quad, literal } = DataFactory;
 /**
  * @internal
  */
-function getSingleObject(
+export function getSingleObject(
   vc: DatasetCore,
   subject: Term,
   predicate: Term,
   type: "NamedNode",
 ): NamedNode;
-function getSingleObject(
+export function getSingleObject(
   vc: DatasetCore,
   subject: Term,
   predicate: Term,
   type: "NamedNode",
   required: false,
 ): NamedNode | undefined;
-function getSingleObject(
+export function getSingleObject(
   vc: DatasetCore,
   subject: Term,
   predicate: Term,
   type: "Literal",
   required: false,
 ): Literal | undefined;
-function getSingleObject(
+export function getSingleObject(
   vc: DatasetCore,
   subject: Term,
   predicate: Term,
   type: "BlankNode",
 ): BlankNode;
-function getSingleObject(
+export function getSingleObject(
   vc: DatasetCore,
   subject: Term,
   predicate: Term,
   type: "Literal",
 ): Literal;
-function getSingleObject(
+export function getSingleObject(
   vc: DatasetCore,
   subject: Term,
   predicate: Term,
 ): NamedNode | BlankNode;
-function getSingleObject(
+export function getSingleObject(
   vc: DatasetCore,
   subject: Term,
   predicate: Term,
   type: undefined,
   required: false,
 ): NamedNode | BlankNode | undefined;
-function getSingleObject(
+export function getSingleObject(
   vc: DatasetCore,
   subject: Term,
   predicate: Term,

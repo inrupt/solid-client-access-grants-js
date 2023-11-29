@@ -23,9 +23,16 @@ import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import type * as CrossFetch from "@inrupt/universal-fetch";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 
-import { issueAccessRequest } from "./issueAccessRequest";
+import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
+import {
+  issueAccessRequest,
+  normalizeAccessRequest,
+} from "./issueAccessRequest";
 import { getRequestBody } from "../util/issueAccessVc";
-import { isAccessRequest } from "../guard/isAccessRequest";
+import {
+  isAccessRequest,
+  isRdfjsAccessRequest,
+} from "../guard/isAccessRequest";
 import {
   mockAccessApiEndpoint,
   MOCKED_ACCESS_ISSUER,
@@ -494,7 +501,9 @@ describe("issueAccessRequest", () => {
       inherit: true,
     });
     mockedIssue.mockResolvedValueOnce(
-      jsonLdEquivalent(normalizedAccessRequest, { inherit: "true" }),
+      normalizeAccessRequest(
+        jsonLdEquivalent(normalizedAccessRequest, { inherit: "true" }),
+      ),
     );
     await expect(
       issueAccessRequest(
@@ -524,7 +533,9 @@ describe("issueAccessRequest", () => {
       inherit: false,
     });
     mockedIssue.mockResolvedValueOnce(
-      jsonLdEquivalent(normalizedAccessRequest, { inherit: "false" }),
+      normalizeAccessRequest(
+        jsonLdEquivalent(normalizedAccessRequest, { inherit: "false" }),
+      ),
     );
     await expect(
       issueAccessRequest(
@@ -552,7 +563,7 @@ describe("issueAccessRequest", () => {
   };
 
   describe("isAccessRequest", () => {
-    it("returns false if the credential subject is missing 'hasConsent'", () => {
+    it("returns false if the credential subject is missing 'hasConsent'", async () => {
       expect(
         isAccessRequest({
           "@context": "https://some.context",
@@ -566,6 +577,26 @@ describe("issueAccessRequest", () => {
           issuanceDate: "some date",
           type: ["SolidAccessRequest"],
         }),
+      ).toBe(false);
+      expect(
+        isRdfjsAccessRequest(
+          await verifiableCredentialToDataset({
+            "@context": [
+              "https://www.w3.org/2018/credentials/v1",
+              "https://schema.inrupt.com/credentials/v1.jsonld",
+              "https://vc.inrupt.com/credentials/v1",
+            ],
+            credentialSubject: {
+              id: "https://some.id",
+              inbox: "https://some.inbox",
+            },
+            id: "https://some.credential",
+            proof: mockCredentialProof(),
+            issuer: "https://some.issuer",
+            issuanceDate: "some date",
+            type: ["SolidAccessRequest"],
+          }),
+        ),
       ).toBe(false);
     });
 

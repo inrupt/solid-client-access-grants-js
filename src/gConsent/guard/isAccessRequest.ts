@@ -19,9 +19,19 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import type { DatasetWithId } from "@inrupt/solid-client-vc";
+import { getCredentialSubject, getIssuanceDate } from "@inrupt/solid-client-vc";
+import type { BlankNode, NamedNode } from "@rdfjs/types";
+import { DataFactory } from "n3";
 import { ACCESS_REQUEST_STATUS } from "../constants";
 import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
+import { isRdfjsBaseAccessGrantVerifiableCredential } from "./isBaseAccessGrantVerifiableCredential";
 import { isBaseAccessRequestVerifiableCredential } from "./isBaseAccessRequestVerifiableCredential";
+import { gc } from "../../common/constants";
+import { getResourceOwner, getSingleObject } from "../../common/getters";
+import { isRdfjsGConsentAttributes } from "./isGConsentAttributes";
+
+const { quad, defaultGraph, namedNode } = DataFactory;
 
 export function isAccessRequest(
   x: unknown,
@@ -32,4 +42,30 @@ export function isAccessRequest(
     x.credentialSubject.hasConsent.isConsentForDataSubject !== undefined &&
     typeof x.issuanceDate === "string"
   );
+}
+
+export function isRdfjsAccessRequest(dataset: DatasetWithId) {
+  let consent: NamedNode | BlankNode;
+  try {
+    // There must be an issuance date
+    getIssuanceDate(dataset);
+    consent = getSingleObject(
+      dataset,
+      getCredentialSubject(dataset),
+      gc.hasConsent,
+    );
+  } catch {
+    return false;
+  }
+
+  return (
+    isRdfjsGConsentAttributes(dataset, consent) &&
+    dataset.has(quad(consent, gc.hasStatus, gc.ConsentStatusRequested)) &&
+    dataset.match(consent, gc.isConsentForDataSubject, null, defaultGraph())
+      .size === 1
+  );
+
+  // return isRdfjsBaseAccessGrantVerifiableCredential(dataset)
+  //   && dataset.has(quad(consent, gc.hasStatus, gc.ConsentStatusRequested))
+  //   && dataset.match(consent, gc.isConsentForDataSubject, null, defaultGraph()).size === 1
 }

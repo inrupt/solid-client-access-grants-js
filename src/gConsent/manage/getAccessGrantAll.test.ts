@@ -31,6 +31,7 @@ import type {
 import { getAccessGrantAll } from "./getAccessGrantAll";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import { mockAccessGrantVc } from "../util/access.mock";
+import { normalizeAccessGrant } from "./approveAccessRequest";
 
 const otherFetch = jest.fn(global.fetch);
 
@@ -187,6 +188,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -221,6 +223,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -255,6 +258,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -289,6 +293,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShapeOpen),
       {
         fetch: otherFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -326,6 +331,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -363,6 +369,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
