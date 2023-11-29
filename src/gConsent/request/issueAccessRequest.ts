@@ -31,7 +31,7 @@ import type {
   IssueAccessRequestParameters,
 } from "../type/IssueAccessRequestParameters";
 import type { AccessRequest } from "../type/AccessRequest";
-import { isAccessRequest } from "../guard/isAccessRequest";
+import { isAccessRequest, isRdfjsAccessRequest } from "../guard/isAccessRequest";
 import { gc } from "../../common/constants";
 
 /**
@@ -116,6 +116,11 @@ async function issueAccessRequest(
       ...options,
       returnLegacyJsonld: false,
     });
+    if (!isRdfjsAccessRequest(accessRequest)) {
+      throw new Error(
+        `${JSON.stringify(accessRequest)} is not an Access Request`,
+      );
+    }
     return accessRequest;
   }
 

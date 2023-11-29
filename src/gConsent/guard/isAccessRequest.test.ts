@@ -86,4 +86,70 @@ describe("isAccessRequest (legacy and RDFJS)", () => {
       isRdfjsAccessRequest(await verifiableCredentialToDataset(invalidRequest)),
     ).toBe(false);
   });
+
+  it("returns false if the credential subject is missing 'hasConsent'", async () => {
+    const noConsentRequest = { ...validAccessRequestVerifiableCredential };
+    // @ts-expect-error this creates a malformed VC on purpose
+    delete noConsentRequest.credentialSubject.hasConsent;
+    expect(isAccessRequest(noConsentRequest)).toBe(false);
+    expect(
+      isRdfjsAccessRequest(
+        await verifiableCredentialToDataset(noConsentRequest),
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false if the credential subject 'hasConsent' is missing 'mode'", async () => {
+    const noModeRequest = { ...validAccessRequestVerifiableCredential };
+    // @ts-expect-error this creates a malformed VC on purpose
+    delete noModeRequest.credentialSubject.hasConsent.mode;
+    expect(isAccessRequest(noModeRequest)).toBe(false);
+    expect(
+      isRdfjsAccessRequest(await verifiableCredentialToDataset(noModeRequest)),
+    ).toBe(false);
+  });
+
+  it("returns false if the credential subject 'hasConsent' is missing 'status'", async () => {
+    const noStatusRequest = { ...validAccessRequestVerifiableCredential };
+    // @ts-expect-error this creates a malformed VC on purpose
+    delete noStatusRequest.credentialSubject.hasConsent.hasStatus;
+    expect(isAccessRequest(noStatusRequest)).toBe(false);
+    expect(
+      isRdfjsAccessRequest(
+        await verifiableCredentialToDataset(noStatusRequest),
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false if the credential subject 'hasConsent' is missing 'forPersonalData'", async () => {
+    const noDataRequest = { ...validAccessRequestVerifiableCredential };
+    // @ts-expect-error this creates a malformed VC on purpose
+    delete noDataRequest.credentialSubject.hasConsent.forPersonalData;
+    expect(isAccessRequest(noDataRequest)).toBe(false);
+    expect(
+      isRdfjsAccessRequest(await verifiableCredentialToDataset(noDataRequest)),
+    ).toBe(false);
+  });
+
+  it("returns false if the credential subject 'hasConsent' is missing 'isConsentForDataSubject'", async () => {
+    const noDataSubjectRequest = { ...validAccessRequestVerifiableCredential };
+    // @ts-expect-error this creates a malformed VC on purpose
+    delete noDataSubjectRequest.credentialSubject.hasConsent
+      .isConsentForDataSubject;
+    expect(isAccessRequest(noDataSubjectRequest)).toBe(false);
+    expect(
+      isRdfjsAccessRequest(
+        await verifiableCredentialToDataset(noDataSubjectRequest),
+      ),
+    ).toBe(false);
+  });
+
+  it("returns false if the credential type does not include 'SolidAccessRequest'", async () => {
+    const badTypeRequest = { ...validAccessRequestVerifiableCredential };
+    badTypeRequest.type = ["https://example.org/ns/some-vc-type"];
+    expect(isAccessRequest(badTypeRequest)).toBe(false);
+    expect(
+      isRdfjsAccessRequest(await verifiableCredentialToDataset(badTypeRequest)),
+    ).toBe(false);
+  });
 });

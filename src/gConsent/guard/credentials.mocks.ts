@@ -19,6 +19,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import type * as VcLibrary from "@inrupt/solid-client-vc";
+
 export const validAccessGrantVerifiableCredential = {
   "@context": [
     "https://www.w3.org/2018/credentials/v1",
@@ -83,3 +85,12 @@ export const validAccessRequestVerifiableCredential = {
   },
   type: ["VerifiableCredential", "SolidAccessRequest"],
 };
+
+export const mockCredentialProof =
+  (): VcLibrary.VerifiableCredential["proof"] => ({
+    created: "some date",
+    proofPurpose: "some purpose",
+    proofValue: "some value",
+    type: "some type",
+    verificationMethod: "https://example.org/some/verification/method",
+  });
