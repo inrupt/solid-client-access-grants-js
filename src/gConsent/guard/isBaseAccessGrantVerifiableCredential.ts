@@ -20,10 +20,7 @@
 //
 
 import type { DatasetWithId } from "@inrupt/solid-client-vc";
-import { getId, getIssuanceDate } from "@inrupt/solid-client-vc";
-import { DataFactory } from "n3";
-import { TYPE, solidVc } from "../../common/constants";
-import { getConsent } from "../../common/getters";
+import { solidVc } from "../../common/constants";
 import type {
   BaseGrantBody,
   GrantCredentialSubject,
@@ -31,13 +28,11 @@ import type {
   RequestCredentialSubject,
   RequestCredentialSubjectPayload,
 } from "../type/AccessVerifiableCredential";
-import { isBaseAccessVcBody } from "./isBaseAccessVcBody";
 import {
-  isGConsentAttributes,
-  isRdfjsGConsentAttributes,
-} from "./isGConsentAttributes";
-
-const { namedNode, quad } = DataFactory;
+  isBaseAccessVcBody,
+  isRdfjsAccessVerifiableCredential,
+} from "./isBaseAccessVcBody";
+import { isGConsentAttributes } from "./isGConsentAttributes";
 
 function isGrantCredentialSubject(
   x:
@@ -62,20 +57,8 @@ export function isBaseAccessGrantVerifiableCredential(
 export function isRdfjsBaseAccessGrantVerifiableCredential(
   data: DatasetWithId,
 ) {
-  const s = namedNode(getId(data));
-  if (
-    !data.has(quad(s, TYPE, solidVc.SolidAccessDenial)) &&
-    !data.has(quad(s, TYPE, solidVc.SolidAccessGrant)) &&
-    !data.has(quad(s, TYPE, solidVc.SolidAccessRequest))
-  ) {
-    return false;
-  }
-
-  // getConsent and getIssuanceDate can error
-  try {
-    getIssuanceDate(data);
-    return isRdfjsGConsentAttributes(data, getConsent(data));
-  } catch (e) {
-    return false;
-  }
+  return isRdfjsAccessVerifiableCredential(data, [
+    solidVc.SolidAccessDenial,
+    solidVc.SolidAccessGrant,
+  ]);
 }

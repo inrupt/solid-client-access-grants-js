@@ -59,11 +59,11 @@ jest.mock("@inrupt/solid-client", () => {
   return solidClientModule;
 });
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { verifiableCredentialToDataset } = jest.requireActual(
+  const actualVcLibrary = jest.requireActual(
     "@inrupt/solid-client-vc",
-  ) as jest.Mocked<typeof VcLibrary>;
+  ) as typeof VcLibrary;
   return {
-    verifiableCredentialToDataset,
+    ...actualVcLibrary,
     issueVerifiableCredential: jest.fn(),
   };
 });

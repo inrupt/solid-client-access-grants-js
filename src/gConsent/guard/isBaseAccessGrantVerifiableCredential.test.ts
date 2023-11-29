@@ -25,38 +25,10 @@ import {
   isBaseAccessGrantVerifiableCredential,
   isRdfjsBaseAccessGrantVerifiableCredential,
 } from "./isBaseAccessGrantVerifiableCredential";
-
-const validAccessGrantVerifiableCredential = {
-  "@context": [
-    "https://www.w3.org/2018/credentials/v1",
-    "https://w3id.org/security/suites/ed25519-2020/v1",
-    "https://vc.inrupt.com/credentials/v1",
-  ],
-  credentialSubject: {
-    providedConsent: {
-      mode: ["http://www.w3.org/ns/auth/acl#Read"],
-      hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
-      forPersonalData: ["https://example.pod/resourceX"],
-      forPurpose: "https://example.org/someSpecificPurpose",
-    },
-    id: "https://example.pod/bob",
-    inbox: "https://example.pod/bob/inbox/",
-  },
-  id: "https://consent.service.example.com/vc/52ff98a9-xxxx-xxxx-xxxx-598adef0aafe",
-  issuanceDate: "2021-10-08T08:48:54.428Z",
-  issuer: "https://consent.service.example.com",
-  proof: {
-    created: "2021-10-08T08:48:56.538Z",
-    domain: "solid",
-    proofPurpose: "assertionMethod",
-    proofValue:
-      "SfZGjxiZGqTb7oC7rylJviE2fDTtG5hKsjh9s6bUoqyQUgfaMZ--QMz5tGGD1LSSyfFGhF1I-IG8fDvAmpXTDg",
-    type: "Ed25519Signature2020",
-    verificationMethod:
-      "https://consent.service.example.com/key/f82e5979-xxxx-xxxx-xxxx-cd9d2105d314",
-  },
-  type: ["VerifiableCredential", "SolidAccessRequest"],
-};
+import {
+  validAccessGrantVerifiableCredential,
+  validAccessRequestVerifiableCredential,
+} from "./credentials.mocks";
 
 describe("isBaseAccessGrantVerifiableCredential", () => {
   it("Returns true on valid Access Grant VC", async () => {
@@ -72,6 +44,21 @@ describe("isBaseAccessGrantVerifiableCredential", () => {
         ),
       ),
     ).toBe(true);
+  });
+
+  it("Returns false on valid non-Access Grant VC", async () => {
+    expect(
+      isBaseAccessGrantVerifiableCredential(
+        validAccessRequestVerifiableCredential,
+      ),
+    ).toBe(false);
+    expect(
+      isRdfjsBaseAccessGrantVerifiableCredential(
+        await verifiableCredentialToDataset(
+          validAccessRequestVerifiableCredential,
+        ),
+      ),
+    ).toBe(false);
   });
 
   it("Returns false on invalid Access Grant VC", async () => {

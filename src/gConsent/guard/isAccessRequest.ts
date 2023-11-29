@@ -20,18 +20,15 @@
 //
 
 import type { DatasetWithId } from "@inrupt/solid-client-vc";
-import { getCredentialSubject, getIssuanceDate } from "@inrupt/solid-client-vc";
-import type { BlankNode, NamedNode } from "@rdfjs/types";
 import { DataFactory } from "n3";
 import { ACCESS_REQUEST_STATUS } from "../constants";
 import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
-import { isRdfjsBaseAccessGrantVerifiableCredential } from "./isBaseAccessGrantVerifiableCredential";
 import { isBaseAccessRequestVerifiableCredential } from "./isBaseAccessRequestVerifiableCredential";
-import { gc } from "../../common/constants";
-import { getResourceOwner, getSingleObject } from "../../common/getters";
-import { isRdfjsGConsentAttributes } from "./isGConsentAttributes";
+import { gc, solidVc } from "../../common/constants";
+import { getConsent } from "../../common/getters";
+import { isRdfjsAccessVerifiableCredential } from "./isBaseAccessVcBody";
 
-const { quad, defaultGraph, namedNode } = DataFactory;
+const { quad, defaultGraph } = DataFactory;
 
 export function isAccessRequest(
   x: unknown,
@@ -45,27 +42,25 @@ export function isAccessRequest(
 }
 
 export function isRdfjsAccessRequest(dataset: DatasetWithId) {
-  let consent: NamedNode | BlankNode;
+  if (
+    !isRdfjsAccessVerifiableCredential(dataset, [solidVc.SolidAccessRequest])
+  ) {
+    return false;
+  }
   try {
-    // There must be an issuance date
-    getIssuanceDate(dataset);
-    consent = getSingleObject(
-      dataset,
-      getCredentialSubject(dataset),
-      gc.hasConsent,
+    const requestClaimSubject = getConsent(dataset);
+    return (
+      dataset.has(
+        quad(requestClaimSubject, gc.hasStatus, gc.ConsentStatusRequested),
+      ) &&
+      dataset.match(
+        requestClaimSubject,
+        gc.isConsentForDataSubject,
+        null,
+        defaultGraph(),
+      ).size === 1
     );
   } catch {
     return false;
   }
-
-  return (
-    isRdfjsGConsentAttributes(dataset, consent) &&
-    dataset.has(quad(consent, gc.hasStatus, gc.ConsentStatusRequested)) &&
-    dataset.match(consent, gc.isConsentForDataSubject, null, defaultGraph())
-      .size === 1
-  );
-
-  // return isRdfjsBaseAccessGrantVerifiableCredential(dataset)
-  //   && dataset.has(quad(consent, gc.hasStatus, gc.ConsentStatusRequested))
-  //   && dataset.match(consent, gc.isConsentForDataSubject, null, defaultGraph()).size === 1
 }

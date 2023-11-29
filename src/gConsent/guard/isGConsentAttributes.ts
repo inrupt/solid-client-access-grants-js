@@ -63,14 +63,15 @@ export function isRdfjsGConsentAttributes(
   consent: Quad_Subject,
 ) {
   // isResourceAccessModeArray
-  for (const { object } of dataset.match(
-    consent,
-    acl.mode,
-    null,
-    defaultGraph(),
-  )) {
+  const modeQuads = dataset.match(consent, acl.mode, null, defaultGraph());
+  if (modeQuads.size === 0) {
+    return false;
+  }
+  for (const { object: mode } of modeQuads) {
     if (
-      ![acl.Append, acl.Read, acl.Write].some((mode) => mode.equals(object))
+      ![acl.Append, acl.Read, acl.Write].some((allowedMode) =>
+        allowedMode.equals(mode),
+      )
     ) {
       return false;
     }

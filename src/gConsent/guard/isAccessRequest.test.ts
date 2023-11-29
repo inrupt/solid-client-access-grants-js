@@ -20,17 +20,21 @@
 //
 
 import { it, describe, expect } from "@jest/globals";
-import { isBaseAccessRequestVerifiableCredential } from "./isBaseAccessRequestVerifiableCredential";
+import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
+import { isAccessRequest, isRdfjsAccessRequest } from "./isAccessRequest";
 import {
   validAccessRequestVerifiableCredential,
   validAccessGrantVerifiableCredential,
 } from "./credentials.mocks";
 
-describe("isBaseAccessRequestVerifiableCredential (legacy and RDFJS)", () => {
+describe("isAccessRequest (legacy and RDFJS)", () => {
   it("Returns true on valid Access Request VC", async () => {
+    expect(isAccessRequest(validAccessRequestVerifiableCredential)).toBe(true);
     expect(
-      isBaseAccessRequestVerifiableCredential(
-        validAccessRequestVerifiableCredential,
+      isRdfjsAccessRequest(
+        await verifiableCredentialToDataset(
+          validAccessRequestVerifiableCredential,
+        ),
       ),
     ).toBe(true);
   });
@@ -43,15 +47,21 @@ describe("isBaseAccessRequestVerifiableCredential (legacy and RDFJS)", () => {
         inbox: undefined,
       },
     };
-    expect(isBaseAccessRequestVerifiableCredential(noInboxcredential)).toBe(
-      true,
-    );
+    expect(isAccessRequest(noInboxcredential)).toBe(true);
+    expect(
+      isRdfjsAccessRequest(
+        await verifiableCredentialToDataset(noInboxcredential),
+      ),
+    ).toBe(true);
   });
 
   it("Returns false on valid but non-Access Request VC", async () => {
+    expect(isAccessRequest(validAccessGrantVerifiableCredential)).toBe(false);
     expect(
-      isBaseAccessRequestVerifiableCredential(
-        validAccessGrantVerifiableCredential,
+      isRdfjsAccessRequest(
+        await verifiableCredentialToDataset(
+          validAccessGrantVerifiableCredential,
+        ),
       ),
     ).toBe(false);
   });
@@ -71,6 +81,9 @@ describe("isBaseAccessRequestVerifiableCredential (legacy and RDFJS)", () => {
         },
       },
     };
-    expect(isBaseAccessRequestVerifiableCredential(invalidRequest)).toBe(false);
+    expect(isAccessRequest(invalidRequest)).toBe(false);
+    expect(
+      isRdfjsAccessRequest(await verifiableCredentialToDataset(invalidRequest)),
+    ).toBe(false);
   });
 });
