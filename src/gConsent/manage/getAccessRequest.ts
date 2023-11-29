@@ -38,7 +38,7 @@ import { normalizeAccessRequest } from "../request/issueAccessRequest";
  * from @inrupt/solid-client-authn-browser will be used if available.
  * @returns An Access Request.
  * @since 2.4.0
- * @deprecated Use RDFJS API
+ * @deprecated Use RDFJS API instead of relying on the JSON structure by setting `returnLegacyJsonld` to false
  */
 export async function getAccessRequest(
   url: UrlString | URL,
