@@ -24,8 +24,7 @@ import {
   verifiableCredentialToDataset,
   type VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import type { DatasetCore, Quad } from "@rdfjs/types";
-import type { VerifiableCredentialBase } from "@inrupt/solid-client-vc/dist/common/common";
+import { gc } from "../../common/constants";
 import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import {
   CREDENTIAL_TYPE_ACCESS_GRANT,
@@ -36,12 +35,6 @@ import { normalizeAccessGrant } from "../manage/approveAccessRequest";
 import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import type { AccessGrant } from "../type/AccessGrant";
 import type { AccessRequest } from "../type/AccessRequest";
-import type {
-  AccessRequestBody,
-  BaseGrantBody,
-  BaseRequestBody,
-} from "../type/AccessVerifiableCredential";
-import { gc } from "../../common/constants";
 
 type RequestVcOptions = Partial<{
   resources: UrlString[];
@@ -110,12 +103,13 @@ export const mockAccessRequestVc = async (
   const asObject = mockAccessRequestVcObject(options) as VerifiableCredential;
   modify?.(asObject);
 
-  return (
-    await verifiableCredentialToDataset(normalizeAccessRequest(asObject), {
+  return (await verifiableCredentialToDataset(
+    normalizeAccessRequest(asObject),
+    {
       baseIRI: asObject.id,
       includeVcProperties: true,
-    })
-  ) as unknown as AccessRequest;
+    },
+  )) as unknown as AccessRequest;
 };
 
 export const mockAccessGrantObject = (
@@ -166,19 +160,15 @@ export const mockAccessGrantVc = async (
   const asObject = mockAccessGrantObject(options);
   modify?.(asObject);
 
-  return (
-    await verifiableCredentialToDataset(normalizeAccessGrant(asObject), {
-      baseIRI: asObject.id,
-      includeVcProperties: true,
-    })
-  ) as unknown as AccessGrant;
+  return (await verifiableCredentialToDataset(normalizeAccessGrant(asObject), {
+    baseIRI: asObject.id,
+    includeVcProperties: true,
+  })) as unknown as AccessGrant;
 };
 
 export const mockConsentRequestVc = async (
   options?: RequestVcOptions,
-): Promise<
-  AccessRequest
-> => {
+): Promise<AccessRequest> => {
   const requestVc = await mockAccessRequestVc(options, (object) => {
     object.credentialSubject.hasConsent.forPurpose = ["https://some.purpose"];
     object.expirationDate = new Date(2021, 8, 14).toISOString();

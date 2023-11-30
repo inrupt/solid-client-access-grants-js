@@ -27,6 +27,7 @@ import { getAccessRequest } from "./getAccessRequest";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import type { getSessionFetch } from "../../common/util/getSessionFetch";
 import { normalizeAccessRequest } from "../request/issueAccessRequest";
+import { toBeEqual, withoutDataset } from "../util/toBeEqual.mock";
 
 jest.mock("../../common/util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {
@@ -145,26 +146,35 @@ describe("getAccessRequest", () => {
     // The server returns an equivalent JSON-LD with a different frame:
     (
       VcModule as jest.Mocked<typeof VcModule>
-    ).getVerifiableCredential.mockImplementation(async (_, opts) =>
-      opts && "normalize" in opts && opts.normalize
-        ? opts.normalize(vc)
-        : (vc as any),
+    ).getVerifiableCredential.mockImplementation(
+      async (_, opts) =>
+        VcModule.verifiableCredentialToDataset<VcModule.VerifiableCredentialBase>(
+          opts && "normalize" in opts && opts.normalize
+            ? opts.normalize(withoutDataset(vc) as unknown as VcModule.VerifiableCredential)
+            : withoutDataset(vc as unknown as VcModule.VerifiableCredential) as VcModule.VerifiableCredential,
+          { includeVcProperties: opts?.returnLegacyJsonld !== false },
+          // This is a lie because it will not contain VC properties when opts?.returnLegacyJsonld is false
+          // but we need to do it to keep typescript happy with the current overloading we have
+        ) as Promise<VcModule.VerifiableCredential>,
     );
 
     const accessRequest = await getAccessRequest("https://some.vc");
-    const accessRequestNoProperties = await getAccessRequest("https://some.vc", {
-      returnLegacyJsonld: false,
-    });
-    expect(accessRequest).toStrictEqual(accessRequestVc);
-    expect(
-      isomorphic(
-        [...accessRequest],
-        [
-          ...accessRequestNoProperties,
-        ],
-      ),
-    ).toBe(true);
+    const accessRequestNoProperties = await getAccessRequest(
+      "https://some.vc",
+      {
+        returnLegacyJsonld: false,
+      },
+    );
+    toBeEqual(accessRequest, accessRequestVc);
+    expect(isomorphic([...accessRequest], [...accessRequestNoProperties])).toBe(
+      true,
+    );
 
-    expect(accessRequest.credentialSubject.providedConsent)
+    expect(accessRequest.credentialSubject.hasConsent.forPersonalData).toEqual([
+      "https://some.resource",
+    ]);
+
+    // @ts-expect-error the credential subject should not be available on the new RDFJS API
+    expect(accessRequestNoProperties.credentialSubject).toBeUndefined();
   });
 });

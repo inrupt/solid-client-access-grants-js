@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { namedNode, quad } from "@rdfjs/dataset";
+import { DataFactory } from "n3";
 import type { DatasetWithId } from "@inrupt/solid-client-vc";
 import { getIssuanceDate } from "@inrupt/solid-client-vc";
 import type { NamedNode } from "n3";
@@ -30,6 +30,8 @@ import { isUnknownObject } from "./isUnknownObject";
 import { getConsent, getId } from "../../common/getters";
 import { TYPE } from "../../common/constants";
 import { isRdfjsGConsentAttributes } from "./isGConsentAttributes";
+
+const { namedNode, quad } = DataFactory;
 
 export function isBaseAccessVcBody(x: unknown): x is BaseAccessVcBody {
   return (

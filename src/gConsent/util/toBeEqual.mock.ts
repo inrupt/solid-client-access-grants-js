@@ -20,6 +20,7 @@
 //
 import type { JsonLd } from "@inrupt/solid-client-vc";
 import { expect } from "@jest/globals";
+import DatasetCore from "@rdfjs/dataset/DatasetCore";
 
 /**
  * Remove the properties of an RDF.DatasetCore from an object so that
@@ -29,8 +30,8 @@ import { expect } from "@jest/globals";
 function viaJson(data: JsonLd) {
   return JSON.parse(JSON.stringify(data));
 }
-function withoutDataset(data: JsonLd) {
-  return {
+export function withoutDataset<T>(data: T): Omit<T, keyof DatasetCore> {
+  const res = {
     ...data,
     match: undefined,
     has: undefined,
@@ -40,6 +41,16 @@ function withoutDataset(data: JsonLd) {
     toJSON: undefined,
     [Symbol.iterator]: undefined,
   };
+
+  delete res.match;
+  delete res.has;
+  delete res.add;
+  delete res.size;
+  delete res.delete;
+  delete res.toJSON;
+  delete res[Symbol.iterator];
+
+  return res;
 }
 export function toBeEqual(receieved: JsonLd, actual: JsonLd) {
   expect(viaJson(receieved)).toEqual(viaJson(actual));
