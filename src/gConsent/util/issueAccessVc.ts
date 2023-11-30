@@ -160,7 +160,7 @@ export function getGrantBody(params: AccessGrantParameters): AccessGrantBody {
 export async function issueAccessVc(
   vcBody: BaseRequestBody | BaseGrantBody,
   options: AccessBaseOptions & {
-    returnLegacyJsonld?: true;
+    returnLegacyJsonld: true;
     normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
   },
 ): Promise<VerifiableCredential>;

@@ -23,10 +23,15 @@ import type { UrlString, WebId } from "@inrupt/solid-client";
 // eslint-disable-next-line camelcase
 import { acp_ess_2 } from "@inrupt/solid-client";
 import type {
+  DatasetWithId,
   VerifiableCredential,
   VerifiableCredentialBase,
 } from "@inrupt/solid-client-vc";
-import type { AccessBaseOptions } from "../type/AccessBaseOptions";
+import type {
+  AccessBaseOptions,
+  WithLegacyJsonFlag,
+  WithLegacyJsonFlagSet,
+} from "../type/AccessBaseOptions";
 import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
 import type { AccessGrantParameters } from "../type/Parameter";
 import type { AccessModes } from "../../type/AccessModes";
@@ -42,8 +47,12 @@ import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessV
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { isAccessGrant } from "../guard/isAccessGrant";
-import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
+import {
+  isBaseAccessGrantVerifiableCredential,
+  isRdfjsBaseAccessGrantVerifiableCredential,
+} from "../guard/isBaseAccessGrantVerifiableCredential";
 import { gc } from "../../common/constants";
+import { DatasetCore } from "@rdfjs/types";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
@@ -141,21 +150,21 @@ async function internal_approveAccessRequest(
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions,
-): Promise<VerifiableCredential>;
+  options?: AccessBaseOptions & WithLegacyJsonFlag,
+): Promise<AccessGrant | DatasetWithId>;
 // eslint-disable-next-line camelcase
 async function internal_approveAccessRequest(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
-  options?: AccessBaseOptions,
-): Promise<VerifiableCredential>;
+  options?: AccessBaseOptions & WithLegacyJsonFlag,
+): Promise<AccessGrant | DatasetWithId>;
 // eslint-disable-next-line camelcase
 async function internal_approveAccessRequest(
   requestVc?: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options: AccessBaseOptions = {},
-): Promise<VerifiableCredential> {
+  options: AccessBaseOptions & WithLegacyJsonFlag = {},
+): Promise<AccessGrant | DatasetWithId> {
   const internalOptions = {
     ...options,
     fetch: options.fetch ?? (await getSessionFetch(options)),
@@ -202,8 +211,42 @@ async function internal_approveAccessRequest(
     );
   }
 
-  return issueAccessVc(grantBody, internalOptions);
+  if (internalOptions.returnLegacyJsonld) {
+    return issueAccessVc(grantBody, {
+      ...internalOptions,
+      returnLegacyJsonld: true,
+      normalize: normalizeAccessGrant,
+    });
+  }
+
+  return issueAccessVc(grantBody, { ...internalOptions });
 }
+
+/**
+ * Approve an access request. The content of the approved access request is provided
+ * as a Verifiable Credential which properties may be overridden if necessary.
+ *
+ * @param requestVc The Verifiable Credential representing the Access Request. If
+ * not conform to an Access Request, the function will throw.
+ * @param requestOverride Elements overriding information from the provided Verifiable
+ * Credential.
+ * @param options Optional properties to customizes the access grant behavior. Options
+ * include `updateAcr` which defaults to true. If this flag is set to true, the ACR
+ * of the Resource will be updated when the access grant is approved. If this flag is
+ * set to false, the ACR of the Resource will remain unchanged. This is an advanced
+ * feature, and only users having a good understanding of the relationship between
+ * Access Grants and ACRs should deviate from the default. Additional information is
+ * available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
+ * @returns A Verifiable Credential representing the granted access.
+ * @since 0.0.1.
+ * @deprecated Set the options flag `returnLegacyJsonLd` to false, and prefer using the RDFJS interfaces.
+ */
+export async function approveAccessRequest(
+  // If the VC is specified, all the overrides become optional
+  requestVc: VerifiableCredential | URL | UrlString,
+  requestOverride?: Partial<ApproveAccessRequestOverrides>,
+  options?: AccessBaseOptions & WithLegacyJsonFlagSet,
+): Promise<Exclude<DatasetCore, AccessGrant>>;
 
 /**
  * Approve an access request. The content of the approved access request is provided
@@ -227,8 +270,8 @@ export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions,
-): Promise<AccessGrant>;
+  options?: AccessBaseOptions & WithLegacyJsonFlag,
+): Promise<DatasetWithId>;
 
 /**
  * Approve an access request. The content of the approved access request is provided
@@ -244,8 +287,8 @@ export async function approveAccessRequest(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
-  options?: AccessBaseOptions,
-): Promise<AccessGrant>;
+  options?: AccessBaseOptions & WithLegacyJsonFlag,
+): Promise<DatasetWithId>;
 
 /**
  * @deprecated Please remove the `resourceOwner` parameter.
@@ -256,7 +299,7 @@ export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions,
+  options?: AccessBaseOptions & WithLegacyJsonFlag,
 ): Promise<AccessGrant>;
 
 /**
@@ -268,7 +311,7 @@ export async function approveAccessRequest(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
-  options?: AccessBaseOptions,
+  options?: AccessBaseOptions & WithLegacyJsonFlag,
 ): Promise<AccessGrant>;
 export async function approveAccessRequest(
   resourceOwnerOrRequestVc:
@@ -285,18 +328,33 @@ export async function approveAccessRequest(
   requestOverrideOrOptions?:
     | Partial<ApproveAccessRequestOverrides>
     | AccessBaseOptions,
-  options?: AccessBaseOptions,
+  options?: AccessBaseOptions & WithLegacyJsonFlag,
 ): Promise<AccessGrant> {
+  let requestVc: VerifiableCredential | URL | UrlString;
+  let override: Partial<ApproveAccessRequestOverrides>;
+  let internalOptions: AccessBaseOptions & WithLegacyJsonFlag;
+
   if (typeof options === "object") {
     // The deprecated signature is being used, so ignore the first parameter.
-    const accessGrant = normalizeAccessGrant(
-      await internal_approveAccessRequest(
-        requestVcOrOverride as VerifiableCredential | URL | UrlString,
-        requestOverrideOrOptions as Partial<ApproveAccessRequestOverrides>,
-        options,
-      ),
-    );
+    requestVc = requestVcOrOverride as VerifiableCredential | URL | UrlString;
+    override =
+      requestOverrideOrOptions as Partial<ApproveAccessRequestOverrides>;
+    internalOptions = options;
+  } else {
+    requestVc = resourceOwnerOrRequestVc as
+      | VerifiableCredential
+      | URL
+      | UrlString;
+    override = requestVcOrOverride as Partial<ApproveAccessRequestOverrides>;
+    internalOptions = requestOverrideOrOptions as AccessBaseOptions;
+  }
 
+  const accessGrant = await internal_approveAccessRequest(
+    requestVc,
+    override,
+    internalOptions,
+  );
+  if (internalOptions.returnLegacyJsonld === true) {
     if (
       !isBaseAccessGrantVerifiableCredential(accessGrant) ||
       !isAccessGrant(accessGrant)
@@ -311,18 +369,7 @@ export async function approveAccessRequest(
     return accessGrant;
   }
 
-  const accessGrant = normalizeAccessGrant(
-    await internal_approveAccessRequest(
-      resourceOwnerOrRequestVc as VerifiableCredential | URL | UrlString,
-      requestVcOrOverride as Partial<ApproveAccessRequestOverrides>,
-      requestOverrideOrOptions as AccessBaseOptions,
-    ),
-  );
-
-  if (
-    !isBaseAccessGrantVerifiableCredential(accessGrant) ||
-    !isAccessGrant(accessGrant)
-  ) {
+  if (!isRdfjsBaseAccessGrantVerifiableCredential(accessGrant)) {
     throw new Error(
       `Unexpected response when approving Access Request, the result is not an Access Grant: ${JSON.stringify(
         accessGrant,
