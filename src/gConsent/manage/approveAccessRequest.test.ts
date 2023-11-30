@@ -62,11 +62,16 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { verifiableCredentialToDataset } = jest.requireActual(
+  const { verifiableCredentialToDataset, getCredentialSubject, getIssuanceDate, getIssuer, getExpirationDate, getId } = jest.requireActual(
     "@inrupt/solid-client-vc",
   ) as jest.Mocked<typeof VcClient>;
   return {
     verifiableCredentialToDataset,
+    getCredentialSubject,
+    getIssuanceDate,
+    getIssuer,
+    getExpirationDate,
+    getId,
     issueVerifiableCredential: jest.fn(),
   };
 });

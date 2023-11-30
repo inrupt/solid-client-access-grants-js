@@ -36,7 +36,7 @@ import type {
 import { DataFactory } from "n3";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessModes } from "../type/AccessModes";
-import { INHERIT, TYPE, XSD_BOOLEAN, acl, gc } from "./constants";
+import { INHERIT, TYPE, XSD_BOOLEAN, acl, gc, ldp } from "./constants";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
@@ -297,6 +297,23 @@ export function getRequestor(vc: DatasetWithId): string {
 
   return getSingleObject(vc, providedConsent, gc.isProvidedTo, "NamedNode")
     .value;
+}
+
+// FIXME: describe this correctly
+/**
+ * Get the inbox of the  asking for access to a resources with an Access Grant/Request.
+ *
+ * @example
+ *
+ * ```
+ * const inbox = getInbox(accessGrant);
+ * ```
+ *
+ * @param vc The Access Grant/Request
+ * @returns The requestor WebID
+ */
+export function getInbox(vc: DatasetWithId): string {
+  return getSingleObject(vc, getCredentialSubject(vc), ldp.inbox, "NamedNode").value;
 }
 
 /**

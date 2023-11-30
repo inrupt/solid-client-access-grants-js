@@ -64,16 +64,18 @@ describe("getters", () => {
     });
 
     it("errors when resources are not NamedNodes", async () => {
+      const store = new Store([
+        ...mockedGConsentGrant,
+        quad(
+          getConsent(mockedGConsentGrant),
+          gc.forPersonalData,
+          literal("hello world"),
+        ),
+      ]);
+
       expect(() =>
         getResources(
-          new Store([
-            ...mockedGConsentGrant,
-            quad(
-              getConsent(mockedGConsentGrant),
-              gc.forPersonalData,
-              literal("hello world"),
-            ),
-          ]) as unknown as AccessGrant,
+          Object.assign(store, { id: mockedGConsentGrant.id }),
         ),
       ).toThrow(
         "Expected resource to be a Named Node. Instead got [hello world] with term type [Literal]",
@@ -115,16 +117,18 @@ describe("getters", () => {
     });
 
     it("errors when purposes are not NamedNodes", async () => {
+      const store = new Store([
+        ...mockedGConsentGrant,
+        quad(
+          getConsent(mockedGConsentGrant),
+          gc.forPurpose,
+          literal("hello world"),
+        ),
+      ])
+
       expect(() =>
         getPurposes(
-          new Store([
-            ...mockedGConsentGrant,
-            quad(
-              getConsent(mockedGConsentGrant),
-              gc.forPurpose,
-              literal("hello world"),
-            ),
-          ]) as unknown as AccessGrant,
+          Object.assign(store, { id: mockedGConsentGrant.id }),
         ),
       ).toThrow(
         "Expected purpose to be Named Node. Instead got [hello world] with term type [Literal]",
@@ -132,21 +136,23 @@ describe("getters", () => {
     });
 
     it("errors if there are multiple consents present", async () => {
+      const store = new Store([
+        ...mockedGConsentGrant,
+        quad(
+          getCredentialSubject(mockedGConsentGrant),
+          gc.providedConsent,
+          blankNode(),
+        ),
+        quad(
+          getCredentialSubject(mockedGConsentGrant),
+          gc.hasConsent,
+          blankNode(),
+        ),
+      ])
+
       expect(() =>
         getPurposes(
-          new Store([
-            ...mockedGConsentGrant,
-            quad(
-              getCredentialSubject(mockedGConsentGrant),
-              gc.providedConsent,
-              blankNode(),
-            ),
-            quad(
-              getCredentialSubject(mockedGConsentGrant),
-              gc.hasConsent,
-              blankNode(),
-            ),
-          ]) as unknown as AccessGrant,
+          Object.assign(store, { id: mockedGConsentGrant.id }),
         ),
       ).toThrow("Expected exactly 1 consent value. Found 3.");
     });
@@ -161,16 +167,17 @@ describe("getters", () => {
         ),
       );
 
+      store.add(
+        quad(
+          getCredentialSubject(mockedGConsentGrant),
+          gc.hasConsent,
+          literal("hello world"),
+        )
+      )
+
       expect(() =>
         getPurposes(
-          new Store([
-            ...store,
-            quad(
-              getCredentialSubject(mockedGConsentGrant),
-              gc.hasConsent,
-              literal("hello world"),
-            ),
-          ]) as unknown as AccessGrant,
+          Object.assign(store, { id: mockedGConsentGrant.id }),
         ),
       ).toThrow(
         "Expected consent to be a Named Node or Blank Node, instead got [Literal].",
@@ -218,7 +225,7 @@ describe("getters", () => {
         namedNode("http://example.org/another/requestor"),
       );
 
-      expect(() => getRequestor(store as any)).toThrow(
+      expect(() => getRequestor(Object.assign(store, { id: mockedGConsentGrant.id }))).toThrow(
         "Expected exactly one result. Found 2.",
       );
     });
@@ -232,7 +239,7 @@ describe("getters", () => {
         namedNode("http://example.org/another/consent"),
       );
 
-      expect(() => getRequestor(store as any)).toThrow(
+      expect(() => getRequestor(Object.assign(store, { id: mockedGConsentGrant.id }))).toThrow(
         "Expected exactly one result. Found 2.",
       );
     });
@@ -295,7 +302,7 @@ describe("getters", () => {
         ),
       ]);
 
-      expect(() => getTypes(store as any)).toThrow(
+      expect(() => getTypes(Object.assign(store, { id: mockedGConsentGrant.id }))).toThrow(
         "Expected every type to be a Named Node, but found [this is a literal] with term type [Literal]",
       );
     });
@@ -316,7 +323,7 @@ describe("getters", () => {
         ),
       ]);
 
-      expect(() => getTypes(store as any)).toThrow(
+      expect(() => getTypes(Object.assign(store, { id: mockedGConsentRequest.id }))).toThrow(
         "Expected every type to be a Named Node, but found [this is a literal] with term type [Literal]",
       );
     });
@@ -367,7 +374,7 @@ describe("getters", () => {
         namedNode("http://example.org/this/is/a/date"),
       );
 
-      expect(() => getExpirationDate(store as any)).toThrow(
+      expect(() => getExpirationDate(Object.assign(store, { id: mockedGConsentGrant.id }))).toThrow(
         "Expected expiration date to be a Literal. Found [http://example.org/this/is/a/date] of type [NamedNode].",
       );
     });
@@ -381,7 +388,7 @@ describe("getters", () => {
         literal("boo"),
       );
 
-      expect(() => getExpirationDate(store as any)).toThrow(
+      expect(() => getExpirationDate(Object.assign(store, { id: mockedGConsentGrant.id }))).toThrow(
         "Expected date to be a dateTime; recieved [http://www.w3.org/2001/XMLSchema#string]",
       );
     });
