@@ -23,8 +23,9 @@ import type { DatasetWithId } from "@inrupt/solid-client-vc";
 import { getId, getVerifiableCredential } from "@inrupt/solid-client-vc";
 import type { NamedNode } from "@rdfjs/types";
 import { DataFactory } from "n3";
-import { TYPE } from "../../common/constants";
+import { TYPE, gc } from "../../common/constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
+import { getConsent } from "../../common/getters";
 
 const { quad, namedNode } = DataFactory;
 // async function getVerifiableCredential(
@@ -81,6 +82,7 @@ export async function getBaseAccess(
   vc: string | DatasetWithId | URL,
   options: AccessBaseOptions,
   type?: NamedNode,
+  status?: NamedNode
 ) {
   let baseVc: DatasetWithId;
 
@@ -93,10 +95,14 @@ export async function getBaseAccess(
   } else {
     baseVc = vc;
   }
-
   if (type && !baseVc.has(quad(namedNode(getId(baseVc)), TYPE, type))) {
     throw new Error(
       `An error occurred when type checking the VC: Not of type [${type.value}].`,
+    );
+  }
+  if (status && !baseVc.has(quad(getConsent(baseVc), gc.hasStatus, status))) {
+    throw new Error(
+      `An error occurred when type checking the VC: status not [${status.value}].`,
     );
   }
   return baseVc;

@@ -55,7 +55,6 @@ export function isRdfjsAccessVerifiableCredential(
   if (!expectedTypes.some((type) => data.has(quad(s, TYPE, type)))) {
     return false;
   }
-
   // getConsent and getIssuanceDate can error
   try {
     getIssuanceDate(data);

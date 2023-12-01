@@ -74,6 +74,7 @@ export function normalizeAccessGrant<T extends VerifiableCredentialBase>(
 ): T {
   // Proper type checking is performed after normalization, so casting here is fine.
   const normalized = { ...accessGrant } as unknown as AccessGrant;
+  console.log("Before normalization: ", JSON.stringify(normalized));
   if (normalized.credentialSubject.providedConsent === undefined) {
     throw new Error(
       `[${normalized.id}] is not an Access Grant: missing field "credentialSubject.providedConsent".`,
@@ -99,6 +100,7 @@ export function normalizeAccessGrant<T extends VerifiableCredentialBase>(
     normalized.credentialSubject.providedConsent.inherit =
       normalized.credentialSubject.providedConsent.inherit === "true";
   }
+  console.log("After normalization: ", JSON.stringify(normalized));
   // Cast back to the original type
   return normalized as unknown as T;
 }
@@ -172,7 +174,12 @@ async function internal_approveAccessRequest(
 
   const internalGrantOptions = initializeGrantParameters(
     typeof requestVc !== "undefined"
-      ? await getBaseAccess(requestVc, options, solidVc.SolidAccessRequest)
+      ? await getBaseAccess(
+          requestVc,
+          options,
+          solidVc.SolidAccessRequest,
+          gc.ConsentStatusRequested,
+        )
       : undefined,
     requestOverride,
   );
@@ -340,6 +347,7 @@ export async function approveAccessRequest(
     override,
     internalOptions,
   );
+  console.log("Issued request: ", JSON.stringify(accessGrant));
   if (internalOptions.returnLegacyJsonld !== false) {
     if (
       !isBaseAccessGrantVerifiableCredential(accessGrant) ||
@@ -354,7 +362,6 @@ export async function approveAccessRequest(
 
     return accessGrant as AccessGrant;
   }
-
   if (!isRdfjsBaseAccessGrantVerifiableCredential(accessGrant)) {
     throw new Error(
       `Unexpected response when approving Access Request, the result is not an Access Grant: ${JSON.stringify(

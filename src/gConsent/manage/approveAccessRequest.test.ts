@@ -65,26 +65,12 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const {
-    verifiableCredentialToDataset,
-    getCredentialSubject,
-    getIssuanceDate,
-    getIssuer,
-    getExpirationDate,
-    getId,
-    getVerifiableCredential,
-  } = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
-    typeof VcClient
-  >;
+  const vcModule = jest.requireActual(
+    "@inrupt/solid-client-vc",
+  ) as typeof VcClient;
   return {
-    verifiableCredentialToDataset,
-    getCredentialSubject,
-    getIssuanceDate,
-    getIssuer,
-    getExpirationDate,
-    getId,
+    ...vcModule,
     issueVerifiableCredential: jest.fn(),
-    getVerifiableCredential,
   };
 });
 jest.mock("@inrupt/universal-fetch", () => {
@@ -248,7 +234,7 @@ describe("approveAccessRequest", () => {
           },
         })),
       ),
-    ).rejects.toThrow(/Unexpected VC.*credentialSubject/);
+    ).rejects.toThrow(/ConsentStatusRequested/);
   });
 
   it("uses the provided access endpoint, if any", async () => {
@@ -848,32 +834,24 @@ describe("approveAccessRequest", () => {
     mockAccessApiEndpoint();
     const mockedVcModule = jest.requireMock(
       "@inrupt/solid-client-vc",
-    ) as typeof VcClient;
-    const spiedIssueRequest = jest.spyOn(
-      mockedVcModule,
-      "issueVerifiableCredential",
-    );
+    ) as jest.Mocked<typeof VcClient>;
     const normalizedAccessGrant = accessGrantVc;
     // The server returns an equivalent JSON-LD with a different frame:
-    spiedIssueRequest.mockImplementationOnce(
-      async (_, _1, _2, _3, options) =>
-        ((options as any)?.normalize ?? ((e: unknown) => e))({
-          ...normalizedAccessGrant,
-          credentialSubject: {
-            ...normalizedAccessGrant.credentialSubject,
-            providedConsent: {
-              ...normalizedAccessGrant.credentialSubject.providedConsent,
-              // The 1-value array is replaced by the literal value.
-              forPersonalData:
-                normalizedAccessGrant.credentialSubject.providedConsent
-                  .forPersonalData[0],
-              mode: normalizedAccessGrant.credentialSubject.providedConsent
-                .mode[0],
-              inherit: "true",
-            },
-          },
-        }) as VcClient.VerifiableCredential,
-    );
+    mockedVcModule.issueVerifiableCredential.mockResolvedValueOnce({
+      ...normalizedAccessGrant,
+      credentialSubject: {
+        ...normalizedAccessGrant.credentialSubject,
+        providedConsent: {
+          ...normalizedAccessGrant.credentialSubject.providedConsent,
+          // The 1-value array is replaced by the literal value.
+          forPersonalData:
+            normalizedAccessGrant.credentialSubject.providedConsent
+              .forPersonalData[0],
+          mode: normalizedAccessGrant.credentialSubject.providedConsent.mode[0],
+          inherit: "true",
+        },
+      },
+    } as VcClient.VerifiableCredential);
     await expect(
       approveAccessRequest(accessRequestVc, undefined, {
         fetch: jest.fn(global.fetch),

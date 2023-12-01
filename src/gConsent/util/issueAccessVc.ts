@@ -194,7 +194,7 @@ export async function issueAccessVc(
     await getAccessApiEndpoint(targetResourceIri, options),
   );
 
-  return issueVerifiableCredential(
+  const issuedVc = await issueVerifiableCredential(
     accessIssuerEndpoint.href,
     {
       "@context": instanciateEssAccessGrantContext(
@@ -217,4 +217,6 @@ export async function issueAccessVc(
       normalize: options.normalize,
     },
   );
+  console.log("Issued VC: ", JSON.stringify(issuedVc));
+  return issuedVc;
 }

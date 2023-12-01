@@ -101,12 +101,12 @@ export const mockAccessRequestVc = async (
   modify?: (asObject: Record<string, any>) => void,
 ): Promise<AccessRequest> => {
   const asObject = mockAccessRequestVcObject(options) as VerifiableCredential;
-  modify?.(asObject);
+  const modifiedObject = modify?.(asObject) ?? asObject;
 
   return (await verifiableCredentialToDataset(
-    normalizeAccessRequest(asObject),
+    normalizeAccessRequest(modifiedObject),
     {
-      baseIRI: asObject.id,
+      baseIRI: modifiedObject.id,
       includeVcProperties: true,
     },
   )) as unknown as AccessRequest;

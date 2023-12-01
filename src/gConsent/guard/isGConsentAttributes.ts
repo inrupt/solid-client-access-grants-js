@@ -49,6 +49,14 @@ function isStringArray(x: unknown): x is Array<UrlString> {
 export function isGConsentAttributes(
   x: unknown,
 ): x is GConsentRequestAttributes {
+  console.log(JSON.stringify(x));
+  console.log((x as any).mode, " ", isResourceAccessModeArray((x as any).mode));
+  console.log(isGConsentStatus((x as any).hasStatus));
+  console.log(
+    (x as any).forPersonalData,
+    " ",
+    isStringArray((x as any).forPersonalData),
+  );
   return (
     isUnknownObject(x) &&
     isResourceAccessModeArray(x.mode) &&
