@@ -92,12 +92,19 @@ export function isRdfjsGConsentAttributes(
     return false;
   }
 
-  for (const { object } of dataset.match(
+  const forPersonalData = dataset.match(
     consent,
     gc.forPersonalData,
     null,
     defaultGraph(),
-  )) {
+  )
+  
+  // FIXME: Should we really have this condition?
+  if (forPersonalData.size === 0) {
+    throw new Error("No Personal Data specified for Access Grant");
+  }
+
+  for (const { object } of forPersonalData) {
     if (object.termType !== "NamedNode") {
       return false;
     }

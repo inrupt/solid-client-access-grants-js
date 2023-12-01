@@ -20,14 +20,26 @@
 //
 
 import { DatasetWithId, getCredentialSubject, getExpirationDate, getIssuanceDate } from "@inrupt/solid-client-vc";
+import { DataFactory } from "n3";
 import { getAccessModes, getResources } from "../../common";
-import { getInbox, getInherit, getPurposes } from "../../common/getters";
+import { getConsent, getInbox, getInherit, getPurposes } from "../../common/getters";
 import type { ApproveAccessRequestOverrides } from "../manage/approveAccessRequest";
+import { INHERIT, XSD_BOOLEAN } from "../../common/constants";
+const { quad, literal, defaultGraph } = DataFactory;
 
 export function initializeGrantParameters(
   requestVc: DatasetWithId | undefined,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
 ): ApproveAccessRequestOverrides {
+  const hasInherit = (str: 'true' | 'false') => requestVc!.has(
+    quad(
+      getConsent(requestVc!),
+      INHERIT,
+      literal(str, XSD_BOOLEAN),
+      defaultGraph(),
+    ),
+  )
+
   const resultGrant =
     requestVc === undefined
       ? (requestOverride as ApproveAccessRequestOverrides)
@@ -39,7 +51,7 @@ export function initializeGrantParameters(
           issuanceDate: requestOverride?.issuanceDate ?? getIssuanceDate(requestVc),
           purpose: requestOverride?.purpose ?? getPurposes(requestVc),
           expirationDate: requestOverride?.expirationDate ?? getExpirationDate(requestVc),
-          inherit: requestOverride?.inherit ?? getInherit(requestVc),
+          inherit: requestOverride?.inherit ?? (hasInherit('false') ? false : (hasInherit('true') ? true : undefined))
         };
   if (requestOverride?.expirationDate === null) {
     resultGrant.expirationDate = undefined;

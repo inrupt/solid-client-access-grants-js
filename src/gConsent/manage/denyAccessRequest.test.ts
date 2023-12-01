@@ -47,7 +47,7 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { verifiableCredentialToDataset, isVerifiableCredential, getCredentialSubject, getExpirationDate, getId, getIssuanceDate, getIssuer, getVerifiableCredential } =
+  const { verifiableCredentialToDataset, isVerifiableCredential, getCredentialSubject, getExpirationDate, getId, getIssuanceDate, getIssuer, getVerifiableCredential, isRdfjsVerifiableCredential } =
     jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
       typeof VcLibrary
     >;
@@ -60,6 +60,7 @@ jest.mock("@inrupt/solid-client-vc", () => {
     getIssuanceDate,
     getIssuer,
     getVerifiableCredential,
+    isRdfjsVerifiableCredential,
     issueVerifiableCredential: jest.fn(),
   };
 });
@@ -92,7 +93,7 @@ describe("denyAccessRequest", () => {
           returnLegacyJsonld
         }),
     ).rejects.toThrow(
-      "An error occurred when type checking the VC: Not of type Access Request.",
+      "An error occurred when type checking the VC: Not of type [http://www.w3.org/ns/solid/vc#SolidAccessRequest].",
     );
   });
 

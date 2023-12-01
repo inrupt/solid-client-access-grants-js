@@ -28,13 +28,13 @@ import { MOCKED_CREDENTIAL_ID } from "../request/request.mock";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { verifiableCredentialToDataset } = jest.requireActual(
+  const { verifiableCredentialToDataset, getIssuanceDate, getCredentialSubject, getExpirationDate, getId, getIssuer, getVerifiableCredential } = jest.requireActual(
     "@inrupt/solid-client-vc",
   ) as jest.Mocked<typeof VcLibrary>;
   return {
     verifiableCredentialToDataset,
     issueVerifiableCredential: jest.fn(),
-    revokeVerifiableCredential: jest.fn(),
+    revokeVerifiableCredential: jest.fn(), getIssuanceDate, getCredentialSubject, getExpirationDate, getId, getIssuer, getVerifiableCredential
   };
 });
 describe("revokeAccessGrant", () => {
@@ -103,7 +103,7 @@ describe("revokeAccessGrant", () => {
     await expect(
       revokeAccessGrant(await mockAccessRequestVc()),
     ).rejects.toThrow(
-      "An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.",
+      "An error occurred when type checking the VC: Not of type [http://www.w3.org/ns/solid/vc#SolidAccessGrant].",
     );
   });
 

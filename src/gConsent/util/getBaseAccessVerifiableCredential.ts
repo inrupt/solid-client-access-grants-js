@@ -19,64 +19,78 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import type { UrlString } from "@inrupt/solid-client";
+import { DatasetWithId, getId, getVerifiableCredential } from "@inrupt/solid-client-vc";
+import { NamedNode } from "@rdfjs/types";
+import { TYPE } from "../../common/constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
-import type {
-  AccessGrantBody,
-  AccessRequestBody,
-} from "../type/AccessVerifiableCredential";
-import { getSessionFetch } from "../../common/util/getSessionFetch";
-import { isBaseAccessRequestVerifiableCredential } from "../guard/isBaseAccessRequestVerifiableCredential";
-import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
-import { normalizeAccessRequest } from "../request/issueAccessRequest";
 
-async function getVerifiableCredential(
-  vc: URL | UrlString,
-  options: AccessBaseOptions,
-): Promise<VerifiableCredential> {
-  const fetcher = await getSessionFetch(options);
-  const vcAsUrlString = vc.toString();
-  const issuerResponse = await fetcher(vcAsUrlString);
-  if (!issuerResponse.ok) {
-    throw new Error(
-      `An error occurred when looking up [${vcAsUrlString}]: ${issuerResponse.status} ${issuerResponse.statusText}`,
-    );
-  }
-  // TODO: Type checking VerifiableCredential (probably via solid-client-vc?)
-  return (await issuerResponse.json()) as VerifiableCredential;
-}
+import { DataFactory } from "n3";
+const { quad, namedNode } = DataFactory;
+// async function getVerifiableCredential(
+//   vc: URL | UrlString,
+//   options: AccessBaseOptions,
+// ): Promise<VerifiableCredential> {
+//   const fetcher = await getSessionFetch(options);
+//   const vcAsUrlString = vc.toString();
+//   const issuerResponse = await fetcher(vcAsUrlString);
+//   if (!issuerResponse.ok) {
+//     throw new Error(
+//       `An error occurred when looking up [${vcAsUrlString}]: ${issuerResponse.status} ${issuerResponse.statusText}`,
+//     );
+//   }
+//   // TODO: Type checking VerifiableCredential (probably via solid-client-vc?)
+//   return (await issuerResponse.json()) as VerifiableCredential;
+// }
 
-export async function getBaseAccessGrantVerifiableCredential(
-  vc: VerifiableCredential | URL | UrlString,
-  options: AccessBaseOptions,
-): Promise<AccessGrantBody & VerifiableCredential> {
-  const fetchedVerifiableCredential =
-    typeof vc === "string" || vc instanceof URL
-      ? await getVerifiableCredential(vc, options)
-      : vc;
-  if (!isBaseAccessGrantVerifiableCredential(fetchedVerifiableCredential)) {
-    throw new Error(
-      `An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.`,
-    );
-  }
-  return fetchedVerifiableCredential as AccessGrantBody & VerifiableCredential;
-}
+// export async function getBaseAccessGrantVerifiableCredential(
+//   vc: VerifiableCredential | URL | UrlString,
+//   options: AccessBaseOptions,
+// ): Promise<AccessGrantBody & VerifiableCredential> {
+//   const fetchedVerifiableCredential =
+//     typeof vc === "string" || vc instanceof URL
+//       ? await getVerifiableCredential(vc, options)
+//       : vc;
+//   if (!isBaseAccessGrantVerifiableCredential(fetchedVerifiableCredential)) {
+//     throw new Error(
+//       `An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.`,
+//     );
+//   }
+//   return fetchedVerifiableCredential as AccessGrantBody & VerifiableCredential;
+// }
 
-export async function getBaseAccessRequestVerifiableCredential(
-  vc: VerifiableCredential | URL | UrlString,
-  options: AccessBaseOptions,
-): Promise<AccessRequestBody & VerifiableCredential> {
-  const fetchedVerifiableCredential = normalizeAccessRequest(
-    typeof vc === "string" || vc instanceof URL
-      ? await getVerifiableCredential(vc, options)
-      : vc,
-  );
-  if (!isBaseAccessRequestVerifiableCredential(fetchedVerifiableCredential)) {
-    throw new Error(
-      `An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.`,
-    );
+// export async function getBaseAccessRequestVerifiableCredential(
+//   vc: VerifiableCredential | URL | UrlString,
+//   options: AccessBaseOptions,
+// ): Promise<AccessRequestBody & VerifiableCredential> {
+//   const fetchedVerifiableCredential = normalizeAccessRequest(
+//     typeof vc === "string" || vc instanceof URL
+//       ? await getVerifiableCredential(vc, options)
+//       : vc,
+//   );
+//   if (!isBaseAccessRequestVerifiableCredential(fetchedVerifiableCredential)) {
+//     throw new Error(
+//       `An error occurred when type checking the VC, it is not a BaseAccessVerifiableCredential.`,
+//     );
+//   }
+//   return fetchedVerifiableCredential as AccessRequestBody &
+//     VerifiableCredential;
+// }
+
+export async function getBaseAccess(vc: string | DatasetWithId | URL, options: AccessBaseOptions, type?: NamedNode) {
+  let baseVc: DatasetWithId;
+
+  if (typeof vc === "string" || vc instanceof URL) {
+    baseVc = await getVerifiableCredential(vc.toString(), {
+      returnLegacyJsonld: false,
+      skipValidation: true,
+      fetch: options.fetch,
+    });
+  } else {
+    baseVc = vc;
   }
-  return fetchedVerifiableCredential as AccessRequestBody &
-    VerifiableCredential;
+
+  if (type && !baseVc.has(quad(namedNode(getId(baseVc)), TYPE, type))) {
+    throw new Error(`An error occurred when type checking the VC: Not of type [${type.value}].`);
+  }
+  return baseVc;
 }
