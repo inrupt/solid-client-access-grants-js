@@ -36,14 +36,27 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { verifiableCredentialToDataset, getVerifiableCredential, getId, getCredentialSubject, getExpirationDate, getIssuanceDate, getIssuer } = jest.requireActual(
-    "@inrupt/solid-client-vc",
-  ) as jest.Mocked<typeof VcLibrary>;
+  const {
+    verifiableCredentialToDataset,
+    getVerifiableCredential,
+    getId,
+    getCredentialSubject,
+    getExpirationDate,
+    getIssuanceDate,
+    getIssuer,
+  } = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
+    typeof VcLibrary
+  >;
   return {
     verifiableCredentialToDataset,
     getVerifiableCredential,
     issueVerifiableCredential: jest.fn(),
-    revokeVerifiableCredential: jest.fn(), getId, getCredentialSubject, getExpirationDate, getIssuanceDate, getIssuer
+    revokeVerifiableCredential: jest.fn(),
+    getId,
+    getCredentialSubject,
+    getExpirationDate,
+    getIssuanceDate,
+    getIssuer,
   };
 });
 
@@ -97,7 +110,7 @@ describe("cancelAccessRequest", () => {
     );
   });
 
-  it.only("throws if dereferencing the credential ID fails", async () => {
+  it("throws if dereferencing the credential ID fails", async () => {
     const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
       new Response(undefined, {
         status: 401,

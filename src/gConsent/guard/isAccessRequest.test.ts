@@ -26,7 +26,7 @@ import {
   validAccessRequestVerifiableCredential,
   validAccessGrantVerifiableCredential,
 } from "./credentials.mocks";
-import { AccessRequest } from "../type/AccessRequest";
+import type { AccessRequest } from "../type/AccessRequest";
 
 describe("isAccessRequest (legacy and RDFJS)", () => {
   it("Returns true on valid Access Request VC", async () => {
@@ -89,7 +89,9 @@ describe("isAccessRequest (legacy and RDFJS)", () => {
   });
 
   it("returns false if the credential subject is missing 'hasConsent'", async () => {
-    const noConsentRequest = JSON.parse(JSON.stringify(validAccessRequestVerifiableCredential)) as AccessRequest;
+    const noConsentRequest = JSON.parse(
+      JSON.stringify(validAccessRequestVerifiableCredential),
+    ) as AccessRequest;
     // @ts-expect-error this creates a malformed VC on purpose
     delete noConsentRequest.credentialSubject.hasConsent;
     expect(isAccessRequest(noConsentRequest)).toBe(false);
@@ -101,7 +103,9 @@ describe("isAccessRequest (legacy and RDFJS)", () => {
   });
 
   it("returns false if the credential subject 'hasConsent' is missing 'mode'", async () => {
-    const noModeRequest = JSON.parse(JSON.stringify(validAccessRequestVerifiableCredential)) as AccessRequest;
+    const noModeRequest = JSON.parse(
+      JSON.stringify(validAccessRequestVerifiableCredential),
+    ) as AccessRequest;
     // @ts-expect-error this creates a malformed VC on purpose
     delete noModeRequest.credentialSubject.hasConsent.mode;
     expect(isAccessRequest(noModeRequest)).toBe(false);
@@ -111,7 +115,9 @@ describe("isAccessRequest (legacy and RDFJS)", () => {
   });
 
   it("returns false if the credential subject 'hasConsent' is missing 'status'", async () => {
-    const noStatusRequest = JSON.parse(JSON.stringify(validAccessRequestVerifiableCredential)) as AccessRequest;
+    const noStatusRequest = JSON.parse(
+      JSON.stringify(validAccessRequestVerifiableCredential),
+    ) as AccessRequest;
     // @ts-expect-error this creates a malformed VC on purpose
     delete noStatusRequest.credentialSubject.hasConsent.hasStatus;
     expect(isAccessRequest(noStatusRequest)).toBe(false);
@@ -123,7 +129,9 @@ describe("isAccessRequest (legacy and RDFJS)", () => {
   });
 
   it("returns false if the credential subject 'hasConsent' is missing 'forPersonalData'", async () => {
-    const noDataRequest = JSON.parse(JSON.stringify(validAccessRequestVerifiableCredential)) as AccessRequest;
+    const noDataRequest = JSON.parse(
+      JSON.stringify(validAccessRequestVerifiableCredential),
+    ) as AccessRequest;
     // @ts-expect-error this creates a malformed VC on purpose
     delete noDataRequest.credentialSubject.hasConsent.forPersonalData;
     expect(isAccessRequest(noDataRequest)).toBe(false);
@@ -133,7 +141,9 @@ describe("isAccessRequest (legacy and RDFJS)", () => {
   });
 
   it("returns false if the credential subject 'hasConsent' is missing 'isConsentForDataSubject'", async () => {
-    const noDataSubjectRequest = JSON.parse(JSON.stringify(validAccessRequestVerifiableCredential)) as AccessRequest;
+    const noDataSubjectRequest = JSON.parse(
+      JSON.stringify(validAccessRequestVerifiableCredential),
+    ) as AccessRequest;
     delete noDataSubjectRequest.credentialSubject.hasConsent
       .isConsentForDataSubject;
     expect(isAccessRequest(noDataSubjectRequest)).toBe(false);
@@ -145,7 +155,9 @@ describe("isAccessRequest (legacy and RDFJS)", () => {
   });
 
   it("returns false if the credential type does not include 'SolidAccessRequest'", async () => {
-    const badTypeRequest = JSON.parse(JSON.stringify(validAccessRequestVerifiableCredential)) as AccessRequest;
+    const badTypeRequest = JSON.parse(
+      JSON.stringify(validAccessRequestVerifiableCredential),
+    ) as AccessRequest;
     badTypeRequest.type = ["https://example.org/ns/some-vc-type"];
     expect(isAccessRequest(badTypeRequest)).toBe(false);
     expect(

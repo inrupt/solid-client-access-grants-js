@@ -20,7 +20,7 @@
 //
 
 import type { UrlString, WebId } from "@inrupt/solid-client";
-import type { DatasetWithId, VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { DatasetWithId } from "@inrupt/solid-client-vc";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import {
@@ -100,10 +100,9 @@ export async function redirectToAccessManagementUi(
 ): Promise<void> {
   const fallbackUi = options.fallbackAccessManagementUi;
 
-  const requestVc = await getBaseAccess(
-    accessRequestVc,
-    { fetch: options.fetch },
-  );
+  const requestVc = await getBaseAccess(accessRequestVc, {
+    fetch: options.fetch,
+  });
 
   const [resourceUrl] = getResources(requestVc);
 
@@ -116,9 +115,7 @@ export async function redirectToAccessManagementUi(
 
   if (accessManagementUi === undefined) {
     throw new Error(
-      `Cannot discover access management UI URL for [${
-        resourceUrl
-      }]${
+      `Cannot discover access management UI URL for [${resourceUrl}]${
         options.resourceOwner ? `, neither from [${options.resourceOwner}]` : ""
       }`,
     );

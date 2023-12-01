@@ -97,8 +97,8 @@ export function isRdfjsGConsentAttributes(
     gc.forPersonalData,
     null,
     defaultGraph(),
-  )
-  
+  );
+
   // FIXME: Should we really have this condition?
   if (forPersonalData.size === 0) {
     throw new Error("No Personal Data specified for Access Grant");

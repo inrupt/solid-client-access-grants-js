@@ -20,7 +20,7 @@
 //
 import type { JsonLd } from "@inrupt/solid-client-vc";
 import { expect } from "@jest/globals";
-import DatasetCore from "@rdfjs/dataset/DatasetCore";
+import type DatasetCore from "@rdfjs/dataset/DatasetCore";
 
 /**
  * Remove the properties of an RDF.DatasetCore from an object so that

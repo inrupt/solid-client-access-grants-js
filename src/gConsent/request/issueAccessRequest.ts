@@ -31,7 +31,10 @@ import type {
   IssueAccessRequestParameters,
 } from "../type/IssueAccessRequestParameters";
 import type { AccessRequest } from "../type/AccessRequest";
-import { isAccessRequest, isRdfjsAccessRequest } from "../guard/isAccessRequest";
+import {
+  isAccessRequest,
+  isRdfjsAccessRequest,
+} from "../guard/isAccessRequest";
 import { gc } from "../../common/constants";
 
 /**

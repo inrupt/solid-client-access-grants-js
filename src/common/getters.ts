@@ -313,7 +313,8 @@ export function getRequestor(vc: DatasetWithId): string {
  * @returns The requestor WebID
  */
 export function getInbox(vc: DatasetWithId): string {
-  return getSingleObject(vc, getCredentialSubject(vc), ldp.inbox, "NamedNode").value;
+  return getSingleObject(vc, getCredentialSubject(vc), ldp.inbox, "NamedNode")
+    .value;
 }
 
 /**

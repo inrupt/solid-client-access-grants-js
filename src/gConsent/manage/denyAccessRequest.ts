@@ -20,9 +20,11 @@
 //
 
 import type { UrlString, WebId } from "@inrupt/solid-client";
-import type { DatasetWithId, VerifiableCredential, VerifiableCredentialBase } from "@inrupt/solid-client-vc";
-import { isRdfjsVerifiableCredential, isVerifiableCredential } from "@inrupt/solid-client-vc";
-import { DataFactory } from "n3";
+import type {
+  DatasetWithId,
+  VerifiableCredential,
+  VerifiableCredentialBase,
+} from "@inrupt/solid-client-vc";
 import { gc, solidVc } from "../../common/constants";
 import { CREDENTIAL_TYPE_ACCESS_DENIAL } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
@@ -31,18 +33,23 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
-const { namedNode } = DataFactory;
 
 // Merge back in denyAccessRequest after the deprecated signature has been removed.
 // eslint-disable-next-line camelcase
 async function internal_denyAccessRequest(
   vc: DatasetWithId | URL | UrlString,
-  options: AccessBaseOptions  & {
+  options: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
-    normalize?: ((arg: VerifiableCredentialBase) => VerifiableCredentialBase) | undefined
+    normalize?:
+      | ((arg: VerifiableCredentialBase) => VerifiableCredentialBase)
+      | undefined;
   },
 ): Promise<DatasetWithId> {
-  let baseVc: DatasetWithId = await getBaseAccess(vc, options, solidVc.SolidAccessRequest);
+  const baseVc: DatasetWithId = await getBaseAccess(
+    vc,
+    options,
+    solidVc.SolidAccessRequest,
+  );
 
   const internalOptions = initializeGrantParameters(baseVc);
   const denialBody = getGrantBody({
@@ -146,27 +153,24 @@ async function denyAccessRequest(
       typeof vcOrOptions === "string") ||
     // FIXME: Understand why adding this typeof vcOrOptions === "object" && was necessary before
     // making a release. Without it we were passing undefined to isVerifiableCredential
-    (typeof vcOrOptions === "object" && typeof (vcOrOptions as DatasetWithId).id === 'string')
+    (typeof vcOrOptions === "object" &&
+      typeof (vcOrOptions as DatasetWithId).id === "string")
   ) {
     // The deprecated signature is being used: ignore the first parameter
     return internal_denyAccessRequest(
       vcOrOptions as VerifiableCredential | URL | UrlString,
       {
         ...options,
-        normalize: normalizeAccessGrant
-      }
+        normalize: normalizeAccessGrant,
+      },
     );
   }
-  return internal_denyAccessRequest(
-    resourceOwnerOrVc,
-    {
-      ...vcOrOptions as AccessBaseOptions,
-      normalize: normalizeAccessGrant
-    }
-  );
+  return internal_denyAccessRequest(resourceOwnerOrVc, {
+    ...(vcOrOptions as AccessBaseOptions),
+    normalize: normalizeAccessGrant,
+  });
 }
 
 export { denyAccessRequest };
 export default denyAccessRequest;
 export type { UrlString, VerifiableCredential };
-

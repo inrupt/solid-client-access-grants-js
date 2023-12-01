@@ -28,13 +28,27 @@ import { MOCKED_CREDENTIAL_ID } from "../request/request.mock";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { verifiableCredentialToDataset, getIssuanceDate, getCredentialSubject, getExpirationDate, getId, getIssuer, getVerifiableCredential } = jest.requireActual(
-    "@inrupt/solid-client-vc",
-  ) as jest.Mocked<typeof VcLibrary>;
+  const {
+    verifiableCredentialToDataset,
+    getIssuanceDate,
+    getCredentialSubject,
+    getExpirationDate,
+    getId,
+    getIssuer,
+    getVerifiableCredential,
+  } = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
+    typeof VcLibrary
+  >;
   return {
     verifiableCredentialToDataset,
     issueVerifiableCredential: jest.fn(),
-    revokeVerifiableCredential: jest.fn(), getIssuanceDate, getCredentialSubject, getExpirationDate, getId, getIssuer, getVerifiableCredential
+    revokeVerifiableCredential: jest.fn(),
+    getIssuanceDate,
+    getCredentialSubject,
+    getExpirationDate,
+    getId,
+    getIssuer,
+    getVerifiableCredential,
   };
 });
 describe("revokeAccessGrant", () => {

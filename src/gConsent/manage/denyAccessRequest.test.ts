@@ -24,9 +24,12 @@ import { Response } from "@inrupt/universal-fetch";
 import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 
 import type * as VcLibrary from "@inrupt/solid-client-vc";
-import { getCredentialSubject, getIssuer, verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
-import { DataFactory } from "n3";
-import { isomorphic } from 'rdf-isomorphic';
+import {
+  getCredentialSubject,
+  getIssuer,
+  verifiableCredentialToDataset,
+} from "@inrupt/solid-client-vc";
+import { isomorphic } from "rdf-isomorphic";
 import { getAccessModes, getRequestor, getResources } from "../../common";
 import {
   MOCKED_ACCESS_ISSUER,
@@ -47,20 +50,11 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { verifiableCredentialToDataset, isVerifiableCredential, getCredentialSubject, getExpirationDate, getId, getIssuanceDate, getIssuer, getVerifiableCredential, isRdfjsVerifiableCredential } =
-    jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
-      typeof VcLibrary
-    >;
+  const actualVcLibrary = jest.requireActual(
+    "@inrupt/solid-client-vc",
+  ) as typeof VcLibrary;
   return {
-    verifiableCredentialToDataset,
-    isVerifiableCredential,
-    getCredentialSubject,
-    getExpirationDate,
-    getId,
-    getIssuanceDate,
-    getIssuer,
-    getVerifiableCredential,
-    isRdfjsVerifiableCredential,
+    ...actualVcLibrary,
     issueVerifiableCredential: jest.fn(),
   };
 });
@@ -83,54 +77,68 @@ describe("denyAccessRequest", () => {
     accessRequestVc = await mockAccessRequestVc();
   });
 
-  it.each([[true], [false]])("throws if the provided VC isn't a Solid access request [returnLegacyJsonld: %s]", async (returnLegacyJsonld) => {
-    mockAccessApiEndpoint();
-    await expect(
-      denyAccessRequest(
-        await mockAccessRequestVc(undefined, accessRequest => {
-          accessRequest.type = ["NotASolidAccessRequest"];
-        }), {
-          returnLegacyJsonld
-        }),
-    ).rejects.toThrow(
-      "An error occurred when type checking the VC: Not of type [http://www.w3.org/ns/solid/vc#SolidAccessRequest].",
-    );
-  });
+  it.each([[true], [false]])(
+    "throws if the provided VC isn't a Solid access request [returnLegacyJsonld: %s]",
+    async (returnLegacyJsonld) => {
+      mockAccessApiEndpoint();
+      await expect(
+        denyAccessRequest(
+          await mockAccessRequestVc(undefined, (accessRequest) => ({
+            ...accessRequest,
+            type: ["NotASolidAccessRequest"],
+          })),
+          {
+            returnLegacyJsonld,
+          },
+        ),
+      ).rejects.toThrow(
+        "An error occurred when type checking the VC: Not of type [http://www.w3.org/ns/solid/vc#SolidAccessRequest].",
+      );
+    },
+  );
 
-  it.each([[true], [false]])("throws if there is no well known access endpoint [returnLegacyJsonld: %s]", async (returnLegacyJsonld) => {
-    mockAccessApiEndpoint(false);
-    await expect(denyAccessRequest(accessRequestVc, { returnLegacyJsonld })).rejects.toThrow(
-      "No access issuer listed for property [verifiable_credential_issuer] in",
-    );
-  });
+  it.each([[true], [false]])(
+    "throws if there is no well known access endpoint [returnLegacyJsonld: %s]",
+    async (returnLegacyJsonld) => {
+      mockAccessApiEndpoint(false);
+      await expect(
+        denyAccessRequest(accessRequestVc, { returnLegacyJsonld }),
+      ).rejects.toThrow(
+        "No access issuer listed for property [verifiable_credential_issuer] in",
+      );
+    },
+  );
 
-  it.each([[true], [false]])("uses the provided access endpoint, if any [returnLegacyJsonld: %s]", async (returnLegacyJsonld) => {
-    mockAccessApiEndpoint();
-    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      issueVerifiableCredential: () => Promise<AccessGrant>;
-    };
-    const spiedIssueRequest = jest
-      .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(await mockAccessGrantVc());
+  it.each([[true], [false]])(
+    "uses the provided access endpoint, if any [returnLegacyJsonld: %s]",
+    async (returnLegacyJsonld) => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: () => Promise<AccessGrant>;
+      };
+      const spiedIssueRequest = jest
+        .spyOn(mockedVcModule, "issueVerifiableCredential")
+        .mockResolvedValueOnce(await mockAccessGrantVc());
 
-    const denail = await denyAccessRequest(accessRequestVc, {
-      accessEndpoint: "https://some.access-endpoint.override/",
-      fetch: jest.fn<typeof fetch>() as typeof fetch,
-      returnLegacyJsonld
-    });
+      const denail = await denyAccessRequest(accessRequestVc, {
+        accessEndpoint: "https://some.access-endpoint.override/",
+        fetch: jest.fn<typeof fetch>() as typeof fetch,
+        returnLegacyJsonld,
+      });
 
-    expect(spiedIssueRequest).toHaveBeenCalledWith(
-      "https://some.access-endpoint.override/".concat("issue"),
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-    );
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        "https://some.access-endpoint.override/".concat("issue"),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
 
-    expect(getRequestor(denail)).toEqual(getRequestor(accessRequestVc));
-    expect(getAccessModes(denail)).toEqual(getAccessModes(accessRequestVc));
-    expect(getIssuer(denail)).toEqual(getIssuer(accessRequestVc));
-    expect(getResources(denail)).toEqual(getResources(accessRequestVc));
-  });
+      expect(getRequestor(denail)).toEqual(getRequestor(accessRequestVc));
+      expect(getAccessModes(denail)).toEqual(getAccessModes(accessRequestVc));
+      expect(getIssuer(denail)).toEqual(getIssuer(accessRequestVc));
+      expect(getResources(denail)).toEqual(getResources(accessRequestVc));
+    },
+  );
 
   it("returns isomorphic results regardless of how returnLegacyJsonld is set", async () => {
     mockAccessApiEndpoint();
@@ -144,247 +152,280 @@ describe("denyAccessRequest", () => {
     const legacyDenial = await denyAccessRequest(accessRequestVc, {
       accessEndpoint: "https://some.access-endpoint.override/",
       fetch: jest.fn<typeof fetch>() as typeof fetch,
-      returnLegacyJsonld: true
+      returnLegacyJsonld: true,
     });
 
     jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
-      // @ts-ignore
-      .mockResolvedValueOnce(await verifiableCredentialToDataset(await mockAccessGrantVc(), { includeVcProperties: false }));
+      .mockResolvedValueOnce(
+        // @ts-expect-error only return the dataset-like value.
+        await verifiableCredentialToDataset(await mockAccessGrantVc(), {
+          includeVcProperties: false,
+        }),
+      );
 
     const denial = await denyAccessRequest(accessRequestVc, {
       accessEndpoint: "https://some.access-endpoint.override/",
       fetch: jest.fn<typeof fetch>() as typeof fetch,
-      returnLegacyJsonld: false
+      returnLegacyJsonld: false,
     });
 
     expect(isomorphic([...legacyDenial], [...denial])).toBe(true);
 
-    expect(legacyDenial.credentialSubject.id).toEqual("https://some.resource.owner");
-    expect(getCredentialSubject(legacyDenial).value).toEqual("https://some.resource.owner");
-    expect(getCredentialSubject(denial).value).toEqual("https://some.resource.owner");
+    expect(legacyDenial.credentialSubject.id).toBe(
+      "https://some.resource.owner",
+    );
+    expect(getCredentialSubject(legacyDenial).value).toBe(
+      "https://some.resource.owner",
+    );
+    expect(getCredentialSubject(denial).value).toBe(
+      "https://some.resource.owner",
+    );
     // @ts-expect-error the credentialSubject property has been removed on non-legacy results
     expect(denial.credentialSubject).toBeUndefined();
   });
 
-  it.each([[true], [false]])("uses the provided fetch, if any [returnLegacyJsonld: %s]", async (returnLegacyJsonld) => {
-    mockAccessApiEndpoint();
-    const mockedFetch = jest.fn(global.fetch);
-    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      issueVerifiableCredential: () => Promise<AccessGrant>;
-    };
-    const spiedIssueRequest = jest
-      .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(await mockAccessGrantVc());
+  it.each([[true], [false]])(
+    "uses the provided fetch, if any [returnLegacyJsonld: %s]",
+    async (returnLegacyJsonld) => {
+      mockAccessApiEndpoint();
+      const mockedFetch = jest.fn(global.fetch);
+      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: () => Promise<AccessGrant>;
+      };
+      const spiedIssueRequest = jest
+        .spyOn(mockedVcModule, "issueVerifiableCredential")
+        .mockResolvedValueOnce(await mockAccessGrantVc());
 
-    await denyAccessRequest(accessRequestVc, {
-      fetch: mockedFetch as typeof fetch,
-      returnLegacyJsonld
-    });
-    expect(spiedIssueRequest).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.anything(),
-      expect.anything(),
-      { fetch: mockedFetch, normalize: normalizeAccessGrant, returnLegacyJsonld },
-    );
-  });
-
-  it.each([[true], [false]])("issues a proper denied access VC [returnLegacyJsonld: %s]", async (returnLegacyJsonld) => {
-    mockAccessApiEndpoint();
-    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      issueVerifiableCredential: () => Promise<AccessGrant>;
-    };
-    const spiedIssueRequest = jest
-      .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(await mockAccessGrantVc());
-    const accessRequestWithPurpose = await mockAccessRequestVc({
-      purpose: ["https://example.org/some-purpose"],
-    });
-    await denyAccessRequest(accessRequestWithPurpose, {
-      fetch: jest.fn(global.fetch) as typeof fetch,
-      returnLegacyJsonld
-    });
-
-    // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
-    expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_ACCESS_ISSUER}/issue`,
-      expect.objectContaining({
-        providedConsent: {
-          mode: accessRequestWithPurpose.credentialSubject.hasConsent.mode,
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
-          forPersonalData:
-            accessRequestWithPurpose.credentialSubject.hasConsent
-              .forPersonalData,
-          isProvidedTo: "https://some.requestor",
-          forPurpose:
-            accessRequestWithPurpose.credentialSubject.hasConsent.forPurpose,
+      await denyAccessRequest(accessRequestVc, {
+        fetch: mockedFetch as typeof fetch,
+        returnLegacyJsonld,
+      });
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+        {
+          fetch: mockedFetch,
+          normalize: normalizeAccessGrant,
+          returnLegacyJsonld,
         },
-        inbox: accessRequestWithPurpose.credentialSubject.inbox,
-      }),
-      expect.objectContaining({
-        type: ["SolidAccessDenial"],
-        expirationDate: accessRequestWithPurpose.expirationDate,
-      }),
-      expect.anything(),
-    );
-  });
-
-  it.each([[true], [false]])("issues a proper denied access VC from a given access request VC IRI [returnLegacyJsonld: %s]", async (returnLegacyJsonld) => {
-    mockAccessApiEndpoint();
-    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      issueVerifiableCredential: () => Promise<AccessGrant>;
-    };
-    const spiedIssueRequest = jest
-      .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(await mockAccessGrantVc());
-    const mockedFetch = jest
-      .fn(global.fetch)
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify(await mockAccessRequestVc())),
       );
-    await denyAccessRequest("https://some.credential", {
-      fetch: mockedFetch as typeof fetch,
-      returnLegacyJsonld,
-    });
+    },
+  );
 
-    expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_ACCESS_ISSUER}/issue`,
-      expect.objectContaining({
-        providedConsent: expect.objectContaining({
-          mode: accessRequestVc.credentialSubject.hasConsent.mode,
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
-          forPersonalData:
-            accessRequestVc.credentialSubject.hasConsent
-              .forPersonalData,
+  it.each([[true], [false]])(
+    "issues a proper denied access VC [returnLegacyJsonld: %s]",
+    async (returnLegacyJsonld) => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: () => Promise<AccessGrant>;
+      };
+      const spiedIssueRequest = jest
+        .spyOn(mockedVcModule, "issueVerifiableCredential")
+        .mockResolvedValueOnce(await mockAccessGrantVc());
+      const accessRequestWithPurpose = await mockAccessRequestVc({
+        purpose: ["https://example.org/some-purpose"],
+      });
+      await denyAccessRequest(accessRequestWithPurpose, {
+        fetch: jest.fn(global.fetch) as typeof fetch,
+        returnLegacyJsonld,
+      });
+
+      // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          providedConsent: {
+            mode: accessRequestWithPurpose.credentialSubject.hasConsent.mode,
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
+            forPersonalData:
+              accessRequestWithPurpose.credentialSubject.hasConsent
+                .forPersonalData,
+            isProvidedTo: "https://some.requestor",
+            forPurpose:
+              accessRequestWithPurpose.credentialSubject.hasConsent.forPurpose,
+          },
+          inbox: accessRequestWithPurpose.credentialSubject.inbox,
         }),
-        inbox: accessRequestVc.credentialSubject.inbox,
-      }),
-      expect.objectContaining({
-        type: ["SolidAccessDenial"],
-      }),
-      expect.anything(),
-    );
-  });
-
-  it.each([[true], [false]])("can take a URL as VC IRI parameter [returnLegacyJsonld: %s]", async (returnLegacyJsonld) => {
-    mockAccessApiEndpoint();
-    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      issueVerifiableCredential: () => Promise<AccessGrant>;
-    };
-    const spiedIssueRequest = jest
-      .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(await mockAccessGrantVc());
-
-    const mockedFetch = jest
-      .fn(global.fetch)
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify(await mockAccessRequestVc())),
-      );
-    await denyAccessRequest(new URL("https://some.credential"), {
-      fetch: mockedFetch as typeof fetch,
-      returnLegacyJsonld
-    });
-
-    // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
-    expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_ACCESS_ISSUER}/issue`,
-      expect.objectContaining({
-        providedConsent: expect.objectContaining({
-          mode: accessRequestVc.credentialSubject.hasConsent.mode,
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
-          forPersonalData:
-            accessRequestVc.credentialSubject.hasConsent
-              .forPersonalData,
+        expect.objectContaining({
+          type: ["SolidAccessDenial"],
+          expirationDate: accessRequestWithPurpose.expirationDate,
         }),
-        inbox: accessRequestVc.credentialSubject.inbox,
-      }),
-      expect.objectContaining({
-        type: ["SolidAccessDenial"],
-      }),
-      expect.anything(),
-    );
-  });
-
-  it.each([[true], [false]])("issues a proper denied access VC using the deprecated signature and VC value [returnLegacyJsonld: %s]", async (returnLegacyJsonld) => {
-    mockAccessApiEndpoint();
-    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      issueVerifiableCredential: () => Promise<AccessGrant>;
-    };
-    const spiedIssueRequest = jest
-      .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(await mockAccessGrantVc());
-
-    // This explicitly tests the deprecated signature.
-    await denyAccessRequest("https://some.resource.owner", accessRequestVc, {
-      fetch: jest.fn(global.fetch) as typeof fetch,
-      returnLegacyJsonld
-    });
-
-    // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
-    expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_ACCESS_ISSUER}/issue`,
-      expect.objectContaining({
-        providedConsent: {
-          mode: accessRequestVc.credentialSubject.hasConsent.mode,
-          forPurpose: [],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
-          forPersonalData:
-            accessRequestVc.credentialSubject.hasConsent
-              .forPersonalData,
-          isProvidedTo: "https://some.requestor",
-        },
-        inbox: accessRequestVc.credentialSubject.inbox,
-      }),
-      expect.objectContaining({
-        type: ["SolidAccessDenial"],
-      }),
-      expect.anything(),
-    );
-  });
-
-  it.each([[true], [false]])("issues a proper denied access VC using the deprecated signature and VC IRI [returnLegacyJsonld: %s]", async (returnLegacyJsonld) => {
-    mockAccessApiEndpoint();
-    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      issueVerifiableCredential: () => Promise<AccessGrant>;
-    };
-    const spiedIssueRequest = jest
-      .spyOn(mockedVcModule, "issueVerifiableCredential")
-      .mockResolvedValueOnce(await mockAccessGrantVc());
-
-    const accessRequestWithPurpose = await mockAccessRequestVc({
-      purpose: ["https://example.org/some-purpose"],
-    });
-
-    const mockedFetch = jest
-      .fn(global.fetch)
-      .mockResolvedValueOnce(
-        new Response(JSON.stringify(accessRequestWithPurpose)),
+        expect.anything(),
       );
-    await denyAccessRequest("https://some.resource.owner", "https://some.vc", {
-      fetch: mockedFetch as typeof fetch,
-      returnLegacyJsonld
-    });
+    },
+  );
 
-    // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
-    expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_ACCESS_ISSUER}/issue`,
-      expect.objectContaining({
-        providedConsent: {
-          mode: accessRequestWithPurpose.credentialSubject.hasConsent.mode,
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
-          forPersonalData:
-            accessRequestWithPurpose.credentialSubject.hasConsent
-              .forPersonalData,
-          isProvidedTo: "https://some.requestor",
-          forPurpose:
-            accessRequestWithPurpose.credentialSubject.hasConsent.forPurpose,
+  it.each([[true], [false]])(
+    "issues a proper denied access VC from a given access request VC IRI [returnLegacyJsonld: %s]",
+    async (returnLegacyJsonld) => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: () => Promise<AccessGrant>;
+      };
+      const spiedIssueRequest = jest
+        .spyOn(mockedVcModule, "issueVerifiableCredential")
+        .mockResolvedValueOnce(await mockAccessGrantVc());
+      const mockedFetch = jest
+        .fn(global.fetch)
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify(await mockAccessRequestVc())),
+        );
+      await denyAccessRequest("https://some.credential", {
+        fetch: mockedFetch as typeof fetch,
+        returnLegacyJsonld,
+      });
+
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          providedConsent: expect.objectContaining({
+            mode: accessRequestVc.credentialSubject.hasConsent.mode,
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
+            forPersonalData:
+              accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+          }),
+          inbox: accessRequestVc.credentialSubject.inbox,
+        }),
+        expect.objectContaining({
+          type: ["SolidAccessDenial"],
+        }),
+        expect.anything(),
+      );
+    },
+  );
+
+  it.each([[true], [false]])(
+    "can take a URL as VC IRI parameter [returnLegacyJsonld: %s]",
+    async (returnLegacyJsonld) => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: () => Promise<AccessGrant>;
+      };
+      const spiedIssueRequest = jest
+        .spyOn(mockedVcModule, "issueVerifiableCredential")
+        .mockResolvedValueOnce(await mockAccessGrantVc());
+
+      const mockedFetch = jest
+        .fn(global.fetch)
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify(await mockAccessRequestVc())),
+        );
+      await denyAccessRequest(new URL("https://some.credential"), {
+        fetch: mockedFetch as typeof fetch,
+        returnLegacyJsonld,
+      });
+
+      // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          providedConsent: expect.objectContaining({
+            mode: accessRequestVc.credentialSubject.hasConsent.mode,
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
+            forPersonalData:
+              accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+          }),
+          inbox: accessRequestVc.credentialSubject.inbox,
+        }),
+        expect.objectContaining({
+          type: ["SolidAccessDenial"],
+        }),
+        expect.anything(),
+      );
+    },
+  );
+
+  it.each([[true], [false]])(
+    "issues a proper denied access VC using the deprecated signature and VC value [returnLegacyJsonld: %s]",
+    async (returnLegacyJsonld) => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: () => Promise<AccessGrant>;
+      };
+      const spiedIssueRequest = jest
+        .spyOn(mockedVcModule, "issueVerifiableCredential")
+        .mockResolvedValueOnce(await mockAccessGrantVc());
+
+      // This explicitly tests the deprecated signature.
+      await denyAccessRequest("https://some.resource.owner", accessRequestVc, {
+        fetch: jest.fn(global.fetch) as typeof fetch,
+        returnLegacyJsonld,
+      });
+
+      // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          providedConsent: {
+            mode: accessRequestVc.credentialSubject.hasConsent.mode,
+            forPurpose: [],
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
+            forPersonalData:
+              accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+            isProvidedTo: "https://some.requestor",
+          },
+          inbox: accessRequestVc.credentialSubject.inbox,
+        }),
+        expect.objectContaining({
+          type: ["SolidAccessDenial"],
+        }),
+        expect.anything(),
+      );
+    },
+  );
+
+  it.each([[true], [false]])(
+    "issues a proper denied access VC using the deprecated signature and VC IRI [returnLegacyJsonld: %s]",
+    async (returnLegacyJsonld) => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: () => Promise<AccessGrant>;
+      };
+      const spiedIssueRequest = jest
+        .spyOn(mockedVcModule, "issueVerifiableCredential")
+        .mockResolvedValueOnce(await mockAccessGrantVc());
+
+      const accessRequestWithPurpose = await mockAccessRequestVc({
+        purpose: ["https://example.org/some-purpose"],
+      });
+
+      const mockedFetch = jest
+        .fn(global.fetch)
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify(accessRequestWithPurpose)),
+        );
+      await denyAccessRequest(
+        "https://some.resource.owner",
+        "https://some.vc",
+        {
+          fetch: mockedFetch as typeof fetch,
+          returnLegacyJsonld,
         },
-        inbox: accessRequestWithPurpose.credentialSubject.inbox,
-      }),
-      expect.objectContaining({
-        type: ["SolidAccessDenial"],
-      }),
-      expect.anything(),
-    );
-  });
+      );
+
+      // TODO: Should we expect "isProvidedTo": "https://some.requestor" in "providedConsent" or nest the expect.objectContaining?
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          providedConsent: {
+            mode: accessRequestWithPurpose.credentialSubject.hasConsent.mode,
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
+            forPersonalData:
+              accessRequestWithPurpose.credentialSubject.hasConsent
+                .forPersonalData,
+            isProvidedTo: "https://some.requestor",
+            forPurpose:
+              accessRequestWithPurpose.credentialSubject.hasConsent.forPurpose,
+          },
+          inbox: accessRequestWithPurpose.credentialSubject.inbox,
+        }),
+        expect.objectContaining({
+          type: ["SolidAccessDenial"],
+        }),
+        expect.anything(),
+      );
+    },
+  );
 });

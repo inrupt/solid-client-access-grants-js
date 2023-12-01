@@ -150,8 +150,12 @@ describe("getAccessRequest", () => {
       async (_, opts) =>
         VcModule.verifiableCredentialToDataset<VcModule.VerifiableCredentialBase>(
           opts && "normalize" in opts && opts.normalize
-            ? opts.normalize(withoutDataset(vc) as unknown as VcModule.VerifiableCredential)
-            : withoutDataset(vc as unknown as VcModule.VerifiableCredential) as VcModule.VerifiableCredential,
+            ? opts.normalize(
+                withoutDataset(vc) as unknown as VcModule.VerifiableCredential,
+              )
+            : (withoutDataset(
+                vc as unknown as VcModule.VerifiableCredential,
+              ) as VcModule.VerifiableCredential),
           { includeVcProperties: opts?.returnLegacyJsonld !== false },
           // This is a lie because it will not contain VC properties when opts?.returnLegacyJsonld is false
           // but we need to do it to keep typescript happy with the current overloading we have

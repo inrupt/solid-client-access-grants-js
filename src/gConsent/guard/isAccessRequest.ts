@@ -25,10 +25,13 @@ import { ACCESS_REQUEST_STATUS } from "../constants";
 import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import { isBaseAccessRequestVerifiableCredential } from "./isBaseAccessRequestVerifiableCredential";
 import { gc, solidVc } from "../../common/constants";
-import { getConsent, getCredentialSubject, getId, getIssuanceDate, getSingleObject } from "../../common/getters";
+import {
+  getCredentialSubject,
+  getIssuanceDate,
+  getSingleObject,
+} from "../../common/getters";
 import { isRdfjsAccessVerifiableCredential } from "./isBaseAccessVcBody";
 import { isRdfjsGConsentAttributes } from "./isGConsentAttributes";
-import { namedNode } from "@rdfjs/dataset";
 
 const { quad, defaultGraph } = DataFactory;
 
@@ -53,8 +56,12 @@ export function isRdfjsAccessRequest(dataset: DatasetWithId) {
   try {
     // This will error if there is no issuance date and return false.
     // This is the behavior we want since Access Requests must have an issuance date
-    getIssuanceDate(dataset)
-    const requestClaimSubject = getSingleObject(dataset, getCredentialSubject(dataset),  gc.hasConsent);
+    getIssuanceDate(dataset);
+    const requestClaimSubject = getSingleObject(
+      dataset,
+      getCredentialSubject(dataset),
+      gc.hasConsent,
+    );
     return (
       dataset.has(
         quad(requestClaimSubject, gc.hasStatus, gc.ConsentStatusRequested),
@@ -64,10 +71,11 @@ export function isRdfjsAccessRequest(dataset: DatasetWithId) {
         gc.isConsentForDataSubject,
         null,
         defaultGraph(),
-      ).size === 1
-    ) && isRdfjsGConsentAttributes(dataset, requestClaimSubject);
+      ).size === 1 &&
+      isRdfjsGConsentAttributes(dataset, requestClaimSubject)
+    );
   } catch {
-    console.log('in catch')
+    console.log("in catch");
     return false;
   }
 }

@@ -23,16 +23,11 @@ import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import type * as CrossFetch from "@inrupt/universal-fetch";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 
-import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 import {
   issueAccessRequest,
   normalizeAccessRequest,
 } from "./issueAccessRequest";
 import { getRequestBody } from "../util/issueAccessVc";
-import {
-  isAccessRequest,
-  isRdfjsAccessRequest,
-} from "../guard/isAccessRequest";
 import {
   mockAccessApiEndpoint,
   MOCKED_ACCESS_ISSUER,

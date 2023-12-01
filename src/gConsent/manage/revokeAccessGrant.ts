@@ -20,13 +20,18 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import type { DatasetWithId, VerifiableCredential } from "@inrupt/solid-client-vc";
-import { getId, getIssuer, revokeVerifiableCredential } from "@inrupt/solid-client-vc";
+import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import {
+  getId,
+  getIssuer,
+  revokeVerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import { DataFactory } from "n3";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { TYPE, solidVc } from "../../common/constants";
+
 const { quad, namedNode } = DataFactory;
 
 /**
@@ -42,10 +47,18 @@ async function revokeAccessGrant(
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
 ): Promise<void> {
   const credential = await getBaseAccess(vc, options, solidVc.SolidAccessGrant);
-  
 
-  if (!credential.has(quad(namedNode(getId(credential)), TYPE, solidVc.SolidAccessGrant)) && !credential.has(quad(namedNode(getId(credential)), TYPE, solidVc.SolidAccessDenial))) {
-    throw new Error(`An error occurred when type checking the VC: Not of type [${solidVc.SolidAccessGrant.value}] or [${solidVc.SolidAccessDenial.value}].`);
+  if (
+    !credential.has(
+      quad(namedNode(getId(credential)), TYPE, solidVc.SolidAccessGrant),
+    ) &&
+    !credential.has(
+      quad(namedNode(getId(credential)), TYPE, solidVc.SolidAccessDenial),
+    )
+  ) {
+    throw new Error(
+      `An error occurred when type checking the VC: Not of type [${solidVc.SolidAccessGrant.value}] or [${solidVc.SolidAccessDenial.value}].`,
+    );
   }
 
   return revokeVerifiableCredential(

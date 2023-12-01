@@ -30,7 +30,10 @@ import {
   mockAccessApiEndpoint,
   MOCKED_ACCESS_ISSUER,
 } from "../request/request.mock";
-import { approveAccessRequest, normalizeAccessGrant } from "./approveAccessRequest";
+import {
+  approveAccessRequest,
+  normalizeAccessGrant,
+} from "./approveAccessRequest";
 import {
   mockAccessGrantVc,
   mockAccessRequestVc,
@@ -62,9 +65,17 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { verifiableCredentialToDataset, getCredentialSubject, getIssuanceDate, getIssuer, getExpirationDate, getId, getVerifiableCredential } = jest.requireActual(
-    "@inrupt/solid-client-vc",
-  ) as jest.Mocked<typeof VcClient>;
+  const {
+    verifiableCredentialToDataset,
+    getCredentialSubject,
+    getIssuanceDate,
+    getIssuer,
+    getExpirationDate,
+    getId,
+    getVerifiableCredential,
+  } = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
+    typeof VcClient
+  >;
   return {
     verifiableCredentialToDataset,
     getCredentialSubject,
@@ -211,9 +222,12 @@ describe("approveAccessRequest", () => {
   it("throws if the provided VC isn't a solid access request VC", async () => {
     mockAccessApiEndpoint();
     await expect(
-      approveAccessRequest(await mockAccessRequestVc(undefined, object => {
-        object.type = ["NotASolidAccessRequest"]
-      })),
+      approveAccessRequest(
+        await mockAccessRequestVc(undefined, (object) => ({
+          ...object,
+          type: ["NotASolidAccessRequest"],
+        })),
+      ),
     ).rejects.toThrow(
       "An error occurred when type checking the VC: Not of type [http://www.w3.org/ns/solid/vc#SolidAccessRequest].",
     );
@@ -221,12 +235,19 @@ describe("approveAccessRequest", () => {
 
   it("throws if the provided VC isn't an access request", async () => {
     mockAccessApiEndpoint();
-    const accessRequest = accessRequestVc;
     await expect(
       approveAccessRequest(
-        await mockAccessRequestVc(undefined, object => {
-          object.credentialSubject.hasConsent.hasStatus = "https://w3id.org/GConsent#ConsentStatusDenied"
-        }))
+        await mockAccessRequestVc(undefined, (object) => ({
+          ...object,
+          credentialSubject: {
+            ...object.credentialSubject,
+            hasConsent: {
+              ...object.hasConsent,
+              hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
+            },
+          },
+        })),
+      ),
     ).rejects.toThrow(/Unexpected VC.*credentialSubject/);
   });
 
@@ -271,7 +292,11 @@ describe("approveAccessRequest", () => {
       expect.anything(),
       expect.anything(),
       expect.anything(),
-      { fetch: mockedFetch, normalize: normalizeAccessGrant, returnLegacyJsonld: undefined },
+      {
+        fetch: mockedFetch,
+        normalize: normalizeAccessGrant,
+        returnLegacyJsonld: undefined,
+      },
     );
   });
 
@@ -300,7 +325,7 @@ describe("approveAccessRequest", () => {
           forPersonalData:
             accessRequestVc.credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: accessRequestVc.credentialSubject.id,
-          forPurpose: []
+          forPurpose: [],
         },
         inbox: accessRequestVc.credentialSubject.inbox,
       }),
@@ -830,22 +855,25 @@ describe("approveAccessRequest", () => {
     );
     const normalizedAccessGrant = accessGrantVc;
     // The server returns an equivalent JSON-LD with a different frame:
-    // @ts-ignore
-    spiedIssueRequest.mockImplementationOnce(async (_, _1, _2, _3, options) => ((options as any)?.normalize ?? (e => e))({
-      ...normalizedAccessGrant,
-      credentialSubject: {
-        ...normalizedAccessGrant.credentialSubject,
-        providedConsent: {
-          ...normalizedAccessGrant.credentialSubject.providedConsent,
-          // The 1-value array is replaced by the literal value.
-          forPersonalData:
-            normalizedAccessGrant.credentialSubject.providedConsent
-              .forPersonalData[0],
-          mode: normalizedAccessGrant.credentialSubject.providedConsent.mode[0],
-          inherit: "true",
-        },
-      },
-    }) as VcClient.VerifiableCredential);
+    spiedIssueRequest.mockImplementationOnce(
+      async (_, _1, _2, _3, options) =>
+        ((options as any)?.normalize ?? ((e: unknown) => e))({
+          ...normalizedAccessGrant,
+          credentialSubject: {
+            ...normalizedAccessGrant.credentialSubject,
+            providedConsent: {
+              ...normalizedAccessGrant.credentialSubject.providedConsent,
+              // The 1-value array is replaced by the literal value.
+              forPersonalData:
+                normalizedAccessGrant.credentialSubject.providedConsent
+                  .forPersonalData[0],
+              mode: normalizedAccessGrant.credentialSubject.providedConsent
+                .mode[0],
+              inherit: "true",
+            },
+          },
+        }) as VcClient.VerifiableCredential,
+    );
     await expect(
       approveAccessRequest(accessRequestVc, undefined, {
         fetch: jest.fn(global.fetch),

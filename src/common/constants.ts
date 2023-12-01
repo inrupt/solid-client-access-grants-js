@@ -59,8 +59,8 @@ export const acl = {
 };
 
 export const ldp = {
-  inbox: namedNode('http://www.w3.org/ns/ldp#inbox'),
-}
+  inbox: namedNode("http://www.w3.org/ns/ldp#inbox"),
+};
 
 export const INHERIT = namedNode(
   "urn:uuid:71ab2f68-a68b-4452-b968-dd23e0570227",

@@ -27,6 +27,7 @@ import type {
   VerifiableCredential,
   VerifiableCredentialBase,
 } from "@inrupt/solid-client-vc";
+import type { DatasetCore } from "@rdfjs/types";
 import type {
   AccessBaseOptions,
   WithLegacyJsonFlag,
@@ -37,7 +38,6 @@ import type { AccessGrantParameters } from "../type/Parameter";
 import type { AccessModes } from "../../type/AccessModes";
 import type { AccessGrant } from "../type/AccessGrant";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
-import { isAccessRequest } from "../guard/isAccessRequest";
 import {
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_READ,
@@ -52,7 +52,6 @@ import {
   isRdfjsBaseAccessGrantVerifiableCredential,
 } from "../guard/isBaseAccessGrantVerifiableCredential";
 import { gc, solidVc } from "../../common/constants";
-import { DatasetCore } from "@rdfjs/types";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
@@ -172,7 +171,9 @@ async function internal_approveAccessRequest(
   };
 
   const internalGrantOptions = initializeGrantParameters(
-    typeof requestVc !== 'undefined' ? await getBaseAccess(requestVc, options, solidVc.SolidAccessRequest) : undefined,
+    typeof requestVc !== "undefined"
+      ? await getBaseAccess(requestVc, options, solidVc.SolidAccessRequest)
+      : undefined,
     requestOverride,
   );
 
