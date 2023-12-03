@@ -89,5 +89,5 @@ export interface WithLegacyJsonFlag {
 }
 
 export interface WithLegacyJsonFlagSet {
-  returnLegacyJsonld: true;
+  returnLegacyJsonld?: true;
 }

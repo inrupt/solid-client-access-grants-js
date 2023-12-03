@@ -27,31 +27,29 @@ import type {
   VerifiableCredential,
   VerifiableCredentialBase,
 } from "@inrupt/solid-client-vc";
-import type { DatasetCore } from "@rdfjs/types";
-import type {
-  AccessBaseOptions,
-  WithLegacyJsonFlag,
-  WithLegacyJsonFlagSet,
-} from "../type/AccessBaseOptions";
-import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
-import type { AccessGrantParameters } from "../type/Parameter";
+import { gc, solidVc } from "../../common/constants";
+import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { AccessModes } from "../../type/AccessModes";
-import type { AccessGrant } from "../type/AccessGrant";
-import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import {
   ACL_RESOURCE_ACCESS_MODE_APPEND,
   ACL_RESOURCE_ACCESS_MODE_READ,
   ACL_RESOURCE_ACCESS_MODE_WRITE,
 } from "../../type/ResourceAccessMode";
-import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
-import { initializeGrantParameters } from "../util/initializeGrantParameters";
-import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { isAccessGrant } from "../guard/isAccessGrant";
 import {
   isBaseAccessGrantVerifiableCredential,
   isRdfjsBaseAccessGrantVerifiableCredential,
 } from "../guard/isBaseAccessGrantVerifiableCredential";
-import { gc, solidVc } from "../../common/constants";
+import type {
+  AccessBaseOptions,
+  WithLegacyJsonFlag,
+} from "../type/AccessBaseOptions";
+import type { AccessGrant } from "../type/AccessGrant";
+import type { AccessGrantBody } from "../type/AccessVerifiableCredential";
+import type { AccessGrantParameters } from "../type/Parameter";
+import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
+import { initializeGrantParameters } from "../util/initializeGrantParameters";
+import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
@@ -230,14 +228,15 @@ async function internal_approveAccessRequest(
  * available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
  * @returns A Verifiable Credential representing the granted access.
  * @since 0.0.1.
- * @deprecated Set the options flag `returnLegacyJsonLd` to false, and prefer using the RDFJS interfaces.
  */
 export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential | URL | UrlString,
-  requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions & WithLegacyJsonFlagSet,
-): Promise<Exclude<DatasetCore, AccessGrant>>;
+  requestOverride: Partial<ApproveAccessRequestOverrides>,
+  options: AccessBaseOptions & {
+    returnLegacyJsonld: false;
+  },
+): Promise<DatasetWithId>;
 
 /**
  * Approve an access request. The content of the approved access request is provided
@@ -256,13 +255,16 @@ export async function approveAccessRequest(
  * available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
  * @returns A Verifiable Credential representing the granted access.
  * @since 0.0.1.
+ * @deprecated Set the options flag `returnLegacyJsonLd` to false, and prefer using the RDFJS interfaces.
  */
 export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions & WithLegacyJsonFlag,
-): Promise<DatasetWithId>;
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: true;
+  },
+): Promise<AccessGrant>;
 
 /**
  * Approve an access request. The content of the approved access request is provided
@@ -278,6 +280,44 @@ export async function approveAccessRequest(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
+  options: AccessBaseOptions & {
+    returnLegacyJsonld: false;
+  },
+): Promise<DatasetWithId>;
+/**
+ * Approve an access request. The content of the approved access request is provided
+ * as a set of claims, and no input Verifiable Credential is expected.
+ *
+ * @param requestVc A Verifiable Credential that would represent the Access Request if provided.
+ * @param requestOverride Claims constructing the Access Grant.
+ * @param options Optional properties to customise the access grant behaviour.
+ * @returns A Verifiable Credential representing the granted access.
+ * @since 0.0.1.
+ * @deprecated Set the options flag `returnLegacyJsonLd` to false, and prefer using the RDFJS interfaces.
+ */
+export async function approveAccessRequest(
+  requestVc: undefined,
+  // If the VC is undefined, then some of the overrides become mandatory
+  requestOverride: ApproveAccessRequestOverrides,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: true;
+  },
+): Promise<AccessGrant>;
+/**
+ * Approve an access request. The content of the approved access request is provided
+ * as a set of claims, and no input Verifiable Credential is expected.
+ *
+ * @param requestVc A Verifiable Credential that would represent the Access Request if provided.
+ * @param requestOverride Claims constructing the Access Grant.
+ * @param options Optional properties to customise the access grant behaviour.
+ * @returns A Verifiable Credential representing the granted access.
+ * @since 0.0.1.
+ * @deprecated Set the options flag `returnLegacyJsonLd` to false, and prefer using the RDFJS interfaces.
+ */
+export async function approveAccessRequest(
+  requestVc: undefined,
+  // If the VC is undefined, then some of the overrides become mandatory
+  requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions & WithLegacyJsonFlag,
 ): Promise<DatasetWithId>;
 
@@ -290,8 +330,21 @@ export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
   requestVc: VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions & WithLegacyJsonFlag,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: true;
+  },
 ): Promise<AccessGrant>;
+/**
+ * @deprecated Please remove the `resourceOwner` parameter.
+ * @hidden
+ */
+export async function approveAccessRequest(
+  resourceOwner: WebId,
+  // If the VC is specified, all the overrides become optional
+  requestVc: VerifiableCredential | URL | UrlString,
+  requestOverride?: Partial<ApproveAccessRequestOverrides>,
+  options?: AccessBaseOptions & WithLegacyJsonFlag,
+): Promise<DatasetWithId>;
 
 /**
  * @deprecated Please remove the `resourceOwner` parameter.
@@ -302,8 +355,21 @@ export async function approveAccessRequest(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
-  options?: AccessBaseOptions & WithLegacyJsonFlag,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: true;
+  },
 ): Promise<AccessGrant>;
+/**
+ * @deprecated Please remove the `resourceOwner` parameter.
+ * @hidden
+ */
+export async function approveAccessRequest(
+  resourceOwner: WebId,
+  requestVc: undefined,
+  // If the VC is undefined, then some of the overrides become mandatory
+  requestOverride: ApproveAccessRequestOverrides,
+  options?: AccessBaseOptions & WithLegacyJsonFlag,
+): Promise<DatasetWithId>;
 export async function approveAccessRequest(
   resourceOwnerOrRequestVc:
     | WebId
