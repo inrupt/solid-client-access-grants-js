@@ -47,8 +47,6 @@ function isGrantCredentialSubject(
 export function isBaseAccessGrantVerifiableCredential(
   x: unknown,
 ): x is BaseGrantBody {
-  console.log("test1: ", JSON.stringify(x))
-  console.log("test2: ", JSON.stringify((x as any).credentialSubject.providedConsent))
   return (
     isBaseAccessVcBody(x) &&
     isGrantCredentialSubject(x.credentialSubject) &&

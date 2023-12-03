@@ -75,7 +75,6 @@ export function isRdfjsAccessRequest(dataset: DatasetWithId) {
       isRdfjsGConsentAttributes(dataset, requestClaimSubject)
     );
   } catch {
-    console.log("in catch");
     return false;
   }
 }

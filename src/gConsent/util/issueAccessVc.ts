@@ -217,6 +217,5 @@ export async function issueAccessVc(
       normalize: options.normalize,
     },
   );
-  console.log("Issued VC: ", JSON.stringify(issuedVc));
   return issuedVc;
 }
