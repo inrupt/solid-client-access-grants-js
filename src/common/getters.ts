@@ -312,9 +312,13 @@ export function getRequestor(vc: DatasetWithId): string {
  * @param vc The Access Grant/Request
  * @returns The requestor WebID
  */
-export function getInbox(vc: DatasetWithId): string {
-  return getSingleObject(vc, getCredentialSubject(vc), ldp.inbox, "NamedNode")
-    .value;
+export function getInbox(vc: DatasetWithId): string | undefined {
+  try {
+    return getSingleObject(vc, getCredentialSubject(vc), ldp.inbox, "NamedNode")
+      .value;
+  } catch {
+    return undefined;
+  }
 }
 
 /**
