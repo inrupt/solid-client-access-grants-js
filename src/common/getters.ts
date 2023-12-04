@@ -299,9 +299,8 @@ export function getRequestor(vc: DatasetWithId): string {
     .value;
 }
 
-// FIXME: describe this correctly
 /**
- * Get the inbox of the  asking for access to a resources with an Access Grant/Request.
+ * Get the inbox of the requestor of an Access Grant/Request.
  *
  * @example
  *
@@ -310,7 +309,7 @@ export function getRequestor(vc: DatasetWithId): string {
  * ```
  *
  * @param vc The Access Grant/Request
- * @returns The requestor WebID
+ * @returns The requestors inbox
  */
 export function getInbox(vc: DatasetWithId): string | undefined {
   try {
