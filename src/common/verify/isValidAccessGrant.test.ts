@@ -41,11 +41,12 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { verifiableCredentialToDataset } = jest.requireActual<
-    typeof VcLibrary
-  >("@inrupt/solid-client-vc");
+  const { verifiableCredentialToDataset, getIssuer, getVerifiableCredential } =
+    jest.requireActual<typeof VcLibrary>("@inrupt/solid-client-vc");
   return {
     verifiableCredentialToDataset,
+    getIssuer,
+    getVerifiableCredential,
     isVerifiableCredential: jest.fn(),
     issueVerifiableCredential: jest.fn(),
     getVerifiableCredentialApiConfiguration: jest.fn(),
@@ -180,7 +181,7 @@ describe("isValidAccessGrant", () => {
         verificationEndpoint: MOCK_ACCESS_ENDPOINT,
       }),
     ).rejects.toThrow(
-      "The request to [https://example.com/someVc] returned an unexpected response:",
+      "Verifiable credential is not an object, or does not have an id",
     );
   });
 

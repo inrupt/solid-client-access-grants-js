@@ -20,11 +20,15 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  DatasetWithId,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import {
-  isVerifiableCredential,
+  getIssuer,
   getVerifiableCredentialApiConfiguration,
 } from "@inrupt/solid-client-vc";
+import { getBaseAccess } from "../../gConsent/util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
 
 /**
@@ -37,43 +41,26 @@ import { getSessionFetch } from "../util/getSessionFetch";
  */
 // TODO: Push verification further as this just checks it's a valid VC should we not type check the consent grant?
 async function isValidAccessGrant(
-  vc: VerifiableCredential | URL | UrlString,
+  vc: DatasetWithId | URL | UrlString,
   options: {
     verificationEndpoint?: UrlString;
     fetch?: typeof fetch;
   } = {},
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
   const fetcher = await getSessionFetch(options);
-
-  let vcObject;
-  // This test passes for both URL and UrlString
-  if (vc.toString().startsWith("http")) {
-    // vc is either an IRI-shaped string or a URL object. In both
-    // cases, vc.toString() is an IRI.
-    const vcResponse = await fetcher(vc.toString());
-    vcObject = await vcResponse.json();
-  } else {
-    vcObject = vc;
-  }
-  if (!isVerifiableCredential(vcObject)) {
-    throw new Error(
-      `The request to [${vc}] returned an unexpected response: ${JSON.stringify(
-        vcObject,
-        null,
-        "  ",
-      )}`,
-    );
-  }
+  const vcObject = await getBaseAccess(vc, options);
 
   // Discover the access endpoint from the resource part of the Access Grant.
   const verifierEndpoint =
     options.verificationEndpoint ??
-    (await getVerifiableCredentialApiConfiguration(vcObject.issuer))
+    (await getVerifiableCredentialApiConfiguration(getIssuer(vcObject)))
       .verifierService;
 
   if (verifierEndpoint === undefined) {
     throw new Error(
-      `The VC service provider ${vcObject.issuer} does not advertize for a verifier service in its .well-known/vc-configuration document`,
+      `The VC service provider ${getIssuer(
+        vcObject,
+      )} does not advertize for a verifier service in its .well-known/vc-configuration document`,
     );
   }
 

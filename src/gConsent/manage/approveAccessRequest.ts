@@ -50,6 +50,7 @@ import type { AccessGrantParameters } from "../type/Parameter";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
+import type { AccessRequest } from "../type/AccessRequest";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
@@ -231,7 +232,7 @@ async function internal_approveAccessRequest(
  */
 export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
-  requestVc: VerifiableCredential | URL | UrlString,
+  requestVc: DatasetWithId | AccessRequest | URL | UrlString,
   requestOverride: Partial<ApproveAccessRequestOverrides>,
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
@@ -259,12 +260,40 @@ export async function approveAccessRequest(
  */
 export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
-  requestVc: VerifiableCredential | URL | UrlString,
+  requestVc: DatasetWithId | AccessRequest | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
   },
 ): Promise<AccessGrant>;
+
+/**
+ * Approve an access request. The content of the approved access request is provided
+ * as a Verifiable Credential which properties may be overridden if necessary.
+ *
+ * @param requestVc The Verifiable Credential representing the Access Request. If
+ * not conform to an Access Request, the function will throw.
+ * @param requestOverride Elements overriding information from the provided Verifiable
+ * Credential.
+ * @param options Optional properties to customizes the access grant behavior. Options
+ * include `updateAcr` which defaults to true. If this flag is set to true, the ACR
+ * of the Resource will be updated when the access grant is approved. If this flag is
+ * set to false, the ACR of the Resource will remain unchanged. This is an advanced
+ * feature, and only users having a good understanding of the relationship between
+ * Access Grants and ACRs should deviate from the default. Additional information is
+ * available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
+ * @returns A Verifiable Credential representing the granted access.
+ * @since 0.0.1.
+ * @deprecated Set the options flag `returnLegacyJsonLd` to false, and prefer using the RDFJS interfaces.
+ */
+export async function approveAccessRequest(
+  // If the VC is specified, all the overrides become optional
+  requestVc: DatasetWithId | AccessRequest | URL | UrlString,
+  requestOverride?: Partial<ApproveAccessRequestOverrides>,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+  },
+): Promise<DatasetWithId>;
 
 /**
  * Approve an access request. The content of the approved access request is provided
@@ -328,7 +357,7 @@ export async function approveAccessRequest(
 export async function approveAccessRequest(
   resourceOwner: WebId,
   // If the VC is specified, all the overrides become optional
-  requestVc: VerifiableCredential | URL | UrlString,
+  requestVc: DatasetWithId | AccessRequest | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
@@ -341,7 +370,7 @@ export async function approveAccessRequest(
 export async function approveAccessRequest(
   resourceOwner: WebId,
   // If the VC is specified, all the overrides become optional
-  requestVc: VerifiableCredential | URL | UrlString,
+  requestVc: DatasetWithId | AccessRequest | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions & WithLegacyJsonFlag,
 ): Promise<DatasetWithId>;
@@ -373,12 +402,14 @@ export async function approveAccessRequest(
 export async function approveAccessRequest(
   resourceOwnerOrRequestVc:
     | WebId
-    | VerifiableCredential
+    | DatasetWithId
+    | AccessRequest
     | URL
     | UrlString
     | undefined,
   requestVcOrOverride?:
-    | VerifiableCredential
+    | DatasetWithId
+    | AccessRequest
     | URL
     | UrlString
     | Partial<ApproveAccessRequestOverrides>,
@@ -387,19 +418,20 @@ export async function approveAccessRequest(
     | AccessBaseOptions,
   options?: AccessBaseOptions & WithLegacyJsonFlag,
 ): Promise<DatasetWithId> {
-  let requestVc: VerifiableCredential | URL | UrlString;
+  let requestVc: DatasetWithId | AccessRequest | URL | UrlString;
   let override: Partial<ApproveAccessRequestOverrides>;
   let internalOptions: AccessBaseOptions & WithLegacyJsonFlag;
 
   if (typeof options === "object") {
     // The deprecated signature is being used, so ignore the first parameter.
-    requestVc = requestVcOrOverride as VerifiableCredential | URL | UrlString;
+    requestVc = requestVcOrOverride as DatasetWithId | URL | UrlString;
     override =
       requestOverrideOrOptions as Partial<ApproveAccessRequestOverrides>;
     internalOptions = options;
   } else {
     requestVc = resourceOwnerOrRequestVc as
-      | VerifiableCredential
+      | DatasetWithId
+      | AccessRequest
       | URL
       | UrlString;
     override = requestVcOrOverride as Partial<ApproveAccessRequestOverrides>;

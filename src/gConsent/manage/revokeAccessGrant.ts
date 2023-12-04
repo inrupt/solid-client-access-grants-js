@@ -20,7 +20,10 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  DatasetWithId,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import {
   getId,
   getIssuer,
@@ -43,7 +46,7 @@ const { quad, namedNode } = DataFactory;
  * @since 0.4.0
  */
 async function revokeAccessGrant(
-  vc: VerifiableCredential | URL | UrlString,
+  vc: DatasetWithId | URL | UrlString,
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
 ): Promise<void> {
   const credential = await getBaseAccess(vc, options, solidVc.SolidAccessGrant);

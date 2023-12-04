@@ -22,7 +22,7 @@
 import { fetch as crossFetch } from "@inrupt/universal-fetch";
 import base64url from "base64url";
 import type { UrlString } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type { DatasetWithId } from "@inrupt/solid-client-vc";
 import type { UmaConfiguration } from "../type/UmaConfiguration";
 import type { FetchOptions } from "../type/FetchOptions";
 import {
@@ -86,7 +86,7 @@ export async function getUmaConfiguration(
  */
 export async function exchangeTicketForAccessToken(
   tokenEndpoint: UrlString,
-  accessGrant: VerifiableCredential,
+  accessGrant: DatasetWithId,
   authTicket: string,
   authFetch: typeof fetch,
 ): Promise<string | null> {
@@ -157,7 +157,7 @@ export async function fetchWithVc(
   // Why UrlString instead of UrlString | Url? Because Urls aren't compatible
   // with the fetch return type.
   resourceIri: UrlString,
-  accessGrant: VerifiableCredential,
+  accessGrant: DatasetWithId,
   options?: FetchOptions,
 ): Promise<typeof fetch> {
   // Use an authenticated session to fetch the resource so that we can parse
