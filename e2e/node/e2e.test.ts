@@ -32,6 +32,7 @@ import type {
 } from "@inrupt/solid-client-vc";
 import {
   isVerifiableCredential as _isVerifiableCredential,
+  getVerifiableCredentialApiConfiguration,
   isRdfjsVerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { DataFactory } from "n3";
@@ -190,6 +191,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
   let sessionInterval: NodeJS.Timeout;
   let allSessions: Promise<Session>[];
   let sharedRequest: DatasetWithId;
+  let verifierService: string;
 
   async function getSharedFile() {
     // setup the shared file
@@ -256,6 +258,15 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
     sharedFileIri = await getSharedFile();
     vcProvider = await retryAsync(() => getAccessApiEndpoint(sharedFileIri));
+
+    const vcConfiguration =
+      await getVerifiableCredentialApiConfiguration(vcProvider);
+
+    if (typeof vcConfiguration.verifierService !== "string") {
+      throw new Error("Verifier endpoint is undefined");
+    }
+
+    verifierService = vcConfiguration.verifierService;
   });
 
   afterAll(async () => {
@@ -312,10 +323,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           await expect(
             isValidAccessGrant(grant, {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-              // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
-              // It is an issue documented in the VC library e2e test, and in a ticket
-              // to be fixed.
-              verificationEndpoint: new URL("verify", vcProvider).href,
+              verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
 
@@ -356,8 +364,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
                   resourceOwnerSession.fetch,
                   TEST_USER_AGENT,
                 ),
-                // FIXME: Ditto verification endpoint discovery.
-                verificationEndpoint: new URL("verify", vcProvider).href,
+                verificationEndpoint: verifierService,
               })
             ).errors,
           ).toHaveLength(1);
@@ -399,10 +406,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           await expect(
             isValidAccessGrant(grant, {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-              // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
-              // It is an issue documented in the VC library e2e test, and in a ticket
-              // to be fixed.
-              verificationEndpoint: new URL("verify", vcProvider).href,
+              verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
           expect(
@@ -470,10 +474,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           await expect(
             isValidAccessGrant(grant, {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-              // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
-              // It is an issue documented in the VC library e2e test, and in a ticket
-              // to be fixed.
-              verificationEndpoint: new URL("verify", vcProvider).href,
+              verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
           expect(grant.credentialSubject.providedConsent.inherit).toBe(false);
@@ -512,10 +513,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           await expect(
             isValidAccessGrant(grant, {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-              // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
-              // It is an issue documented in the VC library e2e test, and in a ticket
-              // to be fixed.
-              verificationEndpoint: new URL("verify", vcProvider).href,
+              verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
 
@@ -573,10 +571,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           await expect(
             isValidAccessGrant(grant, {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-              // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
-              // It is an issue documented in the VC library e2e test, and in a ticket
-              // to be fixed.
-              verificationEndpoint: new URL("verify", vcProvider).href,
+              verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
 
@@ -612,10 +607,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           await expect(
             isValidAccessGrant(grant, {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-              // FIXME: Currently looking up JSON-LD doesn't work in jest tests.
-              // It is an issue documented in the VC library e2e test, and in a ticket
-              // to be fixed.
-              verificationEndpoint: new URL("verify", vcProvider).href,
+              verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
 
