@@ -234,11 +234,30 @@ async function internal_getAccessGrantAll(
  * @returns A promise resolving to an array of Access Grants matching the request.
  * @since 0.4.0
  */
-
 async function getAccessGrantAll(
   params: AccessParameters,
-  options?: QueryOptions,
+  options: QueryOptions & {
+    returnLegacyJsonld: false;
+  },
+): Promise<Array<DatasetWithId>>;
+/**
+ * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
+ */
+async function getAccessGrantAll(
+  params: AccessParameters,
+  options?: QueryOptions & {
+    returnLegacyJsonld?: true;
+  },
 ): Promise<Array<VerifiableCredential>>;
+/**
+ * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
+ */
+async function getAccessGrantAll(
+  params: AccessParameters,
+  options?: QueryOptions & {
+    returnLegacyJsonld?: boolean;
+  },
+): Promise<Array<DatasetWithId>>;
 
 /**
  * Retrieve Access Grants issued over a resource. The Access Grants may be filtered
@@ -258,17 +277,45 @@ async function getAccessGrantAll(
  * @since 0.4.0
  * @deprecated Please remove `resource` parameter.
  */
-
+async function getAccessGrantAll(
+  resource: URL | UrlString,
+  params: AccessParameters,
+  options: QueryOptions & {
+    returnLegacyJsonld: false;
+  },
+): Promise<Array<DatasetWithId>>;
+/**
+ * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
+ */
 async function getAccessGrantAll(
   resource: URL | UrlString,
   params?: AccessParameters,
-  options?: QueryOptions,
+  options?: QueryOptions & {
+    returnLegacyJsonld?: true;
+  },
 ): Promise<Array<VerifiableCredential>>;
+/**
+ * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
+ */
+async function getAccessGrantAll(
+  resource: URL | UrlString,
+  params?: AccessParameters,
+  options?: QueryOptions & {
+    returnLegacyJsonld?: boolean;
+  },
+): Promise<Array<DatasetWithId>>;
 // FIXME: Add type overload above
 async function getAccessGrantAll(
   resourceOrParams: URL | UrlString | AccessParameters,
-  paramsOrOptions: AccessParameters | undefined | QueryOptions,
-  options: QueryOptions = {},
+  paramsOrOptions:
+    | AccessParameters
+    | undefined
+    | (QueryOptions & {
+        returnLegacyJsonld?: boolean;
+      }),
+  options: QueryOptions & {
+    returnLegacyJsonld?: boolean;
+  } = {},
 ): Promise<Array<DatasetWithId>> {
   if (
     typeof resourceOrParams === "string" ||

@@ -46,6 +46,10 @@ function isStringArray(x: unknown): x is Array<UrlString> {
   return Array.isArray(x) && x.every((y) => typeof y === "string");
 }
 
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the VC,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 export function isGConsentAttributes(
   x: unknown,
 ): x is GConsentRequestAttributes {

@@ -33,6 +33,7 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
+import type { AccessRequest } from "../type/AccessRequest";
 
 // Merge back in denyAccessRequest after the deprecated signature has been removed.
 // eslint-disable-next-line camelcase
@@ -81,7 +82,7 @@ async function internal_denyAccessRequest(
  * @since 0.0.1
  */
 async function denyAccessRequest(
-  vc: DatasetWithId | URL | UrlString,
+  vc: DatasetWithId | AccessRequest | URL | UrlString,
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
   },
@@ -99,7 +100,7 @@ async function denyAccessRequest(
  * versions of this library.
  */
 async function denyAccessRequest(
-  vc: DatasetWithId | URL | UrlString,
+  vc: DatasetWithId | AccessRequest | URL | UrlString,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
   },
@@ -117,7 +118,7 @@ async function denyAccessRequest(
  * versions of this library.
  */
 async function denyAccessRequest(
-  vc: DatasetWithId | URL | UrlString,
+  vc: DatasetWithId | AccessRequest | URL | UrlString,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
   },
@@ -127,7 +128,7 @@ async function denyAccessRequest(
  */
 async function denyAccessRequest(
   resourceOwner: WebId,
-  vc: DatasetWithId | URL | UrlString,
+  vc: DatasetWithId | AccessRequest | URL | UrlString,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
   },
@@ -137,13 +138,13 @@ async function denyAccessRequest(
  */
 async function denyAccessRequest(
   resourceOwner: WebId,
-  vc: DatasetWithId | URL | UrlString,
+  vc: DatasetWithId | AccessRequest | URL | UrlString,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
   },
 ): Promise<DatasetWithId>;
 async function denyAccessRequest(
-  resourceOwnerOrVc: WebId | DatasetWithId | URL | UrlString,
+  resourceOwnerOrVc: WebId | DatasetWithId | AccessRequest | URL | UrlString,
   vcOrOptions?: DatasetWithId | URL | UrlString | AccessBaseOptions,
   options?: AccessBaseOptions,
 ): Promise<DatasetWithId> {

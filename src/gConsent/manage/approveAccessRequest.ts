@@ -210,8 +210,6 @@ async function internal_approveAccessRequest(
   });
 }
 
-// FIXME: Address these overloads
-
 /**
  * Approve an access request. The content of the approved access request is provided
  * as a Verifiable Credential which properties may be overridden if necessary.

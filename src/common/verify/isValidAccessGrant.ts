@@ -30,6 +30,7 @@ import {
 } from "@inrupt/solid-client-vc";
 import { getBaseAccess } from "../../gConsent/util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
+import type { AccessGrant } from "../../gConsent";
 
 /**
  * Makes a request to the access server to verify the validity of a given Verifiable Credential.
@@ -41,7 +42,7 @@ import { getSessionFetch } from "../util/getSessionFetch";
  */
 // TODO: Push verification further as this just checks it's a valid VC should we not type check the consent grant?
 async function isValidAccessGrant(
-  vc: DatasetWithId | URL | UrlString,
+  vc: DatasetWithId | AccessGrant | URL | UrlString,
   options: {
     verificationEndpoint?: UrlString;
     fetch?: typeof fetch;
@@ -74,6 +75,7 @@ async function isValidAccessGrant(
     }),
   });
 
+  // TODO: Add verifcation on the structure of the response
   return response.json();
 }
 

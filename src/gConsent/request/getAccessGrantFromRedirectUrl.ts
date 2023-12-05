@@ -35,6 +35,21 @@ import type { AccessGrant } from "../type/AccessGrant";
  * from @inrupt/solid-client-authn-browser will be used if available.
  * @returns An Access Grant
  * @since 0.5.0
+ */
+export async function getAccessGrantFromRedirectUrl(
+  redirectUrl: UrlString | URL,
+  options: { fetch?: typeof fetch; returnLegacyJsonld: false },
+): Promise<DatasetWithId>;
+/**
+ * Get the Access Grant out of the incoming redirect from the Access Management app.
+ *
+ * @param redirectUrl The URL the user has been redirected to from the access
+ * management app.
+ * @param options Optional properties to customise the behaviour:
+ * - fetch: an authenticated fetch function. If not provided, the default session
+ * from @inrupt/solid-client-authn-browser will be used if available.
+ * @returns An Access Grant
+ * @since 0.5.0
  * @deprecated Use RDFJS API
  */
 export async function getAccessGrantFromRedirectUrl(
@@ -51,10 +66,11 @@ export async function getAccessGrantFromRedirectUrl(
  * from @inrupt/solid-client-authn-browser will be used if available.
  * @returns An Access Grant
  * @since 0.5.0
+ * @deprecated Use RDFJS API
  */
 export async function getAccessGrantFromRedirectUrl(
   redirectUrl: UrlString | URL,
-  options: { fetch?: typeof fetch; returnLegacyJsonld?: boolean },
+  options?: { fetch?: typeof fetch; returnLegacyJsonld?: boolean },
 ): Promise<DatasetWithId>;
 export async function getAccessGrantFromRedirectUrl(
   redirectUrl: UrlString | URL,

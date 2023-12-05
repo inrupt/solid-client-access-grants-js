@@ -39,6 +39,20 @@ import { normalizeAccessGrant } from "./approveAccessRequest";
  * @param options Optional properties to customise the request behaviour.
  * @returns The Verifiable Credential associated to the given IRI, if it is an access grant. Throws otherwise.
  * @since 0.4.0
+ */
+export async function getAccessGrant(
+  accessGrantVcUrl: UrlString | URL,
+  options: AccessBaseOptions & {
+    returnLegacyJsonld: false;
+  },
+): Promise<DatasetWithId>;
+/**
+ * Retrieve the Access Grant associated to the given URL.
+ *
+ * @param accessGrantVcUrl The URL of an access grant, with or without consent.
+ * @param options Optional properties to customise the request behaviour.
+ * @returns The Verifiable Credential associated to the given IRI, if it is an access grant. Throws otherwise.
+ * @since 0.4.0
  * @deprecated set returnLegacyJsonld: false and use RDFJS API
  */
 export async function getAccessGrant(
@@ -54,6 +68,7 @@ export async function getAccessGrant(
  * @param options Optional properties to customise the request behaviour.
  * @returns The Verifiable Credential associated to the given IRI, if it is an access grant. Throws otherwise.
  * @since 0.4.0
+ * @deprecated set returnLegacyJsonld: false and use RDFJS API
  */
 export async function getAccessGrant(
   accessGrantVcUrl: UrlString | URL,

@@ -27,6 +27,9 @@ import {
   ACL_RESOURCE_ACCESS_MODE_WRITE,
 } from "../../type/ResourceAccessMode";
 
+/**
+ * @deprecated This function is not required when using the RDFJS API
+ */
 export function accessToResourceAccessModeArray(
   desiredAccess: AccessModes,
 ): ResourceAccessMode[] {

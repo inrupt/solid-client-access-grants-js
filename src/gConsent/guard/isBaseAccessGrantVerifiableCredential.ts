@@ -34,6 +34,10 @@ import {
 } from "./isBaseAccessVcBody";
 import { isGConsentAttributes } from "./isGConsentAttributes";
 
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the Access Grant,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 function isGrantCredentialSubject(
   x:
     | RequestCredentialSubject
@@ -44,6 +48,10 @@ function isGrantCredentialSubject(
   return (x as GrantCredentialSubject).providedConsent !== undefined;
 }
 
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the Access Grant,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 export function isBaseAccessGrantVerifiableCredential(
   x: unknown,
 ): x is BaseGrantBody {

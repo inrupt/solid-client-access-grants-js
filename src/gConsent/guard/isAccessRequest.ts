@@ -35,6 +35,10 @@ import { isRdfjsGConsentAttributes } from "./isGConsentAttributes";
 
 const { quad, defaultGraph } = DataFactory;
 
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the Access Request,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 export function isAccessRequest(
   x: unknown,
 ): x is AccessRequestBody & { issuanceDate: string } {

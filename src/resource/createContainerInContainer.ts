@@ -21,7 +21,10 @@
 
 import type { UrlString } from "@inrupt/solid-client";
 import { createContainerInContainer as coreCreateContainerInContainer } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  DatasetWithId,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
 import type { FetchOptions } from "../type/FetchOptions";
 import type { SaveInContainerOptions } from "../type/SaveInContainerOptions";
@@ -58,7 +61,7 @@ import type { SaveInContainerOptions } from "../type/SaveInContainerOptions";
 
 export async function createContainerInContainer(
   containerUrl: UrlString,
-  accessGrant: VerifiableCredential,
+  accessGrant: VerifiableCredential | DatasetWithId,
   options?: SaveInContainerOptions,
 ) {
   const fetchOptions: FetchOptions = {};

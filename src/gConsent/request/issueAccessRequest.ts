@@ -80,18 +80,23 @@ export function normalizeAccessRequest<T extends VerifiableCredentialBase>(
  * @param options Optional properties to customize the access request behavior.
  * @returns A signed Verifiable Credential representing the access request.
  * @since 0.4.0
- * @deprecated Use RDFJS API
+ */
+async function issueAccessRequest(
+  params: IssueAccessRequestParameters,
+  options: AccessBaseOptions & { returnLegacyJsonld: false },
+): Promise<DatasetWithId>;
+/**
+ * Request access to a given Resource.
+ *
+ * @param params Access to request.
+ * @param options Optional properties to customize the access request behavior.
+ * @returns A signed Verifiable Credential representing the access request.
+ * @since 0.4.0
+ * @deprecated Use RDFJS API instead of relying on the JSON structure by setting `returnLegacyJsonld` to false
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options?: AccessBaseOptions & { returnLegacyJsonld?: true },
-): Promise<AccessRequest>;
-/**
- * @deprecated Please remove the `requestor` parameter.
- */
-async function issueAccessRequest(
-  params: DeprecatedAccessRequestParameters,
-  options?: AccessBaseOptions & { returnLegacyJsonld?: boolean },
 ): Promise<AccessRequest>;
 /**
  * Request access to a given Resource.
@@ -100,11 +105,19 @@ async function issueAccessRequest(
  * @param options Optional properties to customize the access request behavior.
  * @returns A signed Verifiable Credential representing the access request.
  * @since 0.4.0
+ * @deprecated Use RDFJS API instead of relying on the JSON structure by setting `returnLegacyJsonld` to false
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options?: AccessBaseOptions & { returnLegacyJsonld?: boolean },
 ): Promise<DatasetWithId>;
+/**
+ * @deprecated Please remove the `requestor` parameter.
+ */
+async function issueAccessRequest(
+  params: DeprecatedAccessRequestParameters,
+  options?: AccessBaseOptions & { returnLegacyJsonld?: boolean },
+): Promise<AccessRequest>;
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options: AccessBaseOptions & { returnLegacyJsonld?: boolean } = {},

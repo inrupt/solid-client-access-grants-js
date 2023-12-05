@@ -33,6 +33,10 @@ import { isRdfjsGConsentAttributes } from "./isGConsentAttributes";
 
 const { namedNode, quad } = DataFactory;
 
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the VC,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 export function isBaseAccessVcBody(x: unknown): x is BaseAccessVcBody {
   return (
     isUnknownObject(x) &&

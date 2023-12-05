@@ -46,4 +46,8 @@ export function isAccessGrant<T extends BaseAccessVcBody>(
   );
 }
 
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the Access Grant,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 export const CredentialIsAccessGrantGConsent = isAccessGrant;

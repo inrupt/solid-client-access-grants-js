@@ -38,6 +38,20 @@ import { normalizeAccessRequest } from "../request/issueAccessRequest";
  * from @inrupt/solid-client-authn-browser will be used if available.
  * @returns An Access Request.
  * @since 2.4.0
+ */
+export async function getAccessRequest(
+  url: UrlString | URL,
+  options: { fetch?: typeof fetch; returnLegacyJsonld: false },
+): Promise<DatasetWithId>;
+/**
+ * Fetch the Access Request from the given URL.
+ *
+ * @param url The URL of the Access Request.
+ * @param options Optional properties to customise the behaviour:
+ * - fetch: an authenticated fetch function. If not provided, the default session
+ * from @inrupt/solid-client-authn-browser will be used if available.
+ * @returns An Access Request.
+ * @since 2.4.0
  * @deprecated Use RDFJS API instead of relying on the JSON structure by setting `returnLegacyJsonld` to false
  */
 export async function getAccessRequest(
@@ -67,6 +81,7 @@ export async function getAccessRequest(
  * from @inrupt/solid-client-authn-browser will be used if available.
  * @returns An Access Request.
  * @since 2.4.0
+ * @deprecated Use RDFJS API instead of relying on the JSON structure by setting `returnLegacyJsonld` to false
  */
 export async function getAccessRequest(
   url: UrlString | URL,

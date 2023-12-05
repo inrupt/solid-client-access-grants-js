@@ -154,20 +154,29 @@ export function getGrantBody(params: AccessGrantParameters): AccessGrantBody {
   return getBaseBody(params, "BaseGrantBody") as AccessGrantBody;
 }
 
-/**
- * @deprecated Use RDFJS API
- */
 export async function issueAccessVc(
   vcBody: BaseRequestBody | BaseGrantBody,
   options: AccessBaseOptions & {
+    returnLegacyJsonld: false;
+    normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
+  },
+): Promise<DatasetWithId>;
+/**
+ * @deprecated Use RDFJS API by setting returnLegacyJsonld: false
+ */
+export async function issueAccessVc(
+  vcBody: BaseRequestBody | BaseGrantBody,
+  options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
     normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
   },
 ): Promise<VerifiableCredential>;
+/**
+ * @deprecated Use RDFJS API by setting returnLegacyJsonld: false
+ */
 export async function issueAccessVc(
   vcBody: BaseRequestBody | BaseGrantBody,
-  // FIXME: Improve the type
-  options: AccessBaseOptions & {
+  options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
     normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
   },
@@ -177,7 +186,7 @@ export async function issueAccessVc(
   options: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
     normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
-  },
+  } = {},
 ): Promise<DatasetWithId> {
   const fetcher = await getSessionFetch(options);
   const targetResourceIri = isBaseRequest(vcBody)
