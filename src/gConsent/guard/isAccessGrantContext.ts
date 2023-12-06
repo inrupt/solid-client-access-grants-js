@@ -23,9 +23,7 @@ import { CONTEXT_VC_W3C } from "../constants";
 import type { AccessGrantContext } from "../type/AccessGrantContext";
 
 /**
- *
- * @param x @deprecated
- * @returns
+ * @deprecated
  */
 export function isAccessGrantContext(x: unknown): x is AccessGrantContext {
   return Array.isArray(x) && x.includes(CONTEXT_VC_W3C);
