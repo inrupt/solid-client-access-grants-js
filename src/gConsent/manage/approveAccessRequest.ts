@@ -441,21 +441,12 @@ export async function approveAccessRequest(
     override,
     internalOptions,
   );
-  if (internalOptions.returnLegacyJsonld !== false) {
-    if (
-      !isBaseAccessGrantVerifiableCredential(accessGrant) ||
-      !isAccessGrant(accessGrant)
-    ) {
-      throw new Error(
-        `Unexpected response when approving Access Request, the result is not an Access Grant: ${JSON.stringify(
-          accessGrant,
-        )}`,
-      );
-    }
-
-    return accessGrant as AccessGrant;
-  }
-  if (!isRdfjsBaseAccessGrantVerifiableCredential(accessGrant)) {
+  if (
+    internalOptions.returnLegacyJsonld !== false
+      ? !isBaseAccessGrantVerifiableCredential(accessGrant) ||
+        !isAccessGrant(accessGrant)
+      : !isRdfjsBaseAccessGrantVerifiableCredential(accessGrant)
+  ) {
     throw new Error(
       `Unexpected response when approving Access Request, the result is not an Access Grant: ${JSON.stringify(
         accessGrant,
@@ -463,7 +454,7 @@ export async function approveAccessRequest(
     );
   }
 
-  return accessGrant as DatasetWithId;
+  return accessGrant;
 }
 
 export default approveAccessRequest;
