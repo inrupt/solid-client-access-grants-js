@@ -28,7 +28,9 @@ const clickOpenIdPrompt = async (page: Page) => {
   // Testid-based selector that will be compatible with newer releases
   const testidBasedSelector = page.getByTestId("prompt-continue");
   // Once we no longer support ESS 2.1, we can remove the class-based selector and only use the testid-based one.
-  await expect(classBasedSelector.or(testidBasedSelector)).toBeVisible({ timeout: 15_000 });
+  await expect(classBasedSelector.or(testidBasedSelector)).toBeVisible({
+    timeout: 15_000,
+  });
   // Fallback selector to support class attributes, until testid supports is fully deployed.
   // eslint-disable-next-line playwright/no-conditional-in-test
   const correctSelector = (await testidBasedSelector.isVisible())
