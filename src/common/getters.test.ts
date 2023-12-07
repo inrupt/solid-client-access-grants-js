@@ -94,14 +94,20 @@ describe("getters", () => {
       );
     });
 
-    it("gets the purposes from a gConsent access grant as empty list when there are no purposes", async () => {
-      const purposes = ['http://example.org/example/1', 'http://example.org/example/2']
-      
-      expect(getPurposes(await mockGConsentGrant(undefined, (grant) => {
-        grant.credentialSubject.providedConsent.forPurpose = purposes
-      }))).toEqual(
-        purposes,
-      );
+    it("gets the purposes from a gConsent access grant when there are multiple purposes", async () => {
+      const purposes = [
+        "http://example.org/example/1",
+        "http://example.org/example/2",
+      ];
+
+      expect(
+        getPurposes(
+          await mockGConsentGrant(undefined, (grant) => {
+            // eslint-disable-next-line no-param-reassign
+            grant.credentialSubject.providedConsent.forPurpose = purposes;
+          }),
+        ),
+      ).toEqual(purposes);
     });
 
     it("gets the purposes from a gConsent access grant", async () => {
