@@ -427,8 +427,13 @@ export class AccessGrantWrapper {
     this.vc = vc;
   }
 
-  // FIXME: Make sure we have full coverage of public exported
-  // functions in this file
+  getPurposes(): ReturnType<typeof getResources> {
+    return getPurposes(this.vc);
+  }
+
+  getInbox(): ReturnType<typeof getInbox> {
+    return getInbox(this.vc);
+  }
 
   getResources(): ReturnType<typeof getResources> {
     return getResources(this.vc);

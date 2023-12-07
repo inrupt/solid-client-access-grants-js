@@ -87,11 +87,20 @@ describe("getters", () => {
     });
   });
 
-  // FIXME: Add some checks where purposes are actually present
   describe("getPurposes", () => {
     it("gets the purposes from a gConsent access grant as empty list when there are no purposes", async () => {
       expect(getPurposes(mockedGConsentGrant)).toEqual(
         mockedGConsentGrant.credentialSubject.providedConsent.forPurpose ?? [],
+      );
+    });
+
+    it("gets the purposes from a gConsent access grant as empty list when there are no purposes", async () => {
+      const purposes = ['http://example.org/example/1', 'http://example.org/example/2']
+      
+      expect(getPurposes(await mockGConsentGrant(undefined, (grant) => {
+        grant.credentialSubject.providedConsent.forPurpose = purposes
+      }))).toEqual(
+        purposes,
       );
     });
 
