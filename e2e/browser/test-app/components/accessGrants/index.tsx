@@ -20,6 +20,7 @@
 //
 
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
+import type { AccessGrant } from "@inrupt/solid-client-access-grants";
 import {
   approveAccessRequest,
   revokeAccessGrant,
@@ -43,7 +44,7 @@ export default function AccessGrant({
 }: {
   setErrorMessage: (msg: string) => void;
 }) {
-  const [accessGrant, setAccessGrant] = useState<string>();
+  const [accessGrant, setAccessGrant] = useState<AccessGrant>();
   const [accessRequest, setAccessRequest] = useState<string>();
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
   const router = useRouter();
@@ -105,23 +106,27 @@ export default function AccessGrant({
         fetch: session.fetch,
       },
     );
-    setAccessGrant(JSON.stringify(accessGrantRequest, null, "  "));
+    setAccessGrant(accessGrantRequest);
   };
 
   const handleRevoke = async () => {
-    if (typeof accessGrant !== "string") {
+    if (typeof accessGrant === "undefined") {
       // If the resource does not exist, do nothing.
       return;
     }
-    await revokeAccessGrant(JSON.parse(accessGrant), {
+    await revokeAccessGrant(accessGrant, {
       fetch: session.fetch,
     });
     setAccessGrant(undefined);
   };
 
   const handleCallAuthedGrant = async () => {
+    if (typeof accessGrant === "undefined") {
+      // If the resource does not exist, do nothing.
+      return;
+    }
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    await getAccessGrant(accessGrant!, { fetch: session.fetch });
+    await getAccessGrant(accessGrant.id, { fetch: session.fetch });
   };
 
   const handleAccessRequest = async () => {
@@ -146,8 +151,11 @@ export default function AccessGrant({
       window.localStorage.getItem("accessGrantUrl") !== null
     ) {
       setAccessGrant(
-        window.localStorage.getItem("accessGrantUrl") ??
-          (router.query.accessGrantUrl as string),
+        await getAccessGrant(
+          window.localStorage.getItem("accessGrantUrl") ??
+            (router.query.accessGrantUrl as string),
+          { fetch: session.fetch },
+        ),
       );
     }
   };
@@ -207,7 +215,10 @@ export default function AccessGrant({
         </button>
       </div>
       <p>
-        Granted access: <pre data-testid="access-grant">{accessGrant}</pre>
+        Granted access:{" "}
+        <pre data-testid="access-grant">
+          {accessGrant && JSON.stringify(accessGrant, null, 2)}
+        </pre>
       </p>
 
       <button
