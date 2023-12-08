@@ -40,7 +40,7 @@ import { accessToResourceAccessModeArray } from "../util/accessToResourceAccessM
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { BaseGrantBody } from "../type/AccessVerifiableCredential";
 import { isAccessGrant } from "../guard/isAccessGrant";
-import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
+import { isBaseAccessGrantVerifiableCredential, isRdfjsBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
 import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { gc } from "../../common/constants";
@@ -159,8 +159,8 @@ async function internal_getAccessGrantAll(
     )
       // getVerifiableCredentialAllFromShape returns a list, so the previous map
       // should be flattened to have all the candidate grants in a non-nested list.
-      .flat();
-    // FIXME: Add RDFJS filter here
+      .flat()
+      .filter(vc => isRdfjsBaseAccessGrantVerifiableCredential(vc));
   } else {
     result = (
       await Promise.all(

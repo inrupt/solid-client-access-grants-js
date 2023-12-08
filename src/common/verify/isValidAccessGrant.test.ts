@@ -25,7 +25,6 @@ import type * as CrossFetch from "@inrupt/universal-fetch";
 import {
   isVerifiableCredential,
   getVerifiableCredentialApiConfiguration,
-  // verifiableCredentialToDataset,
 } from "@inrupt/solid-client-vc";
 
 import type * as VcLibrary from "@inrupt/solid-client-vc";
