@@ -50,7 +50,6 @@ import type { AccessGrantParameters } from "../type/Parameter";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
-import type { AccessRequest } from "../type/AccessRequest";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
@@ -230,7 +229,7 @@ async function internal_approveAccessRequest(
  */
 export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
-  requestVc: DatasetWithId | AccessRequest | URL | UrlString,
+  requestVc: DatasetWithId | VerifiableCredential | URL | UrlString,
   requestOverride: Partial<ApproveAccessRequestOverrides>,
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
@@ -258,7 +257,7 @@ export async function approveAccessRequest(
  */
 export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
-  requestVc: DatasetWithId | AccessRequest | URL | UrlString,
+  requestVc: DatasetWithId | VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
@@ -286,7 +285,7 @@ export async function approveAccessRequest(
  */
 export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
-  requestVc: DatasetWithId | AccessRequest | URL | UrlString,
+  requestVc: DatasetWithId | VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
@@ -355,7 +354,7 @@ export async function approveAccessRequest(
 export async function approveAccessRequest(
   resourceOwner: WebId,
   // If the VC is specified, all the overrides become optional
-  requestVc: DatasetWithId | AccessRequest | URL | UrlString,
+  requestVc: DatasetWithId | VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
@@ -368,7 +367,7 @@ export async function approveAccessRequest(
 export async function approveAccessRequest(
   resourceOwner: WebId,
   // If the VC is specified, all the overrides become optional
-  requestVc: DatasetWithId | AccessRequest | URL | UrlString,
+  requestVc: DatasetWithId | VerifiableCredential | URL | UrlString,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions & WithLegacyJsonFlag,
 ): Promise<DatasetWithId>;
@@ -401,13 +400,13 @@ export async function approveAccessRequest(
   resourceOwnerOrRequestVc:
     | WebId
     | DatasetWithId
-    | AccessRequest
+    | VerifiableCredential
     | URL
     | UrlString
     | undefined,
   requestVcOrOverride?:
     | DatasetWithId
-    | AccessRequest
+    | VerifiableCredential
     | URL
     | UrlString
     | Partial<ApproveAccessRequestOverrides>,
@@ -416,7 +415,7 @@ export async function approveAccessRequest(
     | AccessBaseOptions,
   options?: AccessBaseOptions & WithLegacyJsonFlag,
 ): Promise<DatasetWithId> {
-  let requestVc: DatasetWithId | AccessRequest | URL | UrlString;
+  let requestVc: DatasetWithId | VerifiableCredential | URL | UrlString;
   let override: Partial<ApproveAccessRequestOverrides>;
   let internalOptions: AccessBaseOptions & WithLegacyJsonFlag;
 
@@ -429,7 +428,7 @@ export async function approveAccessRequest(
   } else {
     requestVc = resourceOwnerOrRequestVc as
       | DatasetWithId
-      | AccessRequest
+      | VerifiableCredential
       | URL
       | UrlString;
     override = requestVcOrOverride as Partial<ApproveAccessRequestOverrides>;

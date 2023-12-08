@@ -20,7 +20,10 @@
 //
 
 import type { UrlString, WebId } from "@inrupt/solid-client";
-import type { DatasetWithId } from "@inrupt/solid-client-vc";
+import type {
+  DatasetWithId,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import {
@@ -94,7 +97,7 @@ async function discoverAccessManagementUi(options: {
  * @since 0.4.0
  */
 export async function redirectToAccessManagementUi(
-  accessRequestVc: DatasetWithId | UrlString | URL,
+  accessRequestVc: DatasetWithId | VerifiableCredential | UrlString | URL,
   redirectUrl: UrlString | URL,
   options: RedirectToAccessManagementUiOptions = {},
 ): Promise<void> {
