@@ -88,4 +88,9 @@ export {
   getResourceOwner,
   getResources,
   getTypes,
+  getPurposes,
+  getConsent,
+  getCredentialSubject,
+  getInbox,
+  getInherit,
 } from "./common/getters";
