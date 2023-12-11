@@ -4,21 +4,11 @@ on:
   push:
     tags:
       - v[0-9]+.[0-9]+.[0-9]+
+      - v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]+
+      - v[0-9]+.[0-9]+.[0-9]+-beta.[0-9]+
 
-env:
-  CI: true
 jobs:
   publish-npm:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Prepare for publication to npm
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-          registry-url: "https://registry.npmjs.org"
-          cache: npm
-      - run: npm ci
-      - run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.INRUPT_NPM_TOKEN }}
+    uses: inrupt/typescript-sdk-tools/.github/workflows/reusable-release.yml@v2
+    secrets:
+      NODE_AUTH_TOKEN: ${{ secrets.INRUPT_NPM_TOKEN }}
