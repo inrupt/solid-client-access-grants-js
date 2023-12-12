@@ -10,6 +10,10 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### Breaking Changes
+
+- Parsing Access Grants & Access Requests. This allows the Access Grants & Access Requests to be read using the RDF/JS DatasetCore API. This is a breaking change because their type also now extends the `DatasetCore` type. Importantly, this dataset is not preserved when converting to verifiableCredentials a string and back doing `JSON.parse(JSON.stringify(verifiableCredential))`. We reccomend that developers set `returnLegacyJsonld` to `false` in functions such as `getAccessGrant` in order to avoid returning deprecated object properties. Instead developers should make use of the exported `getter` functions to get these attributes.
+
 ## [2.6.2](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.6.2) - 2023-11-16
 
 ### Removed features (non-breaking)
