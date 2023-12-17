@@ -21,7 +21,6 @@
 
 import { describe, it, jest, expect, beforeEach } from "@jest/globals";
 import * as VcModule from "@inrupt/solid-client-vc";
-import { fetch } from "@inrupt/universal-fetch";
 import { isomorphic } from "rdf-isomorphic";
 import { getAccessRequest } from "./getAccessRequest";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";

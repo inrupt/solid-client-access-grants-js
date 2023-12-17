@@ -22,7 +22,6 @@
 import { jest, it, describe, expect } from "@jest/globals";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import * as VcModule from "@inrupt/solid-client-vc";
-import type { fetch } from "@inrupt/universal-fetch";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 import type {
   AccessParameters,
@@ -33,7 +32,7 @@ import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import { mockAccessGrantVc } from "../util/access.mock";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 
-const otherFetch = jest.fn(global.fetch);
+const otherFetch = jest.fn<typeof fetch>();
 
 jest.mock("@inrupt/solid-client-vc", () => {
   const { verifiableCredentialToDataset, getCredentialSubject } =

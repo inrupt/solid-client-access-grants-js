@@ -20,7 +20,6 @@
 //
 
 import type { getVerifiableCredential } from "@inrupt/solid-client-vc";
-import { fetch } from "@inrupt/universal-fetch";
 import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 import { isomorphic } from "rdf-isomorphic";
 import type { getSessionFetch } from "../../common/util/getSessionFetch";

@@ -50,7 +50,7 @@ describe("getAccessManagementUi", () => {
         "getSolidDataset",
       )
       .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid"));
-    const mockedFetch = jest.fn(global.fetch);
+    const mockedFetch = jest.fn<typeof fetch>();
 
     await getAccessManagementUi("https://some.webid", { fetch: mockedFetch });
 

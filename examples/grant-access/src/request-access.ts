@@ -22,7 +22,6 @@
 /* eslint-disable no-console, import/no-unresolved */
 
 import { Session } from "@inrupt/solid-client-authn-node";
-import { fetch as crossFetch } from "@inrupt/universal-fetch";
 import express from "express";
 import {
   issueAccessRequest,
@@ -87,7 +86,7 @@ app.post("/request", async (req, res) => {
       // Note: the following is only necessary because this projects depends for testing puspose
       // on solid-client-authn-browser, which is picked up automatically for convenience in
       // browser-side apps. A typical node app would not have this dependence.
-      fetch: crossFetch,
+      fetch,
     },
   );
 });

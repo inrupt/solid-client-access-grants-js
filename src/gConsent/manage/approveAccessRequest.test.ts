@@ -20,8 +20,6 @@
 //
 
 import { jest, it, describe, expect, beforeAll } from "@jest/globals";
-import { Response } from "@inrupt/universal-fetch";
-import type * as CrossFetch from "@inrupt/universal-fetch";
 
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import type * as VcClient from "@inrupt/solid-client-vc";
@@ -85,16 +83,6 @@ jest.mock("@inrupt/solid-client-vc", () => {
     getId,
     issueVerifiableCredential: jest.fn(),
     getVerifiableCredential,
-  };
-});
-jest.mock("@inrupt/universal-fetch", () => {
-  const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch",
-  ) as jest.Mocked<typeof CrossFetch>;
-  return {
-    // Do no mock the globals such as Response.
-    ...crossFetch,
-    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
   };
 });
 
@@ -185,7 +173,7 @@ describe("approveAccessRequest", () => {
       }),
       undefined,
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
       },
     );
     // The resource's IRI is picked up from the access grant.
@@ -278,7 +266,7 @@ describe("approveAccessRequest", () => {
   it("uses the provided fetch, if any", async () => {
     mockAcpClient();
     mockAccessApiEndpoint();
-    const mockedFetch = jest.fn(global.fetch);
+    const mockedFetch = jest.fn<typeof fetch>();
     const mockedVcModule = jest.requireMock(
       "@inrupt/solid-client-vc",
     ) as typeof VcClient;
@@ -315,7 +303,7 @@ describe("approveAccessRequest", () => {
     const mockedIssue = jest.spyOn(mockedVcModule, "issueVerifiableCredential");
     mockedIssue.mockResolvedValueOnce(accessGrantVc);
     await approveAccessRequest(accessRequestVc, undefined, {
-      fetch: jest.fn(global.fetch),
+      fetch: jest.fn<typeof fetch>(),
     });
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -346,7 +334,7 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(accessGrantVc);
-    const mockedFetch = jest.fn(global.fetch);
+    const mockedFetch = jest.fn<typeof fetch>();
     mockedFetch.mockResolvedValueOnce(
       new Response(JSON.stringify(consentRequestVc)),
     );
@@ -387,7 +375,7 @@ describe("approveAccessRequest", () => {
     mockedIssue.mockResolvedValueOnce(mockedVc);
     await expect(
       approveAccessRequest(accessRequestVc, undefined, {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
         updateAcr: false,
       }),
     ).resolves.not.toThrow();
@@ -401,7 +389,7 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential",
     );
     mockedIssue.mockResolvedValueOnce(accessRequestVc);
-    const mockedFetch = jest.fn(global.fetch);
+    const mockedFetch = jest.fn<typeof fetch>();
     mockedFetch.mockResolvedValueOnce(
       new Response(JSON.stringify(consentRequestVc)),
     );
@@ -425,7 +413,7 @@ describe("approveAccessRequest", () => {
     );
     spiedIssueRequest.mockResolvedValueOnce(await mockAccessGrantVc());
     await approveAccessRequest(consentRequestVc, undefined, {
-      fetch: jest.fn(global.fetch),
+      fetch: jest.fn<typeof fetch>(),
     });
 
     expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -468,7 +456,7 @@ describe("approveAccessRequest", () => {
         purpose: ["https://some-custom.purpose"],
       },
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
       },
     );
 
@@ -508,7 +496,7 @@ describe("approveAccessRequest", () => {
         inherit: true,
       },
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
       },
     );
     expect(spiedIssueRequest.mock.lastCall?.[1]).toMatchObject({
@@ -541,7 +529,7 @@ describe("approveAccessRequest", () => {
         requestorInboxUrl: "https://some-custom.inbox",
       },
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
       },
     );
 
@@ -587,7 +575,7 @@ describe("approveAccessRequest", () => {
         requestorInboxUrl: "https://some-custom.inbox",
       },
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
       },
     );
 
@@ -627,7 +615,7 @@ describe("approveAccessRequest", () => {
         issuanceDate: new Date(2021, 8, 15),
       },
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
       },
     );
 
@@ -671,7 +659,7 @@ describe("approveAccessRequest", () => {
         expirationDate: new Date(2021, 8, 16),
       },
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
       },
     );
 
@@ -714,7 +702,7 @@ describe("approveAccessRequest", () => {
         expirationDate: null,
       },
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
       },
     );
 
@@ -759,7 +747,7 @@ describe("approveAccessRequest", () => {
       },
       undefined,
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
       },
     );
 
@@ -800,7 +788,7 @@ describe("approveAccessRequest", () => {
       accessRequestVc,
       undefined,
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
       },
     );
 
@@ -839,7 +827,7 @@ describe("approveAccessRequest", () => {
         accessRequestVc,
         undefined,
         {
-          fetch: jest.fn(global.fetch),
+          fetch: jest.fn<typeof fetch>(),
         },
       ),
     ).rejects.toThrow();
@@ -881,7 +869,7 @@ describe("approveAccessRequest", () => {
     );
     await expect(
       approveAccessRequest(accessRequestVc, undefined, {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
       }),
     ).resolves.toStrictEqual(normalizedAccessGrant);
   });
@@ -910,7 +898,7 @@ describe("approveAccessRequest", () => {
       }),
       undefined,
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
       },
     );
     // The resource's IRI is picked up from the access grant.
@@ -957,7 +945,7 @@ describe("approveAccessRequest", () => {
       }),
       undefined,
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
         updateAcr: true,
       },
     );
@@ -1006,7 +994,7 @@ describe("approveAccessRequest", () => {
       }),
       undefined,
       {
-        fetch: jest.fn(global.fetch),
+        fetch: jest.fn<typeof fetch>(),
         updateAcr: false,
       },
     );

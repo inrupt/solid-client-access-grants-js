@@ -20,7 +20,6 @@
 //
 
 import { jest, describe, it, expect, beforeAll } from "@jest/globals";
-import { fetch as crossFetch, Response } from "@inrupt/universal-fetch";
 import type {
   VerifiableCredential,
   VerifiableCredentialBase,
@@ -36,14 +35,6 @@ import {
   boundFetch,
   fetchWithVc,
 } from "./index";
-
-jest.mock("@inrupt/universal-fetch", () => {
-  const crossFetchModule = jest.requireActual("@inrupt/universal-fetch") as any;
-  return {
-    ...crossFetchModule,
-    fetch: jest.fn(),
-  };
-});
 
 const MOCK_VC_BASE = {
   "@context": [
@@ -75,9 +66,7 @@ const MOCK_VC_BASE = {
 };
 
 const mockFetch = (response: Response) => {
-  return (
-    crossFetch as jest.MockedFunction<typeof crossFetch>
-  ).mockResolvedValueOnce(response);
+  return jest.spyOn(globalThis, "fetch").mockResolvedValueOnce(response);
 };
 
 describe("parseUMAAuthTicket", () => {
@@ -154,12 +143,13 @@ describe("exchangeTicketForAccessToken", () => {
     const tokenEndpoint = "https://fake.url/token";
     const authTicket = "auth-ticket";
 
-    const mockedFetch = mockFetch(
-      new Response(
-        JSON.stringify({
-          access_token: "some_access_token",
-        }),
-      ),
+    const mockedFetch = jest.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            access_token: "some_access_token",
+          }),
+        ),
     );
 
     const token = await exchangeTicketForAccessToken(
@@ -197,13 +187,11 @@ describe("exchangeTicketForAccessToken", () => {
     const tokenEndpoint = "https://fake.url/token";
     const authTicket = "auth-ticket";
 
-    const mockedFetch = mockFetch(new Response());
-
     const token = await exchangeTicketForAccessToken(
       tokenEndpoint,
       MOCK_VC,
       authTicket,
-      mockedFetch,
+      async () => new Response(),
     );
 
     expect(token).toBeNull();
@@ -213,13 +201,11 @@ describe("exchangeTicketForAccessToken", () => {
     const tokenEndpoint = "https://fake.url/token";
     const authTicket = "auth-ticket";
 
-    const mockedFetch = mockFetch(new Response(JSON.stringify({})));
-
     const token = await exchangeTicketForAccessToken(
       tokenEndpoint,
       MOCK_VC,
       authTicket,
-      mockedFetch,
+      async () => new Response(JSON.stringify({})),
     );
 
     expect(token).toBeNull();
@@ -325,7 +311,8 @@ describe("fetchWithVc", () => {
     const mockHeader =
       'UMA realm="test" as_uri="https://fake.url" ticket="some_value"';
 
-    (crossFetch as jest.MockedFunction<typeof crossFetch>)
+    jest
+      .spyOn(globalThis, "fetch")
       // first request is for headers
       .mockResolvedValueOnce(
         new Response(undefined, {
@@ -353,7 +340,7 @@ describe("fetchWithVc", () => {
 
     await fetchWithVc(resourceIri, MOCK_VC);
 
-    expect(crossFetch).toHaveBeenCalledWith(
+    expect(fetch).toHaveBeenCalledWith(
       "https://fake.url/.well-known/uma2-configuration",
     );
   });
@@ -363,7 +350,7 @@ describe("fetchWithVc", () => {
     const mockHeader =
       'UMA realm="test" as_uri="https://fake.url" ticket="some_value"';
 
-    (crossFetch as jest.MockedFunction<typeof crossFetch>)
+    (fetch as jest.MockedFunction<typeof fetch>)
       // first request is for headers
       .mockResolvedValueOnce(
         new Response(undefined, {
@@ -393,7 +380,7 @@ describe("fetchWithVc", () => {
     const mockHeader =
       'UMA realm="test" as_uri="https://fake.url" ticket="some_value"';
     // @inrupt/universal-fetch is necessarily called for unauthenticated calls.
-    (crossFetch as jest.MockedFunction<typeof crossFetch>)
+    (fetch as jest.MockedFunction<typeof fetch>)
       // first request is for headers
       .mockResolvedValueOnce(
         new Response(undefined, {

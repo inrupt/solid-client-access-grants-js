@@ -24,7 +24,6 @@ import type {
   VerifiableCredential,
   getVerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { fetch } from "@inrupt/universal-fetch";
 import { getAccessGrantFromRedirectUrl } from "./getAccessGrantFromRedirectUrl";
 import type { getSessionFetch } from "../../common/util/getSessionFetch";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
