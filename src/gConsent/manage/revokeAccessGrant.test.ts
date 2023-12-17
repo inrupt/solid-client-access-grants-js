@@ -20,7 +20,6 @@
 //
 
 import { jest, describe, it, expect } from "@jest/globals";
-import { Response } from "@inrupt/universal-fetch";
 
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 import { revokeAccessGrant } from "./revokeAccessGrant";
@@ -102,7 +101,7 @@ describe("revokeAccessGrant", () => {
   });
 
   it("throws if dereferencing the credential ID fails", async () => {
-    const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValueOnce(
       new Response(undefined, {
         status: 401,
         statusText: "Unauthorized",
@@ -129,7 +128,7 @@ describe("revokeAccessGrant", () => {
       mockedVcModule,
       "revokeVerifiableCredential",
     );
-    const mockedFetch = jest.fn(global.fetch);
+    const mockedFetch = jest.fn<typeof fetch>();
     await revokeAccessGrant(
       await mockAccessGrantVc({ issuer: "https://some.issuer/" }),
       {

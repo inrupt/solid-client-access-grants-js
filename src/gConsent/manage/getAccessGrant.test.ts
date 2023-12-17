@@ -19,8 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type * as CrossFetch from "@inrupt/universal-fetch";
-import { Response } from "@inrupt/universal-fetch";
 import { beforeAll, describe, expect, it, jest } from "@jest/globals";
 import { isomorphic } from "rdf-isomorphic";
 import { getResources } from "../../common/getters";
@@ -32,17 +30,6 @@ import {
 } from "../util/access.mock";
 import { toBeEqual } from "../util/toBeEqual.mock";
 import { getAccessGrant } from "./getAccessGrant";
-
-jest.mock("@inrupt/universal-fetch", () => {
-  const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch",
-  ) as jest.Mocked<typeof CrossFetch>;
-  return {
-    // Do no mock the globals such as Response.
-    Response: crossFetch.Response,
-    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
-  };
-});
 
 describe("getAccessGrant", () => {
   let mockAccessGrant: Awaited<ReturnType<typeof mockAccessGrantVc>>;

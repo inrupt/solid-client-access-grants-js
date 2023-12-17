@@ -20,7 +20,6 @@
 //
 
 import { jest, describe, it, expect, beforeAll } from "@jest/globals";
-import type * as CrossFetch from "@inrupt/universal-fetch";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 
 import {
@@ -60,16 +59,6 @@ jest.mock("@inrupt/solid-client-vc", () => {
   return {
     ...actualVcLibrary,
     issueVerifiableCredential: jest.fn(),
-  };
-});
-jest.mock("@inrupt/universal-fetch", () => {
-  const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch",
-  ) as jest.Mocked<typeof CrossFetch>;
-  return {
-    // Do no mock the globals such as Response.
-    ...crossFetch,
-    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
   };
 });
 

@@ -19,9 +19,14 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type * as CrossFetch from "@inrupt/universal-fetch";
-import { Response } from "@inrupt/universal-fetch";
-import { beforeAll, describe, expect, it, jest } from "@jest/globals";
+import {
+  beforeAll,
+  describe,
+  expect,
+  it,
+  jest,
+  afterEach,
+} from "@jest/globals";
 
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 import {
@@ -58,16 +63,6 @@ jest.mock("@inrupt/solid-client-vc", () => {
     issueVerifiableCredential: jest.fn(),
   };
 });
-jest.mock("@inrupt/universal-fetch", () => {
-  const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch",
-  ) as jest.Mocked<typeof CrossFetch>;
-  return {
-    // Do no mock the globals such as Response.
-    ...crossFetch,
-    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
-  };
-});
 
 // TODO: Extract the fetch VC function and related tests
 describe("denyAccessRequest", () => {
@@ -75,6 +70,10 @@ describe("denyAccessRequest", () => {
 
   beforeAll(async () => {
     accessRequestVc = await mockAccessRequestVc();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   it.each([[true], [false]])(
@@ -189,7 +188,7 @@ describe("denyAccessRequest", () => {
     "uses the provided fetch, if any [returnLegacyJsonld: %s]",
     async (returnLegacyJsonld) => {
       mockAccessApiEndpoint();
-      const mockedFetch = jest.fn(global.fetch);
+      const mockedFetch = async () => new Response();
       const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
         issueVerifiableCredential: () => Promise<AccessGrant>;
       };
@@ -198,7 +197,7 @@ describe("denyAccessRequest", () => {
         .mockResolvedValueOnce(await mockAccessGrantVc());
 
       await denyAccessRequest(accessRequestVc, {
-        fetch: mockedFetch as typeof fetch,
+        fetch: mockedFetch,
         returnLegacyJsonld,
       });
       expect(spiedIssueRequest).toHaveBeenCalledWith(
@@ -228,7 +227,7 @@ describe("denyAccessRequest", () => {
         purpose: ["https://example.org/some-purpose"],
       });
       await denyAccessRequest(accessRequestWithPurpose, {
-        fetch: jest.fn(global.fetch) as typeof fetch,
+        fetch: jest.fn<typeof fetch>() as typeof fetch,
         returnLegacyJsonld,
       });
 
@@ -350,7 +349,7 @@ describe("denyAccessRequest", () => {
 
       // This explicitly tests the deprecated signature.
       await denyAccessRequest("https://some.resource.owner", accessRequestVc, {
-        fetch: jest.fn(global.fetch) as typeof fetch,
+        fetch: jest.fn<typeof fetch>() as typeof fetch,
         returnLegacyJsonld,
       });
 

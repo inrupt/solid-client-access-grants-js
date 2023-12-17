@@ -18,8 +18,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-
-import { fetch as crossFetch } from "@inrupt/universal-fetch";
 import type { AccessBaseOptions } from "../../gConsent/type/AccessBaseOptions";
 
 /**
@@ -47,6 +45,6 @@ export async function getSessionFetch(
     return fetchFn;
   } catch (e) {
     /* istanbul ignore next: @inrupt/solid-client-authn-browser is a devDependency, so this path is not hit in tests: */
-    return crossFetch;
+    return fetch;
   }
 }

@@ -20,7 +20,6 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import { fetch as crossFetch } from "@inrupt/universal-fetch";
 import { parse } from "auth-header";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 
@@ -29,7 +28,7 @@ async function getAccessEndpointForResource(
 ): Promise<UrlString> {
   // Explicitly makes an unauthenticated fetch to be sure to get the link to the
   // authorization server.
-  const response = await crossFetch(resource);
+  const response = await fetch(resource);
   if (!response.headers.has("WWW-Authenticate")) {
     throw new Error(
       `Expected a 401 error with a WWW-Authenticate header, got a [${response.status}: ${response.statusText}] response lacking the WWW-Authenticate header.`,
@@ -47,7 +46,7 @@ async function getAccessEndpointForResource(
     "/.well-known/uma2-configuration",
     authorizationServerIri,
   );
-  const rawDiscoveryDocument = await crossFetch(wellKnownIri.href);
+  const rawDiscoveryDocument = await fetch(wellKnownIri.href);
   const discoveryDocument = await rawDiscoveryDocument.json();
   if (typeof discoveryDocument.verifiable_credential_issuer !== "string") {
     throw new Error(

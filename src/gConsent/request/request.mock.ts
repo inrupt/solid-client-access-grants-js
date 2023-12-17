@@ -30,8 +30,6 @@ import {
   mockSolidDatasetFrom,
   setThing,
 } from "@inrupt/solid-client";
-// eslint-disable-next-line no-shadow
-import { Response } from "@inrupt/universal-fetch";
 
 import { PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
 
@@ -79,7 +77,7 @@ export const mockWebIdWithUi = (
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const mockAccessApiEndpoint = (withCredentialIssuer = true) => {
   const mockedFetch = jest
-    .fn(global.fetch)
+    .spyOn(globalThis, "fetch")
     .mockResolvedValueOnce(
       new Response("", {
         status: 401,
@@ -99,9 +97,5 @@ export const mockAccessApiEndpoint = (withCredentialIssuer = true) => {
         ),
       ),
     );
-  const crossFetchModule = jest.requireMock("@inrupt/universal-fetch") as {
-    fetch: typeof global.fetch;
-  };
-  crossFetchModule.fetch = mockedFetch;
   return mockedFetch;
 };

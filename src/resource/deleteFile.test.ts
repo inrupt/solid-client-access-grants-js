@@ -21,7 +21,6 @@
 
 import { it, jest, describe, expect, beforeAll } from "@jest/globals";
 import type SolidClientCore from "@inrupt/solid-client";
-import { fetch } from "@inrupt/universal-fetch";
 import { mockAccessGrantVc } from "../gConsent/util/access.mock";
 import { deleteFile } from "./deleteFile";
 import { fetchWithVc } from "../fetch";
