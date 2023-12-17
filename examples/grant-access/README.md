@@ -3,7 +3,7 @@
 ## Install and build
 
 - Run `npm ci` and `npm run build` in the current directory to build the demo app.
-- (Optional, requires node16+) Run the app using the local repository's code:
+- (Optional, requires node18+) Run the app using the local repository's code:
   - run `npm ci` and `npm run build` in the root repository to make sure the library is built,
   - run `npm ci` and `npm run build:local` in the current directory to build the demo app.
 
