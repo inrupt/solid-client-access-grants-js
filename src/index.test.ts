@@ -57,6 +57,11 @@ import {
   getResourceOwner,
   getResources,
   getTypes,
+  getPurposes,
+  getConsent,
+  getCredentialSubject,
+  getInbox,
+  getInherit,
 } from "./index";
 
 describe("Index exports", () => {
@@ -97,5 +102,10 @@ describe("Index exports", () => {
     expect(getResourceOwner).toBeDefined();
     expect(getResources).toBeDefined();
     expect(getTypes).toBeDefined();
+    expect(getPurposes).toBeDefined();
+    expect(getConsent).toBeDefined();
+    expect(getCredentialSubject).toBeDefined();
+    expect(getInbox).toBeDefined();
+    expect(getInherit).toBeDefined();
   });
 });

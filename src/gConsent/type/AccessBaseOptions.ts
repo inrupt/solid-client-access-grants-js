@@ -80,3 +80,14 @@ export interface AccessBaseOptions {
   //
   // podHost?: URL | UrlString;
 }
+
+/**
+ * @since unreleased
+ */
+export interface WithLegacyJsonFlag {
+  returnLegacyJsonld?: boolean;
+}
+
+export interface WithLegacyJsonFlagSet {
+  returnLegacyJsonld?: true;
+}

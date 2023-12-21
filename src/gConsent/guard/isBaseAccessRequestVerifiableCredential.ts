@@ -29,6 +29,10 @@ import type {
 import { isGConsentAttributes } from "./isGConsentAttributes";
 import { isBaseAccessVcBody } from "./isBaseAccessVcBody";
 
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the Access Request,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 function isRequestCredentialSubject(
   x:
     | RequestCredentialSubject
@@ -39,6 +43,10 @@ function isRequestCredentialSubject(
   return (x as RequestCredentialSubject).hasConsent !== undefined;
 }
 
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the Access Request,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 export function isBaseAccessRequestVerifiableCredential(
   x: unknown,
 ): x is BaseRequestBody {

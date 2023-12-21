@@ -19,39 +19,45 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { isVerifiableCredential } from "@inrupt/solid-client-vc";
 import type { UrlString, WebId } from "@inrupt/solid-client";
-import {
-  CREDENTIAL_TYPE_ACCESS_DENIAL,
-  GC_CONSENT_STATUS_DENIED,
-  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-} from "../constants";
+import type {
+  DatasetWithId,
+  VerifiableCredential,
+  VerifiableCredentialBase,
+} from "@inrupt/solid-client-vc";
+import { gc, solidVc } from "../../common/constants";
+import { CREDENTIAL_TYPE_ACCESS_DENIAL } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
-import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
-import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
-import { initializeGrantParameters } from "../util/initializeGrantParameters";
-import { normalizeAccessGrant } from "./approveAccessRequest";
 import type { AccessGrant } from "../type/AccessGrant";
+import { initializeGrantParameters } from "../util/initializeGrantParameters";
+import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
+import { normalizeAccessGrant } from "./approveAccessRequest";
+import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 
 // Merge back in denyAccessRequest after the deprecated signature has been removed.
 // eslint-disable-next-line camelcase
 async function internal_denyAccessRequest(
-  vc: VerifiableCredential | URL | UrlString,
-  options: AccessBaseOptions,
-): Promise<VerifiableCredential> {
-  const baseAccessVerifiableCredential =
-    await getBaseAccessRequestVerifiableCredential(vc, options);
-
-  const internalOptions = initializeGrantParameters(
-    baseAccessVerifiableCredential,
+  vc: DatasetWithId | URL | UrlString,
+  options: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+    normalize?:
+      | ((arg: VerifiableCredentialBase) => VerifiableCredentialBase)
+      | undefined;
+  },
+): Promise<DatasetWithId> {
+  const baseVc: DatasetWithId = await getBaseAccess(
+    vc,
+    options,
+    solidVc.SolidAccessRequest,
   );
+
+  const internalOptions = initializeGrantParameters(baseVc);
   const denialBody = getGrantBody({
     access: internalOptions.access,
     requestor: internalOptions.requestor,
     resources: internalOptions.resources,
     requestorInboxUrl: internalOptions.requestorInboxUrl,
-    status: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+    status: gc.ConsentStatusExplicitlyGiven.value,
     purpose: internalOptions.purpose,
     // denyAccessRequest doesn't take an override, so the expiration date
     // cannot be null.
@@ -59,10 +65,11 @@ async function internal_denyAccessRequest(
   });
   denialBody.type = [CREDENTIAL_TYPE_ACCESS_DENIAL];
   denialBody.credentialSubject.providedConsent.hasStatus =
-    GC_CONSENT_STATUS_DENIED;
+    gc.ConsentStatusDenied.value;
 
   return issueAccessVc(denialBody, options);
 }
+
 /**
  * Deny an access request. The content of the denied access request is provided
  * as a Verifiable Credential.
@@ -74,40 +81,101 @@ async function internal_denyAccessRequest(
  * @since 0.0.1
  */
 async function denyAccessRequest(
-  vc: VerifiableCredential | URL | UrlString,
-  options?: AccessBaseOptions,
+  vc: DatasetWithId | VerifiableCredential | URL | UrlString,
+  options: AccessBaseOptions & {
+    returnLegacyJsonld: false;
+  },
+): Promise<DatasetWithId>;
+/**
+ * Deny an access request. The content of the denied access request is provided
+ * as a Verifiable Credential.
+ *
+ * @param vc The Verifiable Credential representing the Access Request. If
+ * not conform to an Access Request, the function will throw.
+ * @param options Optional properties to customise the access denial behaviour.
+ * @returns A Verifiable Credential representing the denied access.
+ * @since 0.0.1
+ * @deprecated Deprecated in favour of setting returnLegacyJsonld: false. This will be the default value in future
+ * versions of this library.
+ */
+async function denyAccessRequest(
+  vc: DatasetWithId | VerifiableCredential | URL | UrlString,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: true;
+  },
+): Promise<AccessGrant>;
+/**
+ * Deny an access request. The content of the denied access request is provided
+ * as a Verifiable Credential.
+ *
+ * @param vc The Verifiable Credential representing the Access Request. If
+ * not conform to an Access Request, the function will throw.
+ * @param options Optional properties to customise the access denial behaviour.
+ * @returns A Verifiable Credential representing the denied access.
+ * @since 0.0.1
+ * @deprecated Deprecated in favour of setting returnLegacyJsonld: false. This will be the default value in future
+ * versions of this library.
+ */
+async function denyAccessRequest(
+  vc: DatasetWithId | VerifiableCredential | URL | UrlString,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+  },
+): Promise<DatasetWithId>;
+/**
+ * @deprecated Please remove the `resourceOwner` parameter.
+ */
+async function denyAccessRequest(
+  resourceOwner: WebId,
+  vc: DatasetWithId | VerifiableCredential | URL | UrlString,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: true;
+  },
 ): Promise<AccessGrant>;
 /**
  * @deprecated Please remove the `resourceOwner` parameter.
  */
 async function denyAccessRequest(
   resourceOwner: WebId,
-  vc: VerifiableCredential | URL | UrlString,
-  options?: AccessBaseOptions,
-): Promise<VerifiableCredential>;
+  vc: DatasetWithId | VerifiableCredential | URL | UrlString,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+  },
+): Promise<DatasetWithId>;
 async function denyAccessRequest(
-  resourceOwnerOrVc: WebId | VerifiableCredential | URL | UrlString,
-  vcOrOptions?: VerifiableCredential | URL | UrlString | AccessBaseOptions,
+  resourceOwnerOrVc:
+    | WebId
+    | DatasetWithId
+    | VerifiableCredential
+    | URL
+    | UrlString,
+  vcOrOptions?: DatasetWithId | URL | UrlString | AccessBaseOptions,
   options?: AccessBaseOptions,
-): Promise<VerifiableCredential> {
+): Promise<DatasetWithId> {
   if (
     typeof options !== "undefined" ||
     (typeof resourceOwnerOrVc === "string" &&
       typeof vcOrOptions === "string") ||
-    isVerifiableCredential(vcOrOptions)
+    // FIXME: Understand why adding this typeof vcOrOptions === "object" && was necessary before
+    // making a release. Without it we were passing undefined to isVerifiableCredential
+    (typeof vcOrOptions === "object" &&
+      typeof (vcOrOptions as DatasetWithId).id === "string")
   ) {
     // The deprecated signature is being used: ignore the first parameter
     return internal_denyAccessRequest(
       vcOrOptions as VerifiableCredential | URL | UrlString,
-      options ?? {},
-    ).then(normalizeAccessGrant);
+      {
+        ...options,
+        normalize: normalizeAccessGrant,
+      },
+    );
   }
-  return internal_denyAccessRequest(
-    resourceOwnerOrVc,
-    (vcOrOptions as AccessBaseOptions) ?? {},
-  ).then(normalizeAccessGrant);
+  return internal_denyAccessRequest(resourceOwnerOrVc, {
+    ...(vcOrOptions as AccessBaseOptions),
+    normalize: normalizeAccessGrant,
+  });
 }
 
 export { denyAccessRequest };
 export default denyAccessRequest;
-export type { VerifiableCredential, UrlString };
+export type { UrlString, VerifiableCredential };

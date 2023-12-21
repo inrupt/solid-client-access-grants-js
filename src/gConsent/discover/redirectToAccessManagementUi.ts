@@ -20,8 +20,11 @@
 //
 
 import type { UrlString, WebId } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
-import { getBaseAccessRequestVerifiableCredential } from "../util/getBaseAccessVerifiableCredential";
+import type {
+  DatasetWithId,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
+import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import {
   getAccessManagementUi,
@@ -30,6 +33,7 @@ import {
 import { redirectWithParameters } from "../util/redirect";
 import type { FetchOptions } from "../../type/FetchOptions";
 import type { RedirectOptions } from "../../type/RedirectOptions";
+import { getResources } from "../../common";
 
 // DEPRECATED: the VC should be sent by IRI, and not by value.
 export const REQUEST_VC_PARAM_NAME = "requestVc";
@@ -93,18 +97,20 @@ async function discoverAccessManagementUi(options: {
  * @since 0.4.0
  */
 export async function redirectToAccessManagementUi(
-  accessRequestVc: VerifiableCredential | UrlString | URL,
+  accessRequestVc: DatasetWithId | VerifiableCredential | UrlString | URL,
   redirectUrl: UrlString | URL,
   options: RedirectToAccessManagementUiOptions = {},
 ): Promise<void> {
   const fallbackUi = options.fallbackAccessManagementUi;
 
-  const requestVc = await getBaseAccessRequestVerifiableCredential(
-    accessRequestVc,
-    { fetch: options.fetch },
-  );
+  const requestVc = await getBaseAccess(accessRequestVc, {
+    fetch: options.fetch,
+  });
+
+  const [resourceUrl] = getResources(requestVc);
+
   const accessManagementUi = await discoverAccessManagementUi({
-    resourceUrl: requestVc.credentialSubject.hasConsent.forPersonalData[0],
+    resourceUrl,
     resourceOwner: options.resourceOwner,
     fallbackUi,
     fetch: options.fetch,
@@ -112,9 +118,7 @@ export async function redirectToAccessManagementUi(
 
   if (accessManagementUi === undefined) {
     throw new Error(
-      `Cannot discover access management UI URL for [${
-        requestVc.credentialSubject.hasConsent.forPersonalData[0]
-      }]${
+      `Cannot discover access management UI URL for [${resourceUrl}]${
         options.resourceOwner ? `, neither from [${options.resourceOwner}]` : ""
       }`,
     );

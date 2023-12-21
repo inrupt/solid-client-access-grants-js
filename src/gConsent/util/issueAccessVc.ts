@@ -19,7 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  VerifiableCredential,
+  VerifiableCredentialBase,
+  DatasetWithId,
+} from "@inrupt/solid-client-vc";
 import { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
   ACCESS_GRANT_CONTEXT_DEFAULT,
@@ -152,8 +156,38 @@ export function getGrantBody(params: AccessGrantParameters): AccessGrantBody {
 
 export async function issueAccessVc(
   vcBody: BaseRequestBody | BaseGrantBody,
-  options: AccessBaseOptions,
-): Promise<VerifiableCredential> {
+  options: AccessBaseOptions & {
+    returnLegacyJsonld: false;
+    normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
+  },
+): Promise<DatasetWithId>;
+/**
+ * @deprecated Use RDFJS API by setting returnLegacyJsonld: false
+ */
+export async function issueAccessVc(
+  vcBody: BaseRequestBody | BaseGrantBody,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: true;
+    normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
+  },
+): Promise<VerifiableCredential>;
+/**
+ * @deprecated Use RDFJS API by setting returnLegacyJsonld: false
+ */
+export async function issueAccessVc(
+  vcBody: BaseRequestBody | BaseGrantBody,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+    normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
+  },
+): Promise<DatasetWithId>;
+export async function issueAccessVc(
+  vcBody: BaseRequestBody | BaseGrantBody,
+  options: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+    normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
+  } = {},
+): Promise<DatasetWithId> {
   const fetcher = await getSessionFetch(options);
   const targetResourceIri = isBaseRequest(vcBody)
     ? vcBody.credentialSubject.hasConsent.forPersonalData[0]
@@ -169,7 +203,7 @@ export async function issueAccessVc(
     await getAccessApiEndpoint(targetResourceIri, options),
   );
 
-  return issueVerifiableCredential(
+  const issuedVc = await issueVerifiableCredential(
     accessIssuerEndpoint.href,
     {
       "@context": instanciateEssAccessGrantContext(
@@ -188,6 +222,9 @@ export async function issueAccessVc(
     },
     {
       fetch: fetcher,
+      returnLegacyJsonld: options.returnLegacyJsonld,
+      normalize: options.normalize,
     },
   );
+  return issuedVc;
 }

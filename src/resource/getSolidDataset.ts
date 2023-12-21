@@ -21,7 +21,10 @@
 
 import type { UrlString } from "@inrupt/solid-client";
 import { getSolidDataset as coreGetSolidDataset } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  DatasetWithId,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
 import type { FetchOptions } from "../type/FetchOptions";
 
@@ -41,7 +44,7 @@ import type { FetchOptions } from "../type/FetchOptions";
  */
 export async function getSolidDataset(
   datasetUrl: UrlString,
-  accessGrant: VerifiableCredential,
+  accessGrant: VerifiableCredential | DatasetWithId,
   options?: FetchOptions,
 ) {
   const fetchOptions: FetchOptions = {};

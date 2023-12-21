@@ -19,6 +19,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import type { DatasetWithId } from "@inrupt/solid-client-vc";
+import { solidVc } from "../../common/constants";
 import type {
   BaseGrantBody,
   GrantCredentialSubject,
@@ -26,9 +28,16 @@ import type {
   RequestCredentialSubject,
   RequestCredentialSubjectPayload,
 } from "../type/AccessVerifiableCredential";
+import {
+  isBaseAccessVcBody,
+  isRdfjsAccessVerifiableCredential,
+} from "./isBaseAccessVcBody";
 import { isGConsentAttributes } from "./isGConsentAttributes";
-import { isBaseAccessVcBody } from "./isBaseAccessVcBody";
 
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the Access Grant,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 function isGrantCredentialSubject(
   x:
     | RequestCredentialSubject
@@ -39,6 +48,10 @@ function isGrantCredentialSubject(
   return (x as GrantCredentialSubject).providedConsent !== undefined;
 }
 
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the Access Grant,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 export function isBaseAccessGrantVerifiableCredential(
   x: unknown,
 ): x is BaseGrantBody {
@@ -47,4 +60,13 @@ export function isBaseAccessGrantVerifiableCredential(
     isGrantCredentialSubject(x.credentialSubject) &&
     isGConsentAttributes(x.credentialSubject.providedConsent)
   );
+}
+
+export function isRdfjsBaseAccessGrantVerifiableCredential(
+  data: DatasetWithId,
+) {
+  return isRdfjsAccessVerifiableCredential(data, [
+    solidVc.SolidAccessDenial,
+    solidVc.SolidAccessGrant,
+  ]);
 }

@@ -21,8 +21,9 @@
 
 import { jest, it, describe, expect } from "@jest/globals";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
-import type * as VcModule from "@inrupt/solid-client-vc";
+import * as VcModule from "@inrupt/solid-client-vc";
 import type { fetch } from "@inrupt/universal-fetch";
+import type * as VcLibrary from "@inrupt/solid-client-vc";
 import type {
   AccessParameters,
   IssueAccessRequestParameters,
@@ -30,16 +31,24 @@ import type {
 import { getAccessGrantAll } from "./getAccessGrantAll";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import { mockAccessGrantVc } from "../util/access.mock";
+import { normalizeAccessGrant } from "./approveAccessRequest";
 
 const otherFetch = jest.fn(global.fetch);
 
-jest.mock("@inrupt/solid-client-vc");
-const mockedVcModule = jest.requireMock(
-  "@inrupt/solid-client-vc",
-) as jest.Mocked<typeof VcModule>;
-mockedVcModule.getVerifiableCredentialAllFromShape.mockResolvedValue([
-  mockAccessGrantVc(),
-]);
+jest.mock("@inrupt/solid-client-vc", () => {
+  const { verifiableCredentialToDataset, getCredentialSubject } =
+    jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
+      typeof VcLibrary
+    >;
+  return {
+    verifiableCredentialToDataset,
+    getCredentialSubject,
+    issueVerifiableCredential: jest.fn(),
+    getVerifiableCredentialAllFromShape: jest.fn(() =>
+      mockAccessGrantVc().then((res) => [res]),
+    ),
+  };
+});
 
 jest.mock("../discover/getAccessApiEndpoint", () => {
   return {
@@ -179,6 +188,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -213,6 +223,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -247,6 +258,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -281,6 +293,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShapeOpen),
       {
         fetch: otherFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -318,6 +331,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -355,6 +369,7 @@ describe("getAccessGrantAll", () => {
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
+        normalize: normalizeAccessGrant,
       },
     );
   });
@@ -420,28 +435,30 @@ describe("getAccessGrantAll", () => {
   });
 
   it("filters out non-recursive grants for ancestors", async () => {
-    const mockedGrant = mockAccessGrantVc({
+    const mockedGrant = await mockAccessGrantVc({
       inherit: false,
       resources: [resourceAncestors[0]],
     });
-    mockedVcModule.getVerifiableCredentialAllFromShape.mockResolvedValue([
-      mockedGrant,
-    ]);
+    (
+      VcModule as jest.Mocked<typeof VcLibrary>
+    ).getVerifiableCredentialAllFromShape.mockResolvedValue([mockedGrant]);
     await expect(
       getAccessGrantAll({ resource: resource.href }),
     ).resolves.toStrictEqual([]);
   });
 
   it("accepts explicitly non-recursive grants for target resource", async () => {
-    const mockedGrant = mockAccessGrantVc({
+    const mockedGrant = await mockAccessGrantVc({
       inherit: false,
       resources: [resource.href],
     });
-    mockedVcModule.getVerifiableCredentialAllFromShape
+    (
+      VcModule as jest.Mocked<typeof VcLibrary>
+    ).getVerifiableCredentialAllFromShape
       .mockResolvedValueOnce([mockedGrant])
       // Override the default mock to an unapplicable non-recursive grant.
       .mockResolvedValue([
-        mockAccessGrantVc({
+        await mockAccessGrantVc({
           inherit: false,
           resources: [resourceAncestors[0]],
         }),

@@ -19,16 +19,23 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  VerifiableCredential,
+  VerifiableCredentialBase,
+  DatasetWithId,
+} from "@inrupt/solid-client-vc";
 import { getRequestBody, issueAccessVc } from "../util/issueAccessVc";
-import { GC_CONSENT_STATUS_REQUESTED } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type {
   DeprecatedAccessRequestParameters,
   IssueAccessRequestParameters,
 } from "../type/IssueAccessRequestParameters";
 import type { AccessRequest } from "../type/AccessRequest";
-import { isAccessRequest } from "../guard/isAccessRequest";
+import {
+  isAccessRequest,
+  isRdfjsAccessRequest,
+} from "../guard/isAccessRequest";
+import { gc } from "../../common/constants";
 
 /**
  * Internal function. This is a stopgap until we have proper JSON-LD parsing.
@@ -41,7 +48,7 @@ import { isAccessRequest } from "../guard/isAccessRequest";
  * @param accessRequest The grant returned by the VC issuer
  * @returns An equivalent JSON-LD document framed according to our typing.
  */
-export function normalizeAccessRequest<T extends VerifiableCredential>(
+export function normalizeAccessRequest<T extends VerifiableCredentialBase>(
   accessRequest: T,
 ): T {
   // Proper type checking is performed after normalization, so casting here is fine.
@@ -76,26 +83,67 @@ export function normalizeAccessRequest<T extends VerifiableCredential>(
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options?: AccessBaseOptions,
+  options: AccessBaseOptions & { returnLegacyJsonld: false },
+): Promise<DatasetWithId>;
+/**
+ * Request access to a given Resource.
+ *
+ * @param params Access to request.
+ * @param options Optional properties to customize the access request behavior.
+ * @returns A signed Verifiable Credential representing the access request.
+ * @since 0.4.0
+ * @deprecated Use RDFJS API instead of relying on the JSON structure by setting `returnLegacyJsonld` to false
+ */
+async function issueAccessRequest(
+  params: IssueAccessRequestParameters,
+  options?: AccessBaseOptions & { returnLegacyJsonld?: true },
 ): Promise<AccessRequest>;
+/**
+ * Request access to a given Resource.
+ *
+ * @param params Access to request.
+ * @param options Optional properties to customize the access request behavior.
+ * @returns A signed Verifiable Credential representing the access request.
+ * @since 0.4.0
+ * @deprecated Use RDFJS API instead of relying on the JSON structure by setting `returnLegacyJsonld` to false
+ */
+async function issueAccessRequest(
+  params: IssueAccessRequestParameters,
+  options?: AccessBaseOptions & { returnLegacyJsonld?: boolean },
+): Promise<DatasetWithId>;
 /**
  * @deprecated Please remove the `requestor` parameter.
  */
 async function issueAccessRequest(
   params: DeprecatedAccessRequestParameters,
-  options?: AccessBaseOptions,
+  options?: AccessBaseOptions & { returnLegacyJsonld?: boolean },
 ): Promise<AccessRequest>;
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options: AccessBaseOptions = {},
-): Promise<AccessRequest> {
+  options: AccessBaseOptions & { returnLegacyJsonld?: boolean } = {},
+): Promise<DatasetWithId> {
   const requestBody = getRequestBody({
     ...params,
-    status: GC_CONSENT_STATUS_REQUESTED,
+    status: gc.ConsentStatusRequested.value,
   });
-  const accessRequest = normalizeAccessRequest(
-    await issueAccessVc(requestBody, options),
-  );
+
+  if (options.returnLegacyJsonld === false) {
+    const accessRequest = await issueAccessVc(requestBody, {
+      ...options,
+      returnLegacyJsonld: false,
+    });
+    if (!isRdfjsAccessRequest(accessRequest)) {
+      throw new Error(
+        `${JSON.stringify(accessRequest)} is not an Access Request`,
+      );
+    }
+    return accessRequest;
+  }
+
+  const accessRequest = await issueAccessVc(requestBody, {
+    ...options,
+    normalize: normalizeAccessRequest,
+  });
   if (!isAccessRequest(accessRequest)) {
     throw new Error(
       `${JSON.stringify(accessRequest)} is not an Access Request`,

@@ -19,93 +19,43 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { UrlString } from "@inrupt/solid-client";
-import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
-import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
+import type { DatasetWithId } from "@inrupt/solid-client-vc";
 import {
-  ACL_RESOURCE_ACCESS_MODE_APPEND_ABBREV,
-  ACL_RESOURCE_ACCESS_MODE_APPEND,
-  ACL_RESOURCE_ACCESS_MODE_READ,
-  ACL_RESOURCE_ACCESS_MODE_WRITE,
-  ACL_RESOURCE_ACCESS_MODE_READ_ABBREV,
-  ACL_RESOURCE_ACCESS_MODE_WRITE_ABBREV,
-} from "../../type/ResourceAccessMode";
+  getCredentialSubject,
+  getExpirationDate,
+  getIssuanceDate,
+} from "@inrupt/solid-client-vc";
+import { DataFactory } from "n3";
+import { getAccessModes, getResources } from "../../common";
+import { getConsent, getInbox, getPurposes } from "../../common/getters";
 import type { ApproveAccessRequestOverrides } from "../manage/approveAccessRequest";
-import type { AccessModes } from "../../type/AccessModes";
+import { INHERIT, XSD_BOOLEAN } from "../../common/constants";
 
-function getRequestorFromRequest(requestVc: AccessRequestBody): UrlString {
-  return requestVc.credentialSubject.id;
-}
+const { quad, literal, defaultGraph } = DataFactory;
 
-function getModesFromRequest(
-  requestVc: AccessRequestBody,
-): ResourceAccessMode[] {
-  return requestVc.credentialSubject.hasConsent.mode;
-}
-
-function modesToAccess(modes: ResourceAccessMode[]): AccessModes {
-  const accessMode: AccessModes = {};
-
-  accessMode.append = modes.some((mode) =>
-    [
-      ACL_RESOURCE_ACCESS_MODE_APPEND,
-      ACL_RESOURCE_ACCESS_MODE_APPEND_ABBREV,
-    ].includes(mode),
-  );
-  accessMode.read = modes.some((mode) =>
-    [
-      ACL_RESOURCE_ACCESS_MODE_READ,
-      ACL_RESOURCE_ACCESS_MODE_READ_ABBREV,
-    ].includes(mode),
-  );
-  accessMode.write = modes.some((mode) =>
-    [
-      ACL_RESOURCE_ACCESS_MODE_WRITE,
-      ACL_RESOURCE_ACCESS_MODE_WRITE_ABBREV,
-    ].includes(mode),
+const inheritQuad = (
+  subject: ReturnType<typeof getConsent>,
+  inherit: boolean,
+) =>
+  quad(
+    subject,
+    INHERIT,
+    literal(inherit ? "true" : "false", XSD_BOOLEAN),
+    defaultGraph(),
   );
 
-  return accessMode;
-}
-
-function getInboxFromRequest(
-  requestVc: AccessRequestBody,
-): UrlString | undefined {
-  return requestVc.credentialSubject.inbox;
-}
-
-function getResourcesFromRequest(requestVc: AccessRequestBody): UrlString[] {
-  return requestVc.credentialSubject.hasConsent.forPersonalData;
-}
-
-function getIssuanceFromRequest(
-  requestVc: AccessRequestBody & { issuanceDate: string },
-): Date | undefined {
-  return new Date(requestVc.issuanceDate);
-}
-
-function getPurposeFromRequest(
-  requestVc: AccessRequestBody,
-): UrlString[] | undefined {
-  return requestVc.credentialSubject.hasConsent.forPurpose;
-}
-
-function getExpirationFromRequest(
-  requestVc: AccessRequestBody,
-): Date | undefined {
-  return requestVc.expirationDate !== undefined
-    ? new Date(requestVc.expirationDate)
-    : undefined;
-}
-
-function getInheritFromRequest(
-  requestVc: AccessRequestBody,
-): boolean | undefined {
-  return requestVc.credentialSubject.hasConsent.inherit;
+function getInherit(vc: DatasetWithId): boolean | undefined {
+  if (vc.has(inheritQuad(getConsent(vc), true))) {
+    return true;
+  }
+  if (vc.has(inheritQuad(getConsent(vc), false))) {
+    return false;
+  }
+  return undefined;
 }
 
 export function initializeGrantParameters(
-  requestVc: (AccessRequestBody & { issuanceDate: string }) | undefined,
+  requestVc: DatasetWithId | undefined,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
 ): ApproveAccessRequestOverrides {
   const resultGrant =
@@ -113,22 +63,17 @@ export function initializeGrantParameters(
       ? (requestOverride as ApproveAccessRequestOverrides)
       : {
           requestor:
-            requestOverride?.requestor ?? getRequestorFromRequest(requestVc),
-          access:
-            requestOverride?.access ??
-            modesToAccess(getModesFromRequest(requestVc)),
-          resources:
-            requestOverride?.resources ?? getResourcesFromRequest(requestVc),
+            requestOverride?.requestor ?? getCredentialSubject(requestVc).value,
+          access: requestOverride?.access ?? getAccessModes(requestVc),
+          resources: requestOverride?.resources ?? getResources(requestVc),
           requestorInboxUrl:
-            requestOverride?.requestorInboxUrl ??
-            getInboxFromRequest(requestVc),
+            requestOverride?.requestorInboxUrl ?? getInbox(requestVc),
           issuanceDate:
-            requestOverride?.issuanceDate ?? getIssuanceFromRequest(requestVc),
-          purpose: requestOverride?.purpose ?? getPurposeFromRequest(requestVc),
+            requestOverride?.issuanceDate ?? getIssuanceDate(requestVc),
+          purpose: requestOverride?.purpose ?? getPurposes(requestVc),
           expirationDate:
-            requestOverride?.expirationDate ??
-            getExpirationFromRequest(requestVc),
-          inherit: requestOverride?.inherit ?? getInheritFromRequest(requestVc),
+            requestOverride?.expirationDate ?? getExpirationDate(requestVc),
+          inherit: requestOverride?.inherit ?? getInherit(requestVc),
         };
   if (requestOverride?.expirationDate === null) {
     resultGrant.expirationDate = undefined;

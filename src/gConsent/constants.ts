@@ -19,23 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-export const AS_ACTOR = "https://www.w3.org/ns/activitystreams#actor";
-export const AS_ANNOUNCE = "https://www.w3.org/ns/activitystreams#Announce";
-export const AS_OBJECT = "https://www.w3.org/ns/activitystreams#object";
-export const AS_SUMMARY = "https://www.w3.org/ns/activitystreams#summary";
-
-export const GC_CONSENT = "https://w3id.org/GConsent#Consent";
-export const GC_FOR_PERSONAL_DATA = "https://w3id.org/GConsent#forPersonalData";
-export const GC_FOR_PURPOSE = "https://w3id.org/GConsent#forPurpose";
-export const GC_HAS_EXPIRY = "https://w3id.org/GConsent#hasExpiry";
-export const GC_HAS_STATUS = "https://w3id.org/GConsent#hasStatus";
-export const GC_IS_PROVIDED_TO = "https://w3id.org/GConsent#isProvidedTo";
-export const GC_CONSENT_STATUS_DENIED =
-  "https://w3id.org/GConsent#ConsentStatusDenied";
-export const GC_CONSENT_STATUS_EXPLICITLY_GIVEN =
-  "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven";
-export const GC_CONSENT_STATUS_REQUESTED =
-  "https://w3id.org/GConsent#ConsentStatusRequested";
+import { gc } from "../common/constants";
 
 export const GC_CONSENT_STATUS_DENIED_ABBREV = "ConsentStatusDenied";
 export const GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV =
@@ -62,11 +46,23 @@ export const CONTEXT_ESS_DEFAULT =
 const instanciateContextVcEssTemplate = (essVcDomain: string): string =>
   `https://${essVcDomain}/credentials/v1`;
 
+const extraContext = [
+  "https://w3id.org/security/data-integrity/v1",
+  "https://w3id.org/vc-revocation-list-2020/v1",
+  "https://w3id.org/vc/status-list/2021/v1",
+  "https://w3id.org/security/suites/ed25519-2020/v1",
+];
+
 // A default context value is provided for mocking purpose accross the codebase.
 export const ACCESS_GRANT_CONTEXT_DEFAULT = [
   CONTEXT_VC_W3C,
   CONTEXT_ESS_DEFAULT,
   instanciateContextVcEssTemplate("vc.inrupt.com"),
+] as const;
+
+export const MOCK_CONTEXT = [
+  ...ACCESS_GRANT_CONTEXT_DEFAULT,
+  ...extraContext,
 ] as const;
 
 // When issuing a VC using a given service,"https://schema.inrupt.com/credentials/v1.jsonld" be sure to set the context using the following.
@@ -79,18 +75,9 @@ export const instanciateEssAccessGrantContext = (
     instanciateContextVcEssTemplate(essVcDomain),
   ] as const;
 
-export const WELL_KNOWN_SOLID = ".well-known/solid";
-
-export const INRUPT_CONSENT_SERVICE_LEGACY =
-  "http://inrupt.com/ns/ess#consentIssuer";
-
-export const SOLID_CONSENT_SERVICE =
-  "http://www.w3.org/ns/solid/terms#accessIssuer";
-
 export const CREDENTIAL_TYPE_ACCESS_REQUEST = "SolidAccessRequest";
 export const CREDENTIAL_TYPE_ACCESS_GRANT = "SolidAccessGrant";
 export const CREDENTIAL_TYPE_ACCESS_DENIAL = "SolidAccessDenial";
-export const CREDENTIAL_TYPE_LEGACY_CONSENT_REQUEST = "SolidConsentRequest";
 export const CREDENTIAL_TYPE_BASE = "VerifiableCredential";
 export const PRESENTATION_TYPE_BASE = "VerifiablePresentation";
 
@@ -99,21 +86,24 @@ export const ACCESS_CREDENTIAL_TYPE = new Set([
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_DENIAL,
   "vc:SolidAccessDenial",
-  CREDENTIAL_TYPE_LEGACY_CONSENT_REQUEST,
 ]);
 
 export const ACCESS_GRANT_STATUS = Object.freeze(
   new Set([
-    GC_CONSENT_STATUS_DENIED,
-    GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
+    gc.ConsentStatusDenied.value,
+    gc.ConsentStatusExplicitlyGiven.value,
     GC_CONSENT_STATUS_DENIED_ABBREV,
     "gc:ConsentStatusDenied",
+    "Consent:StatusDenied",
     GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV,
   ]),
 );
 
 export const ACCESS_REQUEST_STATUS = Object.freeze(
-  new Set([GC_CONSENT_STATUS_REQUESTED, GC_CONSENT_STATUS_REQUESTED_ABBREV]),
+  new Set([
+    gc.ConsentStatusRequested.value,
+    GC_CONSENT_STATUS_REQUESTED_ABBREV,
+  ]),
 );
 
 export const ACCESS_STATUS = Object.freeze(

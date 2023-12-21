@@ -25,9 +25,17 @@ import type {
   BaseAccessVcBody,
 } from "../type/AccessVerifiableCredential";
 
-export function isAccessGrant(
-  vc: BaseAccessVcBody,
-): vc is BaseAccessVcBody & AccessGrantBody {
+export const GC_CONSENT_STATUS_DENIED =
+  "https://w3id.org/GConsent#ConsentStatusDenied";
+export const GC_CONSENT_STATUS_EXPLICITLY_GIVEN =
+  "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven";
+export const GC_CONSENT_STATUS_REQUESTED =
+  "https://w3id.org/GConsent#ConsentStatusRequested";
+
+// Implemented as isGConsentAccessGrant in src/common/getters as isGConsentAccessGrant
+export function isAccessGrant<T extends BaseAccessVcBody>(
+  vc: T,
+): vc is T & AccessGrantBody {
   return (
     (vc as AccessGrantBody).credentialSubject.providedConsent !== undefined &&
     ACCESS_GRANT_STATUS.has(
@@ -38,4 +46,8 @@ export function isAccessGrant(
   );
 }
 
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the Access Grant,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 export const CredentialIsAccessGrantGConsent = isAccessGrant;

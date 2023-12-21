@@ -19,17 +19,15 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { jest, describe, it, expect } from "@jest/globals";
-import type {
-  issueVerifiableCredential,
-  JsonLd,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
+import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import type * as CrossFetch from "@inrupt/universal-fetch";
+import type * as VcLibrary from "@inrupt/solid-client-vc";
 
-import { issueAccessRequest } from "./issueAccessRequest";
+import {
+  issueAccessRequest,
+  normalizeAccessRequest,
+} from "./issueAccessRequest";
 import { getRequestBody } from "../util/issueAccessVc";
-import { isAccessRequest } from "../guard/isAccessRequest";
 import {
   mockAccessApiEndpoint,
   MOCKED_ACCESS_ISSUER,
@@ -55,7 +53,15 @@ jest.mock("@inrupt/solid-client", () => {
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
 });
-jest.mock("@inrupt/solid-client-vc");
+jest.mock("@inrupt/solid-client-vc", () => {
+  const actualVcLibrary = jest.requireActual(
+    "@inrupt/solid-client-vc",
+  ) as typeof VcLibrary;
+  return {
+    ...actualVcLibrary,
+    issueVerifiableCredential: jest.fn(),
+  };
+});
 jest.mock("@inrupt/universal-fetch", () => {
   const crossFetch = jest.requireActual(
     "@inrupt/universal-fetch",
@@ -141,61 +147,28 @@ describe("getRequestBody", () => {
   });
 });
 
-describe("issueAccessRequest", () => {
-  it("sends a proper access request", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential",
-    );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+describe.each([true, false, undefined])(
+  "issueAccessRequest, legacyJsonLd: %s",
+  (returnLegacyJsonld) => {
+    let mockAccessRequest: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+    let mockAccessGrant: Awaited<ReturnType<typeof mockAccessGrantVc>>;
 
-    await issueAccessRequest(
-      {
-        access: { read: true },
-        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-        resources: ["https://some.pod/resource"],
-        requestorInboxUrl: MOCK_REQUESTOR_INBOX,
-      },
-      {
-        fetch: jest.fn<typeof fetch>(),
-      },
-    );
+    beforeAll(async () => {
+      mockAccessRequest = await mockAccessRequestVc();
+      mockAccessGrant = await mockAccessGrantVc();
+    });
 
-    expect(mockedIssue).toHaveBeenCalledWith(
-      `${MOCKED_ACCESS_ISSUER}/issue`,
-      expect.objectContaining({
-        hasConsent: {
-          mode: ["http://www.w3.org/ns/auth/acl#Read"],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-          forPersonalData: ["https://some.pod/resource"],
-          isConsentForDataSubject: "https://some.pod/profile#you",
+    it("sends a proper access request", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
         },
-      }),
-      expect.objectContaining({
-        type: ["SolidAccessRequest"],
-      }),
-      expect.anything(),
-    );
-  });
+        "issueVerifiableCredential",
+      );
+      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
 
-  it("Supports abbreviated status values", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential",
-    );
-    const mockedVc = mockAccessRequestVc();
-    mockedVc.credentialSubject.hasConsent.hasStatus =
-      GC_CONSENT_STATUS_REQUESTED_ABBREV;
-    mockedIssue.mockResolvedValueOnce(mockedVc);
-
-    await expect(
-      issueAccessRequest(
+      await issueAccessRequest(
         {
           access: { read: true },
           resourceOwner: MOCK_RESOURCE_OWNER_IRI,
@@ -204,23 +177,92 @@ describe("issueAccessRequest", () => {
         },
         {
           fetch: jest.fn<typeof fetch>(),
+          returnLegacyJsonld,
         },
-      ),
-    ).resolves.not.toThrow();
-  });
+      );
 
-  it("throws if the VC returned is not an Access Request", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential",
-    );
-    mockedIssue.mockResolvedValueOnce(mockAccessGrantVc());
+      expect(mockedIssue).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          hasConsent: {
+            mode: ["http://www.w3.org/ns/auth/acl#Read"],
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+            forPersonalData: ["https://some.pod/resource"],
+            isConsentForDataSubject: "https://some.pod/profile#you",
+          },
+        }),
+        expect.objectContaining({
+          type: ["SolidAccessRequest"],
+        }),
+        expect.anything(),
+      );
+    });
 
-    await expect(
-      issueAccessRequest(
+    it("Supports abbreviated status values", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
+        },
+        "issueVerifiableCredential",
+      );
+      mockAccessRequest.credentialSubject.hasConsent.hasStatus =
+        GC_CONSENT_STATUS_REQUESTED_ABBREV;
+      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
+
+      await expect(
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
+          },
+        ),
+      ).resolves.not.toThrow();
+    });
+
+    it("throws if the VC returned is not an Access Request", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
+        },
+        "issueVerifiableCredential",
+      );
+      mockedIssue.mockResolvedValueOnce(mockAccessGrant);
+
+      await expect(
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
+          },
+        ),
+      ).rejects.toThrow();
+    });
+
+    it("computes the correct context based on the issuer", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
+        },
+        "issueVerifiableCredential",
+      );
+      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
+
+      await issueAccessRequest(
         {
           access: { read: true },
           resourceOwner: MOCK_RESOURCE_OWNER_IRI,
@@ -229,484 +271,297 @@ describe("issueAccessRequest", () => {
         },
         {
           fetch: jest.fn<typeof fetch>(),
+          returnLegacyJsonld,
         },
-      ),
-    ).rejects.toThrow();
-  });
+      );
 
-  it("computes the correct context based on the issuer", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential",
-    );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+      // Casting is required because TS picks up the deprecated signature.
+      const subjectClaims = mockedIssue.mock
+        .calls[0][1] as unknown as VcLibrary.JsonLd;
+      const credentialClaims = mockedIssue.mock.calls[0][2] as unknown as
+        | VcLibrary.JsonLd
+        | undefined;
 
-    await issueAccessRequest(
-      {
-        access: { read: true },
-        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-        resources: ["https://some.pod/resource"],
-        requestorInboxUrl: MOCK_REQUESTOR_INBOX,
-      },
-      {
-        fetch: jest.fn<typeof fetch>(),
-      },
-    );
+      expect(subjectClaims).toStrictEqual(
+        expect.objectContaining({
+          "@context": expect.arrayContaining([
+            "https://access-issuer.iri/credentials/v1",
+          ]),
+        }),
+      );
 
-    // Casting is required because TS picks up the deprecated signature.
-    const subjectClaims = mockedIssue.mock.calls[0][1] as unknown as JsonLd;
-    const credentialClaims = mockedIssue.mock.calls[0][2] as unknown as
-      | JsonLd
-      | undefined;
+      // Ensure that the default context has been removed
+      expect(subjectClaims["@context"]).not.toContain(
+        ACCESS_GRANT_CONTEXT_DEFAULT,
+      );
 
-    expect(subjectClaims).toStrictEqual(
-      expect.objectContaining({
-        "@context": expect.arrayContaining([
-          "https://access-issuer.iri/credentials/v1",
-        ]),
-      }),
-    );
-
-    // Ensure that the default context has been removed
-    expect(subjectClaims["@context"]).not.toContain(
-      ACCESS_GRANT_CONTEXT_DEFAULT,
-    );
-
-    expect(credentialClaims?.["@context"]).not.toContain(
-      ACCESS_GRANT_CONTEXT_DEFAULT,
-    );
-  });
-
-  it("sends a proper access with consent request", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential",
-    );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
-
-    await issueAccessRequest(
-      {
-        access: { read: true },
-        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-        resources: ["https://some.pod/resource"],
-        purpose: ["https://some.vocab/purpose#save-the-world"],
-        issuanceDate: new Date(Date.UTC(1955, 5, 8, 13, 37, 42, 42)),
-        expirationDate: new Date(Date.UTC(1990, 10, 12, 13, 37, 42, 42)),
-        requestorInboxUrl: "https://some.pod/inbox/",
-      },
-      {
-        fetch: jest.fn<typeof fetch>(),
-      },
-    );
-
-    expect(mockedIssue).toHaveBeenCalledWith(
-      `${MOCKED_ACCESS_ISSUER}/issue`,
-      expect.objectContaining({
-        hasConsent: {
-          mode: ["http://www.w3.org/ns/auth/acl#Read"],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-          forPersonalData: ["https://some.pod/resource"],
-          forPurpose: ["https://some.vocab/purpose#save-the-world"],
-          isConsentForDataSubject: "https://some.pod/profile#you",
-        },
-      }),
-      expect.objectContaining({
-        type: ["SolidAccessRequest"],
-        issuanceDate: "1955-06-08T13:37:42.042Z",
-        expirationDate: "1990-11-12T13:37:42.042Z",
-      }),
-      expect.anything(),
-    );
-  });
-
-  it("supports access with consent request with no issuance or expiration set", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential",
-    );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
-
-    await issueAccessRequest({
-      access: { read: true },
-      resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-      resources: ["https://some.pod/resource"],
-      purpose: ["https://some.vocab/purpose#save-the-world"],
-      requestorInboxUrl: "https://some.pod/inbox/",
+      expect(credentialClaims?.["@context"]).not.toContain(
+        ACCESS_GRANT_CONTEXT_DEFAULT,
+      );
     });
 
-    expect(mockedIssue).toHaveBeenCalledWith(
-      `${MOCKED_ACCESS_ISSUER}/issue`,
-      expect.objectContaining({
-        hasConsent: {
-          mode: ["http://www.w3.org/ns/auth/acl#Read"],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-          forPersonalData: ["https://some.pod/resource"],
-          forPurpose: ["https://some.vocab/purpose#save-the-world"],
-          isConsentForDataSubject: "https://some.pod/profile#you",
+    it("sends a proper access with consent request", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
         },
-      }),
-      expect.objectContaining({
-        type: ["SolidAccessRequest"],
-      }),
-      expect.anything(),
-    );
-  });
+        "issueVerifiableCredential",
+      );
+      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
 
-  it("includes the inherit flag if set to false", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential",
-    );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
+      await issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+          resources: ["https://some.pod/resource"],
+          purpose: ["https://some.vocab/purpose#save-the-world"],
+          issuanceDate: new Date(Date.UTC(1955, 5, 8, 13, 37, 42, 42)),
+          expirationDate: new Date(Date.UTC(1990, 10, 12, 13, 37, 42, 42)),
+          requestorInboxUrl: "https://some.pod/inbox/",
+        },
+        {
+          fetch: jest.fn<typeof fetch>(),
+          returnLegacyJsonld,
+        },
+      );
 
-    await issueAccessRequest(
-      {
-        access: { read: true },
-        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-        resources: ["https://some.pod/resource"],
-        requestorInboxUrl: MOCK_REQUESTOR_INBOX,
-        inherit: false,
-      },
-      {
-        fetch: jest.fn<typeof fetch>(),
-      },
-    );
+      expect(mockedIssue).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          hasConsent: {
+            mode: ["http://www.w3.org/ns/auth/acl#Read"],
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+            forPersonalData: ["https://some.pod/resource"],
+            forPurpose: ["https://some.vocab/purpose#save-the-world"],
+            isConsentForDataSubject: "https://some.pod/profile#you",
+          },
+        }),
+        expect.objectContaining({
+          type: ["SolidAccessRequest"],
+          issuanceDate: "1955-06-08T13:37:42.042Z",
+          expirationDate: "1990-11-12T13:37:42.042Z",
+        }),
+        expect.anything(),
+      );
+    });
 
-    expect(mockedIssue.mock.lastCall?.[1]).toMatchObject({
-      hasConsent: {
-        inherit: false,
+    it("supports access with consent request with no issuance or expiration set", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
+        },
+        "issueVerifiableCredential",
+      );
+      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
+
+      await issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+          resources: ["https://some.pod/resource"],
+          purpose: ["https://some.vocab/purpose#save-the-world"],
+          requestorInboxUrl: "https://some.pod/inbox/",
+        },
+        {
+          returnLegacyJsonld,
+        },
+      );
+
+      expect(mockedIssue).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          hasConsent: {
+            mode: ["http://www.w3.org/ns/auth/acl#Read"],
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+            forPersonalData: ["https://some.pod/resource"],
+            forPurpose: ["https://some.vocab/purpose#save-the-world"],
+            isConsentForDataSubject: "https://some.pod/profile#you",
+          },
+        }),
+        expect.objectContaining({
+          type: ["SolidAccessRequest"],
+        }),
+        expect.anything(),
+      );
+    });
+
+    it("includes the inherit flag if set to false", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
+        },
+        "issueVerifiableCredential",
+      );
+      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
+
+      await issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+          resources: ["https://some.pod/resource"],
+          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          inherit: false,
+        },
+        {
+          fetch: jest.fn<typeof fetch>(),
+          returnLegacyJsonld,
+        },
+      );
+
+      expect(mockedIssue.mock.lastCall?.[1]).toMatchObject({
+        hasConsent: {
+          inherit: false,
+        },
+      });
+    });
+
+    it("includes the inherit flag if set to true", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
+        },
+        "issueVerifiableCredential",
+      );
+      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
+
+      await issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+          resources: ["https://some.pod/resource"],
+          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          inherit: true,
+        },
+        {
+          fetch: jest.fn<typeof fetch>(),
+          returnLegacyJsonld,
+        },
+      );
+
+      expect(mockedIssue.mock.lastCall?.[1]).toMatchObject({
+        hasConsent: {
+          inherit: true,
+        },
+      });
+    });
+
+    it("defaults the inherit flag to undefined", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
+        },
+        "issueVerifiableCredential",
+      );
+      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
+
+      await issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+          resources: ["https://some.pod/resource"],
+          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          // Note that "inherit" is not specified.
+        },
+        {
+          fetch: jest.fn<typeof fetch>(),
+          returnLegacyJsonld,
+        },
+      );
+
+      expect(
+        (
+          mockedIssue.mock
+            .lastCall?.[1] as unknown as AccessRequestBody["credentialSubject"]
+        ).hasConsent.inherit,
+      ).toBeUndefined();
+    });
+
+    const jsonLdEquivalent = (
+      request: AccessRequest,
+      options: { inherit?: "true" | "false" },
+    ) => ({
+      ...request,
+      credentialSubject: {
+        ...request.credentialSubject,
+        hasConsent: {
+          ...request.credentialSubject.hasConsent,
+          // The 1-value array is replaced by the literal value.
+          forPersonalData:
+            request.credentialSubject.hasConsent.forPersonalData[0],
+          mode: request.credentialSubject.hasConsent.mode[0],
+          inherit: options.inherit,
+        },
       },
     });
-  });
 
-  it("includes the inherit flag if set to true", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential",
-    );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
-
-    await issueAccessRequest(
-      {
-        access: { read: true },
-        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-        resources: ["https://some.pod/resource"],
-        requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+    it("normalizes equivalent JSON-LD VCs including 'true' booleans", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
+        },
+        "issueVerifiableCredential",
+      );
+      const normalizedAccessRequest = await mockAccessRequestVc({
         inherit: true,
-      },
-      {
-        fetch: jest.fn<typeof fetch>(),
-      },
-    );
-
-    expect(mockedIssue.mock.lastCall?.[1]).toMatchObject({
-      hasConsent: {
-        inherit: true,
-      },
+      });
+      mockedIssue.mockResolvedValueOnce(
+        normalizeAccessRequest(
+          jsonLdEquivalent(normalizedAccessRequest, { inherit: "true" }),
+        ),
+      );
+      await expect(
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
+          },
+        ),
+      ).resolves.toStrictEqual(normalizedAccessRequest);
     });
-  });
 
-  it("defaults the inherit flag to undefined", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential",
-    );
-    mockedIssue.mockResolvedValueOnce(mockAccessRequestVc());
-
-    await issueAccessRequest(
-      {
-        access: { read: true },
-        resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-        resources: ["https://some.pod/resource"],
-        requestorInboxUrl: MOCK_REQUESTOR_INBOX,
-        // Note that "inherit" is not specified.
-      },
-      {
-        fetch: jest.fn<typeof fetch>(),
-      },
-    );
-
-    expect(
-      (
-        mockedIssue.mock
-          .lastCall?.[1] as unknown as AccessRequestBody["credentialSubject"]
-      ).hasConsent.inherit,
-    ).toBeUndefined();
-  });
-
-  const jsonLdEquivalent = (
-    request: AccessRequest,
-    options: { inherit?: "true" | "false" },
-  ) => ({
-    ...request,
-    credentialSubject: {
-      ...request.credentialSubject,
-      hasConsent: {
-        ...request.credentialSubject.hasConsent,
-        // The 1-value array is replaced by the literal value.
-        forPersonalData:
-          request.credentialSubject.hasConsent.forPersonalData[0],
-        mode: request.credentialSubject.hasConsent.mode[0],
-        inherit: options.inherit,
-      },
-    },
-  });
-
-  it("normalizes equivalent JSON-LD VCs including 'true' booleans", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential",
-    );
-    const normalizedAccessRequest = mockAccessRequestVc({ inherit: true });
-    mockedIssue.mockResolvedValueOnce(
-      jsonLdEquivalent(normalizedAccessRequest, { inherit: "true" }),
-    );
-    await expect(
-      issueAccessRequest(
-        {
-          access: { read: true },
-          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-          resources: ["https://some.pod/resource"],
-          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+    it("normalizes equivalent JSON-LD VCs including 'false' booleans", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
         },
-        {
-          fetch: jest.fn<typeof fetch>(),
-        },
-      ),
-    ).resolves.toStrictEqual(normalizedAccessRequest);
-  });
-
-  it("normalizes equivalent JSON-LD VCs including 'false' booleans", async () => {
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: typeof issueVerifiableCredential;
-      },
-      "issueVerifiableCredential",
-    );
-    // Test for a different "inherit" value
-    const normalizedAccessRequest = mockAccessRequestVc({ inherit: false });
-    mockedIssue.mockResolvedValueOnce(
-      jsonLdEquivalent(normalizedAccessRequest, { inherit: "false" }),
-    );
-    await expect(
-      issueAccessRequest(
-        {
-          access: { read: true },
-          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-          resources: ["https://some.pod/resource"],
-          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
-        },
-        {
-          fetch: jest.fn<typeof fetch>(),
-        },
-      ),
-    ).resolves.toStrictEqual(normalizedAccessRequest);
-  });
-
-  const mockCredentialProof = (): VerifiableCredential["proof"] => {
-    return {
-      created: "some date",
-      proofPurpose: "some purpose",
-      proofValue: "some value",
-      type: "some type",
-      verificationMethod: "some method",
-    };
-  };
-
-  describe("isAccessRequest", () => {
-    it("returns false if the credential subject is missing 'hasConsent'", () => {
-      expect(
-        isAccessRequest({
-          "@context": "https://some.context",
-          credentialSubject: {
-            id: "https://some.id",
-            inbox: "https://some.inbox",
+        "issueVerifiableCredential",
+      );
+      // Test for a different "inherit" value
+      const normalizedAccessRequest = await mockAccessRequestVc({
+        inherit: false,
+      });
+      mockedIssue.mockResolvedValueOnce(
+        normalizeAccessRequest(
+          jsonLdEquivalent(normalizedAccessRequest, { inherit: "false" }),
+        ),
+      );
+      await expect(
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
           },
-          id: "https://some.credential",
-          proof: mockCredentialProof(),
-          issuer: "https://some.issuer",
-          issuanceDate: "some date",
-          type: ["SolidAccessRequest"],
-        }),
-      ).toBe(false);
-    });
-
-    it("returns false if the credential subject 'hasConsent' is missing 'mode'", () => {
-      expect(
-        isAccessRequest({
-          "@context": "https://some.context",
-          credentialSubject: {
-            id: "https://some.id",
-            inbox: "https://some.inbox",
-            hasConsent: {
-              hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-              forPersonalData: ["https://some.resource"],
-              isConsentForDataSubject: "https://some.pod/profile#you",
-            },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
           },
-          id: "https://some.credential",
-          proof: mockCredentialProof(),
-          issuer: "https://some.issuer",
-          issuanceDate: "some date",
-          type: ["SolidAccessRequest"],
-        }),
-      ).toBe(false);
+        ),
+      ).resolves.toStrictEqual(normalizedAccessRequest);
     });
-
-    it("returns false if the credential subject 'hasConsent' is missing 'status'", () => {
-      expect(
-        isAccessRequest({
-          "@context": "https://some.context",
-          credentialSubject: {
-            id: "https://some.id",
-            inbox: "https://some.inbox",
-            hasConsent: {
-              mode: ["some mode"],
-              forPersonalData: ["https://some.resource"],
-              isConsentForDataSubject: "https://some.pod/profile#you",
-            },
-          },
-          id: "https://some.credential",
-          proof: mockCredentialProof(),
-          issuer: "https://some.issuer",
-          issuanceDate: "some date",
-          type: ["SolidAccessRequest"],
-        }),
-      ).toBe(false);
-    });
-
-    it("returns false if the credential subject 'hasConsent' is missing 'forPersonalData'", () => {
-      expect(
-        isAccessRequest({
-          "@context": "https://some.context",
-          credentialSubject: {
-            id: "https://some.id",
-            inbox: "https://some.inbox",
-            hasConsent: {
-              mode: ["some mode"],
-              hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-              isConsentForDataSubject: "https://some.pod/profile#you",
-            },
-          },
-          id: "https://some.credential",
-          proof: mockCredentialProof(),
-          issuer: "https://some.issuer",
-          issuanceDate: "some date",
-          type: ["SolidAccessRequest"],
-        }),
-      ).toBe(false);
-    });
-
-    it("returns false if the credential subject 'hasConsent' is missing 'isConsentForDataSubject'", () => {
-      expect(
-        isAccessRequest({
-          "@context": "https://some.context",
-          credentialSubject: {
-            id: "https://some.id",
-            inbox: "https://some.inbox",
-            hasConsent: {
-              mode: ["some mode"],
-              hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-              forPersonalData: ["https://some.resource"],
-            },
-          },
-          id: "https://some.credential",
-          proof: mockCredentialProof(),
-          issuer: "https://some.issuer",
-          issuanceDate: "some date",
-          type: ["SolidAccessRequest"],
-        }),
-      ).toBe(false);
-    });
-
-    it("returns false if the credential subject is missing an inbox", () => {
-      expect(
-        isAccessRequest({
-          "@context": "https://some.context",
-          credentialSubject: {
-            id: "https://some.id",
-            hasConsent: {
-              mode: ["some mode"],
-              hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-              forPersonalData: ["https://some.resource"],
-              isConsentForDataSubject: "https://some.pod/profile#you",
-            },
-          },
-          id: "https://some.credential",
-          proof: mockCredentialProof(),
-          issuer: "https://some.issuer",
-          issuanceDate: "some date",
-          type: ["SolidAccessRequest"],
-        }),
-      ).toBe(false);
-    });
-
-    it("returns false if the credential type does not include 'SolidAccessRequest'", () => {
-      expect(
-        isAccessRequest({
-          "@context": "https://some.context",
-          credentialSubject: {
-            id: "https://some.id",
-            inbox: "https://some.inbox",
-            hasConsent: {
-              mode: ["some mode"],
-              hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-              forPersonalData: ["https://some.resource"],
-              isConsentForDataSubject: "https://some.pod/profile#you",
-            },
-          },
-          id: "https://some.credential",
-          proof: mockCredentialProof(),
-          issuer: "https://some.issuer",
-          issuanceDate: "some date",
-          type: ["Some other type"],
-        }),
-      ).toBe(false);
-    });
-
-    it("returns true if the credential matches the expected shape", () => {
-      expect(
-        isAccessRequest({
-          "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
-          credentialSubject: {
-            id: "https://some.id",
-            inbox: "https://some.inbox",
-            hasConsent: {
-              mode: ["http://www.w3.org/ns/auth/acl#Read"],
-              hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
-              forPersonalData: ["https://some.resource"],
-              isConsentForDataSubject: "https://some.pod/profile#you",
-            },
-          },
-          id: "https://some.credential",
-          proof: mockCredentialProof(),
-          issuer: "https://some.issuer",
-          issuanceDate: "some date",
-          type: ["SolidAccessRequest"],
-        }),
-      ).toBe(true);
-    });
-  });
-});
+  },
+);

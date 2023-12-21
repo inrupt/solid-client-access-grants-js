@@ -26,7 +26,10 @@ import {
   overwriteFile as coreOverwriteFile,
   saveFileInContainer as coreSaveFileInContainer,
 } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  DatasetWithId,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
 import type { FetchOptions } from "../type/FetchOptions";
 
@@ -46,7 +49,7 @@ import type { FetchOptions } from "../type/FetchOptions";
  */
 export async function getFile(
   resourceUrl: UrlString,
-  accessGrant: VerifiableCredential,
+  accessGrant: VerifiableCredential | DatasetWithId,
   options?: FetchOptions,
 ) {
   const fetchOptions: FetchOptions = {};
@@ -90,7 +93,7 @@ export async function getFile(
 export async function overwriteFile<T extends File | NodeFile>(
   resourceUrl: UrlString,
   file: T,
-  accessGrant: VerifiableCredential,
+  accessGrant: VerifiableCredential | DatasetWithId,
   options?: FetchOptions & { contentType?: string },
 ): Promise<T & WithResourceInfo>;
 /**
@@ -99,13 +102,13 @@ export async function overwriteFile<T extends File | NodeFile>(
 export async function overwriteFile<T extends File | NodeFile | NodeBuffer>(
   resourceUrl: UrlString,
   file: T,
-  accessGrant: VerifiableCredential,
+  accessGrant: VerifiableCredential | DatasetWithId,
   options?: FetchOptions & { contentType?: string },
 ): Promise<T & WithResourceInfo>;
 export async function overwriteFile<T extends File | NodeFile | NodeBuffer>(
   resourceUrl: UrlString,
   file: T,
-  accessGrant: VerifiableCredential,
+  accessGrant: VerifiableCredential | DatasetWithId,
   options?: FetchOptions & { contentType?: string },
 ): Promise<T & WithResourceInfo> {
   const fetchOptions: FetchOptions = {};
@@ -149,7 +152,7 @@ export async function overwriteFile<T extends File | NodeFile | NodeBuffer>(
 export async function saveFileInContainer<T extends File | NodeFile>(
   containerUrl: UrlString,
   file: T,
-  accessGrant: VerifiableCredential,
+  accessGrant: VerifiableCredential | DatasetWithId,
   options?: FetchOptions & { contentType?: string; slug?: string },
 ): Promise<T & WithResourceInfo>;
 /**
@@ -160,7 +163,7 @@ export async function saveFileInContainer<
 >(
   containerUrl: UrlString,
   file: T,
-  accessGrant: VerifiableCredential,
+  accessGrant: VerifiableCredential | DatasetWithId,
   options?: FetchOptions & { contentType?: string; slug?: string },
 ): Promise<T & WithResourceInfo>;
 export async function saveFileInContainer<
@@ -168,7 +171,7 @@ export async function saveFileInContainer<
 >(
   containerUrl: UrlString,
   file: T,
-  accessGrant: VerifiableCredential,
+  accessGrant: VerifiableCredential | DatasetWithId,
   options?: FetchOptions & { contentType?: string; slug?: string },
 ): Promise<T & WithResourceInfo> {
   const fetchOptions: FetchOptions = {};

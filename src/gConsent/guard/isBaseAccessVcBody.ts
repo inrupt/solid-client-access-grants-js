@@ -19,11 +19,24 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import { DataFactory } from "n3";
+import type { DatasetWithId } from "@inrupt/solid-client-vc";
+import { getIssuanceDate } from "@inrupt/solid-client-vc";
+import type { NamedNode } from "n3";
 import type { BaseAccessVcBody } from "../type/AccessVerifiableCredential";
 import { isAccessCredentialType } from "./isAccessCredentialType";
 import { isAccessGrantContext } from "./isAccessGrantContext";
 import { isUnknownObject } from "./isUnknownObject";
+import { getConsent, getId } from "../../common/getters";
+import { TYPE } from "../../common/constants";
+import { isRdfjsGConsentAttributes } from "./isGConsentAttributes";
 
+const { namedNode, quad } = DataFactory;
+
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the VC,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 export function isBaseAccessVcBody(x: unknown): x is BaseAccessVcBody {
   return (
     isUnknownObject(x) &&
@@ -36,4 +49,21 @@ export function isBaseAccessVcBody(x: unknown): x is BaseAccessVcBody {
       typeof x.credentialSubject.inbox === "undefined") &&
     (x.issuanceDate !== undefined ? typeof x.issuanceDate === "string" : true)
   );
+}
+
+export function isRdfjsAccessVerifiableCredential(
+  data: DatasetWithId,
+  expectedTypes: NamedNode[],
+) {
+  const s = namedNode(getId(data));
+  if (!expectedTypes.some((type) => data.has(quad(s, TYPE, type)))) {
+    return false;
+  }
+  // getConsent and getIssuanceDate can error
+  try {
+    getIssuanceDate(data);
+    return isRdfjsGConsentAttributes(data, getConsent(data));
+  } catch (e) {
+    return false;
+  }
 }

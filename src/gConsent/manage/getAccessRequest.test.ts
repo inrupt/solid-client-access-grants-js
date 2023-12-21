@@ -20,15 +20,20 @@
 //
 
 import { describe, it, jest, expect, beforeEach } from "@jest/globals";
-import type { getVerifiableCredential } from "@inrupt/solid-client-vc";
+import * as VcModule from "@inrupt/solid-client-vc";
 import { fetch } from "@inrupt/universal-fetch";
+import { isomorphic } from "rdf-isomorphic";
 import { getAccessRequest } from "./getAccessRequest";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import type { getSessionFetch } from "../../common/util/getSessionFetch";
+import { normalizeAccessRequest } from "../request/issueAccessRequest";
+import { toBeEqual, withoutDataset } from "../util/toBeEqual.mock";
 
 jest.mock("../../common/util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {
-  const vcModule = jest.requireActual("@inrupt/solid-client-vc") as any;
+  const vcModule = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
+    typeof VcModule
+  >;
   return {
     ...vcModule,
     getVerifiableCredential: jest.fn(),
@@ -38,37 +43,65 @@ jest.mock("@inrupt/solid-client-vc", () => {
 describe("getAccessRequest", () => {
   let mockedFetch: jest.MockedFunction<typeof fetch>;
   let embeddedFetch: jest.Mocked<{ getSessionFetch: typeof getSessionFetch }>;
-  let vcModule: jest.Mocked<{
-    getVerifiableCredential: typeof getVerifiableCredential;
-  }>;
-  beforeEach(() => {
+  let accessRequestVc: Awaited<ReturnType<typeof mockAccessRequestVc>>;
+  let accessGrantVc: Awaited<ReturnType<typeof mockAccessGrantVc>>;
+
+  beforeEach(async () => {
     mockedFetch = jest.fn(fetch);
     embeddedFetch = jest.requireMock("../../common/util/getSessionFetch");
     embeddedFetch.getSessionFetch.mockResolvedValueOnce(mockedFetch);
-    vcModule = jest.requireMock("@inrupt/solid-client-vc");
-    vcModule.getVerifiableCredential.mockResolvedValue(mockAccessRequestVc());
+    accessRequestVc = await mockAccessRequestVc();
+    accessGrantVc = await mockAccessGrantVc();
+    (
+      VcModule as jest.Mocked<typeof VcModule>
+    ).getVerifiableCredential.mockResolvedValue(accessRequestVc);
   });
 
   it("uses the default fetch if none is provided", async () => {
     await getAccessRequest("https://some.vc");
-    expect(vcModule.getVerifiableCredential).toHaveBeenCalledWith(
-      "https://some.vc",
-      {
-        fetch: mockedFetch,
-      },
-    );
+    expect(
+      (VcModule as jest.Mocked<typeof VcModule>).getVerifiableCredential,
+    ).toHaveBeenCalledWith("https://some.vc", {
+      fetch: mockedFetch,
+      normalize: normalizeAccessRequest,
+    });
+  });
+
+  it("uses the default fetch if none is provided [returnLegacyJsonld: false]", async () => {
+    await getAccessRequest("https://some.vc", {
+      returnLegacyJsonld: false,
+    });
+    expect(
+      (VcModule as jest.Mocked<typeof VcModule>).getVerifiableCredential,
+    ).toHaveBeenCalledWith("https://some.vc", {
+      fetch: mockedFetch,
+      returnLegacyJsonld: false,
+    });
   });
 
   it("uses the provided fetch if any", async () => {
     await getAccessRequest("https://some.vc", {
       fetch: mockedFetch,
     });
-    expect(vcModule.getVerifiableCredential).toHaveBeenCalledWith(
-      "https://some.vc",
-      {
-        fetch: mockedFetch,
-      },
-    );
+    expect(
+      (VcModule as jest.Mocked<typeof VcModule>).getVerifiableCredential,
+    ).toHaveBeenCalledWith("https://some.vc", {
+      fetch: mockedFetch,
+      normalize: normalizeAccessRequest,
+    });
+  });
+
+  it("uses the provided fetch if any [returnLegacyJsonld: false]", async () => {
+    await getAccessRequest("https://some.vc", {
+      fetch: mockedFetch,
+      returnLegacyJsonld: false,
+    });
+    expect(
+      (VcModule as jest.Mocked<typeof VcModule>).getVerifiableCredential,
+    ).toHaveBeenCalledWith("https://some.vc", {
+      fetch: mockedFetch,
+      returnLegacyJsonld: false,
+    });
   });
 
   it("returns the fetched VC and the redirect URL", async () => {
@@ -79,18 +112,24 @@ describe("getAccessRequest", () => {
     );
 
     expect(accessRequestFromString).toStrictEqual(accessRequestFromUrl);
-    expect(accessRequestFromString).toStrictEqual(mockAccessRequestVc());
+    expect(accessRequestFromString).toStrictEqual(accessRequestVc);
   });
 
   it("throws if the fetched VC is not an Access Request", async () => {
-    vcModule.getVerifiableCredential.mockResolvedValueOnce(mockAccessGrantVc());
+    (
+      VcModule as jest.Mocked<typeof VcModule>
+    ).getVerifiableCredential.mockResolvedValue(accessGrantVc);
     await expect(getAccessRequest("https://some.vc")).rejects.toThrow();
+    await expect(
+      getAccessRequest("https://some.vc", {
+        returnLegacyJsonld: false,
+      }),
+    ).rejects.toThrow();
   });
 
   it("normalizes equivalent JSON-LD VCs", async () => {
-    const normalizedAccessRequest = mockAccessRequestVc();
-    // The server returns an equivalent JSON-LD with a different frame:
-    vcModule.getVerifiableCredential.mockResolvedValueOnce({
+    const normalizedAccessRequest = accessRequestVc;
+    const vc = {
       ...normalizedAccessRequest,
       credentialSubject: {
         ...normalizedAccessRequest.credentialSubject,
@@ -103,8 +142,43 @@ describe("getAccessRequest", () => {
           mode: normalizedAccessRequest.credentialSubject.hasConsent.mode[0],
         },
       },
-    });
+    };
+    // The server returns an equivalent JSON-LD with a different frame:
+    (
+      VcModule as jest.Mocked<typeof VcModule>
+    ).getVerifiableCredential.mockImplementation(
+      async (_, opts) =>
+        VcModule.verifiableCredentialToDataset<VcModule.VerifiableCredentialBase>(
+          opts && "normalize" in opts && opts.normalize
+            ? opts.normalize(
+                withoutDataset(vc) as unknown as VcModule.VerifiableCredential,
+              )
+            : (withoutDataset(
+                vc as unknown as VcModule.VerifiableCredential,
+              ) as VcModule.VerifiableCredential),
+          { includeVcProperties: opts?.returnLegacyJsonld !== false },
+          // This is a lie because it will not contain VC properties when opts?.returnLegacyJsonld is false
+          // but we need to do it to keep typescript happy with the current overloading we have
+        ) as Promise<VcModule.VerifiableCredential>,
+    );
+
     const accessRequest = await getAccessRequest("https://some.vc");
-    expect(accessRequest).toStrictEqual(mockAccessRequestVc());
+    const accessRequestNoProperties = await getAccessRequest(
+      "https://some.vc",
+      {
+        returnLegacyJsonld: false,
+      },
+    );
+    toBeEqual(accessRequest, accessRequestVc);
+    expect(isomorphic([...accessRequest], [...accessRequestNoProperties])).toBe(
+      true,
+    );
+
+    expect(accessRequest.credentialSubject.hasConsent.forPersonalData).toEqual([
+      "https://some.resource",
+    ]);
+
+    // @ts-expect-error the credential subject should not be available on the new RDFJS API
+    expect(accessRequestNoProperties.credentialSubject).toBeUndefined();
   });
 });

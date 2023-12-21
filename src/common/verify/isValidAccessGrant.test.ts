@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { jest, describe, it, expect } from "@jest/globals";
+import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import { Response } from "@inrupt/universal-fetch";
 import type * as CrossFetch from "@inrupt/universal-fetch";
 import {
@@ -27,6 +27,7 @@ import {
   getVerifiableCredentialApiConfiguration,
 } from "@inrupt/solid-client-vc";
 
+import type * as VcLibrary from "@inrupt/solid-client-vc";
 import { isValidAccessGrant } from "./isValidAccessGrant";
 
 jest.mock("@inrupt/solid-client", () => {
@@ -37,20 +38,22 @@ jest.mock("@inrupt/solid-client", () => {
   solidClientModule.getWellKnownSolid = jest.fn();
   return solidClientModule;
 });
-jest.mock("@inrupt/solid-client-vc");
-jest.mock("@inrupt/universal-fetch", () => {
-  const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch",
-  ) as jest.Mocked<typeof CrossFetch>;
+
+jest.mock("@inrupt/solid-client-vc", () => {
+  const { verifiableCredentialToDataset, getIssuer, getVerifiableCredential } =
+    jest.requireActual<typeof VcLibrary>("@inrupt/solid-client-vc");
   return {
-    // Do no mock the globals such as Response.
-    ...crossFetch,
-    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
+    verifiableCredentialToDataset,
+    getIssuer,
+    getVerifiableCredential,
+    isVerifiableCredential: jest.fn(),
+    issueVerifiableCredential: jest.fn(),
+    getVerifiableCredentialApiConfiguration: jest.fn(),
   };
 });
 
 describe("isValidAccessGrant", () => {
-  const MOCK_ACCESS_GRANT = {
+  const MOCK_ACCESS_GRANT_BASE = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
       "https://vc.inrupt.com/credentials/v1",
@@ -80,6 +83,21 @@ describe("isValidAccessGrant", () => {
   };
   const MOCK_ACCESS_ENDPOINT = "https://consent.example.com";
   const MOCK_VERIFY_RESPONSE = { checks: [], warning: [], errors: [] };
+
+  let MOCK_ACCESS_GRANT: VcLibrary.VerifiableCredential;
+
+  beforeAll(async () => {
+    const { verifiableCredentialToDataset } = jest.requireActual<
+      typeof VcLibrary
+    >("@inrupt/solid-client-vc");
+    MOCK_ACCESS_GRANT =
+      await verifiableCredentialToDataset<VcLibrary.VerifiableCredentialBase>(
+        MOCK_ACCESS_GRANT_BASE,
+        {
+          includeVcProperties: true,
+        },
+      );
+  });
 
   it("uses the provided fetch if any", async () => {
     jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
@@ -162,7 +180,7 @@ describe("isValidAccessGrant", () => {
         verificationEndpoint: MOCK_ACCESS_ENDPOINT,
       }),
     ).rejects.toThrow(
-      "The request to [https://example.com/someVc] returned an unexpected response:",
+      "Verifiable credential is not an object, or does not have an id",
     );
   });
 

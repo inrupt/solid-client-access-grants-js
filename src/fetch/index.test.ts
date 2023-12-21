@@ -19,8 +19,13 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { jest, describe, it, expect } from "@jest/globals";
+import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import { fetch as crossFetch, Response } from "@inrupt/universal-fetch";
+import type {
+  VerifiableCredential,
+  VerifiableCredentialBase,
+} from "@inrupt/solid-client-vc";
+import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 
 import base64url from "base64url";
 import {
@@ -40,7 +45,7 @@ jest.mock("@inrupt/universal-fetch", () => {
   };
 });
 
-const MOCK_VC = {
+const MOCK_VC_BASE = {
   "@context": [
     "https://www.w3.org/2018/credentials/v1",
     "https://vc.inrupt.com/credentials/v1",
@@ -134,6 +139,17 @@ describe("getUmaConfiguration", () => {
 });
 
 describe("exchangeTicketForAccessToken", () => {
+  let MOCK_VC: VerifiableCredential;
+  beforeAll(async () => {
+    MOCK_VC = await verifiableCredentialToDataset<VerifiableCredentialBase>(
+      MOCK_VC_BASE,
+      {
+        baseIRI: MOCK_VC_BASE.id,
+        includeVcProperties: true,
+      },
+    );
+  });
+
   it("posts to the token endpoint and parses the resulting access token", async () => {
     const tokenEndpoint = "https://fake.url/token";
     const authTicket = "auth-ticket";
@@ -250,6 +266,17 @@ describe("boundFetch", () => {
 });
 
 describe("fetchWithVc", () => {
+  let MOCK_VC: VerifiableCredential;
+  beforeAll(async () => {
+    MOCK_VC = await verifiableCredentialToDataset<VerifiableCredentialBase>(
+      MOCK_VC_BASE,
+      {
+        baseIRI: MOCK_VC_BASE.id,
+        includeVcProperties: true,
+      },
+    );
+  });
+
   // These tests may be fairly brittle due to the nature of the mocked calls.
   it("throws an error if no www-authentication header is found", async () => {
     const resourceIri = "https://fake.url/some-resource";

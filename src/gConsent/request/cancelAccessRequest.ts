@@ -20,7 +20,10 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  DatasetWithId,
+  VerifiableCredential,
+} from "@inrupt/solid-client-vc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { revokeAccessGrant } from "../manage/revokeAccessGrant";
 
@@ -35,7 +38,7 @@ import { revokeAccessGrant } from "../manage/revokeAccessGrant";
  * @since 0.0.1
  */
 async function cancelAccessRequest(
-  vc: VerifiableCredential | URL | UrlString,
+  vc: VerifiableCredential | DatasetWithId | URL | UrlString,
   options: AccessBaseOptions = {},
 ): Promise<void> {
   return revokeAccessGrant(vc, options);

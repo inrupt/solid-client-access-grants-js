@@ -24,6 +24,10 @@ import type {
   BaseRequestBody,
 } from "../type/AccessVerifiableCredential";
 
+/**
+ * @deprecated This function checks structural assumptions about the JSON-LD presentation of the VC,
+ * which is not recommended. Use the RDFJS API that is now provided instead.
+ */
 export function isBaseRequest(
   vc: BaseAccessVcBody,
 ): vc is BaseAccessVcBody & BaseRequestBody {

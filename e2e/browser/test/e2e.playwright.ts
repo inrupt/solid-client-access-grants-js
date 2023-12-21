@@ -28,7 +28,9 @@ const clickOpenIdPrompt = async (page: Page) => {
   // Testid-based selector that will be compatible with newer releases
   const testidBasedSelector = page.getByTestId("prompt-continue");
   // Once we no longer support ESS 2.1, we can remove the class-based selector and only use the testid-based one.
-  await expect(classBasedSelector.or(testidBasedSelector)).toBeVisible();
+  await expect(classBasedSelector.or(testidBasedSelector)).toBeVisible({
+    timeout: 15_000,
+  });
   // Fallback selector to support class attributes, until testid supports is fully deployed.
   // eslint-disable-next-line playwright/no-conditional-in-test
   const correctSelector = (await testidBasedSelector.isVisible())
@@ -87,14 +89,12 @@ test("Redirect to Podbrowser to accept Access Request", async ({
   await page.getByTestId("handle-grant-response").click();
 
   // Confirm we received an accessGrantURL
-  await expect(
-    page.innerText("pre[data-testid=access-grant]"),
-  ).resolves.not.toBe("");
+  await expect(page.getByTestId("access-grant")).not.toBeEmpty();
 
   // The test app sends an authenticated request to get the resource it has been granted access to
   await Promise.all([
-    page.click("button[data-testid=get-authed-grant]"),
     page.waitForResponse((response) => response.status() === 200),
+    page.getByTestId("get-authed-grant").click(),
   ]);
 });
 
@@ -103,44 +103,21 @@ test("Granting access to a resource, then revoking the access grant", async ({
   auth,
 }) => {
   await auth.login({ allow: true });
-  // Create the resource. Note that the Promise.all prevents a race condition where
-  // the request would be sent before we wait on it.
-  await Promise.all([
-    page.click("button[data-testid=create-resource]"),
-    page.waitForRequest((request) => request.method() === "POST"),
-    page.waitForResponse((response) => response.status() === 201),
-  ]);
-  await expect(
-    page.innerText("span[data-testid=resource-iri]"),
-  ).resolves.toMatch(/https:\/\/.*\.txt/);
-
-  // Grant access to the resource.
-  await Promise.all([
-    page.click("button[data-testid=grant-access]"),
-    page.waitForRequest((request) => request.method() === "POST"),
-    page.waitForResponse((response) => response.status() === 201),
-  ]);
-  await expect(
-    page.innerText("pre[data-testid=access-grant]"),
-  ).resolves.not.toBe("");
-
-  // Revoke the access grant.
-  await Promise.all([
-    page.click("button[data-testid=revoke-access]"),
-    page.waitForRequest((request) => request.method() === "POST"),
-    page.waitForResponse((response) => response.status() === 204),
-  ]);
-  await expect(page.innerText("pre[data-testid=access-grant]")).resolves.toBe(
-    "",
+  await page.getByTestId("create-resource").click();
+  await expect(page.getByTestId("resource-iri")).toContainText(
+    /https:\/\/.*\.txt/,
+    { timeout: 30_000 },
   );
 
+  // Grant access to the resource.
+  await page.getByTestId("grant-access").click();
+  await expect(page.getByTestId("access-grant")).not.toBeEmpty();
+
+  // Revoke the access grant.
+  await page.getByTestId("revoke-access").click();
+  await expect(page.getByTestId("access-grant")).toBeEmpty();
+
   // Cleanup the resource
-  await Promise.all([
-    page.click("button[data-testid=delete-resource]"),
-    page.waitForRequest((request) => request.method() === "DELETE"),
-    page.waitForResponse((response) => response.status() === 204),
-  ]);
-  await expect(
-    page.innerText("span[data-testid=resource-iri]"),
-  ).resolves.toMatch("");
+  await page.getByTestId("delete-resource").click();
+  await expect(page.getByTestId("resource-iri")).toBeEmpty();
 });

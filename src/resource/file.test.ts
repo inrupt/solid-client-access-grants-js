@@ -52,7 +52,7 @@ describe("getFile", () => {
     solidClientModule.getFile.mockResolvedValueOnce(mockedFile);
 
     const fileUrl = "https://some.resource.url/file.txt";
-    const accessGrant = mockAccessRequestVc();
+    const accessGrant = await mockAccessRequestVc();
 
     const resultFile = await getFile(fileUrl, accessGrant, {
       fetch: mockedFetch,
@@ -76,7 +76,7 @@ describe("overwriteFile", () => {
     solidClientModule.overwriteFile.mockResolvedValueOnce(mockedFile);
 
     const fileUrl = "https://some.resource.test/file.txt";
-    const mockedAccessGrant = mockAccessRequestVc();
+    const mockedAccessGrant = await mockAccessRequestVc();
 
     const resultFile = await overwriteFile(
       fileUrl,
@@ -103,7 +103,7 @@ describe("overwriteFile", () => {
     solidClientModule.overwriteFile.mockResolvedValueOnce(mockedFile);
 
     const fileUrl = "https://some.resource.test/file.txt";
-    const mockedAccessGrant = mockAccessRequestVc();
+    const mockedAccessGrant = await mockAccessRequestVc();
 
     const resultFile = await overwriteFile(
       fileUrl,
@@ -133,7 +133,7 @@ describe("saveFileInContainer", () => {
 
     const containerUrl = "https://some.resource.test/";
     const fileNameSuggestion = "test-file.txt";
-    const mockedAccessGrant = mockAccessRequestVc();
+    const mockedAccessGrant = await mockAccessRequestVc();
 
     const resultFile = await saveFileInContainer(
       containerUrl,

@@ -33,9 +33,24 @@ import {
   getResources,
   getTypes,
 } from "./index";
+import * as packageExports from "./index";
 
 describe("Index exports", () => {
   it("exposes expected things", () => {
+    expect(Object.keys(packageExports)).toEqual([
+      "isValidAccessGrant",
+      "AccessGrantWrapper",
+      "getAccessModes",
+      "getExpirationDate",
+      "getId",
+      "getIssuanceDate",
+      "getIssuer",
+      "getRequestor",
+      "getResourceOwner",
+      "getResources",
+      "getTypes",
+    ]);
+
     expect(isValidAccessGrant).toBeDefined();
     expect(AccessGrantWrapper).toBeDefined();
     expect(getAccessModes).toBeDefined();

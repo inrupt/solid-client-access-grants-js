@@ -26,6 +26,9 @@ import { isBaseAccessVcBody } from "../gConsent/guard/isBaseAccessVcBody";
 
 export type AccessGrantAny = AccessGrantGConsent;
 
+/**
+ * @deprecated Use RDFJS API instead.
+ */
 export function CredentialIsAccessGrantAny(
   vc: VerifiableCredential,
 ): vc is AccessGrantAny {

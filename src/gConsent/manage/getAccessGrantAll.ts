@@ -20,7 +20,10 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import type { VerifiableCredential } from "@inrupt/solid-client-vc";
+import type {
+  VerifiableCredential,
+  DatasetWithId,
+} from "@inrupt/solid-client-vc";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
   CONTEXT_ESS_DEFAULT,
@@ -28,8 +31,6 @@ import {
   CREDENTIAL_TYPE_ACCESS_DENIAL,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_BASE,
-  GC_CONSENT_STATUS_DENIED,
-  GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
 } from "../constants";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
@@ -39,9 +40,13 @@ import { accessToResourceAccessModeArray } from "../util/accessToResourceAccessM
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { BaseGrantBody } from "../type/AccessVerifiableCredential";
 import { isAccessGrant } from "../guard/isAccessGrant";
-import { isBaseAccessGrantVerifiableCredential } from "../guard/isBaseAccessGrantVerifiableCredential";
+import {
+  isBaseAccessGrantVerifiableCredential,
+  isRdfjsBaseAccessGrantVerifiableCredential,
+} from "../guard/isBaseAccessGrantVerifiableCredential";
 import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
+import { gc } from "../../common/constants";
 
 export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
@@ -85,8 +90,8 @@ const getAncestorUrls = (resourceUrl: URL) => {
 // eslint-disable-next-line camelcase
 async function internal_getAccessGrantAll(
   params: AccessParameters = {},
-  options: QueryOptions = {},
-): Promise<Array<VerifiableCredential>> {
+  options: QueryOptions & { returnLegacyJsonld?: boolean } = {},
+): Promise<Array<DatasetWithId>> {
   if (!params.resource && !options.accessEndpoint) {
     throw new Error("resource and accessEndpoint cannot both be undefined");
   }
@@ -124,8 +129,8 @@ async function internal_getAccessGrantAll(
       credentialSubject: {
         providedConsent: {
           hasStatus: {
-            granted: GC_CONSENT_STATUS_EXPLICITLY_GIVEN,
-            denied: GC_CONSENT_STATUS_DENIED,
+            granted: gc.ConsentStatusExplicitlyGiven.value,
+            denied: gc.ConsentStatusDenied.value,
             all: undefined,
           }[statusShorthand],
           forPersonalData: url ? [url.href] : undefined,
@@ -136,35 +141,60 @@ async function internal_getAccessGrantAll(
       },
     }));
 
-  // TODO: Fix up the type of accepted arguments (this function should allow deep partial)
-  const result = (
-    await Promise.all(
-      vcShapes.map((vcShape) =>
-        getVerifiableCredentialAllFromShape(
-          queryEndpoint.href,
-          vcShape as Partial<VerifiableCredential>,
-          {
-            fetch: sessionFetch,
-            includeExpiredVc: options.includeExpired,
-          },
+  let result: DatasetWithId[];
+
+  if (options.returnLegacyJsonld === false) {
+    // TODO: Fix up the type of accepted arguments (this function should allow deep partial)
+    result = (
+      await Promise.all(
+        vcShapes.map((vcShape) =>
+          getVerifiableCredentialAllFromShape(
+            queryEndpoint.href,
+            vcShape as Partial<VerifiableCredential>,
+            {
+              fetch: sessionFetch,
+              includeExpiredVc: options.includeExpired,
+              returnLegacyJsonld: false,
+            },
+          ),
         ),
-      ),
+      )
     )
-  )
-    // getVerifiableCredentialAllFromShape returns a list, so the previous map
-    // should be flattened to have all the candidate grants in a non-nested list.
-    .flat()
-    .map(normalizeAccessGrant);
+      // getVerifiableCredentialAllFromShape returns a list, so the previous map
+      // should be flattened to have all the candidate grants in a non-nested list.
+      .flat()
+      .filter((vc) => isRdfjsBaseAccessGrantVerifiableCredential(vc));
+  } else {
+    result = (
+      await Promise.all(
+        vcShapes.map((vcShape) =>
+          getVerifiableCredentialAllFromShape(
+            queryEndpoint.href,
+            vcShape as Partial<VerifiableCredential>,
+            {
+              fetch: sessionFetch,
+              includeExpiredVc: options.includeExpired,
+              normalize: normalizeAccessGrant,
+            },
+          ),
+        ),
+      )
+    )
+      // getVerifiableCredentialAllFromShape returns a list, so the previous map
+      // should be flattened to have all the candidate grants in a non-nested list.
+      .flat()
+      .filter(
+        (vc) => isBaseAccessGrantVerifiableCredential(vc) && isAccessGrant(vc),
+      );
+  }
 
   return result.filter(
     (vc) =>
-      isBaseAccessGrantVerifiableCredential(vc) &&
-      isAccessGrant(vc) &&
       // Explicitly non-recursive grants are filtered out, except if they apply
       // directly to the target resource.
-      (getInherit(vc) !== false ||
-        (params.resource &&
-          getResources(vc).includes(params.resource.toString()))),
+      getInherit(vc) !== false ||
+      (params.resource &&
+        getResources(vc).includes(params.resource.toString())),
   );
 }
 
@@ -207,11 +237,30 @@ async function internal_getAccessGrantAll(
  * @returns A promise resolving to an array of Access Grants matching the request.
  * @since 0.4.0
  */
-
 async function getAccessGrantAll(
   params: AccessParameters,
-  options?: QueryOptions,
+  options: QueryOptions & {
+    returnLegacyJsonld: false;
+  },
+): Promise<Array<DatasetWithId>>;
+/**
+ * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
+ */
+async function getAccessGrantAll(
+  params: AccessParameters,
+  options?: QueryOptions & {
+    returnLegacyJsonld?: true;
+  },
 ): Promise<Array<VerifiableCredential>>;
+/**
+ * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
+ */
+async function getAccessGrantAll(
+  params: AccessParameters,
+  options?: QueryOptions & {
+    returnLegacyJsonld?: boolean;
+  },
+): Promise<Array<DatasetWithId>>;
 
 /**
  * Retrieve Access Grants issued over a resource. The Access Grants may be filtered
@@ -231,18 +280,46 @@ async function getAccessGrantAll(
  * @since 0.4.0
  * @deprecated Please remove `resource` parameter.
  */
-
+async function getAccessGrantAll(
+  resource: URL | UrlString,
+  params: AccessParameters,
+  options: QueryOptions & {
+    returnLegacyJsonld: false;
+  },
+): Promise<Array<DatasetWithId>>;
+/**
+ * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
+ */
 async function getAccessGrantAll(
   resource: URL | UrlString,
   params?: AccessParameters,
-  options?: QueryOptions,
+  options?: QueryOptions & {
+    returnLegacyJsonld?: true;
+  },
 ): Promise<Array<VerifiableCredential>>;
-
+/**
+ * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
+ */
+async function getAccessGrantAll(
+  resource: URL | UrlString,
+  params?: AccessParameters,
+  options?: QueryOptions & {
+    returnLegacyJsonld?: boolean;
+  },
+): Promise<Array<DatasetWithId>>;
+// FIXME: Add type overload above
 async function getAccessGrantAll(
   resourceOrParams: URL | UrlString | AccessParameters,
-  paramsOrOptions: AccessParameters | undefined | QueryOptions,
-  options: QueryOptions = {},
-): Promise<Array<VerifiableCredential>> {
+  paramsOrOptions:
+    | AccessParameters
+    | undefined
+    | (QueryOptions & {
+        returnLegacyJsonld?: boolean;
+      }),
+  options: QueryOptions & {
+    returnLegacyJsonld?: boolean;
+  } = {},
+): Promise<Array<DatasetWithId>> {
   if (
     typeof resourceOrParams === "string" ||
     typeof (resourceOrParams as URL).href === "string"
