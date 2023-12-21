@@ -152,21 +152,12 @@ const describeIf = (condition: boolean) =>
 // For some reason, the Node jest runner throws an undefined error when
 // calling to btoa. This overrides it, while keeping the actual code
 // environment-agnostic.
-if (!global.btoa) {
-  global.btoa = (data: string) => Buffer.from(data).toString("base64");
+if (!globalThis.btoa) {
+  globalThis.btoa = (data: string) => Buffer.from(data).toString("base64");
 }
 
 // This is the content of the file uploaded manually at SHARED_FILE_IRI.
 const SHARED_FILE_CONTENT = "Some content.\n";
-
-const nodeVersion = process.versions.node.split(".");
-const nodeMajor = Number(nodeVersion[0]);
-
-async function toString(input: File | NodeFile | Buffer): Promise<string> {
-  if (input instanceof Buffer) return input.toString("utf-8");
-
-  return input.text();
-}
 
 async function getRequestorSession() {
   const session = new Session();
@@ -198,7 +189,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
     const savedFile = await retryAsync(() =>
       sc.saveFileInContainer(
         resourceOwnerPod,
-        Buffer.from(SHARED_FILE_CONTENT),
+        new Blob([SHARED_FILE_CONTENT]),
         {
           fetch: addUserAgent(
             addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
@@ -1209,7 +1200,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         let accessGrant: AccessGrant;
         let testFileIri: string;
         let testContainerIri: string;
-        let fileContents: Buffer;
+        let fileContents: Blob;
 
         beforeEach(async () => {
           const fileApisContainer = await retryAsync(() =>
@@ -1219,7 +1210,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           );
           testContainerIri = sc.getSourceIri(fileApisContainer);
 
-          fileContents = Buffer.from("hello world", "utf-8");
+          fileContents = new Blob(["hello world"]);
 
           const uploadedFile = await retryAsync(() =>
             sc.saveFileInContainer(testContainerIri, fileContents, {
@@ -1302,24 +1293,15 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           );
         });
 
-        const fileContentMatrix: [string, Buffer | File | NodeFile][] = [
-          ["Buffer", Buffer.from("new contents", "utf-8")],
+        const fileContentMatrix: [string, File | NodeFile | Blob][] = [
+          ["Blob", new Blob(["new contents"])],
+          ["Node File", new NodeFile(["new contents"], "file.txt")],
         ];
 
-        const overwrittenContentMatrix: [string, Buffer | File | NodeFile][] = [
-          ["Buffer", Buffer.from("overwritten contents", "utf-8")],
+        const overwrittenContentMatrix: [string, Blob | File | NodeFile][] = [
+          ["Blob", new Blob(["overwritten contents"])],
+          ["Node File", new NodeFile(["overwritten contents"], "file.txt")],
         ];
-
-        if (nodeMajor >= 18) {
-          fileContentMatrix.push(
-            // ["File", new File(["new contents"], "file.txt")],
-            ["Node File", new NodeFile(["new contents"], "file.txt")],
-          );
-          overwrittenContentMatrix.push(
-            // ["File", new File(["overwritten contents"], "file.txt")],
-            ["Node File", new NodeFile(["overwritten contents"], "file.txt")],
-          );
-        }
 
         describe.each(fileContentMatrix)(`Using %s`, (__, newFileContents) => {
           it("can use the saveFileInContainer API to create a new file", async () => {
@@ -1332,8 +1314,8 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               },
             );
 
-            expect(await toString(newFile)).toBe(
-              await toString(newFileContents),
+            await expect(newFile.text()).resolves.toBe(
+              await newFileContents.text(),
             );
 
             // Verify as the resource owner that the file was actually created:
@@ -1348,7 +1330,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             );
 
             await expect(fileAsResourceOwner.text()).resolves.toBe(
-              await toString(newFileContents),
+              await newFileContents.text(),
             );
           });
         });
@@ -1361,7 +1343,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           expect(sc.getSourceUrl(existingFile)).toBe(testFileIri);
           await expect(existingFile.text()).resolves.toBe(
-            await toString(fileContents),
+            await fileContents.text(),
           );
         });
 
@@ -1378,8 +1360,8 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
                 },
               );
 
-              expect(await toString(newFile)).toBe(
-                await toString(newFileContents),
+              await expect(newFile.text()).resolves.toBe(
+                await newFileContents.text(),
               );
               expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
 
@@ -1392,7 +1374,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               });
 
               await expect(fileAsResourceOwner.text()).resolves.toBe(
-                await toString(newFileContents),
+                await newFileContents.text(),
               );
             });
           },
@@ -1421,7 +1403,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           const testFile = await retryAsync(() =>
             sc.saveFileInContainer(
               testContainerIri,
-              Buffer.from(testFileContent),
+              new Blob([testFileContent]),
               {
                 fetch: addUserAgent(
                   resourceOwnerSession.fetch,
@@ -1554,7 +1536,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             },
           );
 
-          const newFileContents = Buffer.from("overwritten contents", "utf-8");
+          const newFileContents = new Blob(["overwritten contents"]);
 
           const newFile = await overwriteFile(
             testFileIri,
@@ -1565,7 +1547,9 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             },
           );
 
-          expect(await toString(newFile)).toBe(await toString(newFileContents));
+          await expect(newFile.text()).resolves.toBe(
+            await newFileContents.text(),
+          );
           expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
 
           // Verify as the resource owner that the file was actually created:
@@ -1574,7 +1558,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           });
 
           await expect(fileAsResourceOwner.text()).resolves.toBe(
-            await toString(newFileContents),
+            await newFileContents.text(),
           );
         });
 
