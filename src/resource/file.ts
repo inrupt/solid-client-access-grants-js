@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { Buffer as NodeBuffer, File as NodeFile } from "buffer";
+import type { File as NodeFile } from "buffer";
 import type { UrlString, WithResourceInfo } from "@inrupt/solid-client";
 import {
   getFile as coreGetFile,
@@ -90,22 +90,7 @@ export async function getFile(
  * otherwise.
  * @since 1.1.0
  */
-export async function overwriteFile<T extends File | NodeFile>(
-  resourceUrl: UrlString,
-  file: T,
-  accessGrant: VerifiableCredential | DatasetWithId,
-  options?: FetchOptions & { contentType?: string },
-): Promise<T & WithResourceInfo>;
-/**
- * @deprecated `overwriteFile` should only have `File` input
- */
-export async function overwriteFile<T extends File | NodeFile | NodeBuffer>(
-  resourceUrl: UrlString,
-  file: T,
-  accessGrant: VerifiableCredential | DatasetWithId,
-  options?: FetchOptions & { contentType?: string },
-): Promise<T & WithResourceInfo>;
-export async function overwriteFile<T extends File | NodeFile | NodeBuffer>(
+export async function overwriteFile<T extends File | NodeFile | Blob>(
   resourceUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential | DatasetWithId,
@@ -148,27 +133,7 @@ export async function overwriteFile<T extends File | NodeFile | NodeBuffer>(
  * otherwise.
  * @since 1.1.0
  */
-
-export async function saveFileInContainer<T extends File | NodeFile>(
-  containerUrl: UrlString,
-  file: T,
-  accessGrant: VerifiableCredential | DatasetWithId,
-  options?: FetchOptions & { contentType?: string; slug?: string },
-): Promise<T & WithResourceInfo>;
-/**
- * @deprecated `saveFileInContainer` should only have `File` input; not `Buffer`
- */
-export async function saveFileInContainer<
-  T extends File | NodeFile | NodeBuffer,
->(
-  containerUrl: UrlString,
-  file: T,
-  accessGrant: VerifiableCredential | DatasetWithId,
-  options?: FetchOptions & { contentType?: string; slug?: string },
-): Promise<T & WithResourceInfo>;
-export async function saveFileInContainer<
-  T extends File | NodeFile | NodeBuffer,
->(
+export async function saveFileInContainer<T extends File | NodeFile | Blob>(
   containerUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential | DatasetWithId,
