@@ -189,7 +189,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
     const savedFile = await retryAsync(() =>
       sc.saveFileInContainer(
         resourceOwnerPod,
-        Buffer.from(SHARED_FILE_CONTENT),
+        new Blob([SHARED_FILE_CONTENT]),
         {
           fetch: addUserAgent(
             addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
