@@ -22,6 +22,8 @@ The following changes are pending, and will be applied on the next major release
   `getter` functions to get these attributes.
 - **Node 16 is no longer supported**: The global `fetch` function is now used instead of
   `@inrupt/universal-fetch`. This means this library now only works with Node 18 and higher.
+- Deprecated signature of `denyAccessRequest` is no longer supported. The `resourceOwner`
+  parameter must be removed.
 
 ## [2.6.2](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.6.2) - 2023-11-16
 
