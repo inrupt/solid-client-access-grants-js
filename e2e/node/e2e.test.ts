@@ -1403,7 +1403,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           const testFile = await retryAsync(() =>
             sc.saveFileInContainer(
               testContainerIri,
-              Buffer.from(testFileContent),
+              new Blob([testFileContent]),
               {
                 fetch: addUserAgent(
                   resourceOwnerSession.fetch,
