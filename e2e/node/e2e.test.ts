@@ -152,8 +152,8 @@ const describeIf = (condition: boolean) =>
 // For some reason, the Node jest runner throws an undefined error when
 // calling to btoa. This overrides it, while keeping the actual code
 // environment-agnostic.
-if (!global.btoa) {
-  global.btoa = (data: string) => Buffer.from(data).toString("base64");
+if (!globalThis.btoa) {
+  globalThis.btoa = (data: string) => Buffer.from(data).toString("base64");
 }
 
 // This is the content of the file uploaded manually at SHARED_FILE_IRI.
