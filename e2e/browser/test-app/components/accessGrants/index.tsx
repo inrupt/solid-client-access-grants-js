@@ -191,9 +191,7 @@ export default function AccessGrant({
           onChange={(e) => {
             setAccessRequest(e.currentTarget.value);
           }}
-        >
-          {}
-        </input>
+        />
       </p>
       <div>
         <button type="button" onClick={handleGrant} data-testid="grant-access">

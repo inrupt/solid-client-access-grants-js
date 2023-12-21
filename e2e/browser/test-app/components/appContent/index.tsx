@@ -45,13 +45,17 @@ function AccessGrantContainer({
   setErrorMessage,
 }: {
   sessionInfo?: ISessionInfo;
-  setErrorMessage: (msg: string) => void;
+  setErrorMessage: () => void;
 }) {
   if (sessionInfo?.isLoggedIn) {
     return <AccessGrants setErrorMessage={setErrorMessage} />;
   }
-  return <></>;
+  return <div />;
 }
+
+AccessGrantContainer.defaultProps = {
+  sessionInfo: undefined,
+};
 
 export default function Home() {
   // Kill the app if an error occurs
@@ -118,9 +122,9 @@ export default function Home() {
           }}
         />
         <button
+          type="button"
           data-testid={TESTID_LOGIN_BUTTON}
-          onClick={async (e) => {
-            e.preventDefault();
+          onClick={async () => {
             await handleLogin();
           }}
         >
@@ -128,9 +132,9 @@ export default function Home() {
         </button>
 
         <button
+          type="button"
           data-testid={TESTID_LOGOUT_BUTTON}
-          onClick={async (e) => {
-            e.preventDefault();
+          onClick={async () => {
             await handleLogout();
           }}
         >
