@@ -140,75 +140,6 @@ async function addVcMatcher(
   );
 }
 
-// The following may be removed and merged back in `approveAccessRequest` once
-// the deprecated signature is removed.
-// eslint-disable-next-line camelcase
-async function internal_approveAccessRequest(
-  // If the VC is specified, all the overrides become optional
-  requestVc: DatasetWithId | URL | UrlString,
-  requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions & WithLegacyJsonFlag,
-): Promise<DatasetWithId>;
-// eslint-disable-next-line camelcase
-async function internal_approveAccessRequest(
-  requestVc: undefined,
-  // If the VC is undefined, then some of the overrides become mandatory
-  requestOverride: ApproveAccessRequestOverrides,
-  options?: AccessBaseOptions & WithLegacyJsonFlag,
-): Promise<DatasetWithId>;
-// eslint-disable-next-line camelcase
-async function internal_approveAccessRequest(
-  requestVc?: DatasetWithId | URL | UrlString,
-  requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options: AccessBaseOptions & WithLegacyJsonFlag = {},
-): Promise<DatasetWithId> {
-  const internalOptions = {
-    ...options,
-    fetch: options.fetch ?? (await getSessionFetch(options)),
-    updateAcr: options.updateAcr ?? true,
-  };
-
-  const internalGrantOptions = initializeGrantParameters(
-    typeof requestVc !== "undefined"
-      ? await getBaseAccess(
-          requestVc,
-          options,
-          solidVc.SolidAccessRequest,
-          gc.ConsentStatusRequested,
-        )
-      : undefined,
-    requestOverride,
-  );
-
-  const grantBody = getGrantBody({
-    access: internalGrantOptions.access,
-    requestor: internalGrantOptions.requestor,
-    resources: internalGrantOptions.resources,
-    requestorInboxUrl: internalGrantOptions.requestorInboxUrl,
-    purpose: internalGrantOptions.purpose,
-    issuanceDate: internalGrantOptions.issuanceDate,
-    expirationDate: internalGrantOptions.expirationDate ?? undefined,
-    status: gc.ConsentStatusExplicitlyGiven.value,
-    inherit: internalGrantOptions.inherit,
-  });
-
-  const grantedAccess = getAccessModesFromAccessGrant(grantBody);
-
-  if (internalOptions.updateAcr === true) {
-    await addVcMatcher(
-      grantBody.credentialSubject.providedConsent.forPersonalData,
-      grantedAccess,
-      internalOptions,
-    );
-  }
-
-  return issueAccessVc(grantBody, {
-    ...internalOptions,
-    returnLegacyJsonld: options.returnLegacyJsonld,
-    normalize: normalizeAccessGrant,
-  });
-}
-
 /**
  * Approve an access request. The content of the approved access request is provided
  * as a Verifiable Credential which properties may be overridden if necessary.
@@ -346,102 +277,59 @@ export async function approveAccessRequest(
   requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions & WithLegacyJsonFlag,
 ): Promise<DatasetWithId>;
-
-/**
- * @deprecated Please remove the `resourceOwner` parameter.
- * @hidden
- */
 export async function approveAccessRequest(
-  resourceOwner: WebId,
-  // If the VC is specified, all the overrides become optional
-  requestVc: DatasetWithId | VerifiableCredential | URL | UrlString,
+  requestVc: DatasetWithId | VerifiableCredential | URL | UrlString | undefined,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions & {
-    returnLegacyJsonld?: true;
-  },
-): Promise<AccessGrant>;
-/**
- * @deprecated Please remove the `resourceOwner` parameter.
- * @hidden
- */
-export async function approveAccessRequest(
-  resourceOwner: WebId,
-  // If the VC is specified, all the overrides become optional
-  requestVc: DatasetWithId | VerifiableCredential | URL | UrlString,
-  requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options?: AccessBaseOptions & WithLegacyJsonFlag,
-): Promise<DatasetWithId>;
-
-/**
- * @deprecated Please remove the `resourceOwner` parameter.
- * @hidden
- */
-export async function approveAccessRequest(
-  resourceOwner: WebId,
-  requestVc: undefined,
-  // If the VC is undefined, then some of the overrides become mandatory
-  requestOverride: ApproveAccessRequestOverrides,
-  options?: AccessBaseOptions & {
-    returnLegacyJsonld?: true;
-  },
-): Promise<AccessGrant>;
-/**
- * @deprecated Please remove the `resourceOwner` parameter.
- * @hidden
- */
-export async function approveAccessRequest(
-  resourceOwner: WebId,
-  requestVc: undefined,
-  // If the VC is undefined, then some of the overrides become mandatory
-  requestOverride: ApproveAccessRequestOverrides,
-  options?: AccessBaseOptions & WithLegacyJsonFlag,
-): Promise<DatasetWithId>;
-export async function approveAccessRequest(
-  resourceOwnerOrRequestVc:
-    | WebId
-    | DatasetWithId
-    | VerifiableCredential
-    | URL
-    | UrlString
-    | undefined,
-  requestVcOrOverride?:
-    | DatasetWithId
-    | VerifiableCredential
-    | URL
-    | UrlString
-    | Partial<ApproveAccessRequestOverrides>,
-  requestOverrideOrOptions?:
-    | Partial<ApproveAccessRequestOverrides>
-    | AccessBaseOptions,
-  options?: AccessBaseOptions & WithLegacyJsonFlag,
+  options: AccessBaseOptions & WithLegacyJsonFlag = {},
 ): Promise<DatasetWithId> {
-  let requestVc: DatasetWithId | VerifiableCredential | URL | UrlString;
-  let override: Partial<ApproveAccessRequestOverrides>;
-  let internalOptions: AccessBaseOptions & WithLegacyJsonFlag;
+  const internalOptions = {
+    ...options,
+    fetch: options.fetch ?? (await getSessionFetch(options)),
+    updateAcr: options.updateAcr ?? true,
+  };
 
-  if (typeof options === "object") {
-    // The deprecated signature is being used, so ignore the first parameter.
-    requestVc = requestVcOrOverride as DatasetWithId | URL | UrlString;
-    override =
-      requestOverrideOrOptions as Partial<ApproveAccessRequestOverrides>;
-    internalOptions = options;
-  } else {
-    requestVc = resourceOwnerOrRequestVc as
-      | DatasetWithId
-      | VerifiableCredential
-      | URL
-      | UrlString;
-    override = requestVcOrOverride as Partial<ApproveAccessRequestOverrides>;
-    internalOptions = requestOverrideOrOptions as AccessBaseOptions;
+  const internalGrantOptions = initializeGrantParameters(
+    typeof requestVc !== "undefined"
+      ? await getBaseAccess(
+          requestVc,
+          options,
+          solidVc.SolidAccessRequest,
+          gc.ConsentStatusRequested,
+        )
+      : undefined,
+    requestOverride,
+  );
+
+  const grantBody = getGrantBody({
+    access: internalGrantOptions.access,
+    requestor: internalGrantOptions.requestor,
+    resources: internalGrantOptions.resources,
+    requestorInboxUrl: internalGrantOptions.requestorInboxUrl,
+    purpose: internalGrantOptions.purpose,
+    issuanceDate: internalGrantOptions.issuanceDate,
+    expirationDate: internalGrantOptions.expirationDate ?? undefined,
+    status: gc.ConsentStatusExplicitlyGiven.value,
+    inherit: internalGrantOptions.inherit,
+  });
+
+  const grantedAccess = getAccessModesFromAccessGrant(grantBody);
+
+  if (internalOptions.updateAcr === true) {
+    await addVcMatcher(
+      grantBody.credentialSubject.providedConsent.forPersonalData,
+      grantedAccess,
+      internalOptions,
+    );
   }
 
-  const accessGrant = await internal_approveAccessRequest(
-    requestVc,
-    override,
-    internalOptions,
-  );
+  const accessGrant = await issueAccessVc(grantBody, {
+    ...internalOptions,
+    returnLegacyJsonld: options.returnLegacyJsonld,
+    normalize: normalizeAccessGrant,
+  });
+
   if (
-    internalOptions.returnLegacyJsonld !== false
+    options.returnLegacyJsonld !== false
       ? !isBaseAccessGrantVerifiableCredential(accessGrant) ||
         !isAccessGrant(accessGrant)
       : !isRdfjsBaseAccessGrantVerifiableCredential(accessGrant)
