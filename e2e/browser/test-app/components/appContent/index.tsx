@@ -40,18 +40,18 @@ import AccessGrants from "../accessGrants";
 const DEFAULT_ISSUER = "https://login.inrupt.com/";
 const REDIRECT_URL = "http://localhost:3000/";
 const APP_NAME = "Access Grants browser-based tests app";
-const AccessGrantContainer = ({
+function AccessGrantContainer({
   sessionInfo,
   setErrorMessage,
 }: {
   sessionInfo?: ISessionInfo;
   setErrorMessage: (msg: string) => void;
-}) => {
+}) {
   if (sessionInfo?.isLoggedIn) {
     return <AccessGrants setErrorMessage={setErrorMessage} />;
   }
   return <></>;
-};
+}
 
 export default function Home() {
   // Kill the app if an error occurs
