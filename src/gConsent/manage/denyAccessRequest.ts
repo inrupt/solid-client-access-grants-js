@@ -23,7 +23,6 @@ import type { UrlString, WebId } from "@inrupt/solid-client";
 import type {
   DatasetWithId,
   VerifiableCredential,
-  VerifiableCredentialBase,
 } from "@inrupt/solid-client-vc";
 import { gc, solidVc } from "../../common/constants";
 import { CREDENTIAL_TYPE_ACCESS_DENIAL } from "../constants";
@@ -33,42 +32,6 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
-
-// Merge back in denyAccessRequest after the deprecated signature has been removed.
-// eslint-disable-next-line camelcase
-async function internal_denyAccessRequest(
-  vc: DatasetWithId | URL | UrlString,
-  options: AccessBaseOptions & {
-    returnLegacyJsonld?: boolean;
-    normalize?:
-      | ((arg: VerifiableCredentialBase) => VerifiableCredentialBase)
-      | undefined;
-  },
-): Promise<DatasetWithId> {
-  const baseVc: DatasetWithId = await getBaseAccess(
-    vc,
-    options,
-    solidVc.SolidAccessRequest,
-  );
-
-  const internalOptions = initializeGrantParameters(baseVc);
-  const denialBody = getGrantBody({
-    access: internalOptions.access,
-    requestor: internalOptions.requestor,
-    resources: internalOptions.resources,
-    requestorInboxUrl: internalOptions.requestorInboxUrl,
-    status: gc.ConsentStatusExplicitlyGiven.value,
-    purpose: internalOptions.purpose,
-    // denyAccessRequest doesn't take an override, so the expiration date
-    // cannot be null.
-    expirationDate: internalOptions.expirationDate as Date | undefined,
-  });
-  denialBody.type = [CREDENTIAL_TYPE_ACCESS_DENIAL];
-  denialBody.credentialSubject.providedConsent.hasStatus =
-    gc.ConsentStatusDenied.value;
-
-  return issueAccessVc(denialBody, options);
-}
 
 /**
  * Deny an access request. The content of the denied access request is provided
@@ -122,56 +85,34 @@ async function denyAccessRequest(
     returnLegacyJsonld?: boolean;
   },
 ): Promise<DatasetWithId>;
-/**
- * @deprecated Please remove the `resourceOwner` parameter.
- */
 async function denyAccessRequest(
-  resourceOwner: WebId,
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
-  options?: AccessBaseOptions & {
-    returnLegacyJsonld?: true;
-  },
-): Promise<AccessGrant>;
-/**
- * @deprecated Please remove the `resourceOwner` parameter.
- */
-async function denyAccessRequest(
-  resourceOwner: WebId,
-  vc: DatasetWithId | VerifiableCredential | URL | UrlString,
-  options?: AccessBaseOptions & {
-    returnLegacyJsonld?: boolean;
-  },
-): Promise<DatasetWithId>;
-async function denyAccessRequest(
-  resourceOwnerOrVc:
-    | WebId
-    | DatasetWithId
-    | VerifiableCredential
-    | URL
-    | UrlString,
-  vcOrOptions?: DatasetWithId | URL | UrlString | AccessBaseOptions,
   options?: AccessBaseOptions,
 ): Promise<DatasetWithId> {
-  if (
-    typeof options !== "undefined" ||
-    (typeof resourceOwnerOrVc === "string" &&
-      typeof vcOrOptions === "string") ||
-    // FIXME: Understand why adding this typeof vcOrOptions === "object" && was necessary before
-    // making a release. Without it we were passing undefined to isVerifiableCredential
-    (typeof vcOrOptions === "object" &&
-      typeof (vcOrOptions as DatasetWithId).id === "string")
-  ) {
-    // The deprecated signature is being used: ignore the first parameter
-    return internal_denyAccessRequest(
-      vcOrOptions as VerifiableCredential | URL | UrlString,
-      {
-        ...options,
-        normalize: normalizeAccessGrant,
-      },
-    );
-  }
-  return internal_denyAccessRequest(resourceOwnerOrVc, {
-    ...(vcOrOptions as AccessBaseOptions),
+  const baseVc: DatasetWithId = await getBaseAccess(
+    vc,
+    options ?? {},
+    solidVc.SolidAccessRequest,
+  );
+
+  const internalOptions = initializeGrantParameters(baseVc);
+  const denialBody = getGrantBody({
+    access: internalOptions.access,
+    requestor: internalOptions.requestor,
+    resources: internalOptions.resources,
+    requestorInboxUrl: internalOptions.requestorInboxUrl,
+    status: gc.ConsentStatusExplicitlyGiven.value,
+    purpose: internalOptions.purpose,
+    // denyAccessRequest doesn't take an override, so the expiration date
+    // cannot be null.
+    expirationDate: internalOptions.expirationDate as Date | undefined,
+  });
+  denialBody.type = [CREDENTIAL_TYPE_ACCESS_DENIAL];
+  denialBody.credentialSubject.providedConsent.hasStatus =
+    gc.ConsentStatusDenied.value;
+
+  return issueAccessVc(denialBody, {
+    ...options,
     normalize: normalizeAccessGrant,
   });
 }
