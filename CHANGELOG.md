@@ -23,8 +23,10 @@ The following changes are pending, and will be applied on the next major release
 - **Node 16 is no longer supported**: The global `fetch` function is now used instead of
   `@inrupt/universal-fetch`. This means this library now only works with Node 18 and higher.
 - **Deprecated signatures removed**:
-  - `denyAccessRequest` no longer supports the `resourceOwner` parameter, it must be removed.
-  - `approveAccessRequest` no longer supports the `resourceOwner` parameter, it must be removed.
+  - `denyAccessRequest` no longer supports the `resourceOwner` argument, it must be removed.
+  - `approveAccessRequest` no longer supports the `resourceOwner` argument, it must be removed.
+  - `getAccessGrantAll` no longer supports the `resource` argument, which should be merged into
+    the `params` argument along the other `AccessParameter`.
 
 ## [2.6.2](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v2.6.2) - 2023-11-16
 

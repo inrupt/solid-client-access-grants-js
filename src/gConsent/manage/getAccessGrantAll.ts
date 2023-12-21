@@ -85,12 +85,74 @@ const getAncestorUrls = (resourceUrl: URL) => {
   );
 };
 
-// The following temporary internal function can be merged into
-// `getAccessGrantAll` once the deprecated signature is removed.
-// eslint-disable-next-line camelcase
-async function internal_getAccessGrantAll(
-  params: AccessParameters = {},
-  options: QueryOptions & { returnLegacyJsonld?: boolean } = {},
+/**
+ * Retrieve Access Grants issued over a resource. The Access Grants may be filtered
+ * by resource, requestor, access modes and purpose.
+ *
+ * If a resource filter is specified, the resources hierarchy is walked up to the
+ * storage root so that all applicable Access Grants for the target resource are
+ * discovered, including recursive Access Grants issued over an ancestor container.
+ *
+ * @example ```
+ * const grantsForResource = await getAccessGrantAll({
+ *  resource: "https://example.org/storage/some-resource"
+ * }, {
+ *  fetch: session.fetch,
+ *  accessEndpoint: "https://example.org/grants-holder/"
+ * });
+ *
+ * const grantsForAgentWrite = await getAccessGrantAll({
+ *  requestor: "https://id.example.org/some-agent-webid",
+ *  modes: ["write"]
+ * }, {
+ *  fetch: session.fetch,
+ *  accessEndpoint: "https://example.org/grants-holder/"
+ * });
+ * ```
+ *
+ * @param grantShape The properties of grants to filter results.
+ * @param options Optional parameter:
+ * - `options.fetch`: An alternative `fetch` function to make the HTTP request,
+ *   compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
+ *   This is typically used for authentication.
+ * - `options.includeExpiredGrants`: include expired grants in the result set.
+ * - accessEndpoint: A base URL used when determining the location of access API calls.
+ *   If not given, it is attempted to be found by determining the server URL from the resource
+ *   involved in the request and reading its .well-known/solid file for an Access API entry. If
+ *   you are not providing a resource this url must point to the vcProvider endpoint associated
+ *   with the environment you are requesting against.
+ * @returns A promise resolving to an array of Access Grants matching the request.
+ * @since 0.4.0
+ */
+async function getAccessGrantAll(
+  params: AccessParameters,
+  options: QueryOptions & {
+    returnLegacyJsonld: false;
+  },
+): Promise<Array<DatasetWithId>>;
+/**
+ * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
+ */
+async function getAccessGrantAll(
+  params: AccessParameters,
+  options?: QueryOptions & {
+    returnLegacyJsonld?: true;
+  },
+): Promise<Array<VerifiableCredential>>;
+/**
+ * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
+ */
+async function getAccessGrantAll(
+  params: AccessParameters,
+  options?: QueryOptions & {
+    returnLegacyJsonld?: boolean;
+  },
+): Promise<Array<DatasetWithId>>;
+async function getAccessGrantAll(
+  params: AccessParameters,
+  options: QueryOptions & {
+    returnLegacyJsonld?: boolean;
+  } = {},
 ): Promise<Array<DatasetWithId>> {
   if (!params.resource && !options.accessEndpoint) {
     throw new Error("resource and accessEndpoint cannot both be undefined");
@@ -195,149 +257,6 @@ async function internal_getAccessGrantAll(
       getInherit(vc) !== false ||
       (params.resource &&
         getResources(vc).includes(params.resource.toString())),
-  );
-}
-
-/**
- * Retrieve Access Grants issued over a resource. The Access Grants may be filtered
- * by resource, requestor, access modes and purpose.
- *
- * If a resource filter is specified, the resources hierarchy is walked up to the
- * storage root so that all applicable Access Grants for the target resource are
- * discovered, including recursive Access Grants issued over an ancestor container.
- *
- * @example ```
- * const grantsForResource = await getAccessGrantAll({
- *  resource: "https://example.org/storage/some-resource"
- * }, {
- *  fetch: session.fetch,
- *  accessEndpoint: "https://example.org/grants-holder/"
- * });
- *
- * const grantsForAgentWrite = await getAccessGrantAll({
- *  requestor: "https://id.example.org/some-agent-webid",
- *  modes: ["write"]
- * }, {
- *  fetch: session.fetch,
- *  accessEndpoint: "https://example.org/grants-holder/"
- * });
- * ```
- *
- * @param grantShape The properties of grants to filter results.
- * @param options Optional parameter:
- * - `options.fetch`: An alternative `fetch` function to make the HTTP request,
- *   compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
- *   This is typically used for authentication.
- * - `options.includeExpiredGrants`: include expired grants in the result set.
- * - accessEndpoint: A base URL used when determining the location of access API calls.
- *   If not given, it is attempted to be found by determining the server URL from the resource
- *   involved in the request and reading its .well-known/solid file for an Access API entry. If
- *   you are not providing a resource this url must point to the vcProvider endpoint associated
- *   with the environment you are requesting against.
- * @returns A promise resolving to an array of Access Grants matching the request.
- * @since 0.4.0
- */
-async function getAccessGrantAll(
-  params: AccessParameters,
-  options: QueryOptions & {
-    returnLegacyJsonld: false;
-  },
-): Promise<Array<DatasetWithId>>;
-/**
- * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
- */
-async function getAccessGrantAll(
-  params: AccessParameters,
-  options?: QueryOptions & {
-    returnLegacyJsonld?: true;
-  },
-): Promise<Array<VerifiableCredential>>;
-/**
- * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
- */
-async function getAccessGrantAll(
-  params: AccessParameters,
-  options?: QueryOptions & {
-    returnLegacyJsonld?: boolean;
-  },
-): Promise<Array<DatasetWithId>>;
-
-/**
- * Retrieve Access Grants issued over a resource. The Access Grants may be filtered
- * by requestor, access modes and purpose. In order to discover all applicable Access
- * Grants for the target resource, including recursive Access Grants issued over
- * an ancestor container, the resources hierarchy is walked up to the storage root.
- *
- * @param resource The URL of a resource to which access grants might have been issued.
- * @param grantShape The properties of grants to filter results.
- * @param options Optional parameter:
- * - `options.fetch`: An alternative `fetch` function to make the HTTP request, compatible with the browser-native [fetch API](https://developer.mozilla.org/docs/Web/API/WindowOrWorkerGlobalScope/fetch#parameters).
- * This can be typically used for authentication. Note that if it is omitted, and
- * `@inrupt/solid-client-authn-browser` is in your dependencies, the default session
- * is picked up.
- * - `options.includeExpiredGrants`: include expired grants in the result set.
- * @returns A promise resolving to an array of Access Grants matching the request.
- * @since 0.4.0
- * @deprecated Please remove `resource` parameter.
- */
-async function getAccessGrantAll(
-  resource: URL | UrlString,
-  params: AccessParameters,
-  options: QueryOptions & {
-    returnLegacyJsonld: false;
-  },
-): Promise<Array<DatasetWithId>>;
-/**
- * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
- */
-async function getAccessGrantAll(
-  resource: URL | UrlString,
-  params?: AccessParameters,
-  options?: QueryOptions & {
-    returnLegacyJsonld?: true;
-  },
-): Promise<Array<VerifiableCredential>>;
-/**
- * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
- */
-async function getAccessGrantAll(
-  resource: URL | UrlString,
-  params?: AccessParameters,
-  options?: QueryOptions & {
-    returnLegacyJsonld?: boolean;
-  },
-): Promise<Array<DatasetWithId>>;
-// FIXME: Add type overload above
-async function getAccessGrantAll(
-  resourceOrParams: URL | UrlString | AccessParameters,
-  paramsOrOptions:
-    | AccessParameters
-    | undefined
-    | (QueryOptions & {
-        returnLegacyJsonld?: boolean;
-      }),
-  options: QueryOptions & {
-    returnLegacyJsonld?: boolean;
-  } = {},
-): Promise<Array<DatasetWithId>> {
-  if (
-    typeof resourceOrParams === "string" ||
-    typeof (resourceOrParams as URL).href === "string"
-  ) {
-    return internal_getAccessGrantAll(
-      {
-        ...paramsOrOptions,
-        resource:
-          typeof resourceOrParams === "string"
-            ? resourceOrParams
-            : (resourceOrParams as URL).href,
-      },
-      options,
-    );
-  }
-  return internal_getAccessGrantAll(
-    resourceOrParams as AccessParameters,
-    paramsOrOptions as QueryOptions,
   );
 }
 
