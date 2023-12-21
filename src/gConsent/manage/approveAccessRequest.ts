@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { UrlString, WebId } from "@inrupt/solid-client";
+import type { UrlString } from "@inrupt/solid-client";
 // eslint-disable-next-line camelcase
 import { acp_ess_2 } from "@inrupt/solid-client";
 import type {
