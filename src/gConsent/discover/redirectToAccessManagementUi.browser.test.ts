@@ -27,7 +27,6 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
-import { Response } from "@inrupt/universal-fetch";
 import { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 import {
   getAccessManagementUiFromWellKnown,

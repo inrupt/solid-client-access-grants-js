@@ -20,3 +20,6 @@
 //
 
 import "@inrupt/jest-jsdom-polyfills";
+globalThis.fetch = () => {
+    throw new Error('Global fetch should not be called without being mocked in unit tests')
+}

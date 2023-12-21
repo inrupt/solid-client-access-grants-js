@@ -19,7 +19,6 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { fetch as crossFetch } from "@inrupt/universal-fetch";
 import base64url from "base64url";
 import type { UrlString } from "@inrupt/solid-client";
 import type {
@@ -76,7 +75,7 @@ export async function getUmaConfiguration(
   authIri: string,
 ): Promise<UmaConfiguration> {
   const configurationUrl = new URL(UMA_CONFIG_PATH, authIri).href;
-  const response = await crossFetch(configurationUrl);
+  const response = await fetch(configurationUrl);
   return response.json().catch((e) => {
     throw new Error(
       `Parsing the UMA configuration found at ${configurationUrl} failed with the following error: ${e.toString()}`,
@@ -126,7 +125,7 @@ export async function exchangeTicketForAccessToken(
 export function boundFetch(accessToken: string): typeof fetch {
   // Explicitly use a named function such that it appears in stacktraces
   return function authenticatedFetch(url, init) {
-    return crossFetch(url, {
+    return fetch(url, {
       ...init,
       headers: {
         ...(init?.headers || {}),
@@ -165,7 +164,7 @@ export async function fetchWithVc(
 ): Promise<typeof fetch> {
   // Use an authenticated session to fetch the resource so that we can parse
   // its headers to find the UMA endpoint information and ticket
-  const response = await crossFetch(resourceIri);
+  const response = await fetch(resourceIri);
   const { headers } = response;
 
   const wwwAuthentication = headers.get(WWW_AUTH_HEADER);
@@ -192,7 +191,7 @@ export async function fetchWithVc(
     tokenEndpoint,
     accessGrant,
     authTicket,
-    options?.fetch ?? crossFetch,
+    options?.fetch ?? fetch,
   );
 
   if (!accessToken) {

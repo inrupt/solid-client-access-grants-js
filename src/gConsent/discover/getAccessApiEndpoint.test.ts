@@ -19,9 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { jest, describe, it, expect } from "@jest/globals";
-import { Response } from "@inrupt/universal-fetch";
-import type * as CrossFetch from "@inrupt/universal-fetch";
+import { jest, describe, it, expect, afterEach } from "@jest/globals";
 
 import {
   MOCKED_ACCESS_ISSUER,
@@ -30,18 +28,11 @@ import {
 } from "../request/request.mock";
 import { getAccessApiEndpoint } from "./getAccessApiEndpoint";
 
-jest.mock("@inrupt/universal-fetch", () => {
-  const crossFetch = jest.requireActual(
-    "@inrupt/universal-fetch",
-  ) as jest.Mocked<typeof CrossFetch>;
-  return {
-    // Do no mock the globals such as Response.
-    ...crossFetch,
-    fetch: jest.fn<(typeof crossFetch)["fetch"]>(),
-  };
-});
-
 describe("getAccessApiEndpoint", () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it("can find the access endpoint for a given resource", async () => {
     mockAccessApiEndpoint();
     const accessEndpoint = await getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI);
@@ -57,23 +48,19 @@ describe("getAccessApiEndpoint", () => {
   });
 
   it("throws an error if the unauthenticated fetch does not fail", async () => {
-    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValueOnce(
+    jest.spyOn(globalThis, "fetch").mockResolvedValueOnce(
       new Response("", {
         status: 200,
         statusText: "Ok",
       }),
     );
-    const crossFetchModule = jest.requireMock("@inrupt/universal-fetch") as {
-      fetch: typeof global.fetch;
-    };
-    crossFetchModule.fetch = mockedFetch;
     await expect(getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI)).rejects.toThrow(
       "Expected a 401 error with a WWW-Authenticate header, got a [200: Ok] response lacking the WWW-Authenticate header",
     );
   });
 
   it("throws if the authentication scheme is unexpected", async () => {
-    const mockedFetch = jest.fn(global.fetch).mockResolvedValueOnce(
+    jest.spyOn(globalThis, "fetch").mockResolvedValueOnce(
       new Response("", {
         status: 401,
         headers: {
@@ -81,18 +68,14 @@ describe("getAccessApiEndpoint", () => {
         },
       }),
     );
-    const crossFetchModule = jest.requireMock("@inrupt/universal-fetch") as {
-      fetch: typeof global.fetch;
-    };
-    crossFetchModule.fetch = mockedFetch;
     await expect(getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI)).rejects.toThrow(
       "Unsupported authorization scheme: [someScheme]",
     );
   });
 
   it("throws an error if the well-known document does not list a access endpoint", async () => {
-    const mockedFetch = jest
-      .fn(global.fetch)
+    jest
+      .spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(
         new Response("", {
           status: 401,
@@ -108,10 +91,6 @@ describe("getAccessApiEndpoint", () => {
           }),
         ),
       );
-    const crossFetchModule = jest.requireMock("@inrupt/universal-fetch") as {
-      fetch: typeof global.fetch;
-    };
-    crossFetchModule.fetch = mockedFetch;
     await expect(getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI)).rejects.toThrow(
       /No access issuer listed for property \[verifiable_credential_issuer\] in.*some_property.*some value/,
     );
