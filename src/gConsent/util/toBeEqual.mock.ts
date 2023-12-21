@@ -20,6 +20,7 @@
 //
 import type { JsonLd } from "@inrupt/solid-client-vc";
 import { expect } from "@jest/globals";
+import type { DatasetCore } from "@rdfjs/types";
 
 /**
  * Remove the properties of an RDF.DatasetCore from an object so that
@@ -29,7 +30,7 @@ import { expect } from "@jest/globals";
 function viaJson(data: JsonLd) {
   return JSON.parse(JSON.stringify(data));
 }
-export function withoutDataset<T>(data: T): T {
+export function withoutDataset<T>(data: T): Omit<T, keyof DatasetCore> {
   const res = {
     ...data,
     match: undefined,
