@@ -87,7 +87,9 @@ async function denyAccessRequest(
 ): Promise<DatasetWithId>;
 async function denyAccessRequest(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
-  options?: AccessBaseOptions,
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+  },
 ): Promise<DatasetWithId> {
   const baseVc: DatasetWithId = await getBaseAccess(
     vc,
