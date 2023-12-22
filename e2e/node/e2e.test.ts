@@ -319,8 +319,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           ).resolves.toMatchObject({ errors: [] });
 
           const grantedAccess = await getAccessGrantAll(
-            sharedFileIri,
-            undefined,
+            { resource: sharedFileIri },
             {
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
@@ -731,10 +730,13 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         });
 
         it("can filter VCs held by the service based on target resource", async () => {
-          const allGrants = getAccessGrantAll(sharedFilterTestIri, undefined, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-            accessEndpoint: vcProvider,
-          });
+          const allGrants = getAccessGrantAll(
+            { resource: sharedFilterTestIri },
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+            },
+          );
           // There should be at least one grant
           await expect(allGrants).resolves.not.toHaveLength(0);
 
@@ -1487,9 +1489,12 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           await expect(requestorFile.text()).resolves.toBe(testFileContent);
 
           // Lookup grants for the target resource, while it has been issued for the container.
-          const grants = await getAccessGrantAll(testFileIri, undefined, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          });
+          const grants = await getAccessGrantAll(
+            { resource: testFileIri },
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            },
+          );
           expect(grants.map((grant) => grant.proof)).toContainEqual(
             accessGrant.proof,
           );
@@ -1514,9 +1519,12 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           // Lookup grants for the target resource, while it has been issued for the container.
           // There should be no matching grant, because the issued grant is not recursive.
-          const grants = await getAccessGrantAll(testFileIri, undefined, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
-          });
+          const grants = await getAccessGrantAll(
+            { resource: testFileIri },
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            },
+          );
           expect(grants).not.toContainEqual(accessGrant);
         });
 

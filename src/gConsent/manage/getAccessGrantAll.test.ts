@@ -93,36 +93,6 @@ describe("getAccessGrantAll", () => {
     );
   });
 
-  it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right parameters when using deprecated function signature", async () => {
-    const requestor = "https://some.requestor";
-    const expectedDefaultVcShape = {
-      credentialSubject: {
-        providedConsent: {
-          forPersonalData: [resource.href],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          isProvidedTo: requestor,
-        },
-      },
-    };
-
-    await getAccessGrantAll(resource, { requestor });
-
-    expect(getAccessApiEndpoint).toHaveBeenCalledTimes(1);
-
-    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
-
-    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
-      "https://some.api.endpoint/derive",
-      expect.objectContaining(expectedDefaultVcShape),
-      expect.objectContaining({
-        // Expecting fetch to match universal-fetch fails in node because the
-        // getSessionFetch function returns the default @inrupt/solid-client-authn-browser
-        // fetch instead.
-        fetch: expect.anything(),
-      }),
-    );
-  });
-
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right parameters if resource is not available", async () => {
     const requestor = "https://some.requestor";
     const expectedDefaultVcShape = {

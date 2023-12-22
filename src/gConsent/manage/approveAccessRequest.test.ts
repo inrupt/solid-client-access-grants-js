@@ -772,67 +772,6 @@ describe("approveAccessRequest", () => {
     );
   });
 
-  it("issues a proper access grant from a request VC using the deprecated signature", async () => {
-    mockAcpClient();
-    mockAccessApiEndpoint();
-    const mockedVcModule = jest.requireMock(
-      "@inrupt/solid-client-vc",
-    ) as typeof VcClient;
-    const spiedIssueRequest = jest.spyOn(
-      mockedVcModule,
-      "issueVerifiableCredential",
-    );
-    spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
-    await approveAccessRequest(
-      "https://some.resource.owner",
-      accessRequestVc,
-      undefined,
-      {
-        fetch: jest.fn<typeof fetch>(),
-      },
-    );
-
-    // Tests like this are failing because of the fact that
-    expect(spiedIssueRequest).toHaveBeenCalledWith(
-      `${MOCKED_ACCESS_ISSUER}/issue`,
-      expect.objectContaining({
-        providedConsent: {
-          mode: accessRequestVc.credentialSubject.hasConsent.mode,
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          forPersonalData:
-            accessRequestVc.credentialSubject.hasConsent.forPersonalData,
-          isProvidedTo: accessRequestVc.credentialSubject.id,
-          forPurpose: [],
-        },
-        inbox: accessRequestVc.credentialSubject.inbox,
-      }),
-      expect.objectContaining({
-        type: ["SolidAccessGrant"],
-      }),
-      expect.anything(),
-    );
-  });
-
-  it("throws if the returned VC is not an Access Grant using the deprecated signature", async () => {
-    mockAcpClient();
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as typeof VcClient,
-      "issueVerifiableCredential",
-    );
-    mockedIssue.mockResolvedValueOnce(accessRequestVc);
-    await expect(
-      approveAccessRequest(
-        "https://some.resource.owner",
-        accessRequestVc,
-        undefined,
-        {
-          fetch: jest.fn<typeof fetch>(),
-        },
-      ),
-    ).rejects.toThrow();
-  });
-
   it("normalizes equivalent JSON-LD VCs", async () => {
     mockAcpClient();
     mockAccessApiEndpoint();

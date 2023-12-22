@@ -35,8 +35,6 @@ import type { FetchOptions } from "../../type/FetchOptions";
 import type { RedirectOptions } from "../../type/RedirectOptions";
 import { getResources } from "../../common";
 
-// DEPRECATED: the VC should be sent by IRI, and not by value.
-export const REQUEST_VC_PARAM_NAME = "requestVc";
 export const REQUEST_VC_URL_PARAM_NAME = "requestVcUrl";
 export const REDIRECT_URL_PARAM_NAME = "redirectUrl";
 
