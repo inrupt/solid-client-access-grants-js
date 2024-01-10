@@ -10,6 +10,10 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### Bugfix
+
+- `getAccessGrantAll` incorrectly excluded non-recursive grants if not filtering on target resource.
+
 ## [3.0.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.0.0) - 2023-12-22
 
 ### Breaking Changes
