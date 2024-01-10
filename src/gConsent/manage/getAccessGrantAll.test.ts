@@ -436,6 +436,31 @@ describe("getAccessGrantAll", () => {
       getAccessGrantAll({ resource: resource.href }),
     ).resolves.toStrictEqual([mockedGrant]);
   });
+
+  it("accepts explicitly non-recursive grants if the target resource is left undefined", async () => {
+    const mockedGrant = await mockAccessGrantVc({
+      inherit: false,
+      resources: [resource.href],
+    });
+    (
+      VcModule as jest.Mocked<typeof VcLibrary>
+    ).getVerifiableCredentialAllFromShape
+      .mockResolvedValueOnce([mockedGrant])
+      // Override the default mock to an unapplicable non-recursive grant.
+      .mockResolvedValue([
+        await mockAccessGrantVc({
+          inherit: false,
+          resources: [resourceAncestors[0]],
+        }),
+      ]);
+    await expect(
+      getAccessGrantAll(
+        { resource: undefined },
+        { accessEndpoint: "https://example.org/vc/" },
+      ),
+    ).resolves.toStrictEqual([mockedGrant]);
+  });
+
   it("throws if both resource and accessEndpoint are undefined", async () => {
     await expect(getAccessGrantAll({})).rejects.toThrow(
       "resource and accessEndpoint cannot both be undefined",

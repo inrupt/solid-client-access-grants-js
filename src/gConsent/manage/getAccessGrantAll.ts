@@ -249,15 +249,13 @@ async function getAccessGrantAll(
         (vc) => isBaseAccessGrantVerifiableCredential(vc) && isAccessGrant(vc),
       );
   }
-
-  return result.filter(
-    (vc) =>
-      // Explicitly non-recursive grants are filtered out, except if they apply
-      // directly to the target resource.
+  return result.filter((vc) => {
+    return (
       getInherit(vc) !== false ||
-      (params.resource &&
-        getResources(vc).includes(params.resource.toString())),
-  );
+      params.resource === undefined ||
+      getResources(vc).includes(params.resource.toString())
+    );
+  });
 }
 
 export { getAccessGrantAll };
