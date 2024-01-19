@@ -403,6 +403,17 @@ describe("getAccessGrantAll", () => {
     );
   });
 
+  it("doesn't include duplicates when filtering by resources using a container", async () => {
+    await getAccessGrantAll({
+      resource: "https://pod.example/container-1/child/",
+    });
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(3);
+    await getAccessGrantAll({
+      resource: "https://pod.example/container-1/child",
+    });
+    expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(6);
+  });
+
   it("filters out non-recursive grants for ancestors", async () => {
     const mockedGrant = await mockAccessGrantVc({
       inherit: false,

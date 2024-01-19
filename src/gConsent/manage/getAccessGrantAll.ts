@@ -72,7 +72,9 @@ interface QueryOptions extends AccessBaseOptions {
 const getAncestorUrls = (resourceUrl: URL) => {
   // Splitting on / will result in the first element being empty (since the path
   // starts with /) and in the last element being the target resource name.
-  const ancestorNames = resourceUrl.pathname.split("/").slice(1, -1);
+  const ancestorNames = resourceUrl.pathname
+    .split("/")
+    .slice(1, resourceUrl.pathname.endsWith("/") ? -2 : -1);
   return ancestorNames.reduce(
     (ancestors, curName) => {
       // Add each intermediary container to ancestorPaths
