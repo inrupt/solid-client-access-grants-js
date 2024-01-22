@@ -21,8 +21,5 @@
 
 import type { ACCESS_CREDENTIAL_TYPE } from "../constants";
 
-export type AccessCredentialType = typeof ACCESS_CREDENTIAL_TYPE extends Set<
-  infer T
->
-  ? T
-  : never;
+export type AccessCredentialType =
+  typeof ACCESS_CREDENTIAL_TYPE extends Set<infer T> ? T : never;

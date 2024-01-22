@@ -21,6 +21,5 @@
 
 import type { ACCESS_STATUS } from "../constants";
 
-export type GConsentStatus = typeof ACCESS_STATUS extends Set<infer T>
-  ? T
-  : never;
+export type GConsentStatus =
+  typeof ACCESS_STATUS extends Set<infer T> ? T : never;

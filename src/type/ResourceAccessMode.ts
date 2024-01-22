@@ -40,8 +40,5 @@ export const RESOURCE_ACCESS_MODE = new Set([
   ACL_RESOURCE_ACCESS_MODE_APPEND_ABBREV,
 ]);
 
-export type ResourceAccessMode = typeof RESOURCE_ACCESS_MODE extends Set<
-  infer T
->
-  ? T
-  : never;
+export type ResourceAccessMode =
+  typeof RESOURCE_ACCESS_MODE extends Set<infer T> ? T : never;
