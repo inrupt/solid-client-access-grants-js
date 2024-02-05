@@ -47,7 +47,6 @@ import {
   saveSolidDatasetInContainer,
   GRANT_VC_URL_PARAM_NAME,
   gConsent,
-  AccessGrantWrapper,
   getAccessModes,
   getExpirationDate,
   getId,
