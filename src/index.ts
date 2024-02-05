@@ -19,6 +19,10 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+export type { DatasetWithId } from "@inrupt/solid-client-vc";
+
+export type { AccessGrantWrapper } from "./common/index";
+
 export type {
   AccessBaseOptions,
   AccessCredentialType,
@@ -36,6 +40,7 @@ export type { AccessModes } from "./type/AccessModes";
 export type { FetchOptions } from "./type/FetchOptions";
 export type { RedirectOptions } from "./type/RedirectOptions";
 export type { SaveInContainerOptions } from "./type/SaveInContainerOptions";
+
 export { CredentialIsAccessGrantAny } from "./type/AccessGrant";
 
 export {
@@ -79,7 +84,6 @@ export {
 } from "./resource";
 
 export {
-  AccessGrantWrapper,
   getAccessModes,
   getExpirationDate,
   getId,
@@ -90,10 +94,7 @@ export {
   getResources,
   getTypes,
   getPurposes,
-  getConsent,
   getCredentialSubject,
   getInbox,
   getInherit,
-} from "./common/getters";
-
-export type { DatasetWithId } from "@inrupt/solid-client-vc";
+} from "./common/index";
