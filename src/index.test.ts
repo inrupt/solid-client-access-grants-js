@@ -58,7 +58,6 @@ import {
   getResources,
   getTypes,
   getPurposes,
-  getConsent,
   getCredentialSubject,
   getInbox,
   getInherit,
@@ -92,7 +91,6 @@ describe("Index exports", () => {
     expect(saveSolidDatasetInContainer).toBeDefined();
     expect(GRANT_VC_URL_PARAM_NAME).toBeDefined();
     expect(gConsent).toBeDefined();
-    expect(AccessGrantWrapper).toBeDefined();
     expect(getAccessModes).toBeDefined();
     expect(getExpirationDate).toBeDefined();
     expect(getId).toBeDefined();
@@ -103,7 +101,6 @@ describe("Index exports", () => {
     expect(getResources).toBeDefined();
     expect(getTypes).toBeDefined();
     expect(getPurposes).toBeDefined();
-    expect(getConsent).toBeDefined();
     expect(getCredentialSubject).toBeDefined();
     expect(getInbox).toBeDefined();
     expect(getInherit).toBeDefined();

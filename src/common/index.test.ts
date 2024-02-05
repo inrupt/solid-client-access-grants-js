@@ -22,7 +22,6 @@
 import { describe, it, expect } from "@jest/globals";
 import {
   isValidAccessGrant,
-  AccessGrantWrapper,
   getAccessModes,
   getExpirationDate,
   getId,
@@ -39,7 +38,6 @@ describe("Index exports", () => {
   it("exposes expected things", () => {
     expect(Object.keys(packageExports)).toEqual([
       "isValidAccessGrant",
-      "AccessGrantWrapper",
       "getAccessModes",
       "getExpirationDate",
       "getId",
@@ -49,10 +47,13 @@ describe("Index exports", () => {
       "getResourceOwner",
       "getResources",
       "getTypes",
+      "getPurposes",
+      "getCredentialSubject",
+      "getInbox",
+      "getInherit",
     ]);
 
     expect(isValidAccessGrant).toBeDefined();
-    expect(AccessGrantWrapper).toBeDefined();
     expect(getAccessModes).toBeDefined();
     expect(getExpirationDate).toBeDefined();
     expect(getId).toBeDefined();
