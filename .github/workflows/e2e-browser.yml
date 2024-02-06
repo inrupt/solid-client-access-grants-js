@@ -17,10 +17,10 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        environment-name: ["ESS PodSpaces", "ESS Dev-2-1"]
+        environment-name: ["ESS PodSpaces", "ESS Dev-2-1", "ESS Dev-2-2"]
         experimental: [false]
         include:
-          - environment-name: "ESS Dev-2-2"
+          - environment-name: "ESS Dev-2-3"
             experimental: true
     steps:
       - uses: actions/checkout@v4
