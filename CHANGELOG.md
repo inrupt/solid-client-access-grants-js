@@ -10,6 +10,8 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+## [3.0.3](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.0.3) - 2024-02-06
+
 ### Bugfix
 
 - Internal function `getConsent` is no longer part of the exports, which was causing TS to not build in some setups.
