@@ -21,7 +21,6 @@
 
 import type { Page } from "@playwright/test";
 import { test, expect } from "./fixtures";
-import { getBrowserTestingEnvironment } from "@inrupt/internal-test-env";
 
 const clickOpenIdPrompt = async (page: Page) => {
   // Class-based selector that will remain compatible with previous code
