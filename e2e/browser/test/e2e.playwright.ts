@@ -21,6 +21,7 @@
 
 import type { Page } from "@playwright/test";
 import { test, expect } from "./fixtures";
+import { getBrowserTestingEnvironment } from "@inrupt/internal-test-env";
 
 const clickOpenIdPrompt = async (page: Page) => {
   // Class-based selector that will remain compatible with previous code
@@ -39,7 +40,7 @@ const clickOpenIdPrompt = async (page: Page) => {
   await correctSelector.click();
 };
 
-test("Redirect to Podbrowser to accept Access Request", async ({
+test("Redirect to AMC to accept Access Request", async ({
   page,
   auth,
   accessRequest,
@@ -47,34 +48,30 @@ test("Redirect to Podbrowser to accept Access Request", async ({
 }) => {
   // Initial login
   await auth.login({ allow: true });
-  // The test issues an access request on behalf of a requestor thru the fixture
-  // then the test writes the id to a readable input text input
+  // The test issues an access request on behalf of a requestor through the fixture,
+  // and then writes its URL to a text input.
   await page.getByTestId("access-request-id").fill(accessRequest);
 
   // Playwright test reads that access grant id
   // The test user clicks to be redirected to Podbrowser
   await Promise.all([
     page.click("button[data-testid=redirect-for-access]"),
-    page.waitForURL("https://podbrowser.inrupt.com/*"),
+    page.waitForURL("https://amc.inrupt.com/*"),
   ]);
 
-  // PodBrowser requires you to select which IDP session to use as we proceed
-  await page.getByTestId("other-providers-button").click();
-  await page.getByTestId("login-field").fill(idp);
-  await page.getByTestId("go-button").click();
-  await clickOpenIdPrompt(page);
+  await page.getByTestId("advanced-login").click();
+  // AMC requires you to select which IDP session to use as we proceed
+  await page.getByTestId("identityProviderInput").fill(idp);
+  await page.getByTestId("loginButton").click();
 
-  // We validate the request fields are editable before we confirm access
-  // Select our purposes
-  await page.getByRole("checkbox").nth(1).check();
-
-  // Select our resources for allowing access
-  await page.getByRole("checkbox").nth(2).check();
+  // At this point, the user is already logged into the OpenID Provider.
+  await page.getByTestId("prompt-continue").click();
+  await page.getByTestId("confirm-access").click();
 
   // The test user confirms the access they selected and is redirected back to app
   await Promise.all([
     // eslint-disable-next-line playwright/no-force-option
-    page.getByRole("button", { name: "Confirm Access" }).click({ force: true }),
+    page.getByTestId("modal-primary-action").click(),
     page.waitForURL("http://localhost:3000/?accessGrantUrl=*"),
   ]);
 
