@@ -77,8 +77,8 @@ app.post("/request", async (req, res) => {
         console.log(`Redirecting to ${url}`);
         res.redirect(url);
       },
-      // The following IRI redirects the user to PodBrowser so that they can approve/reny the request.
-      // fallbackAccessManagementUi: `https://podborowser.inrupt.com/privacy/consent/requests/`,
+      // The following IRI redirects the user to AMC so that they can approve/reny the request.
+      // fallbackAccessManagementUi: `https://amc.inrupt.com/accessRequest/`,
       // The following IRI redirects to the IRI used by the examples/grant-access demo.
       fallbackAccessManagementUi: `${
         new URL("/manage", config.grant.href).href
