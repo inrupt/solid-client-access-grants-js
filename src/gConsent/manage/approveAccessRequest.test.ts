@@ -428,7 +428,6 @@ describe("approveAccessRequest", () => {
           forPurpose:
             consentGrantVc.credentialSubject.providedConsent.forPurpose,
         },
-        inbox: consentGrantVc.credentialSubject.inbox,
       }),
       expect.objectContaining({
         type: ["SolidAccessGrant"],

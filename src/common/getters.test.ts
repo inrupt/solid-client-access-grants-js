@@ -33,6 +33,7 @@ import {
   getCredentialSubject,
   getExpirationDate,
   getId,
+  getInbox,
   getInherit,
   getIssuanceDate,
   getIssuer,
@@ -431,6 +432,20 @@ describe("getters", () => {
       expect(getIssuer(mockedGConsentRequest)).toStrictEqual(
         mockedGConsentRequest.issuer,
       );
+    });
+  });
+
+  describe("getInbox", () => {
+    it("returns the inbox if available", async () => {
+      const gConsentGrant = await mockGConsentGrant({
+        inbox: "https://some.inbox",
+      });
+      expect(getInbox(gConsentGrant)).toBe("https://some.inbox");
+    });
+
+    it("returns undefined if the inbox if not available", async () => {
+      const gConsentGrant = await mockGConsentGrant();
+      expect(getInbox(gConsentGrant)).toBeUndefined();
     });
   });
 
