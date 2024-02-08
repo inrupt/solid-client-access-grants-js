@@ -506,6 +506,12 @@ describe("getters", () => {
       expect(wrappedConsentRequest.getInherit()).toStrictEqual(
         getInherit(mockedGConsentRequest),
       );
+      expect(wrappedConsentRequest.getPurposes()).toStrictEqual(
+        getPurposes(mockedGConsentRequest),
+      );
+      expect(wrappedConsentRequest.getInbox()).toStrictEqual(
+        getInbox(mockedGConsentRequest),
+      );
     });
   });
 });
