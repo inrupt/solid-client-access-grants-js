@@ -29,4 +29,8 @@ export type { RedirectToAccessManagementUiOptions } from "./redirectToAccessMana
 
 export { getAccessApiEndpoint } from "./getAccessApiEndpoint";
 export { getAccessManagementUi } from "./getAccessManagementUi";
-export { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
+export {
+  redirectToAccessManagementUi,
+  REDIRECT_URL_PARAM_NAME,
+  REQUEST_VC_URL_PARAM_NAME,
+} from "./redirectToAccessManagementUi";
