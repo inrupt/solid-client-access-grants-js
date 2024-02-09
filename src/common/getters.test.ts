@@ -237,6 +237,71 @@ describe("getters", () => {
       ).toThrow("Expected exactly one result. Found 2.");
     });
 
+    it("supports alternate gc:isProvidedToPerson", async () => {
+      const store = new Store([...mockedGConsentGrant]);
+      const isProvidedToQuad = store
+        .match(null, gc.isProvidedTo, null, null)
+        .read();
+      if (isProvidedToQuad !== null) {
+        store.removeQuad(
+          isProvidedToQuad.subject,
+          isProvidedToQuad.predicate,
+          isProvidedToQuad.object,
+        );
+      }
+      store.addQuad(
+        getConsent(mockedGConsentGrant),
+        gc.isProvidedToPerson,
+        namedNode("http://example.org/another/requestorPerson"),
+      );
+
+      expect(
+        getRequestor(Object.assign(store, { id: mockedGConsentGrant.id })),
+      ).toBe("http://example.org/another/requestorPerson");
+    });
+
+    it("supports alternate gc:isProvidedToController", async () => {
+      const store = new Store([...mockedGConsentGrant]);
+      const isProvidedToQuad = store
+        .match(null, gc.isProvidedTo, null, null)
+        .read();
+      if (isProvidedToQuad !== null) {
+        store.removeQuad(
+          isProvidedToQuad.subject,
+          isProvidedToQuad.predicate,
+          isProvidedToQuad.object,
+        );
+      }
+      store.addQuad(
+        getConsent(mockedGConsentGrant),
+        gc.isProvidedToController,
+        namedNode("http://example.org/another/requestorController"),
+      );
+
+      expect(
+        getRequestor(Object.assign(store, { id: mockedGConsentGrant.id })),
+      ).toBe("http://example.org/another/requestorController");
+    });
+
+    it("errors out if more than one alternate predicate is present", async () => {
+      const store = new Store([...mockedGConsentGrant]);
+      store.addQuad(
+        getConsent(mockedGConsentGrant),
+        gc.isProvidedToController,
+        namedNode("http://example.org/another/requestorController"),
+      );
+
+      store.addQuad(
+        getConsent(mockedGConsentGrant),
+        gc.isProvidedToPerson,
+        namedNode("http://example.org/another/requestorPerson"),
+      );
+
+      expect(() =>
+        getRequestor(Object.assign(store, { id: mockedGConsentGrant.id })),
+      ).toThrow("Too many requestors found.");
+    });
+
     it("errors if there are multiple consent objects", async () => {
       const store = new Store([...mockedGConsentGrant]);
 
