@@ -18,11 +18,11 @@
 
 Let the application be ACME.
 Let the user be Alice.
-Let the access management app be PodBrowser.
+Let the access management app be [AMC](https://amc.inrupt.com/).
 Let X be a resource Alice owns (it is a resource in Alice's Pod).
 
 1. ACME has a WebID and a set of client credentials.
-2. Alice also has a WebID and uses PodBrowser for access management.
+2. Alice also has a WebID and uses AMC for access management.
 3. Alice wants to share access to X with ACME.
 4. Alice fills ACME's create Access Request form.
 5. The application needs to know:
@@ -36,13 +36,13 @@ Let X be a resource Alice owns (it is a resource in Alice's Pod).
    - Retrieve the VC issuer service URI from the well known UMA configuration
    - Retrieve the VC service well known configuration (for VC endpoints)
 8. ACME uses the VC issuer endpoint to create an Access Request.
-9. ACME redirects Alice to PodBrowser with the Access Request URI as parameter.
-10. Alice uses PodBrowser to create an Access Grant from ACME's Access Request.
-11. PodBrowser redirects Alice to ACME with the Access Grant URI as parameter.
+9. ACME redirects Alice to AMC with the Access Request URI as parameter.
+10. Alice uses AMC to create an Access Grant from ACME's Access Request.
+11. AMC redirects Alice to ACME with the Access Grant URI as parameter.
 12. ACME uses the Access Grant to access X.
 13. ACME displays the Access Grant and X.
 
-Note: PodBrowser is the assumed Access Management app for the sake of simplicity.
+Note: AMC is the assumed Access Management app for the sake of simplicity.
 
 ## See also
 
