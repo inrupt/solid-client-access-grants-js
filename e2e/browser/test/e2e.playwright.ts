@@ -64,7 +64,7 @@ test("Redirect to AMC to accept Access Request", async ({
   await page.getByTestId("loginButton").click();
 
   // At this point, the user is already logged into the OpenID Provider.
-  await page.getByTestId("prompt-continue").click();
+  await clickOpenIdPrompt(page);
   await page.getByTestId("confirm-access").click();
 
   // The test user confirms the access they selected and is redirected back to app
