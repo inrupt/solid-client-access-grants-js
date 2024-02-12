@@ -10,6 +10,11 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### Bugfixes
+
+- Extend predicate supported by `getRequestor`: `getRequestor` now supports the `gc:isProvidedToPerson` and `gc:isProvidedToController`
+  predicates in addition to the current `gc:isProvidedTo` predicate.
+
 ## [3.0.3](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.0.3) - 2024-02-06
 
 ### Bugfix

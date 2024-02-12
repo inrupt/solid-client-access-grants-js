@@ -295,8 +295,36 @@ export function getRequestor(vc: DatasetWithId): string {
 
   if (!providedConsent) return credentialSubject.value;
 
-  return getSingleObject(vc, providedConsent, gc.isProvidedTo, "NamedNode")
-    .value;
+  const supportedPredicates = [
+    gc.isProvidedTo,
+    gc.isProvidedToPerson,
+    gc.isProvidedToController,
+  ];
+  const candidateResults: Array<string> = [];
+  supportedPredicates.forEach((predicate) => {
+    const candidate = getSingleObject(
+      vc,
+      providedConsent,
+      predicate,
+      "NamedNode",
+      false,
+    );
+    if (candidate !== undefined) {
+      candidateResults.push(candidate.value);
+    }
+  });
+
+  if (candidateResults.length === 1) {
+    return candidateResults[0];
+  }
+
+  if (candidateResults.length > 1) {
+    throw new Error(
+      `Too many requestors found. Expected one, found ${candidateResults}`,
+    );
+  }
+
+  throw new Error(`No requestor found.`);
 }
 
 /**
