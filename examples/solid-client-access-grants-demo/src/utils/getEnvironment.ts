@@ -38,7 +38,7 @@ export function getEnvironment(): Environment {
     url,
     managementApp: new URL(
       process.env.ACCESS_MANAGEMENT_APP ??
-        "https://podbrowser.inrupt.com/privacy/access/requests/",
+        "https://amc.inrupt.com/accessRequest/",
     ),
     clientId: process.env.CLIENT_ID ?? "",
     clientSecret: process.env.CLIENT_SECRET ?? "",
