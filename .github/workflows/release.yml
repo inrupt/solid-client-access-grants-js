@@ -9,6 +9,6 @@ on:
 
 jobs:
   publish-npm:
-    uses: inrupt/typescript-sdk-tools/.github/workflows/reusable-release.yml@v2
+    uses: inrupt/typescript-sdk-tools/.github/workflows/reusable-release.yml@v3
     secrets:
       NODE_AUTH_TOKEN: ${{ secrets.INRUPT_NPM_TOKEN }}
