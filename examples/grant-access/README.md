@@ -17,7 +17,7 @@
 - (Optional) Run the services separately:
   - `node dist/request-access.js`
   - `node dist/grant-access.js`
-- (Optional) Alternatively, you can use Podbrowser as an access management app. In that case,
+- (Optional) Alternatively, you can use [AMC](https://amc.inrupt.com/) as an access management app. In that case,
   make sure to edit `src/request-access.ts` appropriately.
 
 ## Go through the access request flow

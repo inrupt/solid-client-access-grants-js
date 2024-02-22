@@ -42,6 +42,8 @@ export const gc = {
   hasConsent: namedNode(`${GC}hasConsent`),
   hasStatus: namedNode(`${GC}hasStatus`),
   isProvidedTo: namedNode(`${GC}isProvidedTo`),
+  isProvidedToPerson: namedNode(`${GC}isProvidedToPerson`),
+  isProvidedToController: namedNode(`${GC}isProvidedToController`),
   isConsentForDataSubject: namedNode(`${GC}isConsentForDataSubject`),
   forPurpose: namedNode(`${GC}forPurpose`),
   forPersonalData: namedNode(`${GC}forPersonalData`),
