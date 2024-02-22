@@ -216,6 +216,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
   beforeAll(async () => {
     // Log both sessions in.
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     allSessions = [
       retryAsync(getRequestorSession),
       retryAsync(() => getAuthenticatedSession(env)),
