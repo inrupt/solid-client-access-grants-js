@@ -138,7 +138,7 @@ export default function AccessGrant({
         redirectCallback: (url: string) => {
           window.location.replace(url);
         },
-        fallbackAccessManagementUi: `https://podbrowser.inrupt.com/privacy/access/requests/`,
+        fallbackAccessManagementUi: `https://amc.inrupt.com/accessRequest/`,
         fetch: session.fetch,
       },
     );
@@ -209,7 +209,7 @@ export default function AccessGrant({
           onClick={handleAccessRequest}
           data-testid="redirect-for-access"
         >
-          Redirect to PodBrowser to Grant Access
+          Redirect to AMC to Grant Access
         </button>
       </div>
       <p>

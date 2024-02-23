@@ -35,6 +35,8 @@ export {
   getAccessApiEndpoint,
   getAccessManagementUi,
   redirectToAccessManagementUi,
+  REDIRECT_URL_PARAM_NAME,
+  REQUEST_VC_URL_PARAM_NAME,
 } from "./discover";
 
 export {

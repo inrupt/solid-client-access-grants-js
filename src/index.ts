@@ -59,6 +59,8 @@ export {
   redirectToRequestor,
   revokeAccessGrant,
   GRANT_VC_URL_PARAM_NAME,
+  REDIRECT_URL_PARAM_NAME,
+  REQUEST_VC_URL_PARAM_NAME,
 } from "./gConsent";
 
 // Add an API object to the exports to allow explicitly relying on the gConsent-based
