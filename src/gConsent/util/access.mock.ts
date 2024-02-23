@@ -118,6 +118,7 @@ export const mockAccessGrantObject = (
     subjectId: string;
     inherit: boolean;
     resources: string[];
+    inbox: string;
   }>,
 ) => ({
   "@context": MOCK_CONTEXT,
@@ -131,7 +132,7 @@ export const mockAccessGrantObject = (
       isProvidedTo: "https://some.requestor",
       inherit: options?.inherit ?? true,
     },
-    inbox: "https://some.inbox",
+    inbox: options?.inbox,
   },
   issuanceDate: "1965-08-28T00:00:00.000Z",
   issuer: options?.issuer ?? "https://some.issuer",
@@ -153,6 +154,7 @@ export const mockAccessGrantVc = async (
     inherit: boolean;
     resources: string[];
     purposes: string[];
+    inbox: string;
   }>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   modify?: (asObject: Record<string, any>) => void,

@@ -55,5 +55,91 @@ describe("redirectToAccessManagementUi", () => {
         `In a non-browser environment, a redirectCallback must be provided by the user.`,
       );
     });
+
+    it("throws if the access management UI may not be discovered", async () => {
+      mockAccessManagementUiDiscovery(undefined);
+      await expect(
+        redirectToAccessManagementUi(
+          await mockAccessRequestVc(),
+          "https://some.redirect.iri",
+          {
+            redirectCallback: () => {},
+          },
+        ),
+      ).rejects.toThrow(
+        `Cannot discover access management UI URL for [${
+          (await mockAccessRequestVc()).credentialSubject.hasConsent
+            .forPersonalData[0]
+        }]`,
+      );
+    });
+
+    it("throws if the access management UI may not be discovered, even if a resource owner WebID is provided", async () => {
+      mockAccessManagementUiDiscovery(undefined);
+      const resourceOwner = "https://some.webid";
+      await expect(
+        redirectToAccessManagementUi(
+          await mockAccessRequestVc(),
+          "https://some.redirect.iri",
+          {
+            resourceOwner,
+            redirectCallback: () => {},
+          },
+        ),
+      ).rejects.toThrow(
+        `Cannot discover access management UI URL for [${
+          (await mockAccessRequestVc()).credentialSubject.hasConsent
+            .forPersonalData[0]
+        }], neither from [${resourceOwner}]`,
+      );
+    });
+
+    it("discovers the access management UI from the resource owner profile if provided", async () => {
+      mockAccessManagementUiDiscovery("https://some.app");
+      const resourceOwner = "https://some.webid";
+      const redirectCallback = jest.fn();
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
+        await mockAccessRequestVc(),
+        "https://some.redirect.iri",
+        {
+          resourceOwner,
+          redirectCallback,
+        },
+      );
+      // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
+      expect(redirectCallback).toHaveBeenCalledWith(
+        "https://some.app/?requestVcUrl=https%3A%2F%2Fsome.credential&redirectUrl=https%3A%2F%2Fsome.redirect.iri",
+      );
+    });
+
+    it("falls back to the provided access app IRI if any", async () => {
+      const redirectCallback = jest.fn();
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
+        await mockAccessRequestVc(),
+        "https://some.redirect.iri",
+        {
+          fallbackAccessManagementUi: "https://some.app",
+          redirectCallback,
+        },
+      );
+      // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
+      expect(redirectCallback).toHaveBeenCalledWith(
+        "https://some.app/?requestVcUrl=https%3A%2F%2Fsome.credential&redirectUrl=https%3A%2F%2Fsome.redirect.iri",
+      );
+    });
   });
 });

@@ -137,6 +137,30 @@ describe("isValidAccessGrant", () => {
     );
   });
 
+  it("uses the native fetch if none is provided", async () => {
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+      verifierService: "https://some.vc.verifier",
+      specCompliant: {},
+      legacy: {},
+    });
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValueOnce(
+      new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+        status: 200,
+      }),
+    );
+    globalThis.fetch = mockedFetch;
+
+    await isValidAccessGrant(MOCK_ACCESS_GRANT);
+
+    expect(mockedFetch).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        body: JSON.stringify({ verifiableCredential: MOCK_ACCESS_GRANT }),
+      }),
+    );
+  });
+
   it("retrieves the vc if a url was passed", async () => {
     jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
     const mockedFetch = jest
