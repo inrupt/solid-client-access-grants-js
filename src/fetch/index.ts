@@ -18,8 +18,6 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-
-import base64url from "base64url";
 import type { UrlString } from "@inrupt/solid-client";
 import type {
   DatasetWithId,
@@ -84,6 +82,16 @@ export async function getUmaConfiguration(
 }
 
 /**
+ * @hidden Internal utility isomorphic function to encode in base64.
+ */
+export function isomorphicBtoa(stringToEncode: string): string {
+  if (typeof window === "object") {
+    return btoa(stringToEncode);
+  }
+  return Buffer.from(stringToEncode).toString("base64");
+}
+
+/**
  * @hidden This is just an internal utility function to exchange a VC and ticket for an auth token.
  */
 export async function exchangeTicketForAccessToken(
@@ -103,7 +111,7 @@ export async function exchangeTicketForAccessToken(
       "Content-Type": "application/x-www-form-urlencoded",
     },
     body: new URLSearchParams({
-      claim_token: base64url.encode(JSON.stringify(credentialPresentation)),
+      claim_token: isomorphicBtoa(JSON.stringify(credentialPresentation)),
       claim_token_format: VC_CLAIM_TOKEN_TYPE,
       grant_type: UMA_GRANT_TYPE,
       ticket: authTicket,

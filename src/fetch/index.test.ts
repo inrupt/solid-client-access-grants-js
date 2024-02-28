@@ -26,7 +26,6 @@ import type {
 } from "@inrupt/solid-client-vc";
 import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 
-import base64url from "base64url";
 import {
   parseUMAAuthTicket,
   parseUMAAuthIri,
@@ -34,6 +33,7 @@ import {
   exchangeTicketForAccessToken,
   boundFetch,
   fetchWithVc,
+  isomorphicBtoa,
 } from "./index";
 
 const MOCK_VC_BASE = {
@@ -166,7 +166,7 @@ describe("exchangeTicketForAccessToken", () => {
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
-        claim_token: base64url.encode(
+        claim_token: isomorphicBtoa(
           JSON.stringify({
             "@context": [
               "https://www.w3.org/2018/credentials/v1",
