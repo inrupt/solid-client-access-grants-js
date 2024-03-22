@@ -13,6 +13,8 @@ The following changes are pending, and will be applied on the next major release
 ### Bugfixes
 
 - Removed base64url dependency due to potential issues with the browser environment.
+- A descriptive error is now thrown when trying to create an access request/approve an access grant for no resources. Note that previously, such call may not have thrown, but it resulted in an Access Grant granting access to nothing, which would have caused confusion when trying to use it.
+- The error thrown when the issuer endpoint for an access grant/request cannot be computed is more comprehensive.
 
 ## [3.0.4](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.0.4) - 2024-02-12
 
