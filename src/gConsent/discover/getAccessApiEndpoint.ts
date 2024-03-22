@@ -73,8 +73,13 @@ async function getAccessApiEndpoint(
   if (options.accessEndpoint !== undefined) {
     return options.accessEndpoint.toString();
   }
-
-  return getAccessEndpointForResource(resource.toString());
+  try {
+    return await getAccessEndpointForResource(resource.toString());
+  } catch (e: unknown) {
+    throw new Error(
+      `Couldn't figure out the VC issuer from the resources: ${e}`,
+    );
+  }
 }
 
 export { getAccessApiEndpoint };
