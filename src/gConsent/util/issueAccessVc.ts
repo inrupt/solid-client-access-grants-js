@@ -191,10 +191,11 @@ export async function issueAccessVc(
   const fetcher = await getSessionFetch(options);
 
   const hasConsent = isBaseRequest(vcBody);
-  if (hasConsent) {
-    if (vcBody.credentialSubject.hasConsent.forPersonalData.length <= 0) {
-      throw new Error("There are no resources in the access request!");
-    }
+  if (
+    hasConsent &&
+    vcBody.credentialSubject.hasConsent.forPersonalData.length <= 0
+  ) {
+    throw new Error("There are no resources in the access request!");
   } else if (
     (vcBody as BaseGrantBody).credentialSubject.providedConsent.forPersonalData
       .length <= 0

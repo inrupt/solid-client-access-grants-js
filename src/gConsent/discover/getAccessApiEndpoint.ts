@@ -77,7 +77,7 @@ async function getAccessApiEndpoint(
     return await getAccessEndpointForResource(resource.toString());
   } catch (e: unknown) {
     throw new Error(
-      `Couldn't figure out the VC issuer from the resources: ${e}`,
+      `Couldn't figure out the Access Grant issuer from the resources: ${e}`,
     );
   }
 }
