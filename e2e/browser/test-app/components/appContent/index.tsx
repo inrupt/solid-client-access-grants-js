@@ -34,7 +34,7 @@ import {
   TESTID_SESSION_STATUS,
 } from "@inrupt/internal-playwright-testids";
 import { useState, useEffect } from "react";
-import AccessGrants from "../accessGrants";
+import AccessController from "../accessGrants";
 
 // This is the content of the file uploaded manually at SHARED_FILE_IRI.
 const DEFAULT_ISSUER = "https://login.inrupt.com/";
@@ -45,10 +45,10 @@ function AccessGrantContainer({
   setErrorMessage,
 }: {
   sessionInfo?: ISessionInfo;
-  setErrorMessage: () => void;
+  setErrorMessage: (msg: string) => void;
 }) {
   if (sessionInfo?.isLoggedIn) {
-    return <AccessGrants setErrorMessage={setErrorMessage} />;
+    return <AccessController setErrorMessage={setErrorMessage} />;
   }
   return <div />;
 }

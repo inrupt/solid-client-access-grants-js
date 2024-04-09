@@ -20,12 +20,15 @@
 //
 
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
-import type { AccessGrant } from "@inrupt/solid-client-access-grants";
+import type {
+  AccessRequest,
+  AccessGrant,
+} from "@inrupt/solid-client-access-grants";
 import {
-  approveAccessRequest,
-  revokeAccessGrant,
+  issueAccessRequest,
   redirectToAccessManagementUi,
   getAccessGrant,
+  denyAccessRequest,
 } from "@inrupt/solid-client-access-grants";
 import {
   getPodUrlAll,
@@ -39,13 +42,13 @@ import { useRouter } from "next/router";
 const session = getDefaultSession();
 const SHARED_FILE_CONTENT = "Some content.\n";
 
-export default function AccessGrant({
+export default function AccessController({
   setErrorMessage,
 }: {
   setErrorMessage: (msg: string) => void;
 }) {
   const [accessGrant, setAccessGrant] = useState<AccessGrant>();
-  const [accessRequest, setAccessRequest] = useState<string>();
+  const [accessRequest, setAccessRequest] = useState<AccessRequest | string>();
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
   const router = useRouter();
 
@@ -90,34 +93,42 @@ export default function AccessGrant({
     setSharedResourceIri(undefined);
   };
 
-  const handleGrant = async () => {
+  const handleRequest = async () => {
     if (typeof sharedResourceIri !== "string") {
       // If the resource does not exist, do nothing.
       return;
     }
-    const accessGrantRequest = await approveAccessRequest(
-      undefined,
-      {
-        requestor: "https://johndoe.webid",
-        access: { read: true },
-        resources: [sharedResourceIri],
-      },
-      {
-        fetch: session.fetch,
-      },
-    );
-    setAccessGrant(accessGrantRequest);
+    // if the resource owner is not defined, do nothing.
+    if (session.info.webId) {
+      const accessRequestReturned = await issueAccessRequest(
+        {
+          requestor: "https://johndoe.webid",
+          resourceOwner: session.info.webId,
+          access: { read: true },
+          resources: [sharedResourceIri],
+          purpose: [
+            "https://w3id.org/dpv#UserInterfacePersonalisation",
+            "https://w3id.org/dpv#OptimiseUserInterface",
+          ],
+          inherit: false,
+        },
+        {
+          fetch: session.fetch,
+        },
+      );
+      setAccessRequest(accessRequestReturned);
+    }
   };
 
-  const handleRevoke = async () => {
-    if (typeof accessGrant === "undefined") {
+  const handleDenial = async () => {
+    if (typeof accessRequest === "undefined") {
       // If the resource does not exist, do nothing.
       return;
     }
-    await revokeAccessGrant(accessGrant, {
+    await denyAccessRequest(accessRequest, {
       fetch: session.fetch,
     });
-    setAccessGrant(undefined);
+    setAccessRequest(undefined);
   };
 
   const handleCallAuthedGrant = async () => {
@@ -194,15 +205,15 @@ export default function AccessGrant({
         />
       </p>
       <div>
-        <button type="button" onClick={handleGrant} data-testid="grant-access">
-          Grant access
-        </button>
         <button
           type="button"
-          onClick={handleRevoke}
-          data-testid="revoke-access"
+          onClick={handleRequest}
+          data-testid="issue-access"
         >
-          Revoke access
+          Issue access request
+        </button>
+        <button type="button" onClick={handleDenial} data-testid="deny-access">
+          Deny access request
         </button>
         <button
           type="button"
@@ -212,6 +223,12 @@ export default function AccessGrant({
           Redirect to AMC to Grant Access
         </button>
       </div>
+      <p>
+        Issued access request:{" "}
+        <pre data-testid="access-request">
+          {accessRequest && JSON.stringify(accessRequest, null, 2)}
+        </pre>
+      </p>
       <p>
         Granted access:{" "}
         <pre data-testid="access-grant">
