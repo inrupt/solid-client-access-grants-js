@@ -98,7 +98,7 @@ test("Redirect to AMC to accept Access Request", async ({
   ]);
 });
 
-test("Granting access to a resource, then revoking the access grant", async ({
+test("Issue an access request, then denying the access request", async ({
   page,
   auth,
 }) => {
@@ -109,13 +109,13 @@ test("Granting access to a resource, then revoking the access grant", async ({
     { timeout: 30_000 },
   );
 
-  // Grant access to the resource.
-  await page.getByTestId("grant-access").click();
-  await expect(page.getByTestId("access-grant")).not.toBeEmpty();
+  // Issue an access request to the resource.
+  await page.getByTestId("issue-access").click();
+  await expect(page.getByTestId("access-request")).not.toBeEmpty();
 
-  // Revoke the access grant.
-  await page.getByTestId("revoke-access").click();
-  await expect(page.getByTestId("access-grant")).toBeEmpty();
+  // Revoke the access request.
+  await page.getByTestId("deny-access").click();
+  await expect(page.getByTestId("access-request")).toBeEmpty();
 
   // Cleanup the resource
   await page.getByTestId("delete-resource").click();
