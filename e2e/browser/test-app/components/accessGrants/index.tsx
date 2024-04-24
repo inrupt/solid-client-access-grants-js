@@ -20,15 +20,12 @@
 //
 
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
-import type {
-  AccessRequest,
-  AccessGrant,
-} from "@inrupt/solid-client-access-grants";
+import type { AccessGrant } from "@inrupt/solid-client-access-grants";
 import {
   issueAccessRequest,
   redirectToAccessManagementUi,
   getAccessGrant,
-  denyAccessRequest,
+  cancelAccessRequest,
 } from "@inrupt/solid-client-access-grants";
 import {
   getPodUrlAll,
@@ -48,7 +45,7 @@ export default function AccessController({
   setErrorMessage: (msg: string) => void;
 }) {
   const [accessGrant, setAccessGrant] = useState<AccessGrant>();
-  const [accessRequest, setAccessRequest] = useState<AccessRequest | string>();
+  const [accessRequest, setAccessRequest] = useState<string>();
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
   const router = useRouter();
 
@@ -94,38 +91,29 @@ export default function AccessController({
   };
 
   const handleRequest = async () => {
-    if (typeof sharedResourceIri !== "string") {
+    if (typeof sharedResourceIri !== "string" || !session.info.webId) {
       // If the resource does not exist, do nothing.
       return;
     }
-    // if the resource owner is not defined, do nothing.
-    if (session.info.webId) {
-      const accessRequestReturned = await issueAccessRequest(
-        {
-          requestor: "https://johndoe.webid",
-          resourceOwner: session.info.webId,
-          access: { read: true },
-          resources: [sharedResourceIri],
-          purpose: [
-            "https://w3id.org/dpv#UserInterfacePersonalisation",
-            "https://w3id.org/dpv#OptimiseUserInterface",
-          ],
-          inherit: false,
-        },
-        {
-          fetch: session.fetch,
-        },
-      );
-      setAccessRequest(accessRequestReturned);
-    }
+    const accessRequestReturned = await issueAccessRequest(
+      {
+        resourceOwner: session.info.webId,
+        access: { read: true },
+        resources: [sharedResourceIri],
+      },
+      {
+        fetch: session.fetch,
+      },
+    );
+    setAccessRequest(accessRequestReturned);
   };
 
-  const handleDenial = async () => {
+  const handleRevoke = async () => {
     if (typeof accessRequest === "undefined") {
       // If the resource does not exist, do nothing.
       return;
     }
-    await denyAccessRequest(accessRequest, {
+    await cancelAccessRequest(accessRequest, {
       fetch: session.fetch,
     });
     setAccessRequest(undefined);
@@ -212,8 +200,12 @@ export default function AccessController({
         >
           Issue access request
         </button>
-        <button type="button" onClick={handleDenial} data-testid="deny-access">
-          Deny access request
+        <button
+          type="button"
+          onClick={handleRevoke}
+          data-testid="revoke-access"
+        >
+          Revoke access request
         </button>
         <button
           type="button"
