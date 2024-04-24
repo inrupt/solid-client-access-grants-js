@@ -98,7 +98,7 @@ test("Redirect to AMC to accept Access Request", async ({
   ]);
 });
 
-test("Issue an access request, then denying the access request", async ({
+test("Issue an access request, then revoking the access request", async ({
   page,
   auth,
 }) => {
@@ -114,7 +114,7 @@ test("Issue an access request, then denying the access request", async ({
   await expect(page.getByTestId("access-request")).not.toBeEmpty();
 
   // Revoke the access request.
-  await page.getByTestId("deny-access").click();
+  await page.getByTestId("revoke-access").click();
   await expect(page.getByTestId("access-request")).toBeEmpty();
 
   // Cleanup the resource
