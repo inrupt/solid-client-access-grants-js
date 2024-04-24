@@ -26,6 +26,7 @@ import type {
 } from "@inrupt/solid-client-vc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { revokeAccessGrant } from "../manage/revokeAccessGrant";
+import { solidVc } from "../../common/constants";
 
 /**
  * Cancel a request for access to data (with explicit or implicit consent) before
@@ -41,7 +42,7 @@ async function cancelAccessRequest(
   vc: VerifiableCredential | DatasetWithId | URL | UrlString,
   options: AccessBaseOptions = {},
 ): Promise<void> {
-  return revokeAccessGrant(vc, options);
+  return revokeAccessGrant(vc, options, solidVc.SolidAccessRequest);
 }
 
 export { cancelAccessRequest };
