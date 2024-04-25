@@ -25,7 +25,7 @@ import type {
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
-import { revokeAccessGrant } from "../manage/revokeAccessGrant";
+import { revokeAccessCredential } from "../manage/revokeAccessGrant";
 import { solidVc } from "../../common/constants";
 
 /**
@@ -42,7 +42,7 @@ async function cancelAccessRequest(
   vc: VerifiableCredential | DatasetWithId | URL | UrlString,
   options: AccessBaseOptions = {},
 ): Promise<void> {
-  return revokeAccessGrant(vc, options, solidVc.SolidAccessRequest);
+  return revokeAccessCredential(vc, options, solidVc.SolidAccessRequest);
 }
 
 export { cancelAccessRequest };

@@ -23,7 +23,7 @@ import { jest, describe, it, expect } from "@jest/globals";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 import { cancelAccessRequest } from "./cancelAccessRequest";
 import { MOCKED_CREDENTIAL_ID } from "./request.mock";
-import { mockAccessGrantVc } from "../util/access.mock";
+import { mockAccessRequestVc } from "../util/access.mock";
 
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
@@ -71,7 +71,7 @@ describe("cancelAccessRequest", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValueOnce(
-        new Response(JSON.stringify(await mockAccessGrantVc())),
+        new Response(JSON.stringify(await mockAccessRequestVc())),
       );
     await cancelAccessRequest("https://some.credential", {
       fetch: mockedFetch,
@@ -96,7 +96,7 @@ describe("cancelAccessRequest", () => {
     const mockedFetch = jest
       .fn(global.fetch)
       .mockResolvedValue(
-        new Response(JSON.stringify(await mockAccessGrantVc())),
+        new Response(JSON.stringify(await mockAccessRequestVc())),
       );
     await cancelAccessRequest(MOCKED_CREDENTIAL_ID, {
       fetch: mockedFetch,
@@ -131,7 +131,7 @@ describe("cancelAccessRequest", () => {
     );
     const mockedFetch = jest.fn<typeof fetch>();
     await cancelAccessRequest(
-      await mockAccessGrantVc({ issuer: "https://some.issuer" }),
+      await mockAccessRequestVc({ issuer: "https://some.issuer" }),
       {
         fetch: mockedFetch,
       },
