@@ -29,6 +29,7 @@ import {
   getIssuer,
   revokeVerifiableCredential,
 } from "@inrupt/solid-client-vc";
+import type { NamedNode } from "n3";
 import { DataFactory } from "n3";
 import { TYPE, solidVc } from "../../common/constants";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
@@ -36,6 +37,36 @@ import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 
 const { quad, namedNode } = DataFactory;
+
+/**
+ * @internal
+ */
+async function revokeAccessCredential(
+  vc: DatasetWithId | VerifiableCredential | URL | UrlString,
+  options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
+  type: NamedNode<string> = solidVc.SolidAccessGrant,
+): Promise<void> {
+  const credential = await getBaseAccess(vc, options, type);
+
+  if (
+    !credential.has(quad(namedNode(getId(credential)), TYPE, type)) &&
+    !credential.has(
+      quad(namedNode(getId(credential)), TYPE, solidVc.SolidAccessDenial),
+    )
+  ) {
+    throw new Error(
+      `An error occurred when type checking the VC: Not of type [${type.value}] or [${solidVc.SolidAccessDenial.value}].`,
+    );
+  }
+
+  return revokeVerifiableCredential(
+    new URL("status", getIssuer(credential)).href,
+    getId(credential),
+    {
+      fetch: await getSessionFetch(options),
+    },
+  );
+}
 
 /**
  * Makes a request to the access server to revoke a given Verifiable Credential (VC).
@@ -49,30 +80,9 @@ async function revokeAccessGrant(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
 ): Promise<void> {
-  const credential = await getBaseAccess(vc, options, solidVc.SolidAccessGrant);
-
-  if (
-    !credential.has(
-      quad(namedNode(getId(credential)), TYPE, solidVc.SolidAccessGrant),
-    ) &&
-    !credential.has(
-      quad(namedNode(getId(credential)), TYPE, solidVc.SolidAccessDenial),
-    )
-  ) {
-    throw new Error(
-      `An error occurred when type checking the VC: Not of type [${solidVc.SolidAccessGrant.value}] or [${solidVc.SolidAccessDenial.value}].`,
-    );
-  }
-
-  return revokeVerifiableCredential(
-    new URL("status", getIssuer(credential)).href,
-    getId(credential),
-    {
-      fetch: await getSessionFetch(options),
-    },
-  );
+  return revokeAccessCredential(vc, options, solidVc.SolidAccessGrant);
 }
 
-export { revokeAccessGrant };
+export { revokeAccessGrant, revokeAccessCredential };
 export default revokeAccessGrant;
 export type { UrlString, VerifiableCredential };
