@@ -39,14 +39,9 @@ import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 const { quad, namedNode } = DataFactory;
 
 /**
- * Makes a request to the access server to revoke a given Verifiable Credential (VC).
- *
- * @param vc Either a VC, or a URL to a VC, to be revoked.
- * @param options Optional properties to customise the request behaviour.
- * @returns A void promise.
- * @since 0.4.0
+ * @internal
  */
-async function revokeAccessGrant(
+async function revokeAccessCredential(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
   type: NamedNode<string> = solidVc.SolidAccessGrant,
@@ -73,6 +68,21 @@ async function revokeAccessGrant(
   );
 }
 
-export { revokeAccessGrant };
+/**
+ * Makes a request to the access server to revoke a given Verifiable Credential (VC).
+ *
+ * @param vc Either a VC, or a URL to a VC, to be revoked.
+ * @param options Optional properties to customise the request behaviour.
+ * @returns A void promise.
+ * @since 0.4.0
+ */
+async function revokeAccessGrant(
+  vc: DatasetWithId | VerifiableCredential | URL | UrlString,
+  options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
+): Promise<void> {
+  return revokeAccessCredential(vc, options, solidVc.SolidAccessGrant);
+}
+
+export { revokeAccessGrant, revokeAccessCredential };
 export default revokeAccessGrant;
 export type { UrlString, VerifiableCredential };

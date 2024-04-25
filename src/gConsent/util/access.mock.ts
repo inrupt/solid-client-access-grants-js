@@ -37,6 +37,7 @@ import type { AccessGrant } from "../type/AccessGrant";
 import type { AccessRequest } from "../type/AccessRequest";
 
 type RequestVcOptions = Partial<{
+  issuer: string;
   resources: UrlString[];
   modes: ResourceAccessMode[];
   resourceOwner: string | null;
