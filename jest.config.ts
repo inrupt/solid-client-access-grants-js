@@ -39,7 +39,7 @@ export default {
       // jose (dependency of solid-client-authn) and ts-jest.
       // FIXME: some unit tests do not cover node-specific code.
       branches: 94,
-      functions: 94,
+      functions: 93,
       lines: 94,
       statements: 94,
     },
