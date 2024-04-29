@@ -39,27 +39,30 @@ import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 const { quad, namedNode } = DataFactory;
 
 /**
+ * Revokes the given Verifiable Credential (VC). It supports revoking approved/denied Access Grants and Access Requests.
+ *
+ * This function is called by revokeAccessGrant and cancelAccessRequest.
+ * Each of them call this function with the appropriate types parameter: [SolidAccessGrant, SolidAccessDenial] and
+ * [SolidAccessRequest] respectively.
+ * In both cases, index 0 of types array must contain either SolidAccessGrant or SolidAccessRequest type
+ * for getBaseAccess to get the credential.
  * @internal
  */
 async function revokeAccessCredential(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
+  types: NamedNode<string>[],
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
-  type: NamedNode<string>[] = [
-    solidVc.SolidAccessGrant,
-    solidVc.SolidAccessDenial,
-  ],
 ): Promise<void> {
-  const credential = await getBaseAccess(vc, options, type[0]);
+  const credential = await getBaseAccess(vc, options, types[0]);
 
   if (
-    type.every(
+    types.every(
       (vcType) =>
         !credential.has(quad(namedNode(getId(credential)), TYPE, vcType)),
     )
   ) {
     throw new Error(
-      `An error occurred when type checking the VC: Not of type [${type[0].value}] 
-      ${type.length > 1 ? `or [${type[1].value}]` : ``}.`,
+      `An error occurred when type checking the VC: Not of type [${types.map((type) => type.value).join("] or [")}]`,
     );
   }
 
@@ -84,10 +87,11 @@ async function revokeAccessGrant(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
 ): Promise<void> {
-  return revokeAccessCredential(vc, options, [
-    solidVc.SolidAccessGrant,
-    solidVc.SolidAccessDenial,
-  ]);
+  return revokeAccessCredential(
+    vc,
+    [solidVc.SolidAccessGrant, solidVc.SolidAccessDenial],
+    options,
+  );
 }
 
 export { revokeAccessGrant, revokeAccessCredential };
