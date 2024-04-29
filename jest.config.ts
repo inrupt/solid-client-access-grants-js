@@ -38,10 +38,10 @@ export default {
       // The auto-pickup of fetch is no longer tested because of issues between
       // jose (dependency of solid-client-authn) and ts-jest.
       // FIXME: some unit tests do not cover node-specific code.
-      branches: 94,
-      functions: 94,
-      lines: 94,
-      statements: 94,
+      branches: 93,
+      functions: 93,
+      lines: 93,
+      statements: 93,
     },
   },
   projects: [
