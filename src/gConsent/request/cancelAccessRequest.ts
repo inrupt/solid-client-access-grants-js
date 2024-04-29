@@ -42,7 +42,7 @@ async function cancelAccessRequest(
   vc: VerifiableCredential | DatasetWithId | URL | UrlString,
   options: AccessBaseOptions = {},
 ): Promise<void> {
-  return revokeAccessCredential(vc, options, solidVc.SolidAccessRequest);
+  return revokeAccessCredential(vc, [solidVc.SolidAccessRequest], options);
 }
 
 export { cancelAccessRequest };
