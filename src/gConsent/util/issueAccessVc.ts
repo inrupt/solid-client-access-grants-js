@@ -33,6 +33,7 @@ import {
 } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
+import { getResources } from "../../common/getters";
 import type {
   AccessGrantBody,
   AccessRequestBody,
@@ -197,6 +198,7 @@ export async function issueAccessVc(
   ) {
     throw new Error("There are no resources in the access request!");
   } else if (
+    !hasConsent &&
     (vcBody as BaseGrantBody).credentialSubject.providedConsent.forPersonalData
       .length <= 0
   ) {
