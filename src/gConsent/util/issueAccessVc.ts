@@ -189,6 +189,21 @@ export async function issueAccessVc(
   } = {},
 ): Promise<DatasetWithId> {
   const fetcher = await getSessionFetch(options);
+
+  const hasConsent = isBaseRequest(vcBody);
+  if (
+    hasConsent &&
+    vcBody.credentialSubject.hasConsent.forPersonalData.length <= 0
+  ) {
+    throw new Error("There are no resources in the access request!");
+  } else if (
+    !hasConsent &&
+    (vcBody as BaseGrantBody).credentialSubject.providedConsent.forPersonalData
+      .length <= 0
+  ) {
+    throw new Error("There are no resources in the access grant!");
+  }
+
   const targetResourceIri = isBaseRequest(vcBody)
     ? vcBody.credentialSubject.hasConsent.forPersonalData[0]
     : (vcBody as BaseGrantBody).credentialSubject.providedConsent

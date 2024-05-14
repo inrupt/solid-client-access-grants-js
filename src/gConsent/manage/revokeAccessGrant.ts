@@ -30,12 +30,50 @@ import {
   revokeVerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { DataFactory } from "n3";
+import type { NamedNode } from "n3";
 import { TYPE, solidVc } from "../../common/constants";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 
 const { quad, namedNode } = DataFactory;
+
+/**
+ * Revokes the given Verifiable Credential (VC). It supports revoking approved/denied Access Grants and Access Requests.
+ *
+ * This function is called by revokeAccessGrant and cancelAccessRequest.
+ * Each of them call this function with the appropriate types parameter: [SolidAccessGrant, SolidAccessDenial] and
+ * [SolidAccessRequest] respectively.
+ * In both cases, index 0 of types array must contain either SolidAccessGrant or SolidAccessRequest type
+ * for getBaseAccess to get the credential.
+ * @internal
+ */
+async function revokeAccessCredential(
+  vc: DatasetWithId | VerifiableCredential | URL | UrlString,
+  types: NamedNode<string>[],
+  options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
+): Promise<void> {
+  const credential = await getBaseAccess(vc, options, types[0]);
+
+  if (
+    types.every(
+      (vcType) =>
+        !credential.has(quad(namedNode(getId(credential)), TYPE, vcType)),
+    )
+  ) {
+    throw new Error(
+      `An error occurred when type checking the VC: Not of type [${types.map((type) => type.value).join("] or [")}]`,
+    );
+  }
+
+  return revokeVerifiableCredential(
+    new URL("status", getIssuer(credential)).href,
+    getId(credential),
+    {
+      fetch: await getSessionFetch(options),
+    },
+  );
+}
 
 /**
  * Makes a request to the access server to revoke a given Verifiable Credential (VC).
@@ -49,30 +87,13 @@ async function revokeAccessGrant(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
 ): Promise<void> {
-  const credential = await getBaseAccess(vc, options, solidVc.SolidAccessGrant);
-
-  if (
-    !credential.has(
-      quad(namedNode(getId(credential)), TYPE, solidVc.SolidAccessGrant),
-    ) &&
-    !credential.has(
-      quad(namedNode(getId(credential)), TYPE, solidVc.SolidAccessDenial),
-    )
-  ) {
-    throw new Error(
-      `An error occurred when type checking the VC: Not of type [${solidVc.SolidAccessGrant.value}] or [${solidVc.SolidAccessDenial.value}].`,
-    );
-  }
-
-  return revokeVerifiableCredential(
-    new URL("status", getIssuer(credential)).href,
-    getId(credential),
-    {
-      fetch: await getSessionFetch(options),
-    },
+  return revokeAccessCredential(
+    vc,
+    [solidVc.SolidAccessGrant, solidVc.SolidAccessDenial],
+    options,
   );
 }
 
-export { revokeAccessGrant };
+export { revokeAccessGrant, revokeAccessCredential };
 export default revokeAccessGrant;
 export type { UrlString, VerifiableCredential };
