@@ -37,6 +37,7 @@ import type { AccessGrant } from "../type/AccessGrant";
 import type { AccessRequest } from "../type/AccessRequest";
 
 type RequestVcOptions = Partial<{
+  issuer: string;
   resources: UrlString[];
   modes: ResourceAccessMode[];
   resourceOwner: string | null;
@@ -72,7 +73,7 @@ export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
     },
     issuanceDate: "2022-02-22T00:00:00.000Z",
     expirationDate: "2022-02-23T00:00:00.000Z",
-    issuer: "https://some.issuer",
+    issuer: options?.issuer ?? "https://some.issuer",
     proof: {
       created: "2022-06-08T15:28:51.810Z",
       proofPurpose: "https://example.org/some/proof/purpose",

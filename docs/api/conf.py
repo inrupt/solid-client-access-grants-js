@@ -49,7 +49,6 @@ highlight_language = 'javascript'
 extensions = [
     'sphinx.ext.extlinks',
     'myst_parser',
-    'sphinx_reredirects'
 ]
 
 
@@ -140,9 +139,6 @@ myst_heading_anchors = 6
 myst_url_schemes = ('https', 'http')
 myst_enable_extensions = ['colon_fence']
 
-redirects = {
-    "modules/manage.html": "./gConsent_manage.html"
-}
 
 # Typedoc by default outputs all files as relative to their directory, but for
 # Interfaces this is not what we want. Instead of
