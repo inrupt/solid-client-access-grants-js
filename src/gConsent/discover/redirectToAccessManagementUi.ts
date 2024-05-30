@@ -24,8 +24,6 @@ import type {
   DatasetWithId,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-// eslint-disable-next-line import/no-unresolved
-import { isUrl } from "@inrupt/solid-client-vc/common";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import {
@@ -37,6 +35,7 @@ import type { FetchOptions } from "../../type/FetchOptions";
 import type { RedirectOptions } from "../../type/RedirectOptions";
 import { getResources } from "../../common";
 import { isDatasetCore } from "../guard/isDatasetCore";
+import { isUrl } from "../../common/util/isUrl";
 
 export const REQUEST_VC_URL_PARAM_NAME = "requestVcUrl";
 export const REDIRECT_URL_PARAM_NAME = "redirectUrl";

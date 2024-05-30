@@ -22,8 +22,6 @@
 import type { UrlString } from "@inrupt/solid-client";
 // eslint-disable-next-line camelcase
 import { acp_ess_2 } from "@inrupt/solid-client";
-// eslint-disable-next-line import/no-unresolved
-import { isUrl } from "@inrupt/solid-client-vc/common";
 import type {
   DatasetWithId,
   VerifiableCredential,
@@ -53,6 +51,7 @@ import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isDatasetCore } from "../guard/isDatasetCore";
+import { isUrl } from "../../common/util/isUrl";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,

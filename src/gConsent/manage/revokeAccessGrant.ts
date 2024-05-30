@@ -31,13 +31,12 @@ import {
 } from "@inrupt/solid-client-vc";
 import { DataFactory } from "n3";
 import type { NamedNode } from "n3";
-// eslint-disable-next-line import/no-unresolved
-import { isUrl } from "@inrupt/solid-client-vc/common";
 import { TYPE, solidVc } from "../../common/constants";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { isDatasetCore } from "../guard/isDatasetCore";
+import { isUrl } from "../../common/util/isUrl";
 
 const { quad, namedNode } = DataFactory;
 

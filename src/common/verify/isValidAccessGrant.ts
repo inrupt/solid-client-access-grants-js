@@ -28,11 +28,10 @@ import {
   getIssuer,
   getVerifiableCredentialApiConfiguration,
 } from "@inrupt/solid-client-vc";
-// eslint-disable-next-line import/no-unresolved
-import { isUrl } from "@inrupt/solid-client-vc/common";
 import { getBaseAccess } from "../../gConsent/util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
 import { isDatasetCore } from "../../gConsent/guard/isDatasetCore";
+import { isUrl } from "../util/isUrl";
 
 /**
  * Makes a request to the access server to verify the validity of a given Verifiable Credential.

@@ -24,8 +24,6 @@ import {
   type DatasetWithId,
   type VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-// eslint-disable-next-line import/no-unresolved
-import { isUrl } from "@inrupt/solid-client-vc/common";
 import { gc, solidVc } from "../../common/constants";
 import { CREDENTIAL_TYPE_ACCESS_DENIAL } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
@@ -35,6 +33,7 @@ import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { isDatasetCore } from "../guard/isDatasetCore";
+import { isUrl } from "../../common/util/isUrl";
 
 /**
  * Deny an access request. The content of the denied access request is provided
