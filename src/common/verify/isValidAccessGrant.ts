@@ -28,8 +28,10 @@ import {
   getIssuer,
   getVerifiableCredentialApiConfiguration,
 } from "@inrupt/solid-client-vc";
+import { isUrl } from "@inrupt/solid-client-vc/dist/common/common";
 import { getBaseAccess } from "../../gConsent/util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
+import { isDatasetCore } from "../../gConsent/guard/isDatasetCore";
 
 /**
  * Makes a request to the access server to verify the validity of a given Verifiable Credential.
@@ -48,6 +50,13 @@ async function isValidAccessGrant(
   } = {},
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
   const fetcher = await getSessionFetch(options);
+
+  if (typeof vc !== "string" && !isUrl(vc.toString()) && !isDatasetCore(vc)) {
+    throw new Error(
+      "Verifiable Credential is not of valid types: string, URL, VerifiableCredential or DatasetWithId",
+    );
+  }
+
   const vcObject = await getBaseAccess(vc, options);
 
   // Discover the access endpoint from the resource part of the Access Grant.

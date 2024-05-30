@@ -31,10 +31,12 @@ import {
 } from "@inrupt/solid-client-vc";
 import { DataFactory } from "n3";
 import type { NamedNode } from "n3";
+import { isUrl } from "@inrupt/solid-client-vc/dist/common/common";
 import { TYPE, solidVc } from "../../common/constants";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
+import { isDatasetCore } from "../guard/isDatasetCore";
 
 const { quad, namedNode } = DataFactory;
 
@@ -53,6 +55,12 @@ async function revokeAccessCredential(
   types: NamedNode<string>[],
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
 ): Promise<void> {
+  if (typeof vc !== "string" && !isUrl(vc.toString()) && !isDatasetCore(vc)) {
+    throw new Error(
+      "Verifiable Credential is not of valid types: string, URL, VerifiableCredential or DatasetWithId",
+    );
+  }
+
   const credential = await getBaseAccess(vc, options, types[0]);
 
   if (

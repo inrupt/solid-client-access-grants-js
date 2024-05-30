@@ -27,6 +27,7 @@ import type {
   VerifiableCredential,
   VerifiableCredentialBase,
 } from "@inrupt/solid-client-vc";
+import { isUrl } from "@inrupt/solid-client-vc/dist/common/common";
 import { gc, solidVc } from "../../common/constants";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { AccessModes } from "../../type/AccessModes";
@@ -50,6 +51,7 @@ import type { AccessGrantParameters } from "../type/Parameter";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
+import { isDatasetCore } from "../guard/isDatasetCore";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
@@ -288,6 +290,16 @@ export async function approveAccessRequest(
     updateAcr: options.updateAcr ?? true,
   };
 
+  if (
+    requestVc &&
+    typeof requestVc !== "string" &&
+    !isUrl(requestVc.toString()) &&
+    !isDatasetCore(requestVc)
+  ) {
+    throw new Error(
+      "Verifiable Credential is not of valid types: string, URL, VerifiableCredential or DatasetWithId",
+    );
+  }
   const internalGrantOptions = initializeGrantParameters(
     typeof requestVc !== "undefined"
       ? await getBaseAccess(

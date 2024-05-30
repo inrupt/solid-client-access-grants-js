@@ -24,6 +24,7 @@ import type {
   DatasetWithId,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
+import { isUrl } from "@inrupt/solid-client-vc/dist/common/common";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import {
@@ -34,6 +35,7 @@ import { redirectWithParameters } from "../util/redirect";
 import type { FetchOptions } from "../../type/FetchOptions";
 import type { RedirectOptions } from "../../type/RedirectOptions";
 import { getResources } from "../../common";
+import { isDatasetCore } from "../guard/isDatasetCore";
 
 export const REQUEST_VC_URL_PARAM_NAME = "requestVcUrl";
 export const REDIRECT_URL_PARAM_NAME = "redirectUrl";
@@ -100,6 +102,16 @@ export async function redirectToAccessManagementUi(
   options: RedirectToAccessManagementUiOptions = {},
 ): Promise<void> {
   const fallbackUi = options.fallbackAccessManagementUi;
+
+  if (
+    typeof accessRequestVc !== "string" &&
+    !isUrl(accessRequestVc.toString()) &&
+    !isDatasetCore(accessRequestVc)
+  ) {
+    throw new Error(
+      "Verifiable Credential is not of valid types: string, URL, VerifiableCredential or DatasetWithId",
+    );
+  }
 
   const requestVc = await getBaseAccess(accessRequestVc, {
     fetch: options.fetch,

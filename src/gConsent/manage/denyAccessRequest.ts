@@ -20,10 +20,11 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import type {
-  DatasetWithId,
-  VerifiableCredential,
+import {
+  type DatasetWithId,
+  type VerifiableCredential,
 } from "@inrupt/solid-client-vc";
+import { isUrl } from "@inrupt/solid-client-vc/dist/common/common";
 import { gc, solidVc } from "../../common/constants";
 import { CREDENTIAL_TYPE_ACCESS_DENIAL } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
@@ -32,6 +33,7 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
+import { isDatasetCore } from "../guard/isDatasetCore";
 
 /**
  * Deny an access request. The content of the denied access request is provided
@@ -91,6 +93,11 @@ async function denyAccessRequest(
     returnLegacyJsonld?: boolean;
   },
 ): Promise<DatasetWithId> {
+  if (typeof vc !== "string" && !isUrl(vc.toString()) && !isDatasetCore(vc)) {
+    throw new Error(
+      "Verifiable Credential is not of valid types: string, URL, VerifiableCredential or DatasetWithId",
+    );
+  }
   const baseVc: DatasetWithId = await getBaseAccess(
     vc,
     options ?? {},
