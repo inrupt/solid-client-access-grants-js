@@ -24,7 +24,8 @@ import type {
   DatasetWithId,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { isUrl } from "@inrupt/solid-client-vc/dist/common/common";
+// eslint-disable-next-line import/no-unresolved
+import { isUrl } from "@inrupt/solid-client-vc/common";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import {

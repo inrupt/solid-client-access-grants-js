@@ -31,7 +31,8 @@ import {
 } from "@inrupt/solid-client-vc";
 import { DataFactory } from "n3";
 import type { NamedNode } from "n3";
-import { isUrl } from "@inrupt/solid-client-vc/dist/common/common";
+// eslint-disable-next-line import/no-unresolved
+import { isUrl } from "@inrupt/solid-client-vc/common";
 import { TYPE, solidVc } from "../../common/constants";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";

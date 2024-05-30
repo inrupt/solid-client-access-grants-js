@@ -28,7 +28,8 @@ import {
   getIssuer,
   getVerifiableCredentialApiConfiguration,
 } from "@inrupt/solid-client-vc";
-import { isUrl } from "@inrupt/solid-client-vc/dist/common/common";
+// eslint-disable-next-line import/no-unresolved
+import { isUrl } from "@inrupt/solid-client-vc/common";
 import { getBaseAccess } from "../../gConsent/util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
 import { isDatasetCore } from "../../gConsent/guard/isDatasetCore";

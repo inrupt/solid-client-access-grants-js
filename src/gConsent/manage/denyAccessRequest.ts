@@ -24,7 +24,8 @@ import {
   type DatasetWithId,
   type VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { isUrl } from "@inrupt/solid-client-vc/dist/common/common";
+// eslint-disable-next-line import/no-unresolved
+import { isUrl } from "@inrupt/solid-client-vc/common";
 import { gc, solidVc } from "../../common/constants";
 import { CREDENTIAL_TYPE_ACCESS_DENIAL } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";

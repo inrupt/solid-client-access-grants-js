@@ -22,12 +22,13 @@
 import type { UrlString } from "@inrupt/solid-client";
 // eslint-disable-next-line camelcase
 import { acp_ess_2 } from "@inrupt/solid-client";
+// eslint-disable-next-line import/no-unresolved
+import { isUrl } from "@inrupt/solid-client-vc/common";
 import type {
   DatasetWithId,
   VerifiableCredential,
   VerifiableCredentialBase,
 } from "@inrupt/solid-client-vc";
-import { isUrl } from "@inrupt/solid-client-vc/dist/common/common";
 import { gc, solidVc } from "../../common/constants";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { AccessModes } from "../../type/AccessModes";
