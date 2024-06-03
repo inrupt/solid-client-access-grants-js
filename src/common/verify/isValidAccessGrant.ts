@@ -27,6 +27,7 @@ import type {
 import {
   getIssuer,
   getVerifiableCredentialApiConfiguration,
+  verifiableCredentialToDataset,
 } from "@inrupt/solid-client-vc";
 import { getBaseAccess } from "../../gConsent/util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
@@ -50,14 +51,20 @@ async function isValidAccessGrant(
   } = {},
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
   const fetcher = await getSessionFetch(options);
-
-  if (typeof vc !== "string" && !isUrl(vc.toString()) && !isDatasetCore(vc)) {
-    throw new Error(
-      "Verifiable Credential is not of valid types: string, URL, VerifiableCredential or DatasetWithId",
-    );
+  let validVC = null;
+  if (
+    typeof vc !== "string" &&
+    !isUrl(vc.toString()) &&
+    !isDatasetCore(vc) &&
+    !(vc instanceof URL) // avoid ts
+  ) {
+    validVC = await verifiableCredentialToDataset(vc, {
+      includeVcProperties: true,
+      requireId: false,
+    });
   }
-
-  const vcObject = await getBaseAccess(vc, options);
+  // validVc is null if the provided VC is of the supported types
+  const vcObject = await getBaseAccess(validVC ?? vc, options);
 
   // Discover the access endpoint from the resource part of the Access Grant.
   const verifierEndpoint =

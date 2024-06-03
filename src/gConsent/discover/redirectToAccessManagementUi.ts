@@ -20,9 +20,10 @@
 //
 
 import type { UrlString, WebId } from "@inrupt/solid-client";
-import type {
-  DatasetWithId,
-  VerifiableCredential,
+import {
+  verifiableCredentialToDataset,
+  type DatasetWithId,
+  type VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
@@ -102,18 +103,22 @@ export async function redirectToAccessManagementUi(
   options: RedirectToAccessManagementUiOptions = {},
 ): Promise<void> {
   const fallbackUi = options.fallbackAccessManagementUi;
+  let validVC = null;
 
   if (
     typeof accessRequestVc !== "string" &&
     !isUrl(accessRequestVc.toString()) &&
     !isDatasetCore(accessRequestVc)
   ) {
-    throw new Error(
-      "Verifiable Credential is not of valid types: string, URL, VerifiableCredential or DatasetWithId",
-    );
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    validVC = await verifiableCredentialToDataset(accessRequestVc, {
+      includeVcProperties: true,
+      requireId: false,
+    });
   }
 
-  const requestVc = await getBaseAccess(accessRequestVc, {
+  const requestVc = await getBaseAccess(validVC ?? accessRequestVc, {
     fetch: options.fetch,
   });
 
