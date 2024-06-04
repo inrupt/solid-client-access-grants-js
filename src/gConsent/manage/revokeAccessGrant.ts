@@ -28,6 +28,7 @@ import {
   getId,
   getIssuer,
   revokeVerifiableCredential,
+  verifiableCredentialToDataset,
 } from "@inrupt/solid-client-vc";
 import { DataFactory } from "n3";
 import type { NamedNode } from "n3";
@@ -55,13 +56,20 @@ async function revokeAccessCredential(
   types: NamedNode<string>[],
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
 ): Promise<void> {
-  if (typeof vc !== "string" && !isUrl(vc.toString()) && !isDatasetCore(vc)) {
-    throw new Error(
-      "Verifiable Credential is not of valid types: string, URL, VerifiableCredential or DatasetWithId",
-    );
+  let validVC = null;
+  if (
+    typeof vc !== "string" &&
+    !isUrl(vc.toString()) &&
+    !(vc instanceof URL) &&
+    !isDatasetCore(vc)
+  ) {
+    validVC = await verifiableCredentialToDataset(vc, {
+      includeVcProperties: true,
+      requireId: false,
+    });
   }
 
-  const credential = await getBaseAccess(vc, options, types[0]);
+  const credential = await getBaseAccess(validVC ?? vc, options, types[0]);
 
   if (
     types.every(

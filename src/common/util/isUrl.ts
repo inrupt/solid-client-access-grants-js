@@ -20,9 +20,9 @@
 //
 
 /**
- * Auxiliary function to check if a given string  or URL is a valid URL.
+ * Auxiliary function to check if a given string or URL is a valid URL.
  * @param candidateUrl value to be checked
- * @returns true if the value is a URL, false otherwise
+ * @returns true if the value is a valid URL, false otherwise.
  * @internal
  */
 function isUrl(candidateUrl: string | URL): candidateUrl is URL {

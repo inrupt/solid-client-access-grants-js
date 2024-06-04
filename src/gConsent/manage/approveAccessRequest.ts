@@ -22,10 +22,11 @@
 import type { UrlString } from "@inrupt/solid-client";
 // eslint-disable-next-line camelcase
 import { acp_ess_2 } from "@inrupt/solid-client";
-import type {
-  DatasetWithId,
-  VerifiableCredential,
-  VerifiableCredentialBase,
+import {
+  verifiableCredentialToDataset,
+  type DatasetWithId,
+  type VerifiableCredential,
+  type VerifiableCredentialBase,
 } from "@inrupt/solid-client-vc";
 import { gc, solidVc } from "../../common/constants";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
@@ -289,21 +290,24 @@ export async function approveAccessRequest(
     fetch: options.fetch ?? (await getSessionFetch(options)),
     updateAcr: options.updateAcr ?? true,
   };
+  let validVC = null;
 
   if (
     requestVc &&
     typeof requestVc !== "string" &&
     !isUrl(requestVc.toString()) &&
+    !(requestVc instanceof URL) &&
     !isDatasetCore(requestVc)
   ) {
-    throw new Error(
-      "Verifiable Credential is not of valid types: string, URL, VerifiableCredential or DatasetWithId",
-    );
+    validVC = await verifiableCredentialToDataset(requestVc, {
+      includeVcProperties: true,
+      requireId: false,
+    });
   }
   const internalGrantOptions = initializeGrantParameters(
     typeof requestVc !== "undefined"
       ? await getBaseAccess(
-          requestVc,
+          validVC ?? requestVc,
           options,
           solidVc.SolidAccessRequest,
           gc.ConsentStatusRequested,

@@ -108,10 +108,9 @@ export async function redirectToAccessManagementUi(
   if (
     typeof accessRequestVc !== "string" &&
     !isUrl(accessRequestVc.toString()) &&
+    !(accessRequestVc instanceof URL) &&
     !isDatasetCore(accessRequestVc)
   ) {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     validVC = await verifiableCredentialToDataset(accessRequestVc, {
       includeVcProperties: true,
       requireId: false,

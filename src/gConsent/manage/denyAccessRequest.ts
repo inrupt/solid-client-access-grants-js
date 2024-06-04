@@ -21,6 +21,7 @@
 
 import type { UrlString } from "@inrupt/solid-client";
 import {
+  verifiableCredentialToDataset,
   type DatasetWithId,
   type VerifiableCredential,
 } from "@inrupt/solid-client-vc";
@@ -93,13 +94,20 @@ async function denyAccessRequest(
     returnLegacyJsonld?: boolean;
   },
 ): Promise<DatasetWithId> {
-  if (typeof vc !== "string" && !isUrl(vc.toString()) && !isDatasetCore(vc)) {
-    throw new Error(
-      "Verifiable Credential is not of valid types: string, URL, VerifiableCredential or DatasetWithId",
-    );
+  let validVC = null;
+  if (
+    typeof vc !== "string" &&
+    !isUrl(vc.toString()) &&
+    !(vc instanceof URL) &&
+    !isDatasetCore(vc)
+  ) {
+    validVC = await verifiableCredentialToDataset(vc, {
+      includeVcProperties: true,
+      requireId: false,
+    });
   }
   const baseVc: DatasetWithId = await getBaseAccess(
-    vc,
+    validVC ?? vc,
     options ?? {},
     solidVc.SolidAccessRequest,
   );

@@ -55,8 +55,8 @@ async function isValidAccessGrant(
   if (
     typeof vc !== "string" &&
     !isUrl(vc.toString()) &&
-    !isDatasetCore(vc) &&
-    !(vc instanceof URL) // avoid ts
+    !(vc instanceof URL) &&
+    !isDatasetCore(vc)
   ) {
     validVC = await verifiableCredentialToDataset(vc, {
       includeVcProperties: true,
