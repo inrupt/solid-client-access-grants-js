@@ -28,10 +28,8 @@ import type { DatasetCore } from "@rdfjs/types";
  * @returns true if the candidate implements the DatasetCore interface, false otherwise.
  * @internal
  */
-function isDatasetCore(
+export function isDatasetCore(
   candidateDataset: unknown | DatasetCore,
 ): candidateDataset is DatasetCore {
   return typeof (candidateDataset as DatasetCore).add === "function";
 }
-
-export { isDatasetCore };

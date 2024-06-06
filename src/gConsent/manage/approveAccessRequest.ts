@@ -52,6 +52,7 @@ import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { isDatasetCore } from "../guard/isDatasetCore";
+import { toVcDataset } from "../../common/util/toVcDataset";
 import { isUrl } from "../../common/util/isUrl";
 
 export type ApproveAccessRequestOverrides = Omit<
@@ -290,24 +291,17 @@ export async function approveAccessRequest(
     fetch: options.fetch ?? (await getSessionFetch(options)),
     updateAcr: options.updateAcr ?? true,
   };
-  let validVC = null;
+  let validVc;
+  validVc = await toVcDataset(requestVc, options);
 
-  if (
-    requestVc &&
-    typeof requestVc !== "string" &&
-    !isUrl(requestVc.toString()) &&
-    !(requestVc instanceof URL) &&
-    !isDatasetCore(requestVc)
-  ) {
-    validVC = await verifiableCredentialToDataset(requestVc, {
-      includeVcProperties: true,
-      requireId: false,
-    });
+  if (validVc === undefined && requestVc && isUrl(requestVc.toString())) {
+    validVc = requestVc;
   }
+
   const internalGrantOptions = initializeGrantParameters(
-    typeof requestVc !== "undefined"
+    typeof validVc !== "undefined"
       ? await getBaseAccess(
-          validVC ?? requestVc,
+          validVc as DatasetWithId,
           options,
           solidVc.SolidAccessRequest,
           gc.ConsentStatusRequested,

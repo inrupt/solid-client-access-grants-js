@@ -21,7 +21,6 @@
 
 import type { UrlString } from "@inrupt/solid-client";
 import {
-  verifiableCredentialToDataset,
   type DatasetWithId,
   type VerifiableCredential,
 } from "@inrupt/solid-client-vc";
@@ -33,8 +32,8 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
-import { isDatasetCore } from "../guard/isDatasetCore";
 import { isUrl } from "../../common/util/isUrl";
+import { toVcDataset } from "../../common/util/toVcDataset";
 
 /**
  * Deny an access request. The content of the denied access request is provided
@@ -94,20 +93,21 @@ async function denyAccessRequest(
     returnLegacyJsonld?: boolean;
   },
 ): Promise<DatasetWithId> {
-  let validVC = null;
-  if (
-    typeof vc !== "string" &&
-    !isUrl(vc.toString()) &&
-    !(vc instanceof URL) &&
-    !isDatasetCore(vc)
-  ) {
-    validVC = await verifiableCredentialToDataset(vc, {
-      includeVcProperties: true,
-      requireId: false,
-    });
+  let validVc;
+  validVc = await toVcDataset(vc, options);
+
+  if (validVc === undefined && isUrl(vc.toString())) {
+    validVc = vc;
   }
+
+  if (validVc === undefined) {
+    throw new Error(
+      `Invalid argument: expected either a VC URL or a RDFJS DatasetCore, received ${vc}`,
+    );
+  }
+
   const baseVc: DatasetWithId = await getBaseAccess(
-    validVC ?? vc,
+    validVc as DatasetWithId,
     options ?? {},
     solidVc.SolidAccessRequest,
   );

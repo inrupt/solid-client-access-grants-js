@@ -28,7 +28,6 @@ import {
   getId,
   getIssuer,
   revokeVerifiableCredential,
-  verifiableCredentialToDataset,
 } from "@inrupt/solid-client-vc";
 import { DataFactory } from "n3";
 import type { NamedNode } from "n3";
@@ -36,8 +35,8 @@ import { TYPE, solidVc } from "../../common/constants";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
-import { isDatasetCore } from "../guard/isDatasetCore";
 import { isUrl } from "../../common/util/isUrl";
+import { toVcDataset } from "../../common/util/toVcDataset";
 
 const { quad, namedNode } = DataFactory;
 
@@ -56,20 +55,24 @@ async function revokeAccessCredential(
   types: NamedNode<string>[],
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
 ): Promise<void> {
-  let validVC = null;
-  if (
-    typeof vc !== "string" &&
-    !isUrl(vc.toString()) &&
-    !(vc instanceof URL) &&
-    !isDatasetCore(vc)
-  ) {
-    validVC = await verifiableCredentialToDataset(vc, {
-      includeVcProperties: true,
-      requireId: false,
-    });
+  let validVc;
+  validVc = await toVcDataset(vc, options);
+
+  if (validVc === undefined && isUrl(vc.toString())) {
+    validVc = vc;
   }
 
-  const credential = await getBaseAccess(validVC ?? vc, options, types[0]);
+  if (validVc === undefined) {
+    throw new Error(
+      `Invalid argument: expected either a VC URL or a RDFJS DatasetCore, received ${vc}`,
+    );
+  }
+
+  const credential = await getBaseAccess(
+    validVc as DatasetWithId,
+    options,
+    types[0],
+  );
 
   if (
     types.every(

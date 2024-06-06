@@ -33,6 +33,7 @@ import { getBaseAccess } from "../../gConsent/util/getBaseAccessVerifiableCreden
 import { getSessionFetch } from "../util/getSessionFetch";
 import { isDatasetCore } from "../../gConsent/guard/isDatasetCore";
 import { isUrl } from "../util/isUrl";
+import { toVcDataset } from "../util/toVcDataset";
 
 /**
  * Makes a request to the access server to verify the validity of a given Verifiable Credential.
@@ -51,20 +52,20 @@ async function isValidAccessGrant(
   } = {},
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
   const fetcher = await getSessionFetch(options);
-  let validVC = null;
-  if (
-    typeof vc !== "string" &&
-    !isUrl(vc.toString()) &&
-    !(vc instanceof URL) &&
-    !isDatasetCore(vc)
-  ) {
-    validVC = await verifiableCredentialToDataset(vc, {
-      includeVcProperties: true,
-      requireId: false,
-    });
+  let validVc;
+  validVc = await toVcDataset(vc, options);
+
+  if (validVc === undefined && isUrl(vc.toString())) {
+    validVc = vc;
   }
-  // validVc is null if the provided VC is of the supported types
-  const vcObject = await getBaseAccess(validVC ?? vc, options);
+
+  if (validVc === undefined) {
+    throw new Error(
+      `Invalid argument: expected either a VC URL or a RDFJS DatasetCore, received ${vc}`,
+    );
+  }
+
+  const vcObject = await getBaseAccess(validVc as DatasetWithId, options);
 
   // Discover the access endpoint from the resource part of the Access Grant.
   const verifierEndpoint =

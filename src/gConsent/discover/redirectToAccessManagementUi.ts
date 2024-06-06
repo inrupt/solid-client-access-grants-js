@@ -21,7 +21,6 @@
 
 import type { UrlString, WebId } from "@inrupt/solid-client";
 import {
-  verifiableCredentialToDataset,
   type DatasetWithId,
   type VerifiableCredential,
 } from "@inrupt/solid-client-vc";
@@ -35,8 +34,8 @@ import { redirectWithParameters } from "../util/redirect";
 import type { FetchOptions } from "../../type/FetchOptions";
 import type { RedirectOptions } from "../../type/RedirectOptions";
 import { getResources } from "../../common";
-import { isDatasetCore } from "../guard/isDatasetCore";
 import { isUrl } from "../../common/util/isUrl";
+import { toVcDataset } from "../../common/util/toVcDataset";
 
 export const REQUEST_VC_URL_PARAM_NAME = "requestVcUrl";
 export const REDIRECT_URL_PARAM_NAME = "redirectUrl";
@@ -103,21 +102,21 @@ export async function redirectToAccessManagementUi(
   options: RedirectToAccessManagementUiOptions = {},
 ): Promise<void> {
   const fallbackUi = options.fallbackAccessManagementUi;
-  let validVC = null;
+  let validVc;
 
-  if (
-    typeof accessRequestVc !== "string" &&
-    !isUrl(accessRequestVc.toString()) &&
-    !(accessRequestVc instanceof URL) &&
-    !isDatasetCore(accessRequestVc)
-  ) {
-    validVC = await verifiableCredentialToDataset(accessRequestVc, {
-      includeVcProperties: true,
-      requireId: false,
-    });
+  validVc = await toVcDataset(accessRequestVc, options);
+
+  if (validVc === undefined && isUrl(accessRequestVc.toString())) {
+    validVc = accessRequestVc;
   }
 
-  const requestVc = await getBaseAccess(validVC ?? accessRequestVc, {
+  if (validVc === undefined) {
+    throw new Error(
+      `Invalid argument: expected either a VC URL or a RDFJS DatasetCore, received ${accessRequestVc}`,
+    );
+  }
+
+  const requestVc = await getBaseAccess(validVc as DatasetWithId, {
     fetch: options.fetch,
   });
 

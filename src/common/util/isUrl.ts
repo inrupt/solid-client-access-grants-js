@@ -25,7 +25,7 @@
  * @returns true if the value is a valid URL, false otherwise.
  * @internal
  */
-function isUrl(candidateUrl: string | URL): candidateUrl is URL {
+export function isUrl(candidateUrl: string | URL): candidateUrl is URL {
   try {
     // If url is not URL-shaped, this will throw.
     // eslint-disable-next-line no-new
@@ -35,5 +35,3 @@ function isUrl(candidateUrl: string | URL): candidateUrl is URL {
     return false;
   }
 }
-
-export { isUrl };

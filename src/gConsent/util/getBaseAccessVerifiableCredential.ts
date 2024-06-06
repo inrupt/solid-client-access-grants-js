@@ -20,7 +20,7 @@
 //
 
 import type { DatasetWithId } from "@inrupt/solid-client-vc";
-import { getId, getVerifiableCredential } from "@inrupt/solid-client-vc";
+import { getId } from "@inrupt/solid-client-vc";
 import type { NamedNode } from "@rdfjs/types";
 import { DataFactory } from "n3";
 import { TYPE, gc } from "../../common/constants";
@@ -30,34 +30,20 @@ import { getConsent } from "../../common/getters";
 const { quad, namedNode } = DataFactory;
 
 export async function getBaseAccess(
-  vc: string | DatasetWithId | URL,
+  vc: DatasetWithId,
   options: AccessBaseOptions,
   type?: NamedNode,
   hasStatus?: NamedNode,
 ) {
-  let baseVc: DatasetWithId;
-
-  if (typeof vc === "string" || vc instanceof URL) {
-    baseVc = await getVerifiableCredential(vc.toString(), {
-      returnLegacyJsonld: false,
-      skipValidation: true,
-      fetch: options.fetch,
-    });
-  } else {
-    baseVc = vc;
-  }
-  if (type && !baseVc.has(quad(namedNode(getId(baseVc)), TYPE, type))) {
+  if (type && !vc.has(quad(namedNode(getId(vc)), TYPE, type))) {
     throw new Error(
       `An error occurred when type checking the VC: Not of type [${type.value}].`,
     );
   }
-  if (
-    hasStatus &&
-    !baseVc.has(quad(getConsent(baseVc), gc.hasStatus, hasStatus))
-  ) {
+  if (hasStatus && !vc.has(quad(getConsent(vc), gc.hasStatus, hasStatus))) {
     throw new Error(
       `An error occurred when type checking the VC: status not [${hasStatus.value}].`,
     );
   }
-  return baseVc;
+  return vc;
 }
