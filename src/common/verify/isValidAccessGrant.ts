@@ -27,11 +27,9 @@ import type {
 import {
   getIssuer,
   getVerifiableCredentialApiConfiguration,
-  verifiableCredentialToDataset,
 } from "@inrupt/solid-client-vc";
 import { getBaseAccess } from "../../gConsent/util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { isDatasetCore } from "../../gConsent/guard/isDatasetCore";
 import { isUrl } from "../util/isUrl";
 import { toVcDataset } from "../util/toVcDataset";
 

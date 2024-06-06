@@ -23,7 +23,6 @@ import type { UrlString } from "@inrupt/solid-client";
 // eslint-disable-next-line camelcase
 import { acp_ess_2 } from "@inrupt/solid-client";
 import {
-  verifiableCredentialToDataset,
   type DatasetWithId,
   type VerifiableCredential,
   type VerifiableCredentialBase,
@@ -51,7 +50,6 @@ import type { AccessGrantParameters } from "../type/Parameter";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
-import { isDatasetCore } from "../guard/isDatasetCore";
 import { toVcDataset } from "../../common/util/toVcDataset";
 import { isUrl } from "../../common/util/isUrl";
 
