@@ -144,6 +144,26 @@ describe("redirectToAccessManagementUi", () => {
       expect(targetIri).toContain("https://some.app");
     });
 
+    it("falls back to the provided access app IRI if any from plain JSON", async () => {
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
+        JSON.parse(JSON.stringify(await mockAccessRequestVc())),
+        "https://some.redirect.iri",
+        {
+          fallbackAccessManagementUi: "https://some.app",
+        },
+      );
+      // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
+      const targetIri = window.location.href;
+      expect(targetIri).toContain("https://some.app");
+    });
+
     it("falls back to the provided access app IRI if any (legacy)", async () => {
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
@@ -198,6 +218,30 @@ describe("redirectToAccessManagementUi", () => {
       const targetIri = new URL(window.location.href);
       const encodedVc = targetIri.searchParams.get("requestVcUrl") as string;
       expect(decodeURI(encodedVc)).toEqual((await mockAccessRequestVc()).id);
+      expect(targetIri.searchParams.get("redirectUrl")).toBe(
+        "https://some.redirect.iri",
+      );
+    });
+
+    it("includes the VC IRI and redirect IRI as query parameters to the access UI IRI from plain JSON", async () => {
+      mockAccessManagementUiDiscovery("https://some.access.ui");
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
+        JSON.parse(JSON.stringify(await mockAccessRequestVc())),
+        "https://some.redirect.iri",
+      );
+      // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
+      const targetIri = new URL(window.location.href);
+      const encodedVc = targetIri.searchParams.get("requestVcUrl") as string;
+      expect(decodeURI(encodedVc)).toEqual(
+        JSON.parse(JSON.stringify(await mockAccessRequestVc())).id,
+      );
       expect(targetIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri",
       );

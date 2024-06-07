@@ -97,6 +97,30 @@ describe("denyAccessRequest", () => {
   );
 
   it.each([[true], [false]])(
+    "throws if the provided plain JSON VC isn't a Solid access request [returnLegacyJsonld: %s]",
+    async (returnLegacyJsonld) => {
+      mockAccessApiEndpoint();
+      await expect(
+        denyAccessRequest(
+          JSON.parse(
+            JSON.stringify(
+              await mockAccessRequestVc(undefined, (accessRequest) => ({
+                ...accessRequest,
+                type: ["NotASolidAccessRequest"],
+              })),
+            ),
+          ),
+          {
+            returnLegacyJsonld,
+          },
+        ),
+      ).rejects.toThrow(
+        "An error occurred when type checking the VC: Not of type [http://www.w3.org/ns/solid/vc#SolidAccessRequest].",
+      );
+    },
+  );
+
+  it.each([[true], [false]])(
     "throws if there is no well known access endpoint [returnLegacyJsonld: %s]",
     async (returnLegacyJsonld) => {
       mockAccessApiEndpoint(false);
@@ -124,6 +148,40 @@ describe("denyAccessRequest", () => {
         fetch: jest.fn<typeof fetch>() as typeof fetch,
         returnLegacyJsonld,
       });
+
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        "https://some.access-endpoint.override/".concat("issue"),
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      );
+
+      expect(getRequestor(denail)).toEqual(getRequestor(accessRequestVc));
+      expect(getAccessModes(denail)).toEqual(getAccessModes(accessRequestVc));
+      expect(getIssuer(denail)).toEqual(getIssuer(accessRequestVc));
+      expect(getResources(denail)).toEqual(getResources(accessRequestVc));
+    },
+  );
+
+  it.each([[true], [false]])(
+    "uses the provided access endpoint from plain JSON VC, if any [returnLegacyJsonld: %s]",
+    async (returnLegacyJsonld) => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+        issueVerifiableCredential: () => Promise<AccessGrant>;
+      };
+      const spiedIssueRequest = jest
+        .spyOn(mockedVcModule, "issueVerifiableCredential")
+        .mockResolvedValueOnce(await mockAccessGrantVc());
+
+      const denail = await denyAccessRequest(
+        JSON.parse(JSON.stringify(accessRequestVc)),
+        {
+          accessEndpoint: "https://some.access-endpoint.override/",
+          fetch: jest.fn<typeof fetch>() as typeof fetch,
+          returnLegacyJsonld,
+        },
+      );
 
       expect(spiedIssueRequest).toHaveBeenCalledWith(
         "https://some.access-endpoint.override/".concat("issue"),

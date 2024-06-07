@@ -100,6 +100,30 @@ describe("revokeAccessGrant", () => {
     );
   });
 
+  it("looks up the VC if provided as a plain JSON containing an IRI", async () => {
+    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      revokeVerifiableCredential: (typeof VcLibrary)["revokeVerifiableCredential"];
+    };
+    const spiedRevoke = jest.spyOn(
+      mockedVcModule,
+      "revokeVerifiableCredential",
+    );
+    const mockedFetch = jest
+      .fn(global.fetch)
+      .mockResolvedValue(
+        new Response(JSON.stringify(await mockAccessGrantVc())),
+      );
+    await revokeAccessGrant(JSON.parse(JSON.stringify(MOCKED_CREDENTIAL_ID)), {
+      fetch: mockedFetch,
+    });
+    expect(mockedFetch).toHaveBeenCalledWith(MOCKED_CREDENTIAL_ID);
+    expect(spiedRevoke).toHaveBeenCalledWith(
+      "https://some.issuer/status",
+      MOCKED_CREDENTIAL_ID,
+      expect.anything(),
+    );
+  });
+
   it("throws if dereferencing the credential ID fails", async () => {
     const mockedFetch = jest.fn<typeof fetch>().mockResolvedValueOnce(
       new Response(undefined, {
@@ -112,9 +136,33 @@ describe("revokeAccessGrant", () => {
     ).rejects.toThrow(/\[https:\/\/some.credential\].*401.*Unauthorized/);
   });
 
+  it("throws if dereferencing the credential ID from a plain JSON fails", async () => {
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValueOnce(
+      new Response(undefined, {
+        status: 401,
+        statusText: "Unauthorized",
+      }),
+    );
+    await expect(
+      revokeAccessGrant(JSON.parse(JSON.stringify("https://some.credential")), {
+        fetch: mockedFetch,
+      }),
+    ).rejects.toThrow(/\[https:\/\/some.credential\].*401.*Unauthorized/);
+  });
+
   it("throws if the resource is not a base access grant VC", async () => {
     await expect(
       revokeAccessGrant(await mockAccessRequestVc()),
+    ).rejects.toThrow(
+      "An error occurred when type checking the VC: Not of type [http://www.w3.org/ns/solid/vc#SolidAccessGrant].",
+    );
+  });
+
+  it("throws if the resource from the plain JSON is not a base access grant VC", async () => {
+    await expect(
+      revokeAccessGrant(
+        JSON.parse(JSON.stringify(await mockAccessRequestVc())),
+      ),
     ).rejects.toThrow(
       "An error occurred when type checking the VC: Not of type [http://www.w3.org/ns/solid/vc#SolidAccessGrant].",
     );
@@ -131,6 +179,31 @@ describe("revokeAccessGrant", () => {
     const mockedFetch = jest.fn<typeof fetch>();
     await revokeAccessGrant(
       await mockAccessGrantVc({ issuer: "https://some.issuer/" }),
+      {
+        fetch: mockedFetch,
+      },
+    );
+    expect(spiedRevoke).toHaveBeenCalledWith(
+      "https://some.issuer/status",
+      MOCKED_CREDENTIAL_ID,
+      expect.anything(),
+    );
+    expect(mockedFetch).not.toHaveBeenCalled();
+  });
+
+  it("gets the VC identifier if provided as a full credential from a plain JSON", async () => {
+    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      revokeVerifiableCredential: (typeof VcLibrary)["revokeVerifiableCredential"];
+    };
+    const spiedRevoke = jest.spyOn(
+      mockedVcModule,
+      "revokeVerifiableCredential",
+    );
+    const mockedFetch = jest.fn<typeof fetch>();
+    await revokeAccessGrant(
+      await mockAccessGrantVc(
+        JSON.parse(JSON.stringify({ issuer: "https://some.issuer/" })),
+      ),
       {
         fetch: mockedFetch,
       },

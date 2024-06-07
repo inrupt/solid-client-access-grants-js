@@ -119,6 +119,31 @@ describe("redirectToAccessManagementUi", () => {
       );
     });
 
+    it("discovers the access management UI from the resource owner profile if provided from plain JSON", async () => {
+      mockAccessManagementUiDiscovery("https://some.app");
+      const resourceOwner = "https://some.webid";
+      const redirectCallback = jest.fn();
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
+        JSON.parse(JSON.stringify(await mockAccessRequestVc())),
+        "https://some.redirect.iri",
+        {
+          resourceOwner,
+          redirectCallback,
+        },
+      );
+      // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
+      expect(redirectCallback).toHaveBeenCalledWith(
+        "https://some.app/?requestVcUrl=https%3A%2F%2Fsome.credential&redirectUrl=https%3A%2F%2Fsome.redirect.iri",
+      );
+    });
+
     it("falls back to the provided access app IRI if any", async () => {
       const redirectCallback = jest.fn();
       // redirectToAccessManagementUi never resolves, which prevents checking values
@@ -126,6 +151,29 @@ describe("redirectToAccessManagementUi", () => {
       // eslint-disable-next-line no-void
       void redirectToAccessManagementUi(
         await mockAccessRequestVc(),
+        "https://some.redirect.iri",
+        {
+          fallbackAccessManagementUi: "https://some.app",
+          redirectCallback,
+        },
+      );
+      // Yield the event loop to make sure the blocking promises completes.
+      // FIXME: Why is setImmediate undefined in this context ?
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
+      expect(redirectCallback).toHaveBeenCalledWith(
+        "https://some.app/?requestVcUrl=https%3A%2F%2Fsome.credential&redirectUrl=https%3A%2F%2Fsome.redirect.iri",
+      );
+    });
+
+    it("falls back to the provided access app IRI if any from plain JSON", async () => {
+      const redirectCallback = jest.fn();
+      // redirectToAccessManagementUi never resolves, which prevents checking values
+      // if it is awaited.
+      // eslint-disable-next-line no-void
+      void redirectToAccessManagementUi(
+        JSON.parse(JSON.stringify(await mockAccessRequestVc())),
         "https://some.redirect.iri",
         {
           fallbackAccessManagementUi: "https://some.app",
