@@ -34,7 +34,6 @@ import { redirectWithParameters } from "../util/redirect";
 import type { FetchOptions } from "../../type/FetchOptions";
 import type { RedirectOptions } from "../../type/RedirectOptions";
 import { getResources } from "../../common";
-import { isUrl } from "../../common/util/isUrl";
 import { toVcDataset } from "../../common/util/toVcDataset";
 
 export const REQUEST_VC_URL_PARAM_NAME = "requestVcUrl";

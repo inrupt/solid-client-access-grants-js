@@ -32,10 +32,13 @@ import { isDatasetCore } from "../../gConsent/guard/isDatasetCore";
 import type { AccessBaseOptions } from "../../gConsent";
 
 /**
- *
- * @param vc
+ * Converts a VC to a Dataset if possible. If VC is neither a URL, an RDFJS dataset,
+ * nor a plain JSON VC, the returned value is undefined.
+ * @param vc The input VC, which can be of types DatasetWithId, VerifiableCredential,
+ * URL, UrlString or undefined.
  * @param options
- * @returns
+ * @returns A promise that resolves to a DatasetWithId if the conversion is successful,
+ * or undefined otherwise.
  */
 export async function toVcDataset(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString | undefined,

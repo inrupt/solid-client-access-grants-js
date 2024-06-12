@@ -35,7 +35,6 @@ import { TYPE, solidVc } from "../../common/constants";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
-import { isUrl } from "../../common/util/isUrl";
 import { toVcDataset } from "../../common/util/toVcDataset";
 
 const { quad, namedNode } = DataFactory;

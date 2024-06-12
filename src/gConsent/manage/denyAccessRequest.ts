@@ -32,7 +32,6 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
-import { isUrl } from "../../common/util/isUrl";
 import { toVcDataset } from "../../common/util/toVcDataset";
 
 /**

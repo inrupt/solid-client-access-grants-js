@@ -30,7 +30,6 @@ import {
 } from "@inrupt/solid-client-vc";
 import { getBaseAccess } from "../../gConsent/util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
-import { isUrl } from "../util/isUrl";
 import { toVcDataset } from "../util/toVcDataset";
 
 /**
