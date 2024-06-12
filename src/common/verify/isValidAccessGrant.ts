@@ -30,6 +30,7 @@ import {
 } from "@inrupt/solid-client-vc";
 import { getBaseAccess } from "../../gConsent/util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
+import { toVcDataset } from "../util/toVcDataset";
 
 /**
  * Makes a request to the access server to verify the validity of a given Verifiable Credential.
@@ -48,7 +49,15 @@ async function isValidAccessGrant(
   } = {},
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
   const fetcher = await getSessionFetch(options);
-  const vcObject = await getBaseAccess(vc, options);
+  const validVc = await toVcDataset(vc, options);
+
+  if (validVc === undefined) {
+    throw new Error(
+      `Invalid argument: expected either a VC URL or a RDFJS DatasetCore, received ${vc}`,
+    );
+  }
+
+  const vcObject = await getBaseAccess(validVc, options);
 
   // Discover the access endpoint from the resource part of the Access Grant.
   const verifierEndpoint =

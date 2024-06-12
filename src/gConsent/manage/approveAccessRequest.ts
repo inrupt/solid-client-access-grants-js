@@ -50,6 +50,7 @@ import type { AccessGrantParameters } from "../type/Parameter";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
+import { toVcDataset } from "../../common/util/toVcDataset";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
@@ -287,11 +288,12 @@ export async function approveAccessRequest(
     fetch: options.fetch ?? (await getSessionFetch(options)),
     updateAcr: options.updateAcr ?? true,
   };
+  const validVc = await toVcDataset(requestVc, options);
 
   const internalGrantOptions = initializeGrantParameters(
-    typeof requestVc !== "undefined"
+    typeof validVc !== "undefined"
       ? await getBaseAccess(
-          requestVc,
+          validVc,
           options,
           solidVc.SolidAccessRequest,
           gc.ConsentStatusRequested,

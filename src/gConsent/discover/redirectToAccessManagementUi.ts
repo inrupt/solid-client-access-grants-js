@@ -20,9 +20,9 @@
 //
 
 import type { UrlString, WebId } from "@inrupt/solid-client";
-import type {
-  DatasetWithId,
-  VerifiableCredential,
+import {
+  type DatasetWithId,
+  type VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
@@ -34,6 +34,7 @@ import { redirectWithParameters } from "../util/redirect";
 import type { FetchOptions } from "../../type/FetchOptions";
 import type { RedirectOptions } from "../../type/RedirectOptions";
 import { getResources } from "../../common";
+import { toVcDataset } from "../../common/util/toVcDataset";
 
 export const REQUEST_VC_URL_PARAM_NAME = "requestVcUrl";
 export const REDIRECT_URL_PARAM_NAME = "redirectUrl";
@@ -100,8 +101,15 @@ export async function redirectToAccessManagementUi(
   options: RedirectToAccessManagementUiOptions = {},
 ): Promise<void> {
   const fallbackUi = options.fallbackAccessManagementUi;
+  const validVc = await toVcDataset(accessRequestVc, options);
 
-  const requestVc = await getBaseAccess(accessRequestVc, {
+  if (validVc === undefined) {
+    throw new Error(
+      `Invalid argument: expected either a VC URL or a RDFJS DatasetCore, received ${accessRequestVc}`,
+    );
+  }
+
+  const requestVc = await getBaseAccess(validVc, {
     fetch: options.fetch,
   });
 

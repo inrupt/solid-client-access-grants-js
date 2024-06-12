@@ -120,6 +120,16 @@ describe("revokeAccessGrant", () => {
     );
   });
 
+  it("throws if the resource from the plain JSON is not a base access grant VC", async () => {
+    await expect(
+      revokeAccessGrant(
+        JSON.parse(JSON.stringify(await mockAccessRequestVc())),
+      ),
+    ).rejects.toThrow(
+      "An error occurred when type checking the VC: Not of type [http://www.w3.org/ns/solid/vc#SolidAccessGrant].",
+    );
+  });
+
   it("gets the VC identifier if provided as a full credential", async () => {
     const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
       revokeVerifiableCredential: (typeof VcLibrary)["revokeVerifiableCredential"];

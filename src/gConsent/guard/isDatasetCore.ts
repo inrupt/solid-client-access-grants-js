@@ -19,31 +19,17 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { DatasetWithId } from "@inrupt/solid-client-vc";
-import { getId } from "@inrupt/solid-client-vc";
-import type { NamedNode } from "@rdfjs/types";
-import { DataFactory } from "n3";
-import { TYPE, gc } from "../../common/constants";
-import type { AccessBaseOptions } from "../type/AccessBaseOptions";
-import { getConsent } from "../../common/getters";
+import type { DatasetCore } from "@rdfjs/types";
 
-const { quad, namedNode } = DataFactory;
-
-export async function getBaseAccess(
-  vc: DatasetWithId,
-  options: AccessBaseOptions,
-  type?: NamedNode,
-  hasStatus?: NamedNode,
-) {
-  if (type && !vc.has(quad(namedNode(getId(vc)), TYPE, type))) {
-    throw new Error(
-      `An error occurred when type checking the VC: Not of type [${type.value}].`,
-    );
-  }
-  if (hasStatus && !vc.has(quad(getConsent(vc), gc.hasStatus, hasStatus))) {
-    throw new Error(
-      `An error occurred when type checking the VC: status not [${hasStatus.value}].`,
-    );
-  }
-  return vc;
+/**
+ * Auxiliary function to determine whether the candidateDataset implements the DatasetCore
+ * interface.
+ * @param candidateDataset the candidate to be checked.
+ * @returns true if the candidate implements the DatasetCore interface, false otherwise.
+ * @internal
+ */
+export function isDatasetCore(
+  candidateDataset: unknown | DatasetCore,
+): candidateDataset is DatasetCore {
+  return typeof (candidateDataset as DatasetCore).add === "function";
 }

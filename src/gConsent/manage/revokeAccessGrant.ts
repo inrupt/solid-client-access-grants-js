@@ -35,6 +35,7 @@ import { TYPE, solidVc } from "../../common/constants";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
+import { toVcDataset } from "../../common/util/toVcDataset";
 
 const { quad, namedNode } = DataFactory;
 
@@ -53,7 +54,15 @@ async function revokeAccessCredential(
   types: NamedNode<string>[],
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
 ): Promise<void> {
-  const credential = await getBaseAccess(vc, options, types[0]);
+  const validVc = await toVcDataset(vc, options);
+
+  if (validVc === undefined) {
+    throw new Error(
+      `Invalid argument: expected either a VC URL or a RDFJS DatasetCore, received ${vc}`,
+    );
+  }
+
+  const credential = await getBaseAccess(validVc, options, types[0]);
 
   if (
     types.every(

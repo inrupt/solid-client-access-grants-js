@@ -137,6 +137,31 @@ describe("isValidAccessGrant", () => {
     );
   });
 
+  it("sends the given plain JSON vc to the verify endpoint", async () => {
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+      verifierService: "https://some.vc.verifier",
+      specCompliant: {},
+      legacy: {},
+    });
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValueOnce(
+      new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+        status: 200,
+      }),
+    );
+
+    await isValidAccessGrant(MOCK_ACCESS_GRANT_BASE as any, {
+      fetch: mockedFetch,
+    });
+
+    expect(mockedFetch).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        body: JSON.stringify({ verifiableCredential: MOCK_ACCESS_GRANT }),
+      }),
+    );
+  });
+
   it("uses the native fetch if none is provided", async () => {
     jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
     jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
@@ -152,6 +177,30 @@ describe("isValidAccessGrant", () => {
     globalThis.fetch = mockedFetch;
 
     await isValidAccessGrant(MOCK_ACCESS_GRANT);
+
+    expect(mockedFetch).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        body: JSON.stringify({ verifiableCredential: MOCK_ACCESS_GRANT }),
+      }),
+    );
+  });
+
+  it("uses the native fetch if none is provided from plain JSON VC", async () => {
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+      verifierService: "https://some.vc.verifier",
+      specCompliant: {},
+      legacy: {},
+    });
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValueOnce(
+      new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+        status: 200,
+      }),
+    );
+    globalThis.fetch = mockedFetch;
+
+    await isValidAccessGrant(JSON.parse(JSON.stringify(MOCK_ACCESS_GRANT)));
 
     expect(mockedFetch).toHaveBeenCalledWith(
       expect.anything(),
@@ -227,6 +276,31 @@ describe("isValidAccessGrant", () => {
     expect(spiedConfigurationDiscovery).not.toHaveBeenCalled();
   });
 
+  it("uses the provided verification endpoint if any from plain JSON VC", async () => {
+    const vcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      getVerifiableCredentialApiConfiguration: typeof getVerifiableCredentialApiConfiguration;
+    };
+    const spiedConfigurationDiscovery = jest.spyOn(
+      vcModule,
+      "getVerifiableCredentialApiConfiguration",
+    );
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValueOnce(
+      new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+        status: 200,
+      }),
+    );
+    await isValidAccessGrant(MOCK_ACCESS_GRANT_BASE as any, {
+      fetch: mockedFetch,
+      verificationEndpoint: "https://some.verification.api",
+    });
+    expect(mockedFetch).toHaveBeenCalledWith(
+      "https://some.verification.api",
+      expect.anything(),
+    );
+    expect(spiedConfigurationDiscovery).not.toHaveBeenCalled();
+  });
+
   it("discovers the verification endpoint if none is provided", async () => {
     const mockedDiscovery = jest
       .mocked(getVerifiableCredentialApiConfiguration)
@@ -250,6 +324,35 @@ describe("isValidAccessGrant", () => {
       );
 
     await isValidAccessGrant(MOCK_ACCESS_GRANT, {
+      fetch: mockedFetch,
+    });
+
+    expect(mockedDiscovery).toHaveBeenCalledWith(MOCK_ACCESS_GRANT.issuer);
+  });
+
+  it("discovers the verification endpoint if none is provided with plain JSON VC", async () => {
+    const mockedDiscovery = jest
+      .mocked(getVerifiableCredentialApiConfiguration)
+      .mockResolvedValueOnce({
+        verifierService: "https://some.vc.verifier",
+        specCompliant: {},
+        legacy: {},
+      });
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    const mockedFetch = jest
+      .fn<typeof fetch>()
+      // First, the VC is fetched
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(MOCK_ACCESS_GRANT), { status: 200 }),
+      )
+      // Then, the verification endpoint is called
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+          status: 200,
+        }),
+      );
+
+    await isValidAccessGrant(MOCK_ACCESS_GRANT_BASE as any, {
       fetch: mockedFetch,
     });
 
@@ -284,6 +387,34 @@ describe("isValidAccessGrant", () => {
     );
   });
 
+  it("throws if no verification endpoint is discovered with plain JSON VC", async () => {
+    jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+      specCompliant: {},
+      legacy: {},
+    });
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    const mockedFetch = jest
+      .fn<typeof fetch>()
+      // First, the VC is fetched
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(MOCK_ACCESS_GRANT), { status: 200 }),
+      )
+      // Then, the verification endpoint is called
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+          status: 200,
+        }),
+      );
+
+    await expect(
+      isValidAccessGrant(JSON.parse(JSON.stringify(MOCK_ACCESS_GRANT)), {
+        fetch: mockedFetch,
+      }),
+    ).rejects.toThrow(
+      `The VC service provider ${MOCK_ACCESS_GRANT.issuer} does not advertize for a verifier service in its .well-known/vc-configuration document`,
+    );
+  });
+
   it("returns the validation result from the access endpoint", async () => {
     jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
       verifierService: "https://some.vc.verifier",
@@ -298,6 +429,26 @@ describe("isValidAccessGrant", () => {
     );
     await expect(
       isValidAccessGrant(MOCK_ACCESS_GRANT, {
+        fetch: mockedFetch,
+        verificationEndpoint: "https://some.verification.api",
+      }),
+    ).resolves.toEqual({ checks: [], errors: [], warning: [] });
+  });
+
+  it("returns the validation result from the access endpoint with plain JSON access grant", async () => {
+    jest.mocked(getVerifiableCredentialApiConfiguration).mockResolvedValueOnce({
+      verifierService: "https://some.vc.verifier",
+      specCompliant: {},
+      legacy: {},
+    });
+    jest.mocked(isVerifiableCredential).mockReturnValueOnce(true);
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValueOnce(
+      new Response(JSON.stringify(MOCK_VERIFY_RESPONSE), {
+        status: 200,
+      }),
+    );
+    await expect(
+      isValidAccessGrant(JSON.parse(JSON.stringify(MOCK_ACCESS_GRANT)), {
         fetch: mockedFetch,
         verificationEndpoint: "https://some.verification.api",
       }),
