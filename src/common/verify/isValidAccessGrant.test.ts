@@ -150,7 +150,7 @@ describe("isValidAccessGrant", () => {
       }),
     );
 
-    await isValidAccessGrant(MOCK_ACCESS_GRANT, {
+    await isValidAccessGrant(MOCK_ACCESS_GRANT_BASE as any, {
       fetch: mockedFetch,
     });
 
@@ -290,7 +290,7 @@ describe("isValidAccessGrant", () => {
         status: 200,
       }),
     );
-    await isValidAccessGrant(MOCK_ACCESS_GRANT, {
+    await isValidAccessGrant(MOCK_ACCESS_GRANT_BASE as any, {
       fetch: mockedFetch,
       verificationEndpoint: "https://some.verification.api",
     });
@@ -352,7 +352,7 @@ describe("isValidAccessGrant", () => {
         }),
       );
 
-    await isValidAccessGrant(MOCK_ACCESS_GRANT, {
+    await isValidAccessGrant(MOCK_ACCESS_GRANT_BASE as any, {
       fetch: mockedFetch,
     });
 
