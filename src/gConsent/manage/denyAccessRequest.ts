@@ -93,12 +93,7 @@ async function denyAccessRequest(
     returnLegacyJsonld?: boolean;
   },
 ): Promise<DatasetWithId> {
-  let validVc;
-  validVc = await toVcDataset(vc, options);
-
-  if (validVc === undefined && isUrl(vc.toString())) {
-    validVc = vc;
-  }
+  const validVc = await toVcDataset(vc, options);
 
   if (validVc === undefined) {
     throw new Error(
@@ -107,7 +102,7 @@ async function denyAccessRequest(
   }
 
   const baseVc: DatasetWithId = await getBaseAccess(
-    validVc as DatasetWithId,
+    validVc,
     options ?? {},
     solidVc.SolidAccessRequest,
   );

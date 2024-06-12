@@ -41,10 +41,11 @@ export async function toVcDataset(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString | undefined,
   options?: AccessBaseOptions,
 ): Promise<DatasetWithId | undefined> {
+  // If the provided VC is already an RDFJS dataset, it can be returned directly.
   if (vc !== undefined && isDatasetCore(vc)) {
     return vc;
   }
-  // fetch the vc if it is valid
+  // Fetch the vc if a URL is provided.
   if (typeof vc === "string" || vc instanceof URL) {
     return getVerifiableCredential(vc.toString(), {
       returnLegacyJsonld: false,
@@ -52,12 +53,14 @@ export async function toVcDataset(
       fetch: options?.fetch,
     });
   }
-  // convert it to valid VC otherwise
+  // Convert the provided plain JSON VC to an RDFJS dataset if appropriate.
   if (typeof vc === "object" && typeof (vc as { id: string }).id === "string") {
     return verifiableCredentialToDataset(vc, {
       includeVcProperties: true,
       requireId: true,
     });
   }
+  // The provided argument is neither a URL, an RDFJS dataset, nor a plain JSON VC,
+  // so we can't do anything with it.
   return undefined;
 }

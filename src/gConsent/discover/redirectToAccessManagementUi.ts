@@ -102,13 +102,7 @@ export async function redirectToAccessManagementUi(
   options: RedirectToAccessManagementUiOptions = {},
 ): Promise<void> {
   const fallbackUi = options.fallbackAccessManagementUi;
-  let validVc;
-
-  validVc = await toVcDataset(accessRequestVc, options);
-
-  if (validVc === undefined && isUrl(accessRequestVc.toString())) {
-    validVc = accessRequestVc;
-  }
+  const validVc = await toVcDataset(accessRequestVc, options);
 
   if (validVc === undefined) {
     throw new Error(
@@ -116,7 +110,7 @@ export async function redirectToAccessManagementUi(
     );
   }
 
-  const requestVc = await getBaseAccess(validVc as DatasetWithId, {
+  const requestVc = await getBaseAccess(validVc, {
     fetch: options.fetch,
   });
 

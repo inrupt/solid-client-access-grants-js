@@ -50,12 +50,7 @@ async function isValidAccessGrant(
   } = {},
 ): Promise<{ checks: string[]; warnings: string[]; errors: string[] }> {
   const fetcher = await getSessionFetch(options);
-  let validVc;
-  validVc = await toVcDataset(vc, options);
-
-  if (validVc === undefined && isUrl(vc.toString())) {
-    validVc = vc;
-  }
+  const validVc = await toVcDataset(vc, options);
 
   if (validVc === undefined) {
     throw new Error(
@@ -63,7 +58,7 @@ async function isValidAccessGrant(
     );
   }
 
-  const vcObject = await getBaseAccess(validVc as DatasetWithId, options);
+  const vcObject = await getBaseAccess(validVc, options);
 
   // Discover the access endpoint from the resource part of the Access Grant.
   const verifierEndpoint =

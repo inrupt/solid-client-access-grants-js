@@ -22,10 +22,10 @@
 import type { UrlString } from "@inrupt/solid-client";
 // eslint-disable-next-line camelcase
 import { acp_ess_2 } from "@inrupt/solid-client";
-import {
-  type DatasetWithId,
-  type VerifiableCredential,
-  type VerifiableCredentialBase,
+import type {
+  DatasetWithId,
+  VerifiableCredential,
+  VerifiableCredentialBase,
 } from "@inrupt/solid-client-vc";
 import { gc, solidVc } from "../../common/constants";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
@@ -51,7 +51,6 @@ import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { toVcDataset } from "../../common/util/toVcDataset";
-import { isUrl } from "../../common/util/isUrl";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
@@ -289,17 +288,12 @@ export async function approveAccessRequest(
     fetch: options.fetch ?? (await getSessionFetch(options)),
     updateAcr: options.updateAcr ?? true,
   };
-  let validVc;
-  validVc = await toVcDataset(requestVc, options);
-
-  if (validVc === undefined && requestVc && isUrl(requestVc.toString())) {
-    validVc = requestVc;
-  }
+  const validVc = await toVcDataset(requestVc, options);
 
   const internalGrantOptions = initializeGrantParameters(
     typeof validVc !== "undefined"
       ? await getBaseAccess(
-          validVc as DatasetWithId,
+          validVc,
           options,
           solidVc.SolidAccessRequest,
           gc.ConsentStatusRequested,

@@ -55,12 +55,7 @@ async function revokeAccessCredential(
   types: NamedNode<string>[],
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
 ): Promise<void> {
-  let validVc;
-  validVc = await toVcDataset(vc, options);
-
-  if (validVc === undefined && isUrl(vc.toString())) {
-    validVc = vc;
-  }
+  const validVc = await toVcDataset(vc, options);
 
   if (validVc === undefined) {
     throw new Error(
@@ -68,11 +63,7 @@ async function revokeAccessCredential(
     );
   }
 
-  const credential = await getBaseAccess(
-    validVc as DatasetWithId,
-    options,
-    types[0],
-  );
+  const credential = await getBaseAccess(validVc, options, types[0]);
 
   if (
     types.every(
