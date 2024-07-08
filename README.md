@@ -17,7 +17,7 @@ designed to support developers building Solid applications.
 
 # Server support
 
-This experimental feature is currently only available in ESS.
+This feature is currently only available in ESS.
 
 # Supported environments
 
