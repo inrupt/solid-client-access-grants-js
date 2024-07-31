@@ -10,6 +10,8 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+## [3.0.5](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.0.5) - 2024-07-31
+
 ### Bugfixes
 
 - Removed base64url dependency due to potential issues with the browser environment.
