@@ -228,7 +228,7 @@ describe("boundFetch", () => {
     });
   });
 
-  it("merges initalization options in the fetch fn", async () => {
+  it("merges initialization options in the fetch fn", async () => {
     const accessToken = "access-token";
     const fetchFn = boundFetch(accessToken);
 

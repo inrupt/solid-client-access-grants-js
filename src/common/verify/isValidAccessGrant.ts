@@ -83,7 +83,7 @@ async function isValidAccessGrant(
     }),
   });
 
-  // TODO: Add verifcation on the structure of the response
+  // TODO: Add verification on the structure of the response
   return response.json();
 }
 
