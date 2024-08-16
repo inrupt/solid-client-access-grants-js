@@ -9,8 +9,6 @@ const external = [
 
 const plugins = [
   typescript({
-    // Use our own version of TypeScript, rather than the one bundled with the plugin:
-    typescript: require("typescript"),
     tsconfigOverride: {
       compilerOptions: {
         module: "esnext",
