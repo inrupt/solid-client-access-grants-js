@@ -10,6 +10,10 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### New Features
+
+- Node 22 is now supported
+
 ## [3.0.5](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.0.5) - 2024-07-31
 
 ### Bugfixes
