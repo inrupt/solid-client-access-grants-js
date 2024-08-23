@@ -11,12 +11,23 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "typedoc-plugin-markdown"
         update-types: ["version-update:semver-major"]
+    groups:
+      internal-tooling:
+        patterns:
+          - "@inrupt/internal-*"
+          - "@inrupt/jest-*"
+          - "@inrupt/eslint-*"
+      external-types:
+        patterns:
+          - "@types/*"
+
   # Enable version updates for the website tooling.
   - package-ecosystem: "pip"
     # Look for `package.json` and `lock` files in the `root` directory.
     directory: "/docs"
     schedule:
       interval: "weekly"
+
   # Enable version updates for our CI tooling.
   - package-ecosystem: "github-actions"
     # For GitHub Actions, setting the directory to / will check for workflow
@@ -24,9 +35,21 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-  # Enable version updates for embedded demo app
+
+  # Enable version updates for embedded tests and demo app
   - package-ecosystem: "npm"
-    # Look for `package.json` and `package-lock.json` files in the `e2e/browser/test-app` directory.
-    directory: "/e2e/browser/test-app"
+    # Look for `package.json` and `package-lock.json` files in the `e2e/browser/test-app` and `examples` directories.
+    directories:
+      - "/e2e/browser/test-app"
+      - "/examples"
     schedule:
       interval: "weekly"
+    groups:
+      internal-tooling:
+        patterns:
+          - "@inrupt/internal-*"
+          - "@inrupt/jest-*"
+          - "@inrupt/eslint-*"
+      external-types:
+        patterns:
+          - "@types/*"
