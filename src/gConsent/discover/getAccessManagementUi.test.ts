@@ -20,11 +20,7 @@
 //
 
 import { jest, describe, it, expect } from "@jest/globals";
-import {
-  getSolidDataset,
-  getWellKnownSolid,
-  mockSolidDatasetFrom,
-} from "@inrupt/solid-client";
+import { getSolidDataset, mockSolidDatasetFrom } from "@inrupt/solid-client";
 import type * as SolidClient from "@inrupt/solid-client";
 
 import { getAccessManagementUi } from "./getAccessManagementUi";

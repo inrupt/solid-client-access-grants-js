@@ -104,17 +104,19 @@ describe("overwriteFile", () => {
 
     const fileUrl = "https://some.resource.test/file.txt";
     const mockedAccessGrant = await mockAccessRequestVc();
-
+    const options = { fetch: mockedFetch, contentType: "text/plain" };
     const resultFile = await overwriteFile(
       fileUrl,
       mockedFile,
       mockedAccessGrant,
-      { fetch: mockedFetch, contentType: "text/plain" },
+      options,
     );
 
-    expect(fetchWithVc).toHaveBeenCalledWith(fileUrl, mockedAccessGrant, {
-      fetch: mockedFetch,
-    });
+    expect(fetchWithVc).toHaveBeenCalledWith(
+      fileUrl,
+      mockedAccessGrant,
+      options,
+    );
 
     expect(solidClientModule.overwriteFile).toHaveBeenCalledWith(
       fileUrl,
@@ -134,21 +136,24 @@ describe("saveFileInContainer", () => {
     const containerUrl = "https://some.resource.test/";
     const fileNameSuggestion = "test-file.txt";
     const mockedAccessGrant = await mockAccessRequestVc();
+    const options = {
+      fetch: mockedFetch,
+      slug: fileNameSuggestion,
+      contentType: "text/plain",
+    };
 
     const resultFile = await saveFileInContainer(
       containerUrl,
       mockedFile,
       mockedAccessGrant,
-      {
-        fetch: mockedFetch,
-        slug: fileNameSuggestion,
-        contentType: "text/plain",
-      },
+      options,
     );
 
-    expect(fetchWithVc).toHaveBeenCalledWith(containerUrl, mockedAccessGrant, {
-      fetch: mockedFetch,
-    });
+    expect(fetchWithVc).toHaveBeenCalledWith(
+      containerUrl,
+      mockedAccessGrant,
+      options,
+    );
 
     expect(solidClientModule.saveFileInContainer).toHaveBeenCalledWith(
       containerUrl,

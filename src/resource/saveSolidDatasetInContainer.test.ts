@@ -58,18 +58,18 @@ describe("saveSolidDatasetInContainer", () => {
     );
     const mockedFetch = jest.fn<typeof fetch>();
 
-    // TODO: change to mockAccessGrantVc when rebasing
+    const options = { fetch: mockedFetch, slugSuggestion: "test" };
     const resultDataset = await saveSolidDatasetInContainer(
       TEST_CONTAINER_URL,
       MOCKED_DATASET,
       accessRequestVc,
-      { fetch: mockedFetch, slugSuggestion: "test" },
+      options,
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(
       TEST_CONTAINER_URL,
       accessRequestVc,
-      { fetch: mockedFetch },
+      options,
     );
 
     expect(solidClientModule.saveSolidDatasetInContainer).toHaveBeenCalledWith(

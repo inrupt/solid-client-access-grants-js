@@ -28,7 +28,6 @@ import {
 import type * as SolidClient from "@inrupt/solid-client";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 import { isValidAccessGrant } from "./isValidAccessGrant";
-import { toVcDataset } from "../util/toVcDataset";
 
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual(
