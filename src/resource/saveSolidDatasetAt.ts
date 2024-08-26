@@ -30,7 +30,8 @@ import type {
 } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
 
-export type solidClientSaveSolidDatasetAtType = typeof solidClientSaveSolidDatasetAt;
+export type solidClientSaveSolidDatasetAtType =
+  typeof solidClientSaveSolidDatasetAt;
 
 /**
  * Saves a Dataset in a Solid Pod using an Access Grant to prove the caller is
