@@ -20,7 +20,7 @@
 //
 
 import { it, jest, describe, expect, beforeAll } from "@jest/globals";
-import type { UrlString } from "@inrupt/solid-client";
+import type * as SolidClient from "@inrupt/solid-client";
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
 import { mockAccessRequestVc } from "../gConsent/util/access.mock";
 import { saveSolidDatasetInContainer } from "./saveSolidDatasetInContainer";
@@ -28,13 +28,18 @@ import { fetchWithVc } from "../fetch";
 
 jest.mock("../fetch");
 jest.mock("@inrupt/solid-client", () => {
-  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
-  solidClientModule.saveSolidDatasetInContainer = jest.fn();
-  return solidClientModule;
+  const solidClientModule = jest.requireActual(
+    "@inrupt/solid-client",
+  ) as typeof SolidClient;
+  return {
+    ...solidClientModule,
+    saveSolidDatasetInContainer:
+      jest.fn<(typeof SolidClient)["saveFileInContainer"]>(),
+  };
 });
 
 const MOCKED_DATASET = mockSolidDatasetFrom("https://some.url");
-const TEST_CONTAINER_URL: UrlString = "https://example.com/testContainerUrl";
+const TEST_CONTAINER_URL = "https://example.com/testContainerUrl";
 
 describe("saveSolidDatasetInContainer", () => {
   let accessRequestVc: Awaited<ReturnType<typeof mockAccessRequestVc>>;
@@ -44,12 +49,14 @@ describe("saveSolidDatasetInContainer", () => {
   });
 
   it("authenticates using the provided VC with a slugSuggestion", async () => {
-    const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
+    const solidClientModule = jest.requireMock(
+      "@inrupt/solid-client",
+    ) as jest.Mocked<typeof SolidClient>;
     const mockedDataset = mockSolidDatasetFrom("https://some.url");
     solidClientModule.saveSolidDatasetInContainer.mockResolvedValueOnce(
       mockedDataset,
     );
-    const mockedFetch = jest.fn() as typeof fetch;
+    const mockedFetch = jest.fn<typeof fetch>();
 
     // TODO: change to mockAccessGrantVc when rebasing
     const resultDataset = await saveSolidDatasetInContainer(

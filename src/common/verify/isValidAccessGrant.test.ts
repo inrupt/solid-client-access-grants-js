@@ -23,18 +23,25 @@ import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import {
   isVerifiableCredential,
   getVerifiableCredentialApiConfiguration,
+  verifiableCredentialToDataset,
 } from "@inrupt/solid-client-vc";
-
+import type * as SolidClient from "@inrupt/solid-client";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 import { isValidAccessGrant } from "./isValidAccessGrant";
+import { toVcDataset } from "../util/toVcDataset";
 
 jest.mock("@inrupt/solid-client", () => {
-  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
+  const solidClientModule = jest.requireActual(
+    "@inrupt/solid-client",
+  ) as typeof SolidClient;
   solidClientModule.getSolidDataset = jest.fn(
     solidClientModule.getSolidDataset,
   );
-  solidClientModule.getWellKnownSolid = jest.fn();
-  return solidClientModule;
+  return {
+    ...solidClientModule,
+    getWellKnownSolid: jest.fn<(typeof SolidClient)["getWellKnownSolid"]>(),
+    getSolidDataset: jest.fn<(typeof SolidClient)["getSolidDataset"]>(),
+  };
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
@@ -150,9 +157,12 @@ describe("isValidAccessGrant", () => {
       }),
     );
 
-    await isValidAccessGrant(MOCK_ACCESS_GRANT_BASE as any, {
-      fetch: mockedFetch,
-    });
+    await isValidAccessGrant(
+      await verifiableCredentialToDataset(MOCK_ACCESS_GRANT_BASE),
+      {
+        fetch: mockedFetch,
+      },
+    );
 
     expect(mockedFetch).toHaveBeenCalledWith(
       expect.anything(),
@@ -290,10 +300,13 @@ describe("isValidAccessGrant", () => {
         status: 200,
       }),
     );
-    await isValidAccessGrant(MOCK_ACCESS_GRANT_BASE as any, {
-      fetch: mockedFetch,
-      verificationEndpoint: "https://some.verification.api",
-    });
+    await isValidAccessGrant(
+      await verifiableCredentialToDataset(MOCK_ACCESS_GRANT_BASE),
+      {
+        fetch: mockedFetch,
+        verificationEndpoint: "https://some.verification.api",
+      },
+    );
     expect(mockedFetch).toHaveBeenCalledWith(
       "https://some.verification.api",
       expect.anything(),
@@ -352,9 +365,12 @@ describe("isValidAccessGrant", () => {
         }),
       );
 
-    await isValidAccessGrant(MOCK_ACCESS_GRANT_BASE as any, {
-      fetch: mockedFetch,
-    });
+    await isValidAccessGrant(
+      await verifiableCredentialToDataset(MOCK_ACCESS_GRANT_BASE),
+      {
+        fetch: mockedFetch,
+      },
+    );
 
     expect(mockedDiscovery).toHaveBeenCalledWith(MOCK_ACCESS_GRANT.issuer);
   });
