@@ -31,7 +31,6 @@ import type {
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
-import type { FetchOptions } from "../type/FetchOptions";
 
 /**
  * Retrieve a File from a Solid Pod using an Access Grant to prove the caller is
@@ -50,20 +49,16 @@ import type { FetchOptions } from "../type/FetchOptions";
 export async function getFile(
   resourceUrl: UrlString,
   accessGrant: VerifiableCredential | DatasetWithId,
-  options?: FetchOptions,
+  options?: Parameters<typeof coreGetFile>[1],
 ) {
-  const fetchOptions: FetchOptions = {};
-  if (options && options.fetch) {
-    fetchOptions.fetch = options.fetch;
-  }
-
   const authenticatedFetch = await fetchWithVc(
     resourceUrl,
     accessGrant,
-    fetchOptions,
+    options,
   );
 
   return await coreGetFile(resourceUrl, {
+    ...options,
     fetch: authenticatedFetch,
   });
 }
@@ -94,26 +89,16 @@ export async function overwriteFile<T extends File | NodeFile | Blob>(
   resourceUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential | DatasetWithId,
-  options?: FetchOptions & { contentType?: string },
+  options?: Parameters<typeof coreOverwriteFile>[2],
 ): Promise<T & WithResourceInfo> {
-  const fetchOptions: FetchOptions = {};
-  if (options && options.fetch) {
-    fetchOptions.fetch = options.fetch;
-  }
-
   const authenticatedFetch = await fetchWithVc(
     resourceUrl,
     accessGrant,
-    fetchOptions,
+    options,
   );
 
-  const overwriteFileOptions: { contentType?: string } = {};
-  if (options && options.contentType) {
-    overwriteFileOptions.contentType = options.contentType;
-  }
-
   return await coreOverwriteFile(resourceUrl, file, {
-    ...overwriteFileOptions,
+    ...options,
     fetch: authenticatedFetch,
   });
 }
@@ -137,29 +122,15 @@ export async function saveFileInContainer<T extends File | NodeFile | Blob>(
   containerUrl: UrlString,
   file: T,
   accessGrant: VerifiableCredential | DatasetWithId,
-  options?: FetchOptions & { contentType?: string; slug?: string },
+  options?: Parameters<typeof coreSaveFileInContainer>[2],
 ): Promise<T & WithResourceInfo> {
-  const fetchOptions: FetchOptions = {};
-  if (options && options.fetch) {
-    fetchOptions.fetch = options.fetch;
-  }
-
   const authenticatedFetch = await fetchWithVc(
     containerUrl,
     accessGrant,
-    fetchOptions,
+    options,
   );
-
-  const fileOptions: { contentType?: string; slug?: string } = {};
-  if (options && options.contentType) {
-    fileOptions.contentType = options.contentType;
-  }
-  if (options && options.slug) {
-    fileOptions.slug = options.slug;
-  }
-
   return await coreSaveFileInContainer(containerUrl, file, {
-    ...fileOptions,
+    ...options,
     fetch: authenticatedFetch,
   });
 }

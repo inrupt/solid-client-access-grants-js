@@ -19,20 +19,25 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { UrlString, SolidDataset } from "@inrupt/solid-client";
-import { saveSolidDatasetAt as coreSaveSolidDatasetAt } from "@inrupt/solid-client";
+import {
+  saveSolidDatasetAt as solidClientSaveSolidDatasetAt,
+  type SolidDataset,
+  type UrlString,
+} from "@inrupt/solid-client";
 import type {
   DatasetWithId,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
-import type { FetchOptions } from "../type/FetchOptions";
+
+export type solidClientSaveSolidDatasetAtType = typeof solidClientSaveSolidDatasetAt;
 
 /**
  * Saves a Dataset in a Solid Pod using an Access Grant to prove the caller is
  * authorized to write or append to the dataset at the given dataset URL.
  *
- * ```{note} This function does not support saving a dataset if the
+ * ```{note}
+ * This function does not support saving a dataset if the
  * dataset does not yet exist, unlike its `@inrupt/solid-client`
  * counterpart.
  * ```
@@ -51,20 +56,15 @@ export async function saveSolidDatasetAt<Dataset extends SolidDataset>(
   datasetUrl: UrlString,
   solidDataset: Dataset,
   accessGrant: VerifiableCredential | DatasetWithId,
-  options?: FetchOptions,
-) {
-  const fetchOptions: FetchOptions = {};
-  if (options && options.fetch) {
-    fetchOptions.fetch = options.fetch;
-  }
-
+  options?: Parameters<typeof solidClientSaveSolidDatasetAt>[2],
+): ReturnType<solidClientSaveSolidDatasetAtType> {
   const authenticatedFetch = await fetchWithVc(
     datasetUrl,
     accessGrant,
-    fetchOptions,
+    options,
   );
 
-  return await coreSaveSolidDatasetAt(datasetUrl, solidDataset, {
+  return await solidClientSaveSolidDatasetAt(datasetUrl, solidDataset, {
     ...options,
     fetch: authenticatedFetch,
   });
