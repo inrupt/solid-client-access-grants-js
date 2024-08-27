@@ -63,7 +63,7 @@ export function isRdfjsAccessVerifiableCredential(
   try {
     getIssuanceDate(data);
     return isRdfjsGConsentAttributes(data, getConsent(data));
-  } catch (e) {
+  } catch {
     return false;
   }
 }
