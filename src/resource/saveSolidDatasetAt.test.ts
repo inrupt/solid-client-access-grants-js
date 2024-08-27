@@ -45,7 +45,7 @@ describe("saveSolidDatasetAt", () => {
     const solidClientModule = jest.requireMock("@inrupt/solid-client") as any;
     const mockedDataset = mockSolidDatasetFrom("https://some.url");
     solidClientModule.saveSolidDatasetAt.mockResolvedValueOnce(mockedDataset);
-    const mockedFetch = jest.fn() as typeof fetch;
+    const mockedFetch = jest.fn<typeof fetch>();
     // TODO: change to mockAccessGrantVc when rebasing
     const resultDataset = await saveSolidDatasetAt(
       "https://some.dataset.url",

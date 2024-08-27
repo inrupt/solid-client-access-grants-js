@@ -26,8 +26,6 @@ import type {
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
-import type { FetchOptions } from "../type/FetchOptions";
-import type { SaveInContainerOptions } from "../type/SaveInContainerOptions";
 
 /**
  * Given a SolidDataset, store it in a Solid Pod as a new Resource inside a Container.
@@ -64,28 +62,16 @@ export async function saveSolidDatasetInContainer(
   containerUrl: UrlString,
   solidDataset: SolidDataset,
   accessGrant: VerifiableCredential | DatasetWithId,
-  options: SaveInContainerOptions,
+  options: Parameters<typeof coreSaveSolidDatasetInContainer>[2],
 ) {
-  const fetchOptions: FetchOptions = {};
-
-  if (options && options.fetch) {
-    fetchOptions.fetch = options.fetch;
-  }
-
   const authenticatedFetch = await fetchWithVc(
     containerUrl,
     accessGrant,
-    fetchOptions,
+    options,
   );
 
-  const containerOptions: { slugSuggestion?: string } = {};
-
-  if (options && options.slugSuggestion) {
-    containerOptions.slugSuggestion = options.slugSuggestion;
-  }
-
   return await coreSaveSolidDatasetInContainer(containerUrl, solidDataset, {
-    ...containerOptions,
+    ...options,
     fetch: authenticatedFetch,
   });
 }

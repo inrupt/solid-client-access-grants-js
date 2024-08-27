@@ -14,6 +14,12 @@ The following changes are pending, and will be applied on the next major release
 
 - Node 22 is now supported
 
+### Bugfixes
+
+- The `/resources` module function have their signature now aligned with the underlying `@inrupt/solid-client` functions.
+  Namely, the `options` parameter for `saveSolidDatasetAt` and `getSolidDataset` support additional entries that were
+  already available in `@inrupt/solid-client`.
+
 ## [3.0.5](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.0.5) - 2024-07-31
 
 ### Bugfixes

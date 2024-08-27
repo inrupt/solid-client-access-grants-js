@@ -20,14 +20,12 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-import { createContainerInContainer as coreCreateContainerInContainer } from "@inrupt/solid-client";
+import { createContainerInContainer as solidClientCreateContainerInContainer } from "@inrupt/solid-client";
 import type {
   DatasetWithId,
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
-import type { FetchOptions } from "../type/FetchOptions";
-import type { SaveInContainerOptions } from "../type/SaveInContainerOptions";
 
 /**
  * Create an empty Container inside the Container at the given URL.
@@ -62,21 +60,15 @@ import type { SaveInContainerOptions } from "../type/SaveInContainerOptions";
 export async function createContainerInContainer(
   containerUrl: UrlString,
   accessGrant: VerifiableCredential | DatasetWithId,
-  options?: SaveInContainerOptions,
+  options?: Parameters<typeof solidClientCreateContainerInContainer>[1],
 ) {
-  const fetchOptions: FetchOptions = {};
-
-  if (options && options.fetch) {
-    fetchOptions.fetch = options.fetch;
-  }
-
   const authenticatedFetch = await fetchWithVc(
     containerUrl,
     accessGrant,
-    fetchOptions,
+    options,
   );
 
-  return await coreCreateContainerInContainer(containerUrl, {
+  return await solidClientCreateContainerInContainer(containerUrl, {
     ...options,
     fetch: authenticatedFetch,
   });

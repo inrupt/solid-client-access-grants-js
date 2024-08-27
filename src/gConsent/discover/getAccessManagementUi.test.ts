@@ -20,8 +20,8 @@
 //
 
 import { jest, describe, it, expect } from "@jest/globals";
-import type { getWellKnownSolid, getSolidDataset } from "@inrupt/solid-client";
-import { mockSolidDatasetFrom } from "@inrupt/solid-client";
+import { getSolidDataset, mockSolidDatasetFrom } from "@inrupt/solid-client";
+import type * as SolidClient from "@inrupt/solid-client";
 
 import { getAccessManagementUi } from "./getAccessManagementUi";
 
@@ -32,39 +32,36 @@ import {
 } from "../request/request.mock";
 
 jest.mock("@inrupt/solid-client", () => {
-  const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
-  solidClientModule.getSolidDataset = jest.fn(
-    solidClientModule.getSolidDataset,
-  );
-  solidClientModule.getWellKnownSolid = jest.fn();
-  return solidClientModule;
+  const solidClientModule = jest.requireActual(
+    "@inrupt/solid-client",
+  ) as typeof SolidClient;
+  return {
+    ...solidClientModule,
+    getSolidDataset: jest.fn(),
+    getWellKnownSolid: jest.fn(),
+  };
 });
 
 describe("getAccessManagementUi", () => {
   it("uses the provided fetch if any", async () => {
-    const spiedGetDataset = jest
-      .spyOn(
-        jest.requireMock("@inrupt/solid-client") as {
-          getSolidDataset: typeof getSolidDataset;
-        },
-        "getSolidDataset",
-      )
-      .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid"));
+    const { getSolidDataset: mockedGetDataset } = jest.requireMock(
+      "@inrupt/solid-client",
+    ) as jest.Mocked<typeof SolidClient>;
+
+    mockedGetDataset.mockResolvedValueOnce(
+      mockWebIdWithUi("https://some.webid"),
+    );
     const mockedFetch = jest.fn<typeof fetch>();
 
     await getAccessManagementUi("https://some.webid", { fetch: mockedFetch });
 
-    expect(spiedGetDataset).toHaveBeenCalledWith("https://some.webid", {
+    expect(mockedGetDataset).toHaveBeenCalledWith("https://some.webid", {
       fetch: mockedFetch,
     });
   });
 
   it("throws if the WebID document cannot be dereferenced", async () => {
-    const solidClient = jest.requireMock("@inrupt/solid-client") as {
-      getSolidDataset: typeof getSolidDataset;
-      getWellKnownSolid: typeof getWellKnownSolid;
-    };
-    jest.spyOn(solidClient, "getSolidDataset").mockRejectedValue("Some error");
+    jest.mocked(getSolidDataset).mockRejectedValue("Some error");
 
     await expect(getAccessManagementUi("https://some.webid")).rejects.toThrow(
       /some.webid.*Some error/,
@@ -72,12 +69,8 @@ describe("getAccessManagementUi", () => {
   });
 
   it("throws if the WebID document does not contain the WebID", async () => {
-    const solidClient = jest.requireMock("@inrupt/solid-client") as {
-      getSolidDataset: typeof getSolidDataset;
-      getWellKnownSolid: typeof getWellKnownSolid;
-    };
     jest
-      .spyOn(solidClient, "getSolidDataset")
+      .mocked(getSolidDataset)
       .mockResolvedValue(mockSolidDatasetFrom("https://some.webid"));
 
     await expect(getAccessManagementUi("https://some.webid")).rejects.toThrow(
@@ -86,48 +79,45 @@ describe("getAccessManagementUi", () => {
   });
 
   it("returns the IRI advertized by the user's profile when present", async () => {
-    const solidClient = jest.requireMock("@inrupt/solid-client") as {
-      getSolidDataset: typeof getSolidDataset;
-      getWellKnownSolid: typeof getWellKnownSolid;
-    };
-    jest
-      .spyOn(solidClient, "getSolidDataset")
-      .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid"));
-    const spiedGetWellKnown = jest.spyOn(solidClient, "getWellKnownSolid");
+    const {
+      getSolidDataset: mockedGetSolidDataset,
+      getWellKnownSolid: mockedGetWellKnownSolid,
+    } = jest.requireMock("@inrupt/solid-client") as jest.Mocked<
+      typeof SolidClient
+    >;
+    mockedGetSolidDataset.mockResolvedValueOnce(
+      mockWebIdWithUi("https://some.webid"),
+    );
 
     await expect(getAccessManagementUi("https://some.webid")).resolves.toBe(
       MOCKED_ACCESS_UI_IRI,
     );
     // If the profile contains a preferred UI, the .well-known document should not be looked up.
-    expect(spiedGetWellKnown).not.toHaveBeenCalled();
+    expect(mockedGetWellKnownSolid).not.toHaveBeenCalled();
   });
 
   it("falls back to the IRI advertized by the user's Pod provider when present", async () => {
-    const solidClient = jest.requireMock("@inrupt/solid-client") as {
-      getSolidDataset: typeof getSolidDataset;
-      getWellKnownSolid: typeof getWellKnownSolid;
-    };
-    jest
-      .spyOn(solidClient, "getSolidDataset")
-      .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid", false));
-    const spiedGetWellKnown = jest
-      .spyOn(solidClient, "getWellKnownSolid")
-      .mockResolvedValueOnce(mockWellKnownWithAccess());
+    const {
+      getSolidDataset: mockedGetSolidDataset,
+      getWellKnownSolid: mockedGetWellKnownSolid,
+    } = jest.requireMock("@inrupt/solid-client") as jest.Mocked<
+      typeof SolidClient
+    >;
+    mockedGetSolidDataset.mockResolvedValueOnce(
+      mockWebIdWithUi("https://some.webid", false),
+    );
+    mockedGetWellKnownSolid.mockResolvedValueOnce(mockWellKnownWithAccess());
 
     await expect(getAccessManagementUi("https://some.webid")).resolves.toBe(
       MOCKED_ACCESS_UI_IRI,
     );
 
-    expect(spiedGetWellKnown).toHaveBeenCalled();
+    expect(mockedGetWellKnownSolid).toHaveBeenCalled();
   });
 
   it("returns undefined if the user's WebID does not link to a storage", async () => {
-    const solidClient = jest.requireMock("@inrupt/solid-client") as {
-      getSolidDataset: typeof getSolidDataset;
-      getWellKnownSolid: typeof getWellKnownSolid;
-    };
     jest
-      .spyOn(solidClient, "getSolidDataset")
+      .mocked(getSolidDataset)
       .mockResolvedValueOnce(
         mockWebIdWithUi("https://some.webid", false, false),
       );
@@ -138,42 +128,44 @@ describe("getAccessManagementUi", () => {
   });
 
   it("returns undefined if the host's well-known does not link to a recommended access management UI", async () => {
-    const solidClient = jest.requireMock("@inrupt/solid-client") as {
-      getSolidDataset: typeof getSolidDataset;
-      getWellKnownSolid: typeof getWellKnownSolid;
-    };
-    jest
-      .spyOn(solidClient, "getSolidDataset")
-      .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid", false));
-    const spiedGetWellKnown = jest
-      .spyOn(solidClient, "getWellKnownSolid")
-      .mockResolvedValueOnce(mockWellKnownWithAccess(false));
+    const {
+      getSolidDataset: mockedGetSolidDataset,
+      getWellKnownSolid: mockedGetWellKnownSolid,
+    } = jest.requireMock("@inrupt/solid-client") as jest.Mocked<
+      typeof SolidClient
+    >;
+    mockedGetSolidDataset.mockResolvedValueOnce(
+      mockWebIdWithUi("https://some.webid", false),
+    );
+    mockedGetWellKnownSolid.mockResolvedValueOnce(
+      mockWellKnownWithAccess(false),
+    );
 
     await expect(
       getAccessManagementUi("https://some.webid"),
     ).resolves.toBeUndefined();
 
-    expect(spiedGetWellKnown).toHaveBeenCalled();
+    expect(mockedGetWellKnownSolid).toHaveBeenCalled();
   });
 
   it("returns undefined if the host's well-known is empty", async () => {
-    const solidClient = jest.requireMock("@inrupt/solid-client") as {
-      getSolidDataset: typeof getSolidDataset;
-      getWellKnownSolid: typeof getWellKnownSolid;
-    };
-    jest
-      .spyOn(solidClient, "getSolidDataset")
-      .mockResolvedValueOnce(mockWebIdWithUi("https://some.webid", false));
-    const spiedGetWellKnown = jest
-      .spyOn(solidClient, "getWellKnownSolid")
-      .mockResolvedValueOnce(
-        mockSolidDatasetFrom("https://some.server/.well-known/solid"),
-      );
+    const {
+      getSolidDataset: mockedGetSolidDataset,
+      getWellKnownSolid: mockedGetWellKnownSolid,
+    } = jest.requireMock("@inrupt/solid-client") as jest.Mocked<
+      typeof SolidClient
+    >;
+    mockedGetSolidDataset.mockResolvedValueOnce(
+      mockWebIdWithUi("https://some.webid", false),
+    );
+    mockedGetWellKnownSolid.mockResolvedValueOnce(
+      mockSolidDatasetFrom("https://some.server/.well-known/solid"),
+    );
 
     await expect(
       getAccessManagementUi("https://some.webid"),
     ).resolves.toBeUndefined();
 
-    expect(spiedGetWellKnown).toHaveBeenCalled();
+    expect(mockedGetWellKnownSolid).toHaveBeenCalled();
   });
 });

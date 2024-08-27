@@ -26,7 +26,6 @@ import type {
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
-import type { FetchOptions } from "../type/FetchOptions";
 
 /**
  * Delete a Dataset from a Solid Pod using an Access Grant to prove the caller
@@ -45,17 +44,12 @@ import type { FetchOptions } from "../type/FetchOptions";
 export async function deleteSolidDataset(
   datasetUrl: UrlString,
   accessGrant: VerifiableCredential | DatasetWithId,
-  options?: FetchOptions,
+  options?: Parameters<typeof coreDeleteSolidDataset>[1],
 ) {
-  const fetchOptions: FetchOptions = {};
-  if (options && options.fetch) {
-    fetchOptions.fetch = options.fetch;
-  }
-
   const authenticatedFetch = await fetchWithVc(
     datasetUrl,
     accessGrant,
-    fetchOptions,
+    options,
   );
 
   return await coreDeleteSolidDataset(datasetUrl, {

@@ -56,16 +56,17 @@ describe("createContainerInContainer", () => {
       MOCKED_DATASET,
     );
     const mockedFetch = jest.fn<typeof fetch>();
+    const options = { fetch: mockedFetch, slugSuggestion: "NewChildContainer" };
     const resultDataset = await createContainerInContainer(
       TEST_CONTAINER_URL,
       mockAccessRequest,
-      { fetch: mockedFetch, slugSuggestion: "NewChildContainer" },
+      options,
     );
 
     expect(fetchWithVc).toHaveBeenCalledWith(
       TEST_CONTAINER_URL,
       mockAccessRequest,
-      { fetch: mockedFetch },
+      options,
     );
 
     expect(solidClientModule.createContainerInContainer).toHaveBeenCalledWith(

@@ -145,7 +145,7 @@ describe("denyAccessRequest", () => {
 
       const denail = await denyAccessRequest(accessRequestVc, {
         accessEndpoint: "https://some.access-endpoint.override/",
-        fetch: jest.fn<typeof fetch>() as typeof fetch,
+        fetch: jest.fn<typeof fetch>(),
         returnLegacyJsonld,
       });
 
@@ -178,7 +178,7 @@ describe("denyAccessRequest", () => {
         JSON.parse(JSON.stringify(accessRequestVc)),
         {
           accessEndpoint: "https://some.access-endpoint.override/",
-          fetch: jest.fn<typeof fetch>() as typeof fetch,
+          fetch: jest.fn<typeof fetch>(),
           returnLegacyJsonld,
         },
       );
@@ -208,7 +208,7 @@ describe("denyAccessRequest", () => {
 
     const legacyDenial = await denyAccessRequest(accessRequestVc, {
       accessEndpoint: "https://some.access-endpoint.override/",
-      fetch: jest.fn<typeof fetch>() as typeof fetch,
+      fetch: jest.fn<typeof fetch>(),
       returnLegacyJsonld: true,
     });
 
@@ -223,7 +223,7 @@ describe("denyAccessRequest", () => {
 
     const denial = await denyAccessRequest(accessRequestVc, {
       accessEndpoint: "https://some.access-endpoint.override/",
-      fetch: jest.fn<typeof fetch>() as typeof fetch,
+      fetch: jest.fn<typeof fetch>(),
       returnLegacyJsonld: false,
     });
 
@@ -285,7 +285,7 @@ describe("denyAccessRequest", () => {
         purpose: ["https://example.org/some-purpose"],
       });
       await denyAccessRequest(accessRequestWithPurpose, {
-        fetch: jest.fn<typeof fetch>() as typeof fetch,
+        fetch: jest.fn<typeof fetch>(),
         returnLegacyJsonld,
       });
 
@@ -325,12 +325,12 @@ describe("denyAccessRequest", () => {
         .spyOn(mockedVcModule, "issueVerifiableCredential")
         .mockResolvedValueOnce(await mockAccessGrantVc());
       const mockedFetch = jest
-        .fn(global.fetch)
+        .fn<typeof fetch>()
         .mockResolvedValueOnce(
           new Response(JSON.stringify(await mockAccessRequestVc())),
         );
       await denyAccessRequest("https://some.credential", {
-        fetch: mockedFetch as typeof fetch,
+        fetch: mockedFetch,
         returnLegacyJsonld,
       });
 
@@ -365,12 +365,12 @@ describe("denyAccessRequest", () => {
         .mockResolvedValueOnce(await mockAccessGrantVc());
 
       const mockedFetch = jest
-        .fn(global.fetch)
+        .fn<typeof fetch>()
         .mockResolvedValueOnce(
           new Response(JSON.stringify(await mockAccessRequestVc())),
         );
       await denyAccessRequest(new URL("https://some.credential"), {
-        fetch: mockedFetch as typeof fetch,
+        fetch: mockedFetch,
         returnLegacyJsonld,
       });
 

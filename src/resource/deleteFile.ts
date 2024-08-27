@@ -26,7 +26,6 @@ import type {
   VerifiableCredential,
 } from "@inrupt/solid-client-vc";
 import { fetchWithVc } from "../fetch";
-import type { FetchOptions } from "../type/FetchOptions";
 
 /**
  * Delete a File from a Solid Pod using an Access Grant to prove the caller
@@ -45,18 +44,9 @@ import type { FetchOptions } from "../type/FetchOptions";
 export async function deleteFile(
   fileUrl: UrlString,
   accessGrant: VerifiableCredential | DatasetWithId,
-  options?: FetchOptions,
+  options?: Parameters<typeof coreDeleteFile>[1],
 ) {
-  const fetchOptions: FetchOptions = {};
-  if (options && options.fetch) {
-    fetchOptions.fetch = options.fetch;
-  }
-
-  const authenticatedFetch = await fetchWithVc(
-    fileUrl,
-    accessGrant,
-    fetchOptions,
-  );
+  const authenticatedFetch = await fetchWithVc(fileUrl, accessGrant, options);
 
   return await coreDeleteFile(fileUrl, {
     ...options,
