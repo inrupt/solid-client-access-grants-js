@@ -43,7 +43,7 @@ export async function getSessionFetch(
     );
 
     return fetchFn;
-  } catch (e) {
+  } catch {
     /* istanbul ignore next: @inrupt/solid-client-authn-browser is a devDependency, so this path is not hit in tests: */
     return fetch;
   }
