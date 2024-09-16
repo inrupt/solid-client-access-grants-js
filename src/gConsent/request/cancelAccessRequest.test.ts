@@ -121,13 +121,14 @@ describe("cancelAccessRequest", () => {
     ).rejects.toThrow(
       expect.objectContaining({
         name: "Error",
-        message: "Fetching the Verifiable Credential [https://some.credential] failed",
+        message:
+          "Fetching the Verifiable Credential [https://some.credential] failed",
         // Check that the Error contains Problem Details
         details: expect.objectContaining({
           status: 401,
-          title: "Unauthorized"
-        })
-      })
+          title: "Unauthorized",
+        }),
+      }),
     );
   });
 
