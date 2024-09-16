@@ -109,7 +109,17 @@ describe("revokeAccessGrant", () => {
     );
     await expect(
       revokeAccessGrant("https://some.credential", { fetch: mockedFetch }),
-    ).rejects.toThrow(/\[https:\/\/some.credential\].*401.*Unauthorized/);
+    ).rejects.toThrow(
+      expect.objectContaining({
+        name: "Error",
+        message: "Fetching the Verifiable Credential [https://some.credential] failed",
+        // Check that the Error contains Problem Details
+        details: expect.objectContaining({
+          status: 401,
+          title: "Unauthorized"
+        })
+      })
+    );
   });
 
   it("throws if the resource is not a base access grant VC", async () => {

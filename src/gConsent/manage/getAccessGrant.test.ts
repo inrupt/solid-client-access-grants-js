@@ -58,7 +58,15 @@ describe("getAccessGrant", () => {
           new Response("Not Found", { status: 404, statusText: "Not Found" }),
       }),
     ).rejects.toThrow(
-      "Fetching the Verifiable Credential [https://some.vc.url] failed: 404 Not Found",
+      expect.objectContaining({
+        name: "Error",
+        message: "Fetching the Verifiable Credential [https://some.vc.url] failed",
+        // Check that the Error contains Problem Details
+        details: expect.objectContaining({
+          status: 404,
+          title: "Not Found"
+        })
+      })
     );
     await expect(
       getAccessGrant("https://some.vc.url", {
@@ -67,7 +75,15 @@ describe("getAccessGrant", () => {
         returnLegacyJsonld: false,
       }),
     ).rejects.toThrow(
-      "Fetching the Verifiable Credential [https://some.vc.url] failed: 404 Not Found",
+      expect.objectContaining({
+        name: "Error",
+        message: "Fetching the Verifiable Credential [https://some.vc.url] failed",
+        // Check that the Error contains Problem Details
+        details: expect.objectContaining({
+          status: 404,
+          title: "Not Found"
+        })
+      })
     );
   });
 
