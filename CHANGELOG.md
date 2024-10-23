@@ -10,6 +10,8 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+## [3.1.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.1.1) - 2024-09-16
+
 ### Patch change
 
 - Added support for the `https://schema.inrupt.com/credentials/v2.jsonld` JSON-LD context.
