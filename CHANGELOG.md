@@ -10,7 +10,7 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
-## [3.1.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.1.1) - 2024-09-16
+## [3.1.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.1.1) - 2024-10-23
 
 ### Patch change
 
