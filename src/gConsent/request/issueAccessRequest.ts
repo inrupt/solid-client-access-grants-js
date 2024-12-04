@@ -73,6 +73,34 @@ export function normalizeAccessRequest<T extends VerifiableCredentialBase>(
   return normalized as unknown as T;
 }
 
+export type CustomFields = {
+  key: URL;
+  value: string | number | boolean;
+};
+
+export const toJson = (
+  c: Set<CustomFields> = new Set(),
+): Record<string, CustomFields["value"]> => {
+  return (
+    Array.from(c)
+      // Check that all the provided custom fields match the expected type,
+      // and change the validated CustomField into a plain JSON object entry.
+      .map((field) => {
+        if (typeof field.key !== "object") {
+          throw new Error(
+            `All custom fields keys must be URL objects, found ${field.key}`,
+          );
+        }
+        return { [`${field.key.toString()}`]: field.value };
+      })
+      // Collapse all the JSON object entries into a single object.
+      .reduce(
+        (cur, acc) => Object.assign(cur, acc),
+        {} as Record<string, CustomFields["value"]>,
+      )
+  );
+};
+
 /**
  * Request access to a given Resource.
  *
@@ -83,7 +111,10 @@ export function normalizeAccessRequest<T extends VerifiableCredentialBase>(
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options: AccessBaseOptions & { returnLegacyJsonld: false },
+  options: AccessBaseOptions & {
+    returnLegacyJsonld: false;
+    customFields?: Set<CustomFields>;
+  },
 ): Promise<DatasetWithId>;
 /**
  * Request access to a given Resource.
@@ -96,7 +127,10 @@ async function issueAccessRequest(
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options?: AccessBaseOptions & { returnLegacyJsonld?: true },
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: true;
+    customFields?: Set<CustomFields>;
+  },
 ): Promise<AccessRequest>;
 /**
  * Request access to a given Resource.
@@ -109,23 +143,35 @@ async function issueAccessRequest(
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options?: AccessBaseOptions & { returnLegacyJsonld?: boolean },
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+    customFields?: Set<CustomFields>;
+  },
 ): Promise<DatasetWithId>;
 /**
  * @deprecated Please remove the `requestor` parameter.
  */
 async function issueAccessRequest(
   params: DeprecatedAccessRequestParameters,
-  options?: AccessBaseOptions & { returnLegacyJsonld?: boolean },
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+    customFields?: Set<CustomFields>;
+  },
 ): Promise<AccessRequest>;
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options: AccessBaseOptions & { returnLegacyJsonld?: boolean } = {},
+  options: AccessBaseOptions & {
+    customFields?: Set<CustomFields>;
+    returnLegacyJsonld?: boolean;
+  } = {},
 ): Promise<DatasetWithId> {
-  const requestBody = getRequestBody({
-    ...params,
-    status: gc.ConsentStatusRequested.value,
-  });
+  const requestBody = getRequestBody(
+    {
+      ...params,
+      status: gc.ConsentStatusRequested.value,
+    },
+    { customFields: toJson(options.customFields) },
+  );
 
   if (options.returnLegacyJsonld === false) {
     const accessRequest = await issueAccessVc(requestBody, {
