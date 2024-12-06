@@ -37,6 +37,7 @@ import { DataFactory } from "n3";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessModes } from "../type/AccessModes";
 import { INHERIT, TYPE, XSD_BOOLEAN, acl, gc, ldp } from "./constants";
+import type { CustomFields } from "../type/CustomFields";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
@@ -212,35 +213,17 @@ export function getPurposes(vc: DatasetWithId): string[] {
   return purposes;
 }
 
-/**
- * Reads the custom string value with the provided name in the consent section of the provided Access Credential.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customString"),
- *       value: "custom value",
- *     },
- *   ]),
- * });
- * // s is "custom value"
- * const s = getCustomString(accessRequest, new URL("https://example.org/ns/customString"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access request)
- * @returns the value of the custom field with the provided name if it is a string, undefined otherwise.
- * @since unreleased
- */
-export function getCustomString(
+function deserializeFields<T>(
   vc: DatasetWithId,
   field: URL,
-): string | undefined {
+  deserializer: (value: string) => T,
+): NonNullable<T>[] {
   return Array.from(
     vc.match(getConsent(vc), namedNode(field.href), null, defaultGraph()),
-  )[0]?.object.value;
+  )
+    .map((q) => q.object.value)
+    .map(deserializer)
+    .filter((candidate) => candidate !== undefined) as NonNullable<T>[];
 }
 
 function deserializeBoolean(serialized: string): boolean | undefined {
@@ -263,12 +246,38 @@ function deserializeBoolean(serialized: string): boolean | undefined {
  *  customFields: new Set([
  *     {
  *       key: new URL("https://example.org/ns/customBoolean"),
+ *       value: [true, false, true],
+ *     },
+ *   ]),
+ * });
+ * // s is [true, false, true]
+ * const s = getCustomBoolean(accessRequest, new URL("https://example.org/ns/customBoolean"));
+ * ```
+ *
+ * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @since unreleased
+ */
+export function getCustomBooleans(vc: DatasetWithId, field: URL): boolean[] {
+  return deserializeFields(vc, field, deserializeBoolean);
+}
+
+/**
+ * Reads the custom boolean array value with the provided name in the consent section of the provided Access Credential.
+ *
+ * @example
+ * ```
+ * const accessRequest = await issueAccessRequest({...}, {
+ *  ...,
+ *  customFields: new Set([
+ *     {
+ *       key: new URL("https://example.org/ns/customBoolean"),
  *       value: true,
  *     },
  *   ]),
  * });
  * // s is true
- * const s = getCustomString(accessRequest, new URL("https://example.org/ns/customBoolean"));
+ * const s = getCustomBoolean(accessRequest, new URL("https://example.org/ns/customBoolean"));
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access request)
@@ -279,15 +288,100 @@ export function getCustomBoolean(
   vc: DatasetWithId,
   field: URL,
 ): boolean | undefined {
-  const val = Array.from(
-    vc.match(getConsent(vc), namedNode(field.href), null, defaultGraph()),
-  )[0]?.object.value;
-  return deserializeBoolean(val);
+  // Unsure yet: should this throw if there are more than one value?
+  return getCustomBooleans(vc, field)[0];
+}
+
+function deserizalizeDouble(serialized: string): number | undefined {
+  const val = Number.parseFloat(serialized);
+  return Number.isNaN(val) ? undefined : val;
+}
+
+/**
+ * Reads the custom double array value with the provided name in the consent section of the provided Access Credential.
+ *
+ * @example
+ * ```
+ * const accessRequest = await issueAccessRequest({...}, {
+ *  ...,
+ *  customFields: new Set([
+ *     {
+ *       key: new URL("https://example.org/ns/customDouble"),
+ *       value: [1.1, 2.2, 3.3],
+ *     },
+ *   ]),
+ * });
+ * // d is [1.1, 2.2, 3.3]
+ * const d = getCustomDoubles(accessRequest, new URL("https://example.org/ns/customDouble"));
+ * ```
+ *
+ * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @since unreleased
+ */
+export function getCustomDoubles(vc: DatasetWithId, field: URL): number[] {
+  return deserializeFields(vc, field, deserizalizeDouble);
+}
+
+/**
+ * Reads the custom double value with the provided name in the consent section of the provided Access Credential.
+ *
+ * @example
+ * ```
+ * const accessRequest = await issueAccessRequest({...}, {
+ *  ...,
+ *  customFields: new Set([
+ *     {
+ *       key: new URL("https://example.org/ns/customDouble"),
+ *       value: 1.1,
+ *     },
+ *   ]),
+ * });
+ * // d is 1.1
+ * const d = getCustomDouble(accessRequest, new URL("https://example.org/ns/customDouble"));
+ * ```
+ *
+ * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @since unreleased
+ */
+export function getCustomDouble(
+  vc: DatasetWithId,
+  field: URL,
+): number | undefined {
+  // Unsure yet: should this throw if there are more than one value?
+  return getCustomDoubles(vc, field)[0];
 }
 
 function deserizalizeInteger(serialized: string): number | undefined {
   const val = Number.parseInt(serialized, 10);
   return Number.isNaN(val) ? undefined : val;
+}
+
+/**
+ * Reads the custom integer array value with the provided name in the consent section of the provided Access Credential.
+ *
+ * @example
+ * ```
+ * const accessRequest = await issueAccessRequest({...}, {
+ *  ...,
+ *  customFields: new Set([
+ *     {
+ *       key: new URL("https://example.org/ns/customInteger"),
+ *       value: [1, 2, 3],
+ *     },
+ *   ]),
+ * });
+ * // i is [1, 2, 3]
+ * const i = getCustomIntegers(accessRequest, new URL("https://example.org/ns/customInteger"));
+ * ```
+ *
+ * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @since unreleased
+ */
+export function getCustomIntegers(vc: DatasetWithId, field: URL): number[] {
+  return deserializeFields(vc, field, deserizalizeInteger);
 }
 
 /**
@@ -316,19 +410,12 @@ export function getCustomInteger(
   vc: DatasetWithId,
   field: URL,
 ): number | undefined {
-  const val = Array.from(
-    vc.match(getConsent(vc), namedNode(field.href), null, defaultGraph()),
-  )[0]?.object.value;
-  return deserizalizeInteger(val);
-}
-
-function deserizalizeDouble(serialized: string): number | undefined {
-  const val = Number.parseFloat(serialized);
-  return Number.isNaN(val) ? undefined : val;
+  // Unsure yet: should this throw if there are more than one value?
+  return getCustomIntegers(vc, field)[0];
 }
 
 /**
- * Reads the custom double value with the provided name in the consent section of the provided Access Credential.
+ * Reads the custom string array value with the provided name in the consent section of the provided Access Credential.
  *
  * @example
  * ```
@@ -336,27 +423,51 @@ function deserizalizeDouble(serialized: string): number | undefined {
  *  ...,
  *  customFields: new Set([
  *     {
- *       key: new URL("https://example.org/ns/customDouble"),
- *       value: 1.1,
+ *       key: new URL("https://example.org/ns/customString"),
+ *       value: ["custom value", "another value"],
  *     },
  *   ]),
  * });
- * // d is 1.1
- * const d = getCustomString(accessRequest, new URL("https://example.org/ns/customDouble"));
+ * // s is ["custom value", "another value"]
+ * const s = getCustomStrings(accessRequest, new URL("https://example.org/ns/customString"));
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @returns the value of the custom field with the provided name if it is a string, undefined otherwise.
  * @since unreleased
  */
-export function getCustomDouble(
+export function getCustomStrings(vc: DatasetWithId, field: URL): string[] {
+  return deserializeFields(vc, field, (value: string) => value);
+}
+
+/**
+ * Reads the custom string value with the provided name in the consent section of the provided Access Credential.
+ *
+ * @example
+ * ```
+ * const accessRequest = await issueAccessRequest({...}, {
+ *  ...,
+ *  customFields: new Set([
+ *     {
+ *       key: new URL("https://example.org/ns/customString"),
+ *       value: "custom value",
+ *     },
+ *   ]),
+ * });
+ * // s is "custom value"
+ * const s = getCustomString(accessRequest, new URL("https://example.org/ns/customString"));
+ * ```
+ *
+ * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @returns the value of the custom field with the provided name if it is a string, undefined otherwise.
+ * @since unreleased
+ */
+export function getCustomString(
   vc: DatasetWithId,
   field: URL,
-): number | undefined {
-  const val = Array.from(
-    vc.match(getConsent(vc), namedNode(field.href), null, defaultGraph()),
-  )[0]?.object.value;
-  return deserizalizeDouble(val);
+): string | undefined {
+  // Unsure yet: should this throw if there are more than one value?
+  return getCustomStrings(vc, field)[0];
 }
 
 const xmlSchemaTypes = {
