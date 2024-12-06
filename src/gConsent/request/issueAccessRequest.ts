@@ -95,11 +95,12 @@ export const toJson = (
       })
       // Collapse all the JSON object entries into a single object.
       .reduce(
-        (cur, acc) => Object.assign(cur, acc),
+        (acc, cur) => Object.assign(acc, cur),
         {} as Record<string, CustomFields["value"]>,
       )
   );
 };
+
 
 /**
  * Request access to a given Resource.
