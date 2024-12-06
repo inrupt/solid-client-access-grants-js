@@ -22,6 +22,7 @@
 import { it, expect, describe, beforeAll } from "@jest/globals";
 import { Store, DataFactory } from "n3";
 import { promisifyEventEmitter } from "event-emitter-promisify";
+import type { DatasetCore } from "@rdfjs/types";
 import {
   mockAccessGrantVc as mockGConsentGrant,
   mockAccessRequestVc as mockGConsentRequest,
@@ -29,18 +30,23 @@ import {
 import {
   AccessGrantWrapper,
   getAccessModes,
+  getBooleanCustomField,
   getConsent,
   getCredentialSubject,
+  getCustomFields,
+  getDoubleCustomField,
   getExpirationDate,
   getId,
   getInbox,
   getInherit,
+  getIntegerCustomField,
   getIssuanceDate,
   getIssuer,
   getPurposes,
   getRequestor,
   getResourceOwner,
   getResources,
+  getStringCustomField,
   getTypes,
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
@@ -533,6 +539,122 @@ describe("getters", () => {
     it("defaults the recursive nature from a gConsent access request to true", async () => {
       const gConsentRequest = await mockGConsentRequest({ inherit: undefined });
       expect(getInherit(gConsentRequest)).toBe(true);
+    });
+  });
+
+  describe("getCustomFields", () => {
+    it("gets all the custom fields from an access request", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customString"),
+          value: "customValue",
+        },
+        {
+          key: new URL("https://example.org/ns/customBoolean"),
+          value: true,
+        },
+        {
+          key: new URL("https://example.org/ns/customInt"),
+          value: 1,
+        },
+        {
+          key: new URL("https://example.org/ns/customFloat"),
+          value: 1.1,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(getCustomFields(gConsentRequest)).toStrictEqual({
+        "https://example.org/ns/customString": "customValue",
+        "https://example.org/ns/customBoolean": true,
+        "https://example.org/ns/customInt": 1,
+        "https://example.org/ns/customFloat": 1.1,
+      });
+    });
+
+    it("returns an empty object if no custom fields are found", async () => {
+      expect(getCustomFields(await mockGConsentRequest())).toStrictEqual({});
+    });
+  });
+
+  describe("getIntegerCustomField", () => {
+    it("gets an integer value from an access request custom field", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customInt"),
+          value: 1,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const i: number | undefined = getIntegerCustomField(
+        gConsentRequest,
+        new URL("https://example.org/ns/customInt"),
+      );
+      expect(i).toBe(1);
+    });
+  });
+
+  describe("getBooleanCustomField", () => {
+    it("gets a boolean value from an access request custom field", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customBoolean"),
+          value: true,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const bool: boolean | undefined = getBooleanCustomField(
+        gConsentRequest,
+        new URL("https://example.org/ns/customBoolean"),
+      );
+      expect(bool).toBe(true);
+    });
+  });
+
+  describe("getDoubleCustomField", () => {
+    it("gets a double value from an access request custom field", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customDouble"),
+          value: 1.1,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const d: number | undefined = getDoubleCustomField(
+        gConsentRequest,
+        new URL("https://example.org/ns/customDouble"),
+      );
+      expect(d).toBe(1.1);
+    });
+  });
+
+  describe("getStringCustomField", () => {
+    it("gets a string value from an access request custom field", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customString"),
+          value: "some value",
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const s: string | undefined = getStringCustomField(
+        gConsentRequest,
+        new URL("https://example.org/ns/customString"),
+      );
+      expect(s).toBe("some value");
     });
   });
 
