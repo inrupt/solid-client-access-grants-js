@@ -22,7 +22,6 @@
 import { it, expect, describe, beforeAll } from "@jest/globals";
 import { Store, DataFactory } from "n3";
 import { promisifyEventEmitter } from "event-emitter-promisify";
-import type { DatasetCore } from "@rdfjs/types";
 import {
   mockAccessGrantVc as mockGConsentGrant,
   mockAccessRequestVc as mockGConsentRequest,

@@ -51,7 +51,7 @@ import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { toVcDataset } from "../../common/util/toVcDataset";
-import { toJson, type CustomFields } from "../request/issueAccessRequest";
+import type { CustomFields } from "../request/issueAccessRequest";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
