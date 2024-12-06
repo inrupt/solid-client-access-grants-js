@@ -35,7 +35,7 @@ import {
 } from "../../common/getters";
 import type { ApproveAccessRequestOverrides } from "../manage/approveAccessRequest";
 import { INHERIT, XSD_BOOLEAN } from "../../common/constants";
-import { toJson } from "../request/issueAccessRequest";
+import { toJson } from "../type/CustomFields";
 
 const { quad, literal, defaultGraph } = DataFactory;
 

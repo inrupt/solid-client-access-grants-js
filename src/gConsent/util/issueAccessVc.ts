@@ -52,7 +52,7 @@ import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArray";
 import { isBaseRequest } from "../guard/isBaseRequest";
 import type { AccessCredentialType } from "../type/AccessCredentialType";
-import type { CustomFields } from "../request/issueAccessRequest";
+import type { CustomFields } from "../type/CustomFields";
 
 function getGConsentAttributes(
   params: AccessRequestParameters,
