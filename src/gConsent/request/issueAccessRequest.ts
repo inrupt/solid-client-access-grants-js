@@ -74,10 +74,18 @@ export function normalizeAccessRequest<T extends VerifiableCredentialBase>(
 }
 
 export type CustomFields = {
+  /* The custom field name (this must be a URL). */
   key: URL;
+  /* The custom field value (this must be a litteral). */
   value: string | number | boolean;
 };
 
+/**
+ * Internal function to collapse the user-provided custom fields into
+ * a simple JSON object.
+ *
+ * @hidden
+ */
 export const toJson = (
   c: Set<CustomFields> = new Set(),
 ): Record<string, CustomFields["value"]> => {
@@ -100,7 +108,6 @@ export const toJson = (
       )
   );
 };
-
 
 /**
  * Request access to a given Resource.

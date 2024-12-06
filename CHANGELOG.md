@@ -10,6 +10,11 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### New feature (alpha)
+
+- Add support for custom fields. Applications are now able to read and write custom fields
+  into Access Credentials (both Access Requests and Access Grants).
+
 ## [3.1.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.1.1) - 2024-10-23
 
 ### Patch change
