@@ -31,7 +31,7 @@ import type {
   IssueAccessRequestParameters,
 } from "../type/IssueAccessRequestParameters";
 import type { AccessRequest } from "../type/AccessRequest";
-import { type CustomFields, toJson } from "../type/CustomFields";
+import { type CustomFields, toJson } from "../../type/CustomFields";
 import {
   isAccessRequest,
   isRdfjsAccessRequest,

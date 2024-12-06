@@ -37,6 +37,7 @@ export type { AccessParameters } from "./gConsent/manage/getAccessGrantAll";
 
 export type { AccessGrantAny } from "./type/AccessGrant";
 export type { AccessModes } from "./type/AccessModes";
+export type { CustomFields } from "./type/CustomFields";
 export type { FetchOptions } from "./type/FetchOptions";
 export type { RedirectOptions } from "./type/RedirectOptions";
 

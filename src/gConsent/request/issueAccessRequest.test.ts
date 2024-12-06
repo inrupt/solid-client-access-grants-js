@@ -22,7 +22,7 @@
 import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 
-import type { CustomFields } from "../type/CustomFields";
+import type { CustomFields } from "../../type/CustomFields";
 import {
   issueAccessRequest,
   normalizeAccessRequest,

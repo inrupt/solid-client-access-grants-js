@@ -32,7 +32,7 @@ import {
   MOCK_CONTEXT,
 } from "../constants";
 import { normalizeAccessGrant } from "../manage/approveAccessRequest";
-import type { CustomFields } from "../type/CustomFields";
+import type { CustomFields } from "../../type/CustomFields";
 import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import type { AccessGrant } from "../type/AccessGrant";
 import type { AccessRequest } from "../type/AccessRequest";
