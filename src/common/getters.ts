@@ -232,6 +232,7 @@ export function getPurposes(vc: DatasetWithId): string[] {
  *
  * @param accessCredential The Access Credential (Access Grant or Access request)
  * @returns the value of the custom field with the provided name if it is a string, undefined otherwise.
+ * @since unreleased
  */
 export function getCustomString(
   vc: DatasetWithId,
@@ -272,6 +273,7 @@ function deserializeBoolean(serialized: string): boolean | undefined {
  *
  * @param accessCredential The Access Credential (Access Grant or Access request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @since unreleased
  */
 export function getCustomBoolean(
   vc: DatasetWithId,
@@ -308,6 +310,7 @@ function deserizalizeInteger(serialized: string): number | undefined {
  *
  * @param accessCredential The Access Credential (Access Grant or Access request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @since unreleased
  */
 export function getCustomInteger(
   vc: DatasetWithId,
@@ -344,6 +347,7 @@ function deserizalizeDouble(serialized: string): number | undefined {
  *
  * @param accessCredential The Access Credential (Access Grant or Access request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @since unreleased
  */
 export function getCustomDouble(
   vc: DatasetWithId,
@@ -415,6 +419,7 @@ const WELL_KNOWN_FIELDS = [
  *
  * @param accessCredential The Access Credential (Access Grant or Access request)
  * @returns an object keyed by the custom fields names, associated to their values.
+ * @since unreleased
  */
 export function getCustomFields(
   accessCredential: DatasetWithId,
