@@ -31,6 +31,7 @@ import type {
   IssueAccessRequestParameters,
 } from "../type/IssueAccessRequestParameters";
 import type { AccessRequest } from "../type/AccessRequest";
+import { type CustomFields, toJson } from "../../type/CustomFields";
 import {
   isAccessRequest,
   isRdfjsAccessRequest,
@@ -83,7 +84,10 @@ export function normalizeAccessRequest<T extends VerifiableCredentialBase>(
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options: AccessBaseOptions & { returnLegacyJsonld: false },
+  options: AccessBaseOptions & {
+    returnLegacyJsonld: false;
+    customFields?: Set<CustomFields>;
+  },
 ): Promise<DatasetWithId>;
 /**
  * Request access to a given Resource.
@@ -96,7 +100,10 @@ async function issueAccessRequest(
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options?: AccessBaseOptions & { returnLegacyJsonld?: true },
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: true;
+    customFields?: Set<CustomFields>;
+  },
 ): Promise<AccessRequest>;
 /**
  * Request access to a given Resource.
@@ -109,23 +116,35 @@ async function issueAccessRequest(
  */
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options?: AccessBaseOptions & { returnLegacyJsonld?: boolean },
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+    customFields?: Set<CustomFields>;
+  },
 ): Promise<DatasetWithId>;
 /**
  * @deprecated Please remove the `requestor` parameter.
  */
 async function issueAccessRequest(
   params: DeprecatedAccessRequestParameters,
-  options?: AccessBaseOptions & { returnLegacyJsonld?: boolean },
+  options?: AccessBaseOptions & {
+    returnLegacyJsonld?: boolean;
+    customFields?: Set<CustomFields>;
+  },
 ): Promise<AccessRequest>;
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
-  options: AccessBaseOptions & { returnLegacyJsonld?: boolean } = {},
+  options: AccessBaseOptions & {
+    customFields?: Set<CustomFields>;
+    returnLegacyJsonld?: boolean;
+  } = {},
 ): Promise<DatasetWithId> {
-  const requestBody = getRequestBody({
-    ...params,
-    status: gc.ConsentStatusRequested.value,
-  });
+  const requestBody = getRequestBody(
+    {
+      ...params,
+      status: gc.ConsentStatusRequested.value,
+    },
+    { customFields: toJson(options.customFields) },
+  );
 
   if (options.returnLegacyJsonld === false) {
     const accessRequest = await issueAccessVc(requestBody, {
