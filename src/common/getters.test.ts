@@ -30,23 +30,23 @@ import {
 import {
   AccessGrantWrapper,
   getAccessModes,
-  getBooleanCustomField,
+  getCustomBoolean,
   getConsent,
   getCredentialSubject,
   getCustomFields,
-  getDoubleCustomField,
+  getCustomDouble,
   getExpirationDate,
   getId,
   getInbox,
   getInherit,
-  getIntegerCustomField,
+  getCustomInteger,
   getIssuanceDate,
   getIssuer,
   getPurposes,
   getRequestor,
   getResourceOwner,
   getResources,
-  getStringCustomField,
+  getCustomString,
   getTypes,
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
@@ -578,7 +578,7 @@ describe("getters", () => {
     });
   });
 
-  describe("getIntegerCustomField", () => {
+  describe("getCustomInteger", () => {
     it("gets an integer value from an access request custom field", async () => {
       const customFields = [
         {
@@ -590,7 +590,7 @@ describe("getters", () => {
         custom: customFields,
       });
       // This shows the typing of the return is correct.
-      const i: number | undefined = getIntegerCustomField(
+      const i: number | undefined = getCustomInteger(
         gConsentRequest,
         new URL("https://example.org/ns/customInt"),
       );
@@ -598,7 +598,7 @@ describe("getters", () => {
     });
   });
 
-  describe("getBooleanCustomField", () => {
+  describe("getCustomBoolean", () => {
     it("gets a boolean value from an access request custom field", async () => {
       const customFields = [
         {
@@ -610,7 +610,7 @@ describe("getters", () => {
         custom: customFields,
       });
       // This shows the typing of the return is correct.
-      const bool: boolean | undefined = getBooleanCustomField(
+      const bool: boolean | undefined = getCustomBoolean(
         gConsentRequest,
         new URL("https://example.org/ns/customBoolean"),
       );
@@ -618,7 +618,7 @@ describe("getters", () => {
     });
   });
 
-  describe("getDoubleCustomField", () => {
+  describe("getCustomDouble", () => {
     it("gets a double value from an access request custom field", async () => {
       const customFields = [
         {
@@ -630,7 +630,7 @@ describe("getters", () => {
         custom: customFields,
       });
       // This shows the typing of the return is correct.
-      const d: number | undefined = getDoubleCustomField(
+      const d: number | undefined = getCustomDouble(
         gConsentRequest,
         new URL("https://example.org/ns/customDouble"),
       );
@@ -638,7 +638,7 @@ describe("getters", () => {
     });
   });
 
-  describe("getStringCustomField", () => {
+  describe("getCustomString", () => {
     it("gets a string value from an access request custom field", async () => {
       const customFields = [
         {
@@ -650,7 +650,7 @@ describe("getters", () => {
         custom: customFields,
       });
       // This shows the typing of the return is correct.
-      const s: string | undefined = getStringCustomField(
+      const s: string | undefined = getCustomString(
         gConsentRequest,
         new URL("https://example.org/ns/customString"),
       );

@@ -86,6 +86,11 @@ export {
 
 export {
   getAccessModes,
+  getCustomBoolean,
+  getCustomDouble,
+  getCustomFields,
+  getCustomInteger,
+  getCustomString,
   getExpirationDate,
   getId,
   getIssuanceDate,

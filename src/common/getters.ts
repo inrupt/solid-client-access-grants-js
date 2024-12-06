@@ -227,13 +227,13 @@ export function getPurposes(vc: DatasetWithId): string[] {
  *   ]),
  * });
  * // s is "custom value"
- * const s = getStringCustomField(accessRequest, new URL("https://example.org/ns/customString"));
+ * const s = getCustomString(accessRequest, new URL("https://example.org/ns/customString"));
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access request)
  * @returns the value of the custom field with the provided name if it is a string, undefined otherwise.
  */
-export function getStringCustomField(
+export function getCustomString(
   vc: DatasetWithId,
   field: URL,
 ): string | undefined {
@@ -267,13 +267,13 @@ function deserializeBoolean(serialized: string): boolean | undefined {
  *   ]),
  * });
  * // s is true
- * const s = getStringCustomField(accessRequest, new URL("https://example.org/ns/customBoolean"));
+ * const s = getCustomString(accessRequest, new URL("https://example.org/ns/customBoolean"));
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  */
-export function getBooleanCustomField(
+export function getCustomBoolean(
   vc: DatasetWithId,
   field: URL,
 ): boolean | undefined {
@@ -303,13 +303,13 @@ function deserizalizeInteger(serialized: string): number | undefined {
  *   ]),
  * });
  * // i is 1
- * const i = getStringCustomField(accessRequest, new URL("https://example.org/ns/customInteger"));
+ * const i = getCustomString(accessRequest, new URL("https://example.org/ns/customInteger"));
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  */
-export function getIntegerCustomField(
+export function getCustomInteger(
   vc: DatasetWithId,
   field: URL,
 ): number | undefined {
@@ -339,13 +339,13 @@ function deserizalizeDouble(serialized: string): number | undefined {
  *   ]),
  * });
  * // d is 1.1
- * const d = getStringCustomField(accessRequest, new URL("https://example.org/ns/customDouble"));
+ * const d = getCustomString(accessRequest, new URL("https://example.org/ns/customDouble"));
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  */
-export function getDoubleCustomField(
+export function getCustomDouble(
   vc: DatasetWithId,
   field: URL,
 ): number | undefined {
