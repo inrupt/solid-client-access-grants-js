@@ -158,7 +158,7 @@ export function getRequestBody(
 
 export function getGrantBody(
   params: AccessGrantParameters,
-  options?: Partial<{ customFields: Record<string, CustomFields["value"]> }>,
+  options?: Partial<{ customFields: Record<string, unknown> }>,
 ): AccessGrantBody {
   const base = getBaseBody(params, "BaseGrantBody") as AccessGrantBody;
   if (typeof options?.customFields === "object") {

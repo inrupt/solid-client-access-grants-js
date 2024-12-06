@@ -27,9 +27,15 @@ import {
 } from "@inrupt/solid-client-vc";
 import { DataFactory } from "n3";
 import { getAccessModes, getResources } from "../../common";
-import { getConsent, getInbox, getPurposes } from "../../common/getters";
+import {
+  getConsent,
+  getCustomFields,
+  getInbox,
+  getPurposes,
+} from "../../common/getters";
 import type { ApproveAccessRequestOverrides } from "../manage/approveAccessRequest";
 import { INHERIT, XSD_BOOLEAN } from "../../common/constants";
+import { toJson } from "../request/issueAccessRequest";
 
 const { quad, literal, defaultGraph } = DataFactory;
 
@@ -54,13 +60,25 @@ function getInherit(vc: DatasetWithId): boolean | undefined {
   return undefined;
 }
 
+type InitializedGrantsParameter = Omit<
+  ApproveAccessRequestOverrides,
+  "customFields"
+> & {
+  customFields: Record<string, unknown>;
+};
+
 export function initializeGrantParameters(
   requestVc: DatasetWithId | undefined,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-): ApproveAccessRequestOverrides {
-  const resultGrant =
+): InitializedGrantsParameter {
+  const resultGrant: InitializedGrantsParameter =
     requestVc === undefined
-      ? (requestOverride as ApproveAccessRequestOverrides)
+      ? ({
+          ...requestOverride,
+          customFields: toJson(requestOverride?.customFields),
+          // The type assertion here reflects the constraints put in the overload of
+          // approveAccessRequest.
+        } as InitializedGrantsParameter)
       : {
           requestor:
             requestOverride?.requestor ?? getCredentialSubject(requestVc).value,
@@ -74,6 +92,10 @@ export function initializeGrantParameters(
           expirationDate:
             requestOverride?.expirationDate ?? getExpirationDate(requestVc),
           inherit: requestOverride?.inherit ?? getInherit(requestVc),
+          customFields:
+            requestOverride?.customFields !== undefined
+              ? toJson(requestOverride?.customFields)
+              : getCustomFields(requestVc),
         };
   if (requestOverride?.expirationDate === null) {
     resultGrant.expirationDate = undefined;
