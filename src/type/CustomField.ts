@@ -21,7 +21,6 @@
 
 import { INHERIT, acl, gc } from "../common/constants";
 
-
 export type CustomField = {
   /* The custom field name (this must be a URL). */
   key: URL;
