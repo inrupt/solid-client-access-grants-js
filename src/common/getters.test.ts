@@ -778,6 +778,70 @@ describe("getters", () => {
       );
       expect(bool).toBe(true);
     });
+
+    it("returns undefined if no matching custom field is available", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customBoolean"),
+          value: true,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const b: boolean | undefined = getCustomBoolean(
+        gConsentRequest,
+        new URL("https://example.org/ns/anotherCustomBoolean"),
+      );
+      expect(b).toBeUndefined();
+    });
+
+    it("returns undefined if no custom field is available", async () => {
+      const gConsentRequest = await mockGConsentRequest();
+      // This shows the typing of the return is correct.
+      const b: boolean | undefined = getCustomBoolean(
+        gConsentRequest,
+        new URL("https://example.org/ns/customBoolean"),
+      );
+      expect(b).toBeUndefined();
+    });
+
+    it("throws if more than one value is available", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customBoolean"),
+          value: [true, false],
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomBoolean(
+          gConsentRequest,
+          new URL("https://example.org/ns/customBoolean"),
+        ),
+      ).toThrow();
+    });
+
+    it("throws on type mismatch", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customBoolean"),
+          value: "not a boolean",
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomBoolean(
+          gConsentRequest,
+          new URL("https://example.org/ns/customBoolean"),
+        ),
+      ).toThrow();
+    });
   });
 
   describe("getCustomDouble", () => {
@@ -798,6 +862,70 @@ describe("getters", () => {
       );
       expect(d).toBe(1.1);
     });
+
+    it("returns undefined if no matching custom field is available", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customDouble"),
+          value: true,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const d: number | undefined = getCustomDouble(
+        gConsentRequest,
+        new URL("https://example.org/ns/anotherCustomDouble"),
+      );
+      expect(d).toBeUndefined();
+    });
+
+    it("returns undefined if no custom field is available", async () => {
+      const gConsentRequest = await mockGConsentRequest();
+      // This shows the typing of the return is correct.
+      const d: number | undefined = getCustomDouble(
+        gConsentRequest,
+        new URL("https://example.org/ns/customDouble"),
+      );
+      expect(d).toBeUndefined();
+    });
+
+    it("throws if more than one value is available", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customDouble"),
+          value: [1.1, 2.2],
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomDouble(
+          gConsentRequest,
+          new URL("https://example.org/ns/customDouble"),
+        ),
+      ).toThrow();
+    });
+
+    it("throws on type mismatch", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customDouble"),
+          value: "not a double",
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomDouble(
+          gConsentRequest,
+          new URL("https://example.org/ns/customDouble"),
+        ),
+      ).toThrow();
+    });
   });
 
   describe("getCustomString", () => {
@@ -817,6 +945,71 @@ describe("getters", () => {
         new URL("https://example.org/ns/customString"),
       );
       expect(s).toBe("some value");
+    });
+
+    it("returns undefined if no matching custom field is available", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customString"),
+          value: true,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const s: string | undefined = getCustomString(
+        gConsentRequest,
+        new URL("https://example.org/ns/anotherCustomString"),
+      );
+      expect(s).toBeUndefined();
+    });
+
+    it("returns undefined if no custom field is available", async () => {
+      const gConsentRequest = await mockGConsentRequest();
+      // This shows the typing of the return is correct.
+      const s: string | undefined = getCustomString(
+        gConsentRequest,
+        new URL("https://example.org/ns/customString"),
+      );
+      expect(s).toBeUndefined();
+    });
+
+    it("throws if more than one value is available", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customString"),
+          value: ["some value", "some other value"],
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomString(
+          gConsentRequest,
+          new URL("https://example.org/ns/customString"),
+        ),
+      ).toThrow();
+    });
+
+    it("throws on type mismatch", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customString"),
+          // Not a string
+          value: false,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomString(
+          gConsentRequest,
+          new URL("https://example.org/ns/customString"),
+        ),
+      ).toThrow();
     });
   });
 
