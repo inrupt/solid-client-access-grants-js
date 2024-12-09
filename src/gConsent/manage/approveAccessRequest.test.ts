@@ -925,6 +925,134 @@ describe("approveAccessRequest", () => {
     );
   });
 
+  it("collapses overriden custom fields using the same key into a single array value", async () => {
+    mockAcpClient();
+    mockAccessApiEndpoint();
+    const mockedVcModule = jest.requireMock(
+      "@inrupt/solid-client-vc",
+    ) as typeof VcClient;
+    const spiedIssueRequest = jest.spyOn(
+      mockedVcModule,
+      "issueVerifiableCredential",
+    );
+    spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+    const customFields = [
+      {
+        key: new URL("https://example.org/ns/customString"),
+        value: "custom value",
+      },
+    ];
+    const customRequest = await mockAccessRequestVc({ custom: customFields });
+    await approveAccessRequest(
+      customRequest,
+      {
+        access: { append: true },
+        expirationDate: new Date(2021, 9, 14),
+        issuanceDate: new Date(2021, 9, 15),
+        purpose: ["https://some-custom.purpose"],
+        requestor: "https://some-custom.requestor",
+        resources: ["https://some-custom.resource"],
+        requestorInboxUrl: "https://some-custom.inbox",
+        customFields: new Set([
+          {
+            key: new URL("https://example.org/ns/customString"),
+            value: "overridden custom value",
+          },
+          {
+            key: new URL("https://example.org/ns/customString"),
+            value: "another custom value",
+          },
+          {
+            key: new URL("https://example.org/ns/customString"),
+            value: "yet another custom value",
+          },
+        ]),
+      },
+      {
+        fetch: jest.fn<typeof fetch>(),
+      },
+    );
+
+    expect(spiedIssueRequest).toHaveBeenCalledWith(
+      `${MOCKED_ACCESS_ISSUER}/issue`,
+      expect.objectContaining({
+        providedConsent: expect.objectContaining({
+          "https://example.org/ns/customString": [
+            "overridden custom value",
+            "another custom value",
+            "yet another custom value",
+          ],
+        }),
+      }),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it("supports overriden custom fields using the same key having different value types", async () => {
+    mockAcpClient();
+    mockAccessApiEndpoint();
+    const mockedVcModule = jest.requireMock(
+      "@inrupt/solid-client-vc",
+    ) as typeof VcClient;
+    const spiedIssueRequest = jest.spyOn(
+      mockedVcModule,
+      "issueVerifiableCredential",
+    );
+    spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+    const customFields = [
+      {
+        key: new URL("https://example.org/ns/customField"),
+        value: "custom value",
+      },
+    ];
+    const customRequest = await mockAccessRequestVc({ custom: customFields });
+    await approveAccessRequest(
+      customRequest,
+      {
+        access: { append: true },
+        expirationDate: new Date(2021, 9, 14),
+        issuanceDate: new Date(2021, 9, 15),
+        purpose: ["https://some-custom.purpose"],
+        requestor: "https://some-custom.requestor",
+        resources: ["https://some-custom.resource"],
+        requestorInboxUrl: "https://some-custom.inbox",
+        customFields: new Set([
+          {
+            key: new URL("https://example.org/ns/customField"),
+            value: "overridden custom value",
+          },
+          {
+            key: new URL("https://example.org/ns/customField"),
+            value: true,
+          },
+          {
+            key: new URL("https://example.org/ns/customField"),
+            value: 1,
+          },
+        ]),
+      },
+      {
+        fetch: jest.fn<typeof fetch>(),
+      },
+    );
+
+    expect(spiedIssueRequest).toHaveBeenCalledWith(
+      `${MOCKED_ACCESS_ISSUER}/issue`,
+      expect.objectContaining({
+        providedConsent: expect.objectContaining({
+          "https://example.org/ns/customField": [
+            "overridden custom value",
+            true,
+            1,
+          ],
+        }),
+      }),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
   it("only overrides specified custom fields", async () => {
     mockAcpClient();
     mockAccessApiEndpoint();

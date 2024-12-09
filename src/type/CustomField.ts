@@ -73,7 +73,33 @@ export const toJson = (
       })
       // Collapse all the JSON object entries into a single object.
       .reduce(
-        (acc, cur) => Object.assign(acc, cur),
+        (acc, cur) => {
+          // We know the current object has a single key.
+          const curKey = Object.keys(cur)[0];
+          // If the provided key already exists, the values need to
+          // be combined rather than overwritten.
+          if (acc[curKey] !== undefined) {
+            if (Array.isArray(acc[curKey])) {
+              return {
+                ...acc,
+                // Append the new value to the existing array.
+                [`${curKey}`]: [...acc[curKey], cur[curKey]],
+                // TS is rightfully upset here, because we're pretending
+                // all the values for a given key is of the same type,
+                // which is not enforced at write time. Typed helpers
+                // will throw at read time, but untyped reader will allow
+                // to read back whathever.
+              } as Record<string, CustomField["value"]>;
+            }
+            return {
+              ...acc,
+              // Create a new array with the new value and the existing one.
+              [`${curKey}`]: [acc[curKey], cur[curKey]],
+              // See type assertion comment above.
+            } as Record<string, CustomField["value"]>;
+          }
+          return Object.assign(acc, cur);
+        },
         {} as Record<string, CustomField["value"]>,
       )
   );

@@ -639,6 +639,112 @@ describe.each([true, false, undefined])(
       );
     });
 
+    it("collapses valid custom fields using the same key to a value array", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
+        },
+        "issueVerifiableCredential",
+      );
+      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
+
+      await issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+          resources: ["https://some.pod/resource"],
+          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+        },
+        {
+          fetch: jest.fn<typeof fetch>(),
+          returnLegacyJsonld,
+          customFields: new Set([
+            {
+              key: new URL("https://example.org/ns/customString"),
+              value: "custom value",
+            },
+            {
+              key: new URL("https://example.org/ns/customString"),
+              value: "another value",
+            },
+            {
+              key: new URL("https://example.org/ns/customString"),
+              value: "yet another value",
+            },
+          ]),
+        },
+      );
+
+      expect(mockedIssue).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          hasConsent: expect.objectContaining({
+            "https://example.org/ns/customString": [
+              "custom value",
+              "another value",
+              "yet another value",
+            ],
+          }),
+        }),
+        expect.objectContaining({
+          type: ["SolidAccessRequest"],
+        }),
+        expect.anything(),
+      );
+    });
+
+    it("supports custom fields using the same key with different value types", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
+        },
+        "issueVerifiableCredential",
+      );
+      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
+
+      await issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+          resources: ["https://some.pod/resource"],
+          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+        },
+        {
+          fetch: jest.fn<typeof fetch>(),
+          returnLegacyJsonld,
+          customFields: new Set([
+            {
+              key: new URL("https://example.org/ns/customField"),
+              value: "custom string",
+            },
+            {
+              key: new URL("https://example.org/ns/customField"),
+              value: true,
+            },
+            {
+              key: new URL("https://example.org/ns/customField"),
+              value: 1,
+            },
+          ]),
+        },
+      );
+
+      expect(mockedIssue).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          hasConsent: expect.objectContaining({
+            "https://example.org/ns/customField": ["custom string", true, 1],
+          }),
+        }),
+        expect.objectContaining({
+          type: ["SolidAccessRequest"],
+        }),
+        expect.anything(),
+      );
+    });
+
     it("throws on invalid custom fields", async () => {
       mockAccessApiEndpoint();
 
