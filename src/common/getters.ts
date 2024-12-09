@@ -44,8 +44,6 @@ import { isAccessGrant } from "../gConsent/guard/isAccessGrant";
 import { isAccessRequest } from "../gConsent/guard/isAccessRequest";
 import type { AccessRequest } from "../gConsent";
 
-src / type / CustomFields.ts;
-
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
 /**
