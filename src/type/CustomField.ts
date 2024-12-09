@@ -19,12 +19,28 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import { INHERIT, acl, gc } from "../common/constants";
+
 export type CustomField = {
   /* The custom field name (this must be a URL). */
   key: URL;
   /* The custom field value (this must be a literal). */
   value: string | number | boolean;
 };
+
+const WELL_KNOWN_FIELDS = [
+  gc.forPersonalData,
+  gc.forPurpose,
+  gc.isProvidedTo,
+  gc.isProvidedToController,
+  gc.isProvidedToPerson,
+  acl.mode,
+  INHERIT,
+];
+
+function isWellKnown(field: URL) {
+  return WELL_KNOWN_FIELDS.map((p) => p.value).includes(field.href);
+}
 
 /**
  * Internal function to collapse the user-provided custom fields into
@@ -40,7 +56,14 @@ export const toJson = (
       // Check that all the provided custom fields match the expected type,
       // and change the validated CustomField into a plain JSON object entry.
       .map((field) => {
+        if (isWellKnown(field.key)) {
+          // FIXME use inrupt error library
+          throw new Error(
+            `${field.key.href} is a reserved field, and cannot be used as a custom field`,
+          );
+        }
         if (typeof field.key !== "object") {
+          // FIXME use inrupt error library
           throw new Error(
             `All custom fields keys must be URL objects, found ${field.key}`,
           );

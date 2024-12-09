@@ -22,7 +22,7 @@
 import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 
-import type { CustomFields } from "../../type/CustomFields";
+import type { CustomField } from "../../type/CustomField";
 import {
   issueAccessRequest,
   normalizeAccessRequest,
@@ -620,7 +620,7 @@ describe.each([true, false, undefined])(
                 key: "not a URL",
                 value: "customValue",
                 // Mimic a user passing in bad data not caught by a TS compiler
-              } as unknown as CustomFields,
+              } as unknown as CustomField,
             ]),
           },
         ),
@@ -642,7 +642,54 @@ describe.each([true, false, undefined])(
                 key: new URL("https://example.org/ns/customField"),
                 value: { notA: "literal" },
                 // Mimic a user passing in bad data not caught by a TS compiler
-              } as unknown as CustomFields,
+              } as unknown as CustomField,
+            ]),
+          },
+        ),
+      ).rejects.toThrow();
+    });
+
+    it("throws if using reserved predicates as custom fields", async () => {
+      mockAccessApiEndpoint();
+
+      await expect(() =>
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
+            customFields: new Set([
+              {
+                key: new URL("https://w3id.org/GConsent#forPersonalData"),
+                value: "customValue",
+              },
+            ]),
+          },
+        ),
+      ).rejects.toThrow();
+
+      await expect(() =>
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
+            customFields: new Set([
+              {
+                key: new URL("https://example.org/ns/customField"),
+                value: { notA: "literal" },
+                // Mimic a user passing in bad data not caught by a TS compiler
+              } as unknown as CustomField,
             ]),
           },
         ),
