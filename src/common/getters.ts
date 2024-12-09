@@ -569,7 +569,7 @@ export function getCustomBooleans(
  * const s = getCustomBoolean(accessRequest, new URL("https://example.org/ns/customBoolean"));
  * ```
  *
- * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  * @since unreleased
  */
@@ -611,7 +611,7 @@ function deserizalizeDouble(serialized: Literal): number | undefined {
  * const d = getCustomDoubles(accessRequest, new URL("https://example.org/ns/customDouble"));
  * ```
  *
- * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  * @since unreleased
  */
@@ -645,7 +645,7 @@ export function getCustomDoubles(
  * const d = getCustomDouble(accessRequest, new URL("https://example.org/ns/customDouble"));
  * ```
  *
- * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  * @since unreleased
  */
@@ -687,7 +687,7 @@ function deserizalizeInteger(serialized: Literal): number | undefined {
  * const i = getCustomIntegers(accessRequest, new URL("https://example.org/ns/customInteger"));
  * ```
  *
- * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  * @since unreleased
  */
@@ -721,7 +721,7 @@ export function getCustomIntegers(
  * const i = getCustomString(accessRequest, new URL("https://example.org/ns/customInteger"));
  * ```
  *
- * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  * @since unreleased
  */
@@ -755,7 +755,7 @@ export function getCustomInteger(
  * const s = getCustomStrings(accessRequest, new URL("https://example.org/ns/customString"));
  * ```
  *
- * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the value of the custom field with the provided name if it is a string, undefined otherwise.
  * @since unreleased
  */
@@ -781,7 +781,7 @@ export function getCustomStrings(vc: DatasetWithId, field: URL): string[] {
  * const s = getCustomString(accessRequest, new URL("https://example.org/ns/customString"));
  * ```
  *
- * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the value of the custom field with the provided name if it is a string, undefined otherwise.
  * @since unreleased
  */
@@ -843,7 +843,7 @@ const WELL_KNOWN_KEYS = [
  * const i = customFields["https://example.org/ns/custominteger"];
  * ```
  *
- * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns an object keyed by the custom fields names, associated to their values.
  * @since unreleased
  */
