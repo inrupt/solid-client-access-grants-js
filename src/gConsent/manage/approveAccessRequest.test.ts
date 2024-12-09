@@ -938,7 +938,7 @@ describe("approveAccessRequest", () => {
     spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
     const customFields = [
       {
-        key: new URL("https://example.org/ns/overridenCustomString"),
+        key: new URL("https://example.org/ns/overriddenCustomString"),
         value: "custom value",
       },
       {
@@ -952,8 +952,8 @@ describe("approveAccessRequest", () => {
       {
         customFields: new Set([
           {
-            key: new URL("https://example.org/ns/overridenCustomString"),
-            value: "overriden value",
+            key: new URL("https://example.org/ns/overriddenCustomString"),
+            value: "overridden value",
           },
         ]),
       },
@@ -965,8 +965,10 @@ describe("approveAccessRequest", () => {
     expect(spiedIssueRequest).toHaveBeenCalledWith(
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
-        "https://example.org/ns/overridenCustomString": "overriden value",
-        "https://example.org/ns/unchangedCustomString": "unchanged value",
+        providedConsent: expect.objectContaining({
+          "https://example.org/ns/overriddenCustomString": "overridden value",
+          "https://example.org/ns/unchangedCustomString": "unchanged value",
+        }),
       }),
       expect.anything(),
       expect.anything(),
