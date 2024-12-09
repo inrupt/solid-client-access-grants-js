@@ -32,7 +32,7 @@ import {
   MOCK_CONTEXT,
 } from "../constants";
 import { normalizeAccessGrant } from "../manage/approveAccessRequest";
-import type { CustomField } from "../../type/CustomField";
+import { toJson, type CustomField } from "../../type/CustomField";
 import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import type { AccessGrant } from "../type/AccessGrant";
 import type { AccessRequest } from "../type/AccessRequest";
@@ -56,10 +56,9 @@ export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
       | string
       | undefined,
   };
-  options?.custom?.forEach((field) => {
-    Object.assign(hasConsent, { [`${field.key.href}`]: field.value });
-  });
-
+  if (options?.custom !== undefined) {
+    Object.assign(hasConsent, toJson(new Set(options?.custom)));
+  }
   if (options?.resourceOwner === null) {
     delete hasConsent.isConsentForDataSubject;
   } else if (options?.resourceOwner) {
