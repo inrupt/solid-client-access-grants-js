@@ -48,6 +48,9 @@ import {
   getCustomString,
   getTypes,
   getCustomIntegers,
+  getCustomBooleans,
+  getCustomDoubles,
+  getCustomStrings,
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
 import { TYPE, gc } from "./constants";
@@ -673,6 +676,163 @@ describe("getters", () => {
         new URL("https://example.org/ns/customInt"),
       );
       expect(i).toHaveLength(0);
+    });
+  });
+
+  describe("getCustomBooleans", () => {
+    it("gets a boolean array value from an access request custom field", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customBoolean"),
+          value: [true],
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const b: boolean[] = getCustomBooleans(
+        gConsentRequest,
+        new URL("https://example.org/ns/customBoolean"),
+      );
+      expect(b).toEqual([true]);
+    });
+
+    it("throws on mixed types", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customBoolean"),
+          value: true,
+        },
+        {
+          key: new URL("https://example.org/ns/customBoolean"),
+          value: "not a boolean",
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomBooleans(
+          gConsentRequest,
+          new URL("https://example.org/ns/customBoolean"),
+        ),
+      ).toThrow();
+    });
+
+    it("gets an empty value from an access request without custom field", async () => {
+      const gConsentRequest = await mockGConsentRequest();
+      // This shows the typing of the return is correct.
+      const b: boolean[] = getCustomBooleans(
+        gConsentRequest,
+        new URL("https://example.org/ns/customBoolean"),
+      );
+      expect(b).toHaveLength(0);
+    });
+  });
+
+  describe("getCustomDoubles", () => {
+    it("gets a double array value from an access request custom field", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customDouble"),
+          value: [1.1],
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const d: number[] = getCustomDoubles(
+        gConsentRequest,
+        new URL("https://example.org/ns/customDouble"),
+      );
+      expect(d).toEqual([1.1]);
+    });
+
+    it("throws on mixed types", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customDouble"),
+          value: 1.1,
+        },
+        {
+          key: new URL("https://example.org/ns/customDouble"),
+          value: "not a double",
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomDoubles(
+          gConsentRequest,
+          new URL("https://example.org/ns/customDouble"),
+        ),
+      ).toThrow();
+    });
+
+    it("gets an empty value from an access request without custom field", async () => {
+      const gConsentRequest = await mockGConsentRequest();
+      // This shows the typing of the return is correct.
+      const d: number[] = getCustomDoubles(
+        gConsentRequest,
+        new URL("https://example.org/ns/customDouble"),
+      );
+      expect(d).toHaveLength(0);
+    });
+  });
+
+  describe("getCustomStrings", () => {
+    it("gets a string array value from an access request custom field", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customString"),
+          value: ["custom value"],
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const s: string[] = getCustomStrings(
+        gConsentRequest,
+        new URL("https://example.org/ns/customString"),
+      );
+      expect(s).toEqual(["custom value"]);
+    });
+
+    it("throws on mixed types", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customString"),
+          value: "some value",
+        },
+        {
+          key: new URL("https://example.org/ns/customString"),
+          // Not a string
+          value: false,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomDoubles(
+          gConsentRequest,
+          new URL("https://example.org/ns/customString"),
+        ),
+      ).toThrow();
+    });
+
+    it("gets an empty value from an access request without custom field", async () => {
+      const gConsentRequest = await mockGConsentRequest();
+      // This shows the typing of the return is correct.
+      const s: string[] = getCustomStrings(
+        gConsentRequest,
+        new URL("https://example.org/ns/customString"),
+      );
+      expect(s).toHaveLength(0);
     });
   });
 
