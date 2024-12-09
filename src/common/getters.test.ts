@@ -646,6 +646,24 @@ describe("getters", () => {
       expect(i).toEqual([1]);
     });
 
+    it("does not collapse similar values", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customInt"),
+          value: [1, 1, 1],
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const i: number[] = getCustomIntegers(
+        gConsentRequest,
+        new URL("https://example.org/ns/customInt"),
+      );
+      expect(i).toEqual([1, 1, 1]);
+    });
+
     it("throws on mixed types", async () => {
       const customFields = [
         {
