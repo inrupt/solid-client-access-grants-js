@@ -790,7 +790,8 @@ export function getCustomString(
   return deserializeField(
     accessCredential,
     field,
-    (str: Literal) => str.value,
+    (str: Literal) =>
+      str.datatype.equals(xmlSchemaTypes.string) ? str.value : undefined,
     "string",
   );
 }
