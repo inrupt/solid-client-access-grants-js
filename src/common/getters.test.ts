@@ -47,6 +47,7 @@ import {
   getResources,
   getCustomString,
   getTypes,
+  getCustomIntegers,
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
 import { TYPE, gc } from "./constants";
@@ -560,20 +561,81 @@ describe("getters", () => {
           key: new URL("https://example.org/ns/customFloat"),
           value: 1.1,
         },
+        {
+          key: new URL("https://example.org/ns/customStringArray"),
+          value: ["customValue", "otherCustomValue"],
+        },
+        {
+          key: new URL("https://example.org/ns/customBooleanArray"),
+          value: [true, false],
+        },
+        {
+          key: new URL("https://example.org/ns/customIntArray"),
+          value: [1, 2],
+        },
+        {
+          key: new URL("https://example.org/ns/customFloatArray"),
+          value: [1.1, 2.2],
+        },
       ];
       const gConsentRequest = await mockGConsentRequest({
         custom: customFields,
       });
-      expect(getCustomFields(gConsentRequest)).toStrictEqual({
+      expect(getCustomFields(gConsentRequest)).toEqual({
         "https://example.org/ns/customString": "customValue",
         "https://example.org/ns/customBoolean": true,
         "https://example.org/ns/customInt": 1,
         "https://example.org/ns/customFloat": 1.1,
+        "https://example.org/ns/customStringArray": [
+          "customValue",
+          "otherCustomValue",
+        ],
+        "https://example.org/ns/customBooleanArray": [true, false],
+        "https://example.org/ns/customIntArray": [1, 2],
+        "https://example.org/ns/customFloatArray": [1.1, 2.2],
       });
     });
 
     it("returns an empty object if no custom fields are found", async () => {
       expect(getCustomFields(await mockGConsentRequest())).toStrictEqual({});
+    });
+  });
+
+  describe("getCustomIntegers", () => {
+    it("gets an integer array value from an access request custom field", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customInt"),
+          value: [1],
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const i: number[] = getCustomIntegers(
+        gConsentRequest,
+        new URL("https://example.org/ns/customInt"),
+      );
+      expect(i).toEqual([1]);
+    });
+
+    it("gets an empty value from an access request without custom field", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customInt"),
+          value: [1],
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const i: number[] = getCustomIntegers(
+        gConsentRequest,
+        new URL("https://example.org/ns/customInt"),
+      );
+      expect(i).toEqual([1]);
     });
   });
 
