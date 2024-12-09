@@ -82,7 +82,7 @@ describe("getAccessGrantAll", () => {
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
-      "https://some.api.endpoint/derive",
+      "https://some.api.endpoint/query",
       expect.objectContaining(expectedDefaultVcShape),
       expect.objectContaining({
         // Expecting fetch to match universal-fetch fails in node because the
@@ -106,13 +106,13 @@ describe("getAccessGrantAll", () => {
 
     await getAccessGrantAll(
       { requestor },
-      { accessEndpoint: "https://some.api.endpoint/derive" },
+      { accessEndpoint: "https://some.api.endpoint/query" },
     );
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
-      "https://some.api.endpoint/derive",
+      "https://some.api.endpoint/query",
       expect.objectContaining(expectedDefaultVcShape),
       expect.objectContaining({
         // Expecting fetch to match universal-fetch fails in node because the
@@ -153,7 +153,7 @@ describe("getAccessGrantAll", () => {
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
-      "https://some.api.endpoint/derive",
+      "https://some.api.endpoint/query",
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
@@ -188,7 +188,7 @@ describe("getAccessGrantAll", () => {
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
-      "https://some.api.endpoint/derive",
+      "https://some.api.endpoint/query",
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
@@ -223,7 +223,7 @@ describe("getAccessGrantAll", () => {
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
-      "https://some.api.endpoint/derive",
+      "https://some.api.endpoint/query",
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
@@ -258,7 +258,7 @@ describe("getAccessGrantAll", () => {
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledTimes(4);
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
-      "https://some.api.endpoint/derive",
+      "https://some.api.endpoint/query",
       expect.objectContaining(expectedVcShapeOpen),
       {
         fetch: otherFetch,
@@ -296,7 +296,7 @@ describe("getAccessGrantAll", () => {
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
-      "https://some.api.endpoint/derive",
+      "https://some.api.endpoint/query",
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
@@ -334,7 +334,7 @@ describe("getAccessGrantAll", () => {
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalled();
 
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
-      "https://some.api.endpoint/derive",
+      "https://some.api.endpoint/query",
       expect.objectContaining(expectedVcShape),
       {
         fetch: otherFetch,
@@ -353,7 +353,7 @@ describe("getAccessGrantAll", () => {
       },
     );
     expect(getVerifiableCredentialAllFromShape).toHaveBeenCalledWith(
-      "https://some.api.endpoint/derive",
+      "https://some.api.endpoint/query",
       expect.anything(),
       expect.objectContaining({
         // FIXME: expecting fetch to match crossFetch fails in node.
