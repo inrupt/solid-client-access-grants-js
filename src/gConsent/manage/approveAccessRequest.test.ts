@@ -448,7 +448,7 @@ describe("approveAccessRequest", () => {
     const customFields = [
       {
         key: new URL("https://example.org/ns/customString"),
-        value: "customValue",
+        value: "custom value",
       },
       {
         key: new URL("https://example.org/ns/customBoolean"),
@@ -459,8 +459,24 @@ describe("approveAccessRequest", () => {
         value: 1,
       },
       {
-        key: new URL("https://example.org/ns/customDouble"),
+        key: new URL("https://example.org/ns/customFloat"),
         value: 1.1,
+      },
+      {
+        key: new URL("https://example.org/ns/customStringArray"),
+        value: ["customValue", "otherCustomValue"],
+      },
+      {
+        key: new URL("https://example.org/ns/customBooleanArray"),
+        value: [true, false],
+      },
+      {
+        key: new URL("https://example.org/ns/customIntArray"),
+        value: [1, 2],
+      },
+      {
+        key: new URL("https://example.org/ns/customFloatArray"),
+        value: [1.1, 2.2],
       },
     ];
     const customRequest = await mockAccessRequestVc({ custom: customFields });
@@ -478,10 +494,17 @@ describe("approveAccessRequest", () => {
             accessRequestVc.credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: accessRequestVc.credentialSubject.id,
           forPurpose: [],
-          "https://example.org/ns/customString": "customValue",
+          "https://example.org/ns/customString": "custom value",
           "https://example.org/ns/customBoolean": true,
           "https://example.org/ns/customInt": 1,
-          "https://example.org/ns/customDouble": 1.1,
+          "https://example.org/ns/customFloat": 1.1,
+          "https://example.org/ns/customStringArray": [
+            "customValue",
+            "otherCustomValue",
+          ],
+          "https://example.org/ns/customBooleanArray": [true, false],
+          "https://example.org/ns/customIntArray": [1, 2],
+          "https://example.org/ns/customFloatArray": [1.1, 2.2],
         }),
         inbox: accessRequestVc.credentialSubject.inbox,
       }),
@@ -790,7 +813,7 @@ describe("approveAccessRequest", () => {
     const customFields = [
       {
         key: new URL("https://example.org/ns/customString"),
-        value: "customValue",
+        value: "custom value",
       },
       {
         key: new URL("https://example.org/ns/customBoolean"),
@@ -803,6 +826,22 @@ describe("approveAccessRequest", () => {
       {
         key: new URL("https://example.org/ns/customDouble"),
         value: 1.1,
+      },
+      {
+        key: new URL("https://example.org/ns/customStringArray"),
+        value: ["customValue", "otherCustomValue"],
+      },
+      {
+        key: new URL("https://example.org/ns/customBooleanArray"),
+        value: [true, false],
+      },
+      {
+        key: new URL("https://example.org/ns/customIntArray"),
+        value: [1, 2],
+      },
+      {
+        key: new URL("https://example.org/ns/customFloatArray"),
+        value: [1.1, 2.2],
       },
     ];
     const customRequest = await mockAccessRequestVc({ custom: customFields });
@@ -818,20 +857,36 @@ describe("approveAccessRequest", () => {
         requestorInboxUrl: "https://some-custom.inbox",
         customFields: new Set([
           {
-            key: new URL("https://example.org/ns/overriddenCustomString"),
+            key: new URL("https://example.org/ns/customString"),
             value: "overriddenCustomValue",
           },
           {
-            key: new URL("https://example.org/ns/overriddenCustomBoolean"),
+            key: new URL("https://example.org/ns/customBoolean"),
             value: false,
           },
           {
-            key: new URL("https://example.org/ns/overriddenCustomInt"),
+            key: new URL("https://example.org/ns/customInt"),
             value: 2,
           },
           {
-            key: new URL("https://example.org/ns/overriddenCustomDouble"),
+            key: new URL("https://example.org/ns/customDouble"),
             value: 2.2,
+          },
+          {
+            key: new URL("https://example.org/ns/customStringArray"),
+            value: ["overriden customValue", "overriden otherCustomValue"],
+          },
+          {
+            key: new URL("https://example.org/ns/customBooleanArray"),
+            value: [false, false, false],
+          },
+          {
+            key: new URL("https://example.org/ns/customIntArray"),
+            value: [2, 3, 4],
+          },
+          {
+            key: new URL("https://example.org/ns/customFloatArray"),
+            value: [2.2, 3.3, 4.4],
           },
         ]),
       },
@@ -849,17 +904,71 @@ describe("approveAccessRequest", () => {
           forPersonalData: ["https://some-custom.resource"],
           isProvidedTo: "https://some-custom.requestor",
           forPurpose: ["https://some-custom.purpose"],
-          "https://example.org/ns/overriddenCustomString":
-            "overriddenCustomValue",
-          "https://example.org/ns/overriddenCustomBoolean": false,
-          "https://example.org/ns/overriddenCustomInt": 2,
-          "https://example.org/ns/overriddenCustomDouble": 2.2,
+          "https://example.org/ns/customString": "overriddenCustomValue",
+          "https://example.org/ns/customBoolean": false,
+          "https://example.org/ns/customInt": 2,
+          "https://example.org/ns/customDouble": 2.2,
+          "https://example.org/ns/customStringArray": [
+            "overriden customValue",
+            "overriden otherCustomValue",
+          ],
+          "https://example.org/ns/customBooleanArray": [false, false, false],
+          "https://example.org/ns/customIntArray": [2, 3, 4],
+          "https://example.org/ns/customFloatArray": [2.2, 3.3, 4.4],
         },
         inbox: "https://some-custom.inbox",
       }),
       expect.objectContaining({
         type: ["SolidAccessGrant"],
       }),
+      expect.anything(),
+    );
+  });
+
+  it("only overrides specified custom fields", async () => {
+    mockAcpClient();
+    mockAccessApiEndpoint();
+    const mockedVcModule = jest.requireMock(
+      "@inrupt/solid-client-vc",
+    ) as typeof VcClient;
+    const spiedIssueRequest = jest.spyOn(
+      mockedVcModule,
+      "issueVerifiableCredential",
+    );
+    spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+    const customFields = [
+      {
+        key: new URL("https://example.org/ns/overridenCustomString"),
+        value: "custom value",
+      },
+      {
+        key: new URL("https://example.org/ns/unchangedCustomString"),
+        value: "unchanged value",
+      },
+    ];
+    const customRequest = await mockAccessRequestVc({ custom: customFields });
+    await approveAccessRequest(
+      customRequest,
+      {
+        customFields: new Set([
+          {
+            key: new URL("https://example.org/ns/overridenCustomString"),
+            value: "overriden value",
+          },
+        ]),
+      },
+      {
+        fetch: jest.fn<typeof fetch>(),
+      },
+    );
+
+    expect(spiedIssueRequest).toHaveBeenCalledWith(
+      `${MOCKED_ACCESS_ISSUER}/issue`,
+      expect.objectContaining({
+        "https://example.org/ns/overridenCustomString": "overriden value",
+        "https://example.org/ns/unchangedCustomString": "unchanged value",
+      }),
+      expect.anything(),
       expect.anything(),
     );
   });
