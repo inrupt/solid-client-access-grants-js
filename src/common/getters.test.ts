@@ -599,6 +599,29 @@ describe("getters", () => {
     it("returns an empty object if no custom fields are found", async () => {
       expect(getCustomFields(await mockGConsentRequest())).toStrictEqual({});
     });
+
+    it("supports the custom fields being arrays of mixed types", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customField"),
+          value: "customValue",
+        },
+        {
+          key: new URL("https://example.org/ns/customField"),
+          value: true,
+        },
+        {
+          key: new URL("https://example.org/ns/customField"),
+          value: 1,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(getCustomFields(gConsentRequest)).toEqual({
+        "https://example.org/ns/customField": ["customValue", true, 1],
+      });
+    });
   });
 
   describe("getCustomIntegers", () => {
@@ -620,22 +643,36 @@ describe("getters", () => {
       expect(i).toEqual([1]);
     });
 
-    it("gets an empty value from an access request without custom field", async () => {
+    it("throws on mixed types", async () => {
       const customFields = [
         {
           key: new URL("https://example.org/ns/customInt"),
           value: [1],
         },
+        {
+          key: new URL("https://example.org/ns/customInt"),
+          value: "not an int",
+        },
       ];
       const gConsentRequest = await mockGConsentRequest({
         custom: customFields,
       });
+      expect(() =>
+        getCustomIntegers(
+          gConsentRequest,
+          new URL("https://example.org/ns/customInt"),
+        ),
+      ).toThrow();
+    });
+
+    it("gets an empty value from an access request without custom field", async () => {
+      const gConsentRequest = await mockGConsentRequest();
       // This shows the typing of the return is correct.
       const i: number[] = getCustomIntegers(
         gConsentRequest,
         new URL("https://example.org/ns/customInt"),
       );
-      expect(i).toEqual([1]);
+      expect(i).toHaveLength(0);
     });
   });
 
@@ -656,6 +693,70 @@ describe("getters", () => {
         new URL("https://example.org/ns/customInt"),
       );
       expect(i).toBe(1);
+    });
+
+    it("returns undefined if no matching custom field is available", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customInt"),
+          value: 1,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const i: number | undefined = getCustomInteger(
+        gConsentRequest,
+        new URL("https://example.org/ns/anotherCustomInt"),
+      );
+      expect(i).toBeUndefined();
+    });
+
+    it("returns undefined if no custom field is available", async () => {
+      const gConsentRequest = await mockGConsentRequest();
+      // This shows the typing of the return is correct.
+      const i: number | undefined = getCustomInteger(
+        gConsentRequest,
+        new URL("https://example.org/ns/customInt"),
+      );
+      expect(i).toBeUndefined();
+    });
+
+    it("throws if more than one value is available", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customInt"),
+          value: [1, 2],
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomInteger(
+          gConsentRequest,
+          new URL("https://example.org/ns/customInt"),
+        ),
+      ).toThrow();
+    });
+
+    it("throws on type mismatch", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customInt"),
+          value: "not an int",
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomInteger(
+          gConsentRequest,
+          new URL("https://example.org/ns/customInt"),
+        ),
+      ).toThrow();
     });
   });
 
