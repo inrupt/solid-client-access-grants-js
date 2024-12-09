@@ -44,6 +44,8 @@ import { isAccessGrant } from "../gConsent/guard/isAccessGrant";
 import { isAccessRequest } from "../gConsent/guard/isAccessRequest";
 import type { AccessRequest } from "../gConsent";
 
+src / type / CustomFields.ts;
+
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
 /**
@@ -533,12 +535,20 @@ function deserializeBoolean(serialized: Literal): boolean | undefined {
  * const s = getCustomBoolean(accessRequest, new URL("https://example.org/ns/customBoolean"));
  * ```
  *
- * @param accessCredential The Access Credential (Access Grant or Access request)
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  * @since unreleased
  */
-export function getCustomBooleans(vc: DatasetWithId, field: URL): boolean[] {
-  return deserializeFields(vc, field, deserializeBoolean, "boolean");
+export function getCustomBooleans(
+  accessCredential: DatasetWithId,
+  field: URL,
+): boolean[] {
+  return deserializeFields(
+    accessCredential,
+    field,
+    deserializeBoolean,
+    "boolean",
+  );
 }
 
 /**
@@ -564,10 +574,15 @@ export function getCustomBooleans(vc: DatasetWithId, field: URL): boolean[] {
  * @since unreleased
  */
 export function getCustomBoolean(
-  vc: DatasetWithId,
+  accessCredential: DatasetWithId,
   field: URL,
 ): boolean | undefined {
-  return deserializeField(vc, field, deserializeBoolean, "boolean");
+  return deserializeField(
+    accessCredential,
+    field,
+    deserializeBoolean,
+    "boolean",
+  );
 }
 
 function deserizalizeDouble(serialized: Literal): number | undefined {
@@ -600,8 +615,16 @@ function deserizalizeDouble(serialized: Literal): number | undefined {
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  * @since unreleased
  */
-export function getCustomDoubles(vc: DatasetWithId, field: URL): number[] {
-  return deserializeFields(vc, field, deserizalizeDouble, "double");
+export function getCustomDoubles(
+  accessCredential: DatasetWithId,
+  field: URL,
+): number[] {
+  return deserializeFields(
+    accessCredential,
+    field,
+    deserizalizeDouble,
+    "double",
+  );
 }
 
 /**
@@ -627,10 +650,15 @@ export function getCustomDoubles(vc: DatasetWithId, field: URL): number[] {
  * @since unreleased
  */
 export function getCustomDouble(
-  vc: DatasetWithId,
+  accessCredential: DatasetWithId,
   field: URL,
 ): number | undefined {
-  return deserializeField(vc, field, deserizalizeDouble, "double");
+  return deserializeField(
+    accessCredential,
+    field,
+    deserizalizeDouble,
+    "double",
+  );
 }
 
 function deserizalizeInteger(serialized: Literal): number | undefined {
@@ -663,8 +691,16 @@ function deserizalizeInteger(serialized: Literal): number | undefined {
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  * @since unreleased
  */
-export function getCustomIntegers(vc: DatasetWithId, field: URL): number[] {
-  return deserializeFields(vc, field, deserizalizeInteger, "integer");
+export function getCustomIntegers(
+  accessCredential: DatasetWithId,
+  field: URL,
+): number[] {
+  return deserializeFields(
+    accessCredential,
+    field,
+    deserizalizeInteger,
+    "integer",
+  );
 }
 
 /**
@@ -690,10 +726,15 @@ export function getCustomIntegers(vc: DatasetWithId, field: URL): number[] {
  * @since unreleased
  */
 export function getCustomInteger(
-  vc: DatasetWithId,
+  accessCredential: DatasetWithId,
   field: URL,
 ): number | undefined {
-  return deserializeField(vc, field, deserizalizeInteger, "integer");
+  return deserializeField(
+    accessCredential,
+    field,
+    deserizalizeInteger,
+    "integer",
+  );
 }
 
 /**
@@ -745,10 +786,15 @@ export function getCustomStrings(vc: DatasetWithId, field: URL): string[] {
  * @since unreleased
  */
 export function getCustomString(
-  vc: DatasetWithId,
+  accessCredential: DatasetWithId,
   field: URL,
 ): string | undefined {
-  return deserializeField(vc, field, (str: Literal) => str.value, "string");
+  return deserializeField(
+    accessCredential,
+    field,
+    (str: Literal) => str.value,
+    "string",
+  );
 }
 
 const WELL_KNOWN_KEYS = [
