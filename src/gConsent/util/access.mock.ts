@@ -32,6 +32,7 @@ import {
   MOCK_CONTEXT,
 } from "../constants";
 import { normalizeAccessGrant } from "../manage/approveAccessRequest";
+import type { CustomField } from "../../type/CustomField";
 import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import type { AccessGrant } from "../type/AccessGrant";
 import type { AccessRequest } from "../type/AccessRequest";
@@ -43,6 +44,7 @@ type RequestVcOptions = Partial<{
   resourceOwner: string | null;
   inherit: boolean;
   purpose: UrlString[];
+  custom: CustomField[];
 }>;
 
 export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
@@ -54,6 +56,9 @@ export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
       | string
       | undefined,
   };
+  options?.custom?.forEach((field) => {
+    Object.assign(hasConsent, { [`${field.key.href}`]: field.value });
+  });
 
   if (options?.resourceOwner === null) {
     delete hasConsent.isConsentForDataSubject;

@@ -39,6 +39,11 @@ describe("Index exports", () => {
     expect(Object.keys(packageExports)).toEqual([
       "isValidAccessGrant",
       "getAccessModes",
+      "getCustomBoolean",
+      "getCustomDouble",
+      "getCustomFields",
+      "getCustomInteger",
+      "getCustomString",
       "getExpirationDate",
       "getId",
       "getIssuanceDate",

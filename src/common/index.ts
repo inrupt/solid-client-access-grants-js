@@ -25,6 +25,11 @@ export { isValidAccessGrant } from "./verify/isValidAccessGrant";
 export type { AccessGrantWrapper } from "./getters";
 export {
   getAccessModes,
+  getCustomBoolean,
+  getCustomDouble,
+  getCustomFields,
+  getCustomInteger,
+  getCustomString,
   getExpirationDate,
   getId,
   getIssuanceDate,
