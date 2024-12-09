@@ -22,7 +22,7 @@
 export type CustomFields = {
   /* The custom field name (this must be a URL). */
   key: URL;
-  /* The custom field value (this must be a litteral). */
+  /* The custom field value (this must be a literal). */
   value: string | number | boolean;
 };
 
