@@ -21,11 +21,12 @@
 
 import { INHERIT, acl, gc } from "../common/constants";
 
+
 export type CustomField = {
   /* The custom field name (this must be a URL). */
   key: URL;
   /* The custom field value (this must be a literal). */
-  value: string | number | boolean;
+  value: string | number | boolean | string[] | number[] | boolean[];
 };
 
 const WELL_KNOWN_FIELDS = [
