@@ -37,7 +37,7 @@ import { DataFactory } from "n3";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessModes } from "../type/AccessModes";
 import { INHERIT, TYPE, XSD_BOOLEAN, acl, gc, ldp } from "./constants";
-import type { CustomFields } from "../type/CustomFields";
+import type { CustomField } from "../type/CustomField";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 

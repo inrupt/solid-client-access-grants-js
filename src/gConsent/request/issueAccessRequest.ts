@@ -31,7 +31,7 @@ import type {
   IssueAccessRequestParameters,
 } from "../type/IssueAccessRequestParameters";
 import type { AccessRequest } from "../type/AccessRequest";
-import { type CustomFields, toJson } from "../../type/CustomFields";
+import { type CustomField, toJson } from "../../type/CustomField";
 import {
   isAccessRequest,
   isRdfjsAccessRequest,
@@ -86,7 +86,7 @@ async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
-    customFields?: Set<CustomFields>;
+    customFields?: Set<CustomField>;
   },
 ): Promise<DatasetWithId>;
 /**
@@ -102,7 +102,7 @@ async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
-    customFields?: Set<CustomFields>;
+    customFields?: Set<CustomField>;
   },
 ): Promise<AccessRequest>;
 /**
@@ -118,7 +118,7 @@ async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
-    customFields?: Set<CustomFields>;
+    customFields?: Set<CustomField>;
   },
 ): Promise<DatasetWithId>;
 /**
@@ -128,13 +128,13 @@ async function issueAccessRequest(
   params: DeprecatedAccessRequestParameters,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
-    customFields?: Set<CustomFields>;
+    customFields?: Set<CustomField>;
   },
 ): Promise<AccessRequest>;
 async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options: AccessBaseOptions & {
-    customFields?: Set<CustomFields>;
+    customFields?: Set<CustomField>;
     returnLegacyJsonld?: boolean;
   } = {},
 ): Promise<DatasetWithId> {

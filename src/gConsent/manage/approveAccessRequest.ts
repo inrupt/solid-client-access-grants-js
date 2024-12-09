@@ -51,12 +51,12 @@ import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { toVcDataset } from "../../common/util/toVcDataset";
-import type { CustomFields } from "../../type/CustomFields";
+import type { CustomField } from "../../type/CustomField";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
   "expirationDate"
-> & { expirationDate?: Date | null; customFields?: Set<CustomFields> };
+> & { expirationDate?: Date | null; customFields?: Set<CustomField> };
 
 /**
  * Internal function. This is a stopgap until we have proper JSON-LD parsing.

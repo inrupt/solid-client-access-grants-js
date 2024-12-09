@@ -52,7 +52,7 @@ import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArray";
 import { isBaseRequest } from "../guard/isBaseRequest";
 import type { AccessCredentialType } from "../type/AccessCredentialType";
-import type { CustomFields } from "../../type/CustomFields";
+import type { CustomField } from "../../type/CustomField";
 
 function getGConsentAttributes(
   params: AccessRequestParameters,
@@ -147,7 +147,7 @@ function getBaseBody(
 
 export function getRequestBody(
   params: AccessRequestParameters,
-  options?: Partial<{ customFields: Record<string, CustomFields["value"]> }>,
+  options?: Partial<{ customFields: Record<string, CustomField["value"]> }>,
 ): AccessRequestBody {
   const base = getBaseBody(params, "BaseRequestBody") as AccessRequestBody;
   if (typeof options?.customFields === "object") {

@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-export type CustomFields = {
+export type CustomField = {
   /* The custom field name (this must be a URL). */
   key: URL;
   /* The custom field value (this must be a literal). */
@@ -33,8 +33,8 @@ export type CustomFields = {
  * @hidden
  */
 export const toJson = (
-  c: Set<CustomFields> = new Set(),
-): Record<string, CustomFields["value"]> => {
+  c: Set<CustomField> = new Set(),
+): Record<string, CustomField["value"]> => {
   return (
     Array.from(c)
       // Check that all the provided custom fields match the expected type,
@@ -50,7 +50,7 @@ export const toJson = (
       // Collapse all the JSON object entries into a single object.
       .reduce(
         (acc, cur) => Object.assign(acc, cur),
-        {} as Record<string, CustomFields["value"]>,
+        {} as Record<string, CustomField["value"]>,
       )
   );
 };
