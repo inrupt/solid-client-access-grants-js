@@ -582,7 +582,7 @@ function deserializeField<T>(
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @returns the custom boolean array field with the provided name
  * @since unreleased
  */
 export function getCustomBooleans(
@@ -617,7 +617,7 @@ export function getCustomBooleans(
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @returns the custom boolean field with the provided name
  * @since unreleased
  */
 export function getCustomBoolean(
@@ -652,7 +652,7 @@ export function getCustomBoolean(
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @returns the custom float array field with the provided name
  * @since unreleased
  */
 export function getCustomFloats(
@@ -687,7 +687,7 @@ export function getCustomFloats(
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @returns the custom float field with the provided name
  * @since unreleased
  */
 export function getCustomFloat(
@@ -722,7 +722,7 @@ export function getCustomFloat(
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @returns the custom integer array field with the provided name
  * @since unreleased
  */
 export function getCustomIntegers(
@@ -757,7 +757,7 @@ export function getCustomIntegers(
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
+ * @returns the custom integer field with the provided name
  * @since unreleased
  */
 export function getCustomInteger(
@@ -792,7 +792,7 @@ export function getCustomInteger(
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns the value of the custom field with the provided name if it is a string, undefined otherwise.
+ * @returns the custom string array field with the provided name
  * @since unreleased
  */
 export function getCustomStrings(vc: DatasetWithId, field: URL): string[] {
@@ -819,7 +819,7 @@ export function getCustomStrings(vc: DatasetWithId, field: URL): string[] {
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns the value of the custom field with the provided name if it is a string, undefined otherwise.
+ * @returns the custom string field with the provided name
  * @since unreleased
  */
 export function getCustomString(
