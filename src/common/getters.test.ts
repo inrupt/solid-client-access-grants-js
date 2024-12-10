@@ -47,10 +47,6 @@ import {
   getResources,
   getCustomString,
   getTypes,
-  getCustomIntegers,
-  getCustomBooleans,
-  getCustomFloats,
-  getCustomStrings,
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
 import { TYPE, gc } from "./constants";
@@ -564,22 +560,6 @@ describe("getters", () => {
           key: new URL("https://example.org/ns/customFloat"),
           value: 1.1,
         },
-        {
-          key: new URL("https://example.org/ns/customStringArray"),
-          value: ["customValue", "otherCustomValue"],
-        },
-        {
-          key: new URL("https://example.org/ns/customBooleanArray"),
-          value: [true, false],
-        },
-        {
-          key: new URL("https://example.org/ns/customIntArray"),
-          value: [1, 2],
-        },
-        {
-          key: new URL("https://example.org/ns/customFloatArray"),
-          value: [1.1, 2.2],
-        },
       ];
       const gConsentRequest = await mockGConsentRequest({
         custom: customFields,
@@ -589,322 +569,11 @@ describe("getters", () => {
         "https://example.org/ns/customBoolean": true,
         "https://example.org/ns/customInt": 1,
         "https://example.org/ns/customFloat": 1.1,
-        "https://example.org/ns/customStringArray": [
-          "customValue",
-          "otherCustomValue",
-        ],
-        "https://example.org/ns/customBooleanArray": [true, false],
-        "https://example.org/ns/customIntArray": [1, 2],
-        "https://example.org/ns/customFloatArray": [1.1, 2.2],
       });
     });
 
     it("returns an empty object if no custom fields are found", async () => {
       expect(getCustomFields(await mockGConsentRequest())).toStrictEqual({});
-    });
-
-    it("supports the custom fields being arrays of mixed types", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customField"),
-          value: "customValue",
-        },
-        {
-          key: new URL("https://example.org/ns/customField"),
-          value: true,
-        },
-        {
-          key: new URL("https://example.org/ns/customField"),
-          value: 1,
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
-      });
-      expect(getCustomFields(gConsentRequest)).toEqual({
-        "https://example.org/ns/customField": ["customValue", true, 1],
-      });
-    });
-  });
-
-  describe("getCustomIntegers", () => {
-    it("gets an integer array value from an access grant custom field", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customInt"),
-          value: [1],
-        },
-      ];
-      const gConsentRequest = await mockGConsentGrant({
-        custom: customFields,
-      });
-      // This shows the typing of the return is correct.
-      const i: number[] = getCustomIntegers(
-        gConsentRequest,
-        new URL("https://example.org/ns/customInt"),
-      );
-      expect(i).toEqual([1]);
-    });
-
-    it("does not collapse similar values", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customInt"),
-          value: [1, 1, 1],
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
-      });
-      // This shows the typing of the return is correct.
-      const i: number[] = getCustomIntegers(
-        gConsentRequest,
-        new URL("https://example.org/ns/customInt"),
-      );
-      expect(i).toEqual([1, 1, 1]);
-    });
-
-    it("throws on mixed types", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customInt"),
-          value: [1],
-        },
-        {
-          key: new URL("https://example.org/ns/customInt"),
-          value: "not an int",
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
-      });
-      expect(() =>
-        getCustomIntegers(
-          gConsentRequest,
-          new URL("https://example.org/ns/customInt"),
-        ),
-      ).toThrow();
-    });
-
-    it("gets an empty value from an access request without custom field", async () => {
-      const gConsentRequest = await mockGConsentRequest();
-      // This shows the typing of the return is correct.
-      const i: number[] = getCustomIntegers(
-        gConsentRequest,
-        new URL("https://example.org/ns/customInt"),
-      );
-      expect(i).toHaveLength(0);
-    });
-  });
-
-  describe("getCustomBooleans", () => {
-    it("gets a boolean array value from an access request custom field", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customBoolean"),
-          value: [true],
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
-      });
-      // This shows the typing of the return is correct.
-      const b: boolean[] = getCustomBooleans(
-        gConsentRequest,
-        new URL("https://example.org/ns/customBoolean"),
-      );
-      expect(b).toEqual([true]);
-    });
-
-    it("does not collapse similar values", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customBoolean"),
-          value: [true, true, true],
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
-      });
-      // This shows the typing of the return is correct.
-      const b: boolean[] = getCustomBooleans(
-        gConsentRequest,
-        new URL("https://example.org/ns/customBoolean"),
-      );
-      expect(b).toEqual([true, true, true]);
-    });
-
-    it("throws on mixed types", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customBoolean"),
-          value: true,
-        },
-        {
-          key: new URL("https://example.org/ns/customBoolean"),
-          value: "not a boolean",
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
-      });
-      expect(() =>
-        getCustomBooleans(
-          gConsentRequest,
-          new URL("https://example.org/ns/customBoolean"),
-        ),
-      ).toThrow();
-    });
-
-    it("gets an empty value from an access request without custom field", async () => {
-      const gConsentRequest = await mockGConsentRequest();
-      // This shows the typing of the return is correct.
-      const b: boolean[] = getCustomBooleans(
-        gConsentRequest,
-        new URL("https://example.org/ns/customBoolean"),
-      );
-      expect(b).toHaveLength(0);
-    });
-  });
-
-  describe("getCustomFloats", () => {
-    it("gets a float array value from an access request custom field", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customFloat"),
-          value: [1.1],
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
-      });
-      // This shows the typing of the return is correct.
-      const d: number[] = getCustomFloats(
-        gConsentRequest,
-        new URL("https://example.org/ns/customFloat"),
-      );
-      expect(d).toEqual([1.1]);
-    });
-
-    it("does not collapse similar values", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customFloat"),
-          value: [1.1, 1.1, 1.1],
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
-      });
-      // This shows the typing of the return is correct.
-      const d: number[] = getCustomFloats(
-        gConsentRequest,
-        new URL("https://example.org/ns/customFloat"),
-      );
-      expect(d).toEqual([1.1, 1.1, 1.1]);
-    });
-
-    it("throws on mixed types", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customFloat"),
-          value: 1.1,
-        },
-        {
-          key: new URL("https://example.org/ns/customFloat"),
-          value: "not a float",
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
-      });
-      expect(() =>
-        getCustomFloats(
-          gConsentRequest,
-          new URL("https://example.org/ns/customFloat"),
-        ),
-      ).toThrow();
-    });
-
-    it("gets an empty value from an access request without custom field", async () => {
-      const gConsentRequest = await mockGConsentRequest();
-      // This shows the typing of the return is correct.
-      const d: number[] = getCustomFloats(
-        gConsentRequest,
-        new URL("https://example.org/ns/customFloat"),
-      );
-      expect(d).toHaveLength(0);
-    });
-  });
-
-  describe("getCustomStrings", () => {
-    it("gets a string array value from an access request custom field", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customString"),
-          value: ["custom value"],
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
-      });
-      // This shows the typing of the return is correct.
-      const s: string[] = getCustomStrings(
-        gConsentRequest,
-        new URL("https://example.org/ns/customString"),
-      );
-      expect(s).toEqual(["custom value"]);
-    });
-
-    it("does not collapse similar values", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customString"),
-          value: ["some value", "some value", "some value"],
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
-      });
-      // This shows the typing of the return is correct.
-      const s: string[] = getCustomStrings(
-        gConsentRequest,
-        new URL("https://example.org/ns/customString"),
-      );
-      expect(s).toEqual(["some value", "some value", "some value"]);
-    });
-
-    it("throws on mixed types", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customString"),
-          value: "some value",
-        },
-        {
-          key: new URL("https://example.org/ns/customString"),
-          // Not a string
-          value: false,
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
-      });
-      expect(() =>
-        getCustomFloats(
-          gConsentRequest,
-          new URL("https://example.org/ns/customString"),
-        ),
-      ).toThrow();
-    });
-
-    it("gets an empty value from an access request without custom field", async () => {
-      const gConsentRequest = await mockGConsentRequest();
-      // This shows the typing of the return is correct.
-      const s: string[] = getCustomStrings(
-        gConsentRequest,
-        new URL("https://example.org/ns/customString"),
-      );
-      expect(s).toHaveLength(0);
     });
   });
 
@@ -956,14 +625,9 @@ describe("getters", () => {
     });
 
     it("throws if more than one value is available", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customInt"),
-          value: [1, 2],
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
+      const gConsentRequest = await mockGConsentRequest();
+      Object.assign(gConsentRequest.credentialSubject.hasConsent, {
+        "https://example.org/ns/customInt": [1, 2],
       });
       expect(() =>
         getCustomInteger(
@@ -1040,14 +704,9 @@ describe("getters", () => {
     });
 
     it("throws if more than one value is available", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customBoolean"),
-          value: [true, false],
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
+      const gConsentRequest = await mockGConsentRequest();
+      Object.assign(gConsentRequest.credentialSubject.hasConsent, {
+        "https://example.org/ns/customBoolean": [true, false],
       });
       expect(() =>
         getCustomBoolean(
@@ -1124,14 +783,9 @@ describe("getters", () => {
     });
 
     it("throws if more than one value is available", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customFloat"),
-          value: [1.1, 2.2],
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
+      const gConsentRequest = await mockGConsentRequest();
+      Object.assign(gConsentRequest.credentialSubject.hasConsent, {
+        "https://example.org/ns/customFloat": [1.1, 2.2],
       });
       expect(() =>
         getCustomFloat(
@@ -1208,14 +862,12 @@ describe("getters", () => {
     });
 
     it("throws if more than one value is available", async () => {
-      const customFields = [
-        {
-          key: new URL("https://example.org/ns/customString"),
-          value: ["some value", "some other value"],
-        },
-      ];
-      const gConsentRequest = await mockGConsentRequest({
-        custom: customFields,
+      const gConsentRequest = await mockGConsentRequest();
+      Object.assign(gConsentRequest.credentialSubject.hasConsent, {
+        "https://example.org/ns/customString": [
+          "some value",
+          "some other value",
+        ],
       });
       expect(() =>
         getCustomString(
