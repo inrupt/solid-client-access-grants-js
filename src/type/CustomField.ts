@@ -84,10 +84,10 @@ export const toJson = (
                 // Append the new value to the existing array.
                 [`${curKey}`]: [...acc[curKey], cur[curKey]],
                 // TS is rightfully upset here, because we're pretending
-                // all the values for a given key is of the same type,
+                // all the values for a given key are of the same type,
                 // which is not enforced at write time. Typed helpers
-                // will throw at read time, but untyped reader will allow
-                // to read back whathever.
+                // will throw at read time, but untyped readers will allow
+                // anything to be read back.
               } as Record<string, CustomField["value"]>;
             }
             return {

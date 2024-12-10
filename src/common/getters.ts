@@ -518,8 +518,8 @@ export function getCustomFields(
 
 /**
  * Internal function. Deserializes a literal using the provided function.
- * If the literal cannot be deserialized as expected (e.g. a string attempted
- * to be deserialized as an integer), an error is thrown.
+ * If the literal cannot be deserialized as expected (e.g. an attempt to
+ * deserialize a string as an integer), an error is thrown.
  *
  * @hidden
  */
@@ -578,7 +578,7 @@ function deserializeField<T>(
  *   ]),
  * });
  * // s is [true, false, true]
- * const s = getCustomBoolean(accessRequest, new URL("https://example.org/ns/customBoolean"));
+ * const s = getCustomBooleans(accessRequest, new URL("https://example.org/ns/customBoolean"));
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
@@ -753,7 +753,7 @@ export function getCustomIntegers(
  *   ]),
  * });
  * // i is 1
- * const i = getCustomString(accessRequest, new URL("https://example.org/ns/customInteger"));
+ * const i = getCustomInteger(accessRequest, new URL("https://example.org/ns/customInteger"));
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
@@ -795,8 +795,13 @@ export function getCustomInteger(
  * @returns the custom string array field with the provided name
  * @since unreleased
  */
-export function getCustomStrings(vc: DatasetWithId, field: URL): string[] {
-  return deserializeFields(vc, field, (s) => typeof s === "string", "string");
+export function getCustomStrings(accessCredential: DatasetWithId, field: URL): string[] {
+  return deserializeFields(
+    accessCredential,
+    field,
+    (s) => typeof s === "string",
+    "string",
+  );  
 }
 
 /**
