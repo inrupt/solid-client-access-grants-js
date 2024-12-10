@@ -563,41 +563,6 @@ function deserializeField<T>(
 }
 
 /**
- * Reads the custom boolean array with the provided name in the consent section of the provided Access Credential.
- * Throws on type mismatch, and returns an empty array if no values are found.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customBoolean"),
- *       value: [true, false, true],
- *     },
- *   ]),
- * });
- * // s is [true, false, true]
- * const s = getCustomBooleans(accessRequest, new URL("https://example.org/ns/customBoolean"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns the custom boolean array field with the provided name
- * @since unreleased
- */
-export function getCustomBooleans(
-  accessCredential: DatasetWithId,
-  field: URL,
-): boolean[] {
-  return deserializeFields(
-    accessCredential,
-    field,
-    (b) => typeof b === "boolean",
-    "boolean",
-  );
-}
-
-/**
  * Reads the custom boolean value with the provided name in the consent section of the provided Access Credential.
  * Throws on type mismatch, and returns `undefined` if no values are found.
  *
@@ -629,41 +594,6 @@ export function getCustomBoolean(
     field,
     (b) => typeof b === "boolean",
     "boolean",
-  );
-}
-
-/**
- * Reads the custom float array with the provided name in the consent section of the provided Access Credential.
- * Throws on type mismatch, and returns an empty array if no values are found.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customFloat"),
- *       value: [1.1, 2.2, 3.3],
- *     },
- *   ]),
- * });
- * // d is [1.1, 2.2, 3.3]
- * const d = getCustomFloats(accessRequest, new URL("https://example.org/ns/customFloat"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns the custom float array field with the provided name
- * @since unreleased
- */
-export function getCustomFloats(
-  accessCredential: DatasetWithId,
-  field: URL,
-): number[] {
-  return deserializeFields(
-    accessCredential,
-    field,
-    (d: unknown): d is number => typeof d === "number" && !Number.isInteger(d),
-    "float",
   );
 }
 
@@ -703,41 +633,6 @@ export function getCustomFloat(
 }
 
 /**
- * Reads the custom integer array with the provided name in the consent section of the provided Access Credential.
- * Throws on type mismatch, and returns an empty array if no values are found.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customInteger"),
- *       value: [1, 2, 3],
- *     },
- *   ]),
- * });
- * // i is [1, 2, 3]
- * const i = getCustomIntegers(accessRequest, new URL("https://example.org/ns/customInteger"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns the custom integer array field with the provided name
- * @since unreleased
- */
-export function getCustomIntegers(
-  accessCredential: DatasetWithId,
-  field: URL,
-): number[] {
-  return deserializeFields(
-    accessCredential,
-    field,
-    (i: unknown): i is number => typeof i === "number" && Number.isInteger(i),
-    "integer",
-  );
-}
-
-/**
  * Reads the custom integer value with the provided name in the consent section of the provided Access Credential.
  * Throws on type mismatch, and returns `undefined` if no values are found.
  *
@@ -770,38 +665,6 @@ export function getCustomInteger(
     (i: unknown): i is number => typeof i === "number" && Number.isInteger(i),
     "integer",
   );
-}
-
-/**
- * Reads the custom string array with the provided name in the consent section of the provided Access Credential.
- * Throws on type mismatch, and returns an empty array if no values are found.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customString"),
- *       value: ["custom value", "another value"],
- *     },
- *   ]),
- * });
- * // s is ["custom value", "another value"]
- * const s = getCustomStrings(accessRequest, new URL("https://example.org/ns/customString"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns the custom string array field with the provided name
- * @since unreleased
- */
-export function getCustomStrings(accessCredential: DatasetWithId, field: URL): string[] {
-  return deserializeFields(
-    accessCredential,
-    field,
-    (s) => typeof s === "string",
-    "string",
-  );  
 }
 
 /**
