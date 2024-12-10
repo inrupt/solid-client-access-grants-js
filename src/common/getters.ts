@@ -630,7 +630,7 @@ export function getCustomBoolean(
 }
 
 /**
- * Reads the custom double array value with the provided name in the consent section of the provided Access Credential.
+ * Reads the custom float array value with the provided name in the consent section of the provided Access Credential.
  *
  * @example
  * ```
@@ -638,20 +638,20 @@ export function getCustomBoolean(
  *  ...,
  *  customFields: new Set([
  *     {
- *       key: new URL("https://example.org/ns/customDouble"),
+ *       key: new URL("https://example.org/ns/customFloat"),
  *       value: [1.1, 2.2, 3.3],
  *     },
  *   ]),
  * });
  * // d is [1.1, 2.2, 3.3]
- * const d = getCustomDoubles(accessRequest, new URL("https://example.org/ns/customDouble"));
+ * const d = getCustomFloats(accessRequest, new URL("https://example.org/ns/customFloat"));
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  * @since unreleased
  */
-export function getCustomDoubles(
+export function getCustomFloats(
   accessCredential: DatasetWithId,
   field: URL,
 ): number[] {
@@ -659,12 +659,12 @@ export function getCustomDoubles(
     accessCredential,
     field,
     (d: unknown): d is number => typeof d === "number" && !Number.isInteger(d),
-    "double",
+    "float",
   );
 }
 
 /**
- * Reads the custom double value with the provided name in the consent section of the provided Access Credential.
+ * Reads the custom float value with the provided name in the consent section of the provided Access Credential.
  *
  * @example
  * ```
@@ -672,20 +672,20 @@ export function getCustomDoubles(
  *  ...,
  *  customFields: new Set([
  *     {
- *       key: new URL("https://example.org/ns/customDouble"),
+ *       key: new URL("https://example.org/ns/customFloat"),
  *       value: 1.1,
  *     },
  *   ]),
  * });
  * // d is 1.1
- * const d = getCustomDouble(accessRequest, new URL("https://example.org/ns/customDouble"));
+ * const d = getCustomFloat(accessRequest, new URL("https://example.org/ns/customFloat"));
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
  * @since unreleased
  */
-export function getCustomDouble(
+export function getCustomFloat(
   accessCredential: DatasetWithId,
   field: URL,
 ): number | undefined {
@@ -693,7 +693,7 @@ export function getCustomDouble(
     accessCredential,
     field,
     (d: unknown): d is number => typeof d === "number" && !Number.isInteger(d),
-    "double",
+    "float",
   );
 }
 

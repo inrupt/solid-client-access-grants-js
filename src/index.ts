@@ -88,7 +88,7 @@ export {
 export {
   getAccessModes,
   getCustomBoolean,
-  getCustomDouble,
+  getCustomFloat,
   getCustomFields,
   getCustomInteger,
   getCustomString,
