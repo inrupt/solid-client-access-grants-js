@@ -526,33 +526,40 @@ export function getCustomFields(
 function deserializeFields<T>(
   vc: DatasetWithId,
   field: URL,
-  validator: (value: unknown) => value is T,
+  deserializer: (value: Literal) => T | undefined,
   type: string,
-): T[] {
-  const customFields = getCustomFields(vc);
-  const foundValue = customFields[field.href];
-  if (foundValue === undefined) {
-    return [];
-  }
-  if (validator(foundValue)) {
-    return [foundValue];
-  }
-  if (Array.isArray(foundValue) && foundValue.every(validator)) {
-    return foundValue;
-  }
-
-  throw new Error(
-    `Could not interpret value for predicate ${field.href} as ${type}, found: ${foundValue}`,
-  );
+): NonNullable<T>[] {
+  return Array.from(
+    vc.match(getConsent(vc), namedNode(field.href), null, defaultGraph()),
+  )
+    .map((q) => {
+      if (q.object.termType !== "Literal") {
+        throw new Error(
+          `Expected value object for predicate ${field.href} to be a litteral, found ${q.object.termType}.`,
+        );
+      }
+      return q.object as Literal;
+    })
+    .map((object) => {
+      const result = deserializer(object);
+      if (result === undefined) {
+        // FIXME use inrupt error library
+        throw new Error(
+          `Error deserializing value ${object} for predicate ${field.href} as type ${type}.`,
+        );
+      }
+      return result;
+      // FIXME why isn't TS happy about the filtering out of undefined?
+    }) as NonNullable<T>[];
 }
 
 function deserializeField<T>(
   vc: DatasetWithId,
   field: URL,
-  validator: (value: unknown) => value is T,
+  deserializer: (value: Literal) => T | undefined,
   type: string,
 ): T | undefined {
-  const result = deserializeFields(vc, field, validator, type);
+  const result = deserializeFields(vc, field, deserializer, type);
   if (result.length > 1) {
     // FIXME use inrupt error library
     throw new Error(
@@ -560,6 +567,26 @@ function deserializeField<T>(
     );
   }
   return result[0];
+}
+
+const xmlSchemaTypes = {
+  boolean: namedNode("http://www.w3.org/2001/XMLSchema#boolean"),
+  double: namedNode("http://www.w3.org/2001/XMLSchema#double"),
+  integer: namedNode("http://www.w3.org/2001/XMLSchema#integer"),
+  string: namedNode("http://www.w3.org/2001/XMLSchema#string"),
+} as const;
+
+function deserializeBoolean(serialized: Literal): boolean | undefined {
+  if (!serialized.datatype.equals(xmlSchemaTypes.boolean)) {
+    return undefined;
+  }
+  if (serialized.value === "true") {
+    return true;
+  }
+  if (serialized.value === "false") {
+    return false;
+  }
+  return undefined;
 }
 
 /**
@@ -592,9 +619,17 @@ export function getCustomBoolean(
   return deserializeField(
     accessCredential,
     field,
-    (b) => typeof b === "boolean",
+    deserializeBoolean,
     "boolean",
   );
+}
+
+function deserizalizeDouble(serialized: Literal): number | undefined {
+  if (!serialized.datatype.equals(xmlSchemaTypes.double)) {
+    return undefined;
+  }
+  const val = Number.parseFloat(serialized.value);
+  return Number.isNaN(val) ? undefined : val;
 }
 
 /**
@@ -624,12 +659,15 @@ export function getCustomFloat(
   accessCredential: DatasetWithId,
   field: URL,
 ): number | undefined {
-  return deserializeField(
-    accessCredential,
-    field,
-    (d: unknown): d is number => typeof d === "number" && !Number.isInteger(d),
-    "float",
-  );
+  return deserializeField(accessCredential, field, deserizalizeDouble, "float");
+}
+
+function deserizalizeInteger(serialized: Literal): number | undefined {
+  if (!serialized.datatype.equals(xmlSchemaTypes.integer)) {
+    return undefined;
+  }
+  const val = Number.parseInt(serialized.value, 10);
+  return Number.isNaN(val) ? undefined : val;
 }
 
 /**
@@ -662,7 +700,7 @@ export function getCustomInteger(
   return deserializeField(
     accessCredential,
     field,
-    (i: unknown): i is number => typeof i === "number" && Number.isInteger(i),
+    deserizalizeInteger,
     "integer",
   );
 }
@@ -697,7 +735,8 @@ export function getCustomString(
   return deserializeField(
     accessCredential,
     field,
-    (s) => typeof s === "string",
+    (str: Literal) =>
+      str.datatype.equals(xmlSchemaTypes.string) ? str.value : undefined,
     "string",
   );
 }
