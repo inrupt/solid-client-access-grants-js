@@ -25,7 +25,7 @@ export type CustomField = {
   /* The custom field name (this must be a URL). */
   key: URL;
   /* The custom field value (this must be a literal). */
-  value: string | number | boolean | string[] | number[] | boolean[];
+  value: string | number | boolean;
 };
 
 const WELL_KNOWN_FIELDS = [
@@ -74,28 +74,12 @@ export const toJson = (
       .reduce(
         (acc, cur) => {
           // We know the current object has a single key.
-          const curKey = Object.keys(cur)[0];
-          // If the provided key already exists, the values need to
-          // be combined rather than overwritten.
-          if (acc[curKey] !== undefined) {
-            if (Array.isArray(acc[curKey])) {
-              return {
-                ...acc,
-                // Append the new value to the existing array.
-                [`${curKey}`]: [...acc[curKey], cur[curKey]],
-                // TS is rightfully upset here, because we're pretending
-                // all the values for a given key are of the same type,
-                // which is not enforced at write time. Typed helpers
-                // will throw at read time, but untyped readers will allow
-                // anything to be read back.
-              } as Record<string, CustomField["value"]>;
-            }
-            return {
-              ...acc,
-              // Create a new array with the new value and the existing one.
-              [`${curKey}`]: [acc[curKey], cur[curKey]],
-              // See type assertion comment above.
-            } as Record<string, CustomField["value"]>;
+          if (acc[Object.keys(cur)[0]] !== undefined) {
+            // If the provided key already exists, the input is invalid.
+            // FIXME use inrupt error library
+            throw new Error(
+              `Each custom field key must be unique. Found multiple values for ${Object.keys(cur)[0]}`,
+            );
           }
           return Object.assign(acc, cur);
         },

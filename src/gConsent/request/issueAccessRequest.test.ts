@@ -591,22 +591,6 @@ describe.each([true, false, undefined])(
               key: new URL("https://example.org/ns/customFloat"),
               value: 1.1,
             },
-            {
-              key: new URL("https://example.org/ns/customStringArray"),
-              value: ["customValue", "otherCustomValue"],
-            },
-            {
-              key: new URL("https://example.org/ns/customBooleanArray"),
-              value: [true, false],
-            },
-            {
-              key: new URL("https://example.org/ns/customIntArray"),
-              value: [1, 2],
-            },
-            {
-              key: new URL("https://example.org/ns/customFloatArray"),
-              value: [1.1, 2.2],
-            },
           ]),
         },
       );
@@ -623,13 +607,6 @@ describe.each([true, false, undefined])(
             "https://example.org/ns/customBoolean": true,
             "https://example.org/ns/customInt": 1,
             "https://example.org/ns/customFloat": 1.1,
-            "https://example.org/ns/customStringArray": [
-              "customValue",
-              "otherCustomValue",
-            ],
-            "https://example.org/ns/customBooleanArray": [true, false],
-            "https://example.org/ns/customIntArray": [1, 2],
-            "https://example.org/ns/customFloatArray": [1.1, 2.2],
           },
         }),
         expect.objectContaining({
@@ -639,7 +616,7 @@ describe.each([true, false, undefined])(
       );
     });
 
-    it("collapses valid custom fields using the same key to a value array", async () => {
+    it("throws if the same key is used for multiple custom fields", async () => {
       mockAccessApiEndpoint();
       const mockedIssue = jest.spyOn(
         jest.requireMock("@inrupt/solid-client-vc") as {
@@ -649,100 +626,30 @@ describe.each([true, false, undefined])(
       );
       mockedIssue.mockResolvedValueOnce(mockAccessRequest);
 
-      await issueAccessRequest(
-        {
-          access: { read: true },
-          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-          resources: ["https://some.pod/resource"],
-          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
-        },
-        {
-          fetch: jest.fn<typeof fetch>(),
-          returnLegacyJsonld,
-          customFields: new Set([
-            {
-              key: new URL("https://example.org/ns/customString"),
-              value: "custom value",
-            },
-            {
-              key: new URL("https://example.org/ns/customString"),
-              value: "another value",
-            },
-            {
-              key: new URL("https://example.org/ns/customString"),
-              value: "yet another value",
-            },
-          ]),
-        },
-      );
-
-      expect(mockedIssue).toHaveBeenCalledWith(
-        `${MOCKED_ACCESS_ISSUER}/issue`,
-        expect.objectContaining({
-          hasConsent: expect.objectContaining({
-            "https://example.org/ns/customString": [
-              "custom value",
-              "another value",
-              "yet another value",
-            ],
-          }),
-        }),
-        expect.objectContaining({
-          type: ["SolidAccessRequest"],
-        }),
-        expect.anything(),
-      );
-    });
-
-    it("supports custom fields using the same key with different value types", async () => {
-      mockAccessApiEndpoint();
-      const mockedIssue = jest.spyOn(
-        jest.requireMock("@inrupt/solid-client-vc") as {
-          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
-        },
-        "issueVerifiableCredential",
-      );
-      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
-
-      await issueAccessRequest(
-        {
-          access: { read: true },
-          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-          resources: ["https://some.pod/resource"],
-          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
-        },
-        {
-          fetch: jest.fn<typeof fetch>(),
-          returnLegacyJsonld,
-          customFields: new Set([
-            {
-              key: new URL("https://example.org/ns/customField"),
-              value: "custom string",
-            },
-            {
-              key: new URL("https://example.org/ns/customField"),
-              value: true,
-            },
-            {
-              key: new URL("https://example.org/ns/customField"),
-              value: 1,
-            },
-          ]),
-        },
-      );
-
-      expect(mockedIssue).toHaveBeenCalledWith(
-        `${MOCKED_ACCESS_ISSUER}/issue`,
-        expect.objectContaining({
-          hasConsent: expect.objectContaining({
-            "https://example.org/ns/customField": ["custom string", true, 1],
-          }),
-        }),
-        expect.objectContaining({
-          type: ["SolidAccessRequest"],
-        }),
-        expect.anything(),
-      );
+      await expect(() =>
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
+            customFields: new Set([
+              {
+                key: new URL("https://example.org/ns/customField"),
+                value: "custom string",
+              },
+              {
+                key: new URL("https://example.org/ns/customField"),
+                value: "another string",
+              },
+            ]),
+          },
+        ),
+      ).rejects.toThrow();
     });
 
     it("throws on invalid custom fields", async () => {
@@ -785,6 +692,28 @@ describe.each([true, false, undefined])(
               {
                 key: new URL("https://example.org/ns/customField"),
                 value: { notA: "literal" },
+                // Mimic a user passing in bad data not caught by a TS compiler
+              } as unknown as CustomField,
+            ]),
+          },
+        ),
+      ).rejects.toThrow();
+
+      await expect(() =>
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
+            customFields: new Set([
+              {
+                key: new URL("https://example.org/ns/customField"),
+                value: ["not a", "scalar"],
                 // Mimic a user passing in bad data not caught by a TS compiler
               } as unknown as CustomField,
             ]),
