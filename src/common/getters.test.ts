@@ -625,9 +625,10 @@ describe("getters", () => {
     });
 
     it("throws if more than one value is available", async () => {
-      const gConsentRequest = await mockGConsentRequest();
-      Object.assign(gConsentRequest.credentialSubject.hasConsent, {
-        "https://example.org/ns/customInt": [1, 2],
+      const gConsentRequest = await mockGConsentRequest({}, (r) => {
+        Object.assign(r.credentialSubject.hasConsent, {
+          "https://example.org/ns/customInt": [1, 2],
+        });
       });
       expect(() =>
         getCustomInteger(
@@ -704,9 +705,10 @@ describe("getters", () => {
     });
 
     it("throws if more than one value is available", async () => {
-      const gConsentRequest = await mockGConsentRequest();
-      Object.assign(gConsentRequest.credentialSubject.hasConsent, {
-        "https://example.org/ns/customBoolean": [true, false],
+      const gConsentRequest = await mockGConsentRequest({}, (r) => {
+        Object.assign(r.credentialSubject.hasConsent, {
+          "https://example.org/ns/customBoolean": [true, false],
+        });
       });
       expect(() =>
         getCustomBoolean(
@@ -783,9 +785,10 @@ describe("getters", () => {
     });
 
     it("throws if more than one value is available", async () => {
-      const gConsentRequest = await mockGConsentRequest();
-      Object.assign(gConsentRequest.credentialSubject.hasConsent, {
-        "https://example.org/ns/customFloat": [1.1, 2.2],
+      const gConsentRequest = await mockGConsentRequest({}, (r) => {
+        Object.assign(r.credentialSubject.hasConsent, {
+          "https://example.org/ns/customFloat": [1.1, 2.2],
+        });
       });
       expect(() =>
         getCustomFloat(
@@ -862,12 +865,13 @@ describe("getters", () => {
     });
 
     it("throws if more than one value is available", async () => {
-      const gConsentRequest = await mockGConsentRequest();
-      Object.assign(gConsentRequest.credentialSubject.hasConsent, {
-        "https://example.org/ns/customString": [
-          "some value",
-          "some other value",
-        ],
+      const gConsentRequest = await mockGConsentRequest({}, (r) => {
+        Object.assign(r.credentialSubject.hasConsent, {
+          "https://example.org/ns/customString": [
+            "some value",
+            "some other value",
+          ],
+        });
       });
       expect(() =>
         getCustomString(
