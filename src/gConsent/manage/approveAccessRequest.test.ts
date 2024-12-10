@@ -408,7 +408,8 @@ describe("approveAccessRequest", () => {
     );
     const mockedIssue = jest.spyOn(mockedVcModule, "issueVerifiableCredential");
     mockedIssue.mockResolvedValueOnce(accessGrantVc);
-    await approveAccessRequest(accessRequestVc, undefined, {
+    const customRequest = await mockAccessRequestVc();
+    await approveAccessRequest(customRequest, undefined, {
       fetch: jest.fn<typeof fetch>(),
     });
 
@@ -423,6 +424,65 @@ describe("approveAccessRequest", () => {
           isProvidedTo: accessRequestVc.credentialSubject.id,
           forPurpose: [],
         },
+        inbox: accessRequestVc.credentialSubject.inbox,
+      }),
+      expect.objectContaining({
+        type: ["SolidAccessGrant"],
+      }),
+      expect.anything(),
+    );
+  });
+
+  it("transfers custom fields from request to grant VC", async () => {
+    mockAcpClient();
+    mockAccessApiEndpoint();
+    const mockedVcModule = jest.requireMock(
+      "@inrupt/solid-client-vc",
+    ) as typeof VcClient;
+    const spiedIssueRequest = jest.spyOn(
+      mockedVcModule,
+      "issueVerifiableCredential",
+    );
+    const mockedIssue = jest.spyOn(mockedVcModule, "issueVerifiableCredential");
+    mockedIssue.mockResolvedValueOnce(accessGrantVc);
+    const customFields = [
+      {
+        key: new URL("https://example.org/ns/customString"),
+        value: "customValue",
+      },
+      {
+        key: new URL("https://example.org/ns/customBoolean"),
+        value: true,
+      },
+      {
+        key: new URL("https://example.org/ns/customInt"),
+        value: 1,
+      },
+      {
+        key: new URL("https://example.org/ns/customDouble"),
+        value: 1.1,
+      },
+    ];
+    const customRequest = await mockAccessRequestVc({ custom: customFields });
+    await approveAccessRequest(customRequest, undefined, {
+      fetch: jest.fn<typeof fetch>(),
+    });
+
+    expect(spiedIssueRequest).toHaveBeenCalledWith(
+      `${MOCKED_ACCESS_ISSUER}/issue`,
+      expect.objectContaining({
+        providedConsent: expect.objectContaining({
+          mode: accessRequestVc.credentialSubject.hasConsent.mode,
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          forPersonalData:
+            accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+          isProvidedTo: accessRequestVc.credentialSubject.id,
+          forPurpose: [],
+          "https://example.org/ns/customString": "customValue",
+          "https://example.org/ns/customBoolean": true,
+          "https://example.org/ns/customInt": 1,
+          "https://example.org/ns/customDouble": 1.1,
+        }),
         inbox: accessRequestVc.credentialSubject.inbox,
       }),
       expect.objectContaining({
@@ -727,8 +787,27 @@ describe("approveAccessRequest", () => {
       "issueVerifiableCredential",
     );
     spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+    const customFields = [
+      {
+        key: new URL("https://example.org/ns/customString"),
+        value: "customValue",
+      },
+      {
+        key: new URL("https://example.org/ns/customBoolean"),
+        value: true,
+      },
+      {
+        key: new URL("https://example.org/ns/customInt"),
+        value: 1,
+      },
+      {
+        key: new URL("https://example.org/ns/customDouble"),
+        value: 1.1,
+      },
+    ];
+    const customRequest = await mockAccessRequestVc({ custom: customFields });
     await approveAccessRequest(
-      consentRequestVc,
+      customRequest,
       {
         access: { append: true },
         expirationDate: new Date(2021, 9, 14),
@@ -737,6 +816,24 @@ describe("approveAccessRequest", () => {
         requestor: "https://some-custom.requestor",
         resources: ["https://some-custom.resource"],
         requestorInboxUrl: "https://some-custom.inbox",
+        customFields: new Set([
+          {
+            key: new URL("https://example.org/ns/overriddenCustomString"),
+            value: "overriddenCustomValue",
+          },
+          {
+            key: new URL("https://example.org/ns/overriddenCustomBoolean"),
+            value: false,
+          },
+          {
+            key: new URL("https://example.org/ns/overriddenCustomInt"),
+            value: 2,
+          },
+          {
+            key: new URL("https://example.org/ns/overriddenCustomDouble"),
+            value: 2.2,
+          },
+        ]),
       },
       {
         fetch: jest.fn<typeof fetch>(),
@@ -752,6 +849,11 @@ describe("approveAccessRequest", () => {
           forPersonalData: ["https://some-custom.resource"],
           isProvidedTo: "https://some-custom.requestor",
           forPurpose: ["https://some-custom.purpose"],
+          "https://example.org/ns/overriddenCustomString":
+            "overriddenCustomValue",
+          "https://example.org/ns/overriddenCustomBoolean": false,
+          "https://example.org/ns/overriddenCustomInt": 2,
+          "https://example.org/ns/overriddenCustomDouble": 2.2,
         },
         inbox: "https://some-custom.inbox",
       }),
@@ -783,6 +885,24 @@ describe("approveAccessRequest", () => {
         requestor: "https://some-custom.requestor",
         resources: ["https://some-custom.resource"],
         requestorInboxUrl: "https://some-custom.inbox",
+        customFields: new Set([
+          {
+            key: new URL("https://example.org/ns/customString"),
+            value: "customValue",
+          },
+          {
+            key: new URL("https://example.org/ns/customBoolean"),
+            value: true,
+          },
+          {
+            key: new URL("https://example.org/ns/customInt"),
+            value: 1,
+          },
+          {
+            key: new URL("https://example.org/ns/customDouble"),
+            value: 1.1,
+          },
+        ]),
       },
       {
         fetch: jest.fn<typeof fetch>(),
@@ -798,6 +918,10 @@ describe("approveAccessRequest", () => {
           forPersonalData: ["https://some-custom.resource"],
           isProvidedTo: "https://some-custom.requestor",
           forPurpose: ["https://some-custom.purpose"],
+          "https://example.org/ns/customString": "customValue",
+          "https://example.org/ns/customBoolean": true,
+          "https://example.org/ns/customInt": 1,
+          "https://example.org/ns/customDouble": 1.1,
         },
         inbox: "https://some-custom.inbox",
       }),

@@ -22,6 +22,7 @@
 import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 
+import type { CustomField } from "../../type/CustomField";
 import {
   issueAccessRequest,
   normalizeAccessRequest,
@@ -551,6 +552,148 @@ describe.each([true, false, undefined])(
           },
         ),
       ).resolves.toStrictEqual(normalizedAccessRequest);
+    });
+
+    it("supports valid custom fields", async () => {
+      mockAccessApiEndpoint();
+      const mockedIssue = jest.spyOn(
+        jest.requireMock("@inrupt/solid-client-vc") as {
+          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
+        },
+        "issueVerifiableCredential",
+      );
+      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
+
+      await issueAccessRequest(
+        {
+          access: { read: true },
+          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+          resources: ["https://some.pod/resource"],
+          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+        },
+        {
+          fetch: jest.fn<typeof fetch>(),
+          returnLegacyJsonld,
+          customFields: new Set([
+            {
+              key: new URL("https://example.org/ns/customField"),
+              value: "customValue",
+            },
+          ]),
+        },
+      );
+
+      expect(mockedIssue).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          hasConsent: {
+            mode: ["http://www.w3.org/ns/auth/acl#Read"],
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
+            forPersonalData: ["https://some.pod/resource"],
+            isConsentForDataSubject: "https://some.pod/profile#you",
+            "https://example.org/ns/customField": "customValue",
+          },
+        }),
+        expect.objectContaining({
+          type: ["SolidAccessRequest"],
+        }),
+        expect.anything(),
+      );
+    });
+
+    it("throws on invalid custom fields", async () => {
+      mockAccessApiEndpoint();
+
+      await expect(() =>
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
+            customFields: new Set([
+              {
+                key: "not a URL",
+                value: "customValue",
+                // Mimic a user passing in bad data not caught by a TS compiler
+              } as unknown as CustomField,
+            ]),
+          },
+        ),
+      ).rejects.toThrow();
+
+      await expect(() =>
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
+            customFields: new Set([
+              {
+                key: new URL("https://example.org/ns/customField"),
+                value: { notA: "literal" },
+                // Mimic a user passing in bad data not caught by a TS compiler
+              } as unknown as CustomField,
+            ]),
+          },
+        ),
+      ).rejects.toThrow();
+    });
+
+    it("throws if using reserved predicates as custom fields", async () => {
+      mockAccessApiEndpoint();
+
+      await expect(() =>
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
+            customFields: new Set([
+              {
+                key: new URL("https://w3id.org/GConsent#forPersonalData"),
+                value: "customValue",
+              },
+            ]),
+          },
+        ),
+      ).rejects.toThrow();
+
+      await expect(() =>
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
+            customFields: new Set([
+              {
+                key: new URL("https://example.org/ns/customField"),
+                value: { notA: "literal" },
+                // Mimic a user passing in bad data not caught by a TS compiler
+              } as unknown as CustomField,
+            ]),
+          },
+        ),
+      ).rejects.toThrow();
     });
   },
 );

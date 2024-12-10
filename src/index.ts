@@ -37,6 +37,7 @@ export type { AccessParameters } from "./gConsent/manage/getAccessGrantAll";
 
 export type { AccessGrantAny } from "./type/AccessGrant";
 export type { AccessModes } from "./type/AccessModes";
+export type { CustomField } from "./type/CustomField";
 export type { FetchOptions } from "./type/FetchOptions";
 export type { RedirectOptions } from "./type/RedirectOptions";
 
@@ -86,6 +87,11 @@ export {
 
 export {
   getAccessModes,
+  getCustomBoolean,
+  getCustomDouble,
+  getCustomFields,
+  getCustomInteger,
+  getCustomString,
   getExpirationDate,
   getId,
   getIssuanceDate,

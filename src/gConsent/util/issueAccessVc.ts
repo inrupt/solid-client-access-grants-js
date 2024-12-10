@@ -52,6 +52,7 @@ import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArray";
 import { isBaseRequest } from "../guard/isBaseRequest";
 import type { AccessCredentialType } from "../type/AccessCredentialType";
+import type { CustomField } from "../../type/CustomField";
 
 function getGConsentAttributes(
   params: AccessRequestParameters,
@@ -146,12 +147,24 @@ function getBaseBody(
 
 export function getRequestBody(
   params: AccessRequestParameters,
+  options?: Partial<{ customFields: Record<string, CustomField["value"]> }>,
 ): AccessRequestBody {
-  return getBaseBody(params, "BaseRequestBody") as AccessRequestBody;
+  const base = getBaseBody(params, "BaseRequestBody") as AccessRequestBody;
+  if (typeof options?.customFields === "object") {
+    Object.assign(base.credentialSubject.hasConsent, options.customFields);
+  }
+  return base;
 }
 
-export function getGrantBody(params: AccessGrantParameters): AccessGrantBody {
-  return getBaseBody(params, "BaseGrantBody") as AccessGrantBody;
+export function getGrantBody(
+  params: AccessGrantParameters,
+  options?: Partial<{ customFields: Record<string, unknown> }>,
+): AccessGrantBody {
+  const base = getBaseBody(params, "BaseGrantBody") as AccessGrantBody;
+  if (typeof options?.customFields === "object") {
+    Object.assign(base.credentialSubject.providedConsent, options.customFields);
+  }
+  return base;
 }
 
 export async function issueAccessVc(
@@ -176,17 +189,19 @@ export async function issueAccessVc(
  */
 export async function issueAccessVc(
   vcBody: BaseRequestBody | BaseGrantBody,
-  options?: AccessBaseOptions & {
-    returnLegacyJsonld?: boolean;
-    normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
-  },
+  options?: AccessBaseOptions &
+    Partial<{
+      returnLegacyJsonld: boolean;
+      normalize: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
+    }>,
 ): Promise<DatasetWithId>;
 export async function issueAccessVc(
   vcBody: BaseRequestBody | BaseGrantBody,
-  options: AccessBaseOptions & {
-    returnLegacyJsonld?: boolean;
-    normalize?: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
-  } = {},
+  options: AccessBaseOptions &
+    Partial<{
+      returnLegacyJsonld: boolean;
+      normalize: (arg: VerifiableCredentialBase) => VerifiableCredentialBase;
+    }> = {},
 ): Promise<DatasetWithId> {
   const fetcher = await getSessionFetch(options);
 
