@@ -850,20 +850,23 @@ export function getCustomFields(
   accessCredential: DatasetWithId,
 ): Record<string, unknown> {
   const credentialObject = JSON.parse(JSON.stringify(accessCredential));
-  let consent: unknown;
+  let consent;
   if (isAccessGrant(credentialObject)) {
     consent = (credentialObject as AccessGrant).credentialSubject
       .providedConsent;
   } else if (isAccessRequest(credentialObject)) {
     consent = (credentialObject as AccessRequest).credentialSubject.hasConsent;
   }
-  const customFields = JSON.parse(
-    JSON.stringify(consent, (k, v) =>
+  return (
+    Object.entries(consent ?? {})
       // Filter out all well-known keys
-      WELL_KNOWN_KEYS.includes(k) ? undefined : v,
-    ),
+      .filter((entry) => !WELL_KNOWN_KEYS.includes(entry[0]))
+      .reduce(
+        (customFields, curEntry) =>
+          Object.assign(customFields, { [`${curEntry[0]}`]: curEntry[1] }),
+        {},
+      )
   );
-  return customFields;
 }
 
 /**
