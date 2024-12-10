@@ -33,7 +33,7 @@ import {
   getConsent,
   getCredentialSubject,
   getCustomFields,
-  getCustomDouble,
+  getCustomFloat,
   getExpirationDate,
   getId,
   getInbox,
@@ -49,7 +49,7 @@ import {
   getTypes,
   getCustomIntegers,
   getCustomBooleans,
-  getCustomDoubles,
+  getCustomFloats,
   getCustomStrings,
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
@@ -767,11 +767,11 @@ describe("getters", () => {
     });
   });
 
-  describe("getCustomDoubles", () => {
-    it("gets a double array value from an access request custom field", async () => {
+  describe("getCustomFloats", () => {
+    it("gets a float array value from an access request custom field", async () => {
       const customFields = [
         {
-          key: new URL("https://example.org/ns/customDouble"),
+          key: new URL("https://example.org/ns/customFloat"),
           value: [1.1],
         },
       ];
@@ -779,9 +779,9 @@ describe("getters", () => {
         custom: customFields,
       });
       // This shows the typing of the return is correct.
-      const d: number[] = getCustomDoubles(
+      const d: number[] = getCustomFloats(
         gConsentRequest,
-        new URL("https://example.org/ns/customDouble"),
+        new URL("https://example.org/ns/customFloat"),
       );
       expect(d).toEqual([1.1]);
     });
@@ -797,7 +797,7 @@ describe("getters", () => {
         custom: customFields,
       });
       // This shows the typing of the return is correct.
-      const d: number[] = getCustomDoubles(
+      const d: number[] = getCustomFloats(
         gConsentRequest,
         new URL("https://example.org/ns/customFloat"),
       );
@@ -807,21 +807,21 @@ describe("getters", () => {
     it("throws on mixed types", async () => {
       const customFields = [
         {
-          key: new URL("https://example.org/ns/customDouble"),
+          key: new URL("https://example.org/ns/customFloat"),
           value: 1.1,
         },
         {
-          key: new URL("https://example.org/ns/customDouble"),
-          value: "not a double",
+          key: new URL("https://example.org/ns/customFloat"),
+          value: "not a float",
         },
       ];
       const gConsentRequest = await mockGConsentRequest({
         custom: customFields,
       });
       expect(() =>
-        getCustomDoubles(
+        getCustomFloats(
           gConsentRequest,
-          new URL("https://example.org/ns/customDouble"),
+          new URL("https://example.org/ns/customFloat"),
         ),
       ).toThrow();
     });
@@ -829,9 +829,9 @@ describe("getters", () => {
     it("gets an empty value from an access request without custom field", async () => {
       const gConsentRequest = await mockGConsentRequest();
       // This shows the typing of the return is correct.
-      const d: number[] = getCustomDoubles(
+      const d: number[] = getCustomFloats(
         gConsentRequest,
-        new URL("https://example.org/ns/customDouble"),
+        new URL("https://example.org/ns/customFloat"),
       );
       expect(d).toHaveLength(0);
     });
@@ -890,7 +890,7 @@ describe("getters", () => {
         custom: customFields,
       });
       expect(() =>
-        getCustomDoubles(
+        getCustomFloats(
           gConsentRequest,
           new URL("https://example.org/ns/customString"),
         ),
@@ -1076,11 +1076,11 @@ describe("getters", () => {
     });
   });
 
-  describe("getCustomDouble", () => {
-    it("gets a double value from an access request custom field", async () => {
+  describe("getCustomFloat", () => {
+    it("gets a float value from an access request custom field", async () => {
       const customFields = [
         {
-          key: new URL("https://example.org/ns/customDouble"),
+          key: new URL("https://example.org/ns/customFloat"),
           value: 1.1,
         },
       ];
@@ -1088,9 +1088,9 @@ describe("getters", () => {
         custom: customFields,
       });
       // This shows the typing of the return is correct.
-      const d: number | undefined = getCustomDouble(
+      const d: number | undefined = getCustomFloat(
         gConsentRequest,
-        new URL("https://example.org/ns/customDouble"),
+        new URL("https://example.org/ns/customFloat"),
       );
       expect(d).toBe(1.1);
     });
@@ -1098,7 +1098,7 @@ describe("getters", () => {
     it("returns undefined if no matching custom field is available", async () => {
       const customFields = [
         {
-          key: new URL("https://example.org/ns/customDouble"),
+          key: new URL("https://example.org/ns/customFloat"),
           value: true,
         },
       ];
@@ -1106,9 +1106,9 @@ describe("getters", () => {
         custom: customFields,
       });
       // This shows the typing of the return is correct.
-      const d: number | undefined = getCustomDouble(
+      const d: number | undefined = getCustomFloat(
         gConsentRequest,
-        new URL("https://example.org/ns/anotherCustomDouble"),
+        new URL("https://example.org/ns/anotherCustomFloat"),
       );
       expect(d).toBeUndefined();
     });
@@ -1116,9 +1116,9 @@ describe("getters", () => {
     it("returns undefined if no custom field is available", async () => {
       const gConsentRequest = await mockGConsentRequest();
       // This shows the typing of the return is correct.
-      const d: number | undefined = getCustomDouble(
+      const d: number | undefined = getCustomFloat(
         gConsentRequest,
-        new URL("https://example.org/ns/customDouble"),
+        new URL("https://example.org/ns/customFloat"),
       );
       expect(d).toBeUndefined();
     });
@@ -1126,7 +1126,7 @@ describe("getters", () => {
     it("throws if more than one value is available", async () => {
       const customFields = [
         {
-          key: new URL("https://example.org/ns/customDouble"),
+          key: new URL("https://example.org/ns/customFloat"),
           value: [1.1, 2.2],
         },
       ];
@@ -1134,9 +1134,9 @@ describe("getters", () => {
         custom: customFields,
       });
       expect(() =>
-        getCustomDouble(
+        getCustomFloat(
           gConsentRequest,
-          new URL("https://example.org/ns/customDouble"),
+          new URL("https://example.org/ns/customFloat"),
         ),
       ).toThrow();
     });
@@ -1144,17 +1144,17 @@ describe("getters", () => {
     it("throws on type mismatch", async () => {
       const customFields = [
         {
-          key: new URL("https://example.org/ns/customDouble"),
-          value: "not a double",
+          key: new URL("https://example.org/ns/customFloat"),
+          value: "not a float",
         },
       ];
       const gConsentRequest = await mockGConsentRequest({
         custom: customFields,
       });
       expect(() =>
-        getCustomDouble(
+        getCustomFloat(
           gConsentRequest,
-          new URL("https://example.org/ns/customDouble"),
+          new URL("https://example.org/ns/customFloat"),
         ),
       ).toThrow();
     });

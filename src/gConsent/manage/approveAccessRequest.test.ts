@@ -824,7 +824,7 @@ describe("approveAccessRequest", () => {
         value: 1,
       },
       {
-        key: new URL("https://example.org/ns/customDouble"),
+        key: new URL("https://example.org/ns/customFloat"),
         value: 1.1,
       },
       {
@@ -869,7 +869,7 @@ describe("approveAccessRequest", () => {
             value: 2,
           },
           {
-            key: new URL("https://example.org/ns/customDouble"),
+            key: new URL("https://example.org/ns/customFloat"),
             value: 2.2,
           },
           {
@@ -907,7 +907,7 @@ describe("approveAccessRequest", () => {
           "https://example.org/ns/customString": "overriddenCustomValue",
           "https://example.org/ns/customBoolean": false,
           "https://example.org/ns/customInt": 2,
-          "https://example.org/ns/customDouble": 2.2,
+          "https://example.org/ns/customFloat": 2.2,
           "https://example.org/ns/customStringArray": [
             "overriden customValue",
             "overriden otherCustomValue",
@@ -1138,7 +1138,7 @@ describe("approveAccessRequest", () => {
             value: 1,
           },
           {
-            key: new URL("https://example.org/ns/customDouble"),
+            key: new URL("https://example.org/ns/customFloat"),
             value: 1.1,
           },
         ]),
@@ -1160,7 +1160,7 @@ describe("approveAccessRequest", () => {
           "https://example.org/ns/customString": "customValue",
           "https://example.org/ns/customBoolean": true,
           "https://example.org/ns/customInt": 1,
-          "https://example.org/ns/customDouble": 1.1,
+          "https://example.org/ns/customFloat": 1.1,
         },
         inbox: "https://some-custom.inbox",
       }),
