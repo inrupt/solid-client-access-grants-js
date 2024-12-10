@@ -51,11 +51,12 @@ import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { toVcDataset } from "../../common/util/toVcDataset";
+import type { CustomField } from "../../type/CustomField";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
   "expirationDate"
-> & { expirationDate?: Date | null };
+> & { expirationDate?: Date | null; customFields?: Set<CustomField> };
 
 /**
  * Internal function. This is a stopgap until we have proper JSON-LD parsing.
@@ -302,17 +303,20 @@ export async function approveAccessRequest(
     requestOverride,
   );
 
-  const grantBody = getGrantBody({
-    access: internalGrantOptions.access,
-    requestor: internalGrantOptions.requestor,
-    resources: internalGrantOptions.resources,
-    requestorInboxUrl: internalGrantOptions.requestorInboxUrl,
-    purpose: internalGrantOptions.purpose,
-    issuanceDate: internalGrantOptions.issuanceDate,
-    expirationDate: internalGrantOptions.expirationDate ?? undefined,
-    status: gc.ConsentStatusExplicitlyGiven.value,
-    inherit: internalGrantOptions.inherit,
-  });
+  const grantBody = getGrantBody(
+    {
+      access: internalGrantOptions.access,
+      requestor: internalGrantOptions.requestor,
+      resources: internalGrantOptions.resources,
+      requestorInboxUrl: internalGrantOptions.requestorInboxUrl,
+      purpose: internalGrantOptions.purpose,
+      issuanceDate: internalGrantOptions.issuanceDate,
+      expirationDate: internalGrantOptions.expirationDate ?? undefined,
+      status: gc.ConsentStatusExplicitlyGiven.value,
+      inherit: internalGrantOptions.inherit,
+    },
+    { customFields: internalGrantOptions.customFields },
+  );
 
   const grantedAccess = getAccessModesFromAccessGrant(grantBody);
 
