@@ -465,6 +465,7 @@ const WELL_KNOWN_KEYS = [
 
 /**
  * Reads all the custom fields in the consent section of the provided Access Credential.
+ * An empty object will be returned if no custom fields are found.
  *
  * @example
  * ```
@@ -562,7 +563,8 @@ function deserializeField<T>(
 }
 
 /**
- * Reads the custom boolean value with the provided name in the consent section of the provided Access Credential.
+ * Reads the custom boolean array with the provided name in the consent section of the provided Access Credential.
+ * Throws on type mismatch, and returns an empty array if no values are found.
  *
  * @example
  * ```
@@ -596,7 +598,8 @@ export function getCustomBooleans(
 }
 
 /**
- * Reads the custom boolean array value with the provided name in the consent section of the provided Access Credential.
+ * Reads the custom boolean value with the provided name in the consent section of the provided Access Credential.
+ * Throws on type mismatch, and returns `undefined` if no values are found.
  *
  * @example
  * ```
@@ -630,7 +633,8 @@ export function getCustomBoolean(
 }
 
 /**
- * Reads the custom float array value with the provided name in the consent section of the provided Access Credential.
+ * Reads the custom float array with the provided name in the consent section of the provided Access Credential.
+ * Throws on type mismatch, and returns an empty array if no values are found.
  *
  * @example
  * ```
@@ -665,6 +669,7 @@ export function getCustomFloats(
 
 /**
  * Reads the custom float value with the provided name in the consent section of the provided Access Credential.
+ * Throws on type mismatch, and returns `undefined` if no values are found.
  *
  * @example
  * ```
@@ -698,7 +703,8 @@ export function getCustomFloat(
 }
 
 /**
- * Reads the custom integer array value with the provided name in the consent section of the provided Access Credential.
+ * Reads the custom integer array with the provided name in the consent section of the provided Access Credential.
+ * Throws on type mismatch, and returns an empty array if no values are found.
  *
  * @example
  * ```
@@ -733,6 +739,7 @@ export function getCustomIntegers(
 
 /**
  * Reads the custom integer value with the provided name in the consent section of the provided Access Credential.
+ * Throws on type mismatch, and returns `undefined` if no values are found.
  *
  * @example
  * ```
@@ -766,7 +773,8 @@ export function getCustomInteger(
 }
 
 /**
- * Reads the custom string array value with the provided name in the consent section of the provided Access Credential.
+ * Reads the custom string array with the provided name in the consent section of the provided Access Credential.
+ * Throws on type mismatch, and returns an empty array if no values are found.
  *
  * @example
  * ```
@@ -793,6 +801,7 @@ export function getCustomStrings(vc: DatasetWithId, field: URL): string[] {
 
 /**
  * Reads the custom string value with the provided name in the consent section of the provided Access Credential.
+ * Throws on type mismatch, and returns `undefined` if no values are found.
  *
  * @example
  * ```
