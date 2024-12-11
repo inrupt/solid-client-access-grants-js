@@ -68,6 +68,12 @@ export const toJson = (
             `All custom fields keys must be URL objects, found ${field.key}`,
           );
         }
+        if (!["string", "number", "boolean"].includes(typeof field.value)) {
+          // FIXME use inrupt error library
+          throw new Error(
+            `All custom fields values must be literals, found ${field.value} (or type ${typeof field.value})`,
+          );
+        }
         return { [`${field.key.toString()}`]: field.value };
       })
       // Collapse all the JSON object entries into a single object.
