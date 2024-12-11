@@ -442,80 +442,6 @@ export function getInherit(vc: DatasetWithId): boolean {
   );
 }
 
-const WELL_KNOWN_KEYS = [
-  "forPersonalData",
-  "forPurpose",
-  "isProvidedTo",
-  "isProvidedToController",
-  "isProvidedToPerson",
-  "mode",
-  "inherit",
-  "hasStatus",
-  "isConsentForDataSubject",
-  gc.forPersonalData.value,
-  gc.forPurpose.value,
-  gc.isProvidedTo.value,
-  gc.isProvidedToController.value,
-  gc.isProvidedToPerson.value,
-  gc.hasStatus.value,
-  gc.isConsentForDataSubject.value,
-  acl.mode.value,
-  INHERIT.value,
-] as const;
-
-/**
- * Reads all the custom fields in the consent section of the provided Access Credential.
- * An empty object will be returned if no custom fields are found.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customString"),
- *       value: "custom value",
- *     },
- *     {
- *       key: new URL("https://example.org/ns/customInteger"),
- *       value: 1,
- *     },
- *   ]),
- * });
- * const customFields = getCustomFields(accessRequest);
- * // s is "custom value"
- * const s = customFields["https://example.org/ns/customString"];
- * // i is 1
- * const i = customFields["https://example.org/ns/custominteger"];
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access Request)
- * @returns an object keyed by the custom fields names, associated to their values.
- * @since unreleased
- */
-export function getCustomFields(
-  accessCredential: DatasetWithId,
-): Record<string, unknown> {
-  const credentialObject = JSON.parse(JSON.stringify(accessCredential));
-  let consent;
-  if (isAccessGrant(credentialObject)) {
-    consent = (credentialObject as AccessGrant).credentialSubject
-      .providedConsent;
-  } else if (isAccessRequest(credentialObject)) {
-    consent = (credentialObject as AccessRequest).credentialSubject.hasConsent;
-  }
-  return (
-    Object.entries(consent ?? {})
-      // Filter out all well-known keys
-      .filter((entry) => !WELL_KNOWN_KEYS.includes(entry[0]))
-      .reduce(
-        (customFields, curEntry) =>
-          Object.assign(customFields, { [`${curEntry[0]}`]: curEntry[1] }),
-        {},
-      )
-  );
-}
-
 /**
  * Internal function. Deserializes a literal using the provided function.
  * If the literal cannot be deserialized as expected (e.g. an attempt to
@@ -739,6 +665,97 @@ export function getCustomString(
       str.datatype.equals(xmlSchemaTypes.string) ? str.value : undefined,
     "string",
   );
+}
+
+function castLiteral(lit: Literal): unknown {
+  if (lit.datatype.equals(xmlSchemaTypes.boolean)) {
+    return deserializeBoolean(lit);
+  }
+  if (lit.datatype.equals(xmlSchemaTypes.double)) {
+    return deserizalizeDouble(lit);
+  }
+  if (lit.datatype.equals(xmlSchemaTypes.integer)) {
+    return deserizalizeInteger(lit);
+  }
+  if (lit.datatype.equals(xmlSchemaTypes.string)) {
+    return lit.value;
+  }
+  throw new Error(`Unsupported literal type ${lit.datatype.value}`);
+}
+
+const WELL_KNOWN_FIELDS = [
+  gc.forPersonalData,
+  gc.forPurpose,
+  gc.isProvidedTo,
+  gc.isProvidedToController,
+  gc.isProvidedToPerson,
+  gc.hasStatus,
+  gc.isConsentForDataSubject,
+  acl.mode,
+  INHERIT,
+] as const;
+
+/**
+ * Reads all the custom fields in the consent section of the provided Access Credential.
+ * An empty object will be returned if no custom fields are found.
+ *
+ * @example
+ * ```
+ * const accessRequest = await issueAccessRequest({...}, {
+ *  ...,
+ *  customFields: new Set([
+ *     {
+ *       key: new URL("https://example.org/ns/customString"),
+ *       value: "custom value",
+ *     },
+ *     {
+ *       key: new URL("https://example.org/ns/customInteger"),
+ *       value: 1,
+ *     },
+ *   ]),
+ * });
+ * const customFields = getCustomFields(accessRequest);
+ * // s is "custom value"
+ * const s = customFields["https://example.org/ns/customString"];
+ * // i is 1
+ * const i = customFields["https://example.org/ns/custominteger"];
+ * ```
+ *
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
+ * @returns an object keyed by the custom fields names, associated to their values.
+ * @since unreleased
+ */
+export function getCustomFields(
+  accessCredential: DatasetWithId,
+): Record<string, unknown> {
+  const consent = getConsent(accessCredential);
+  return Array.from(accessCredential.match(consent, null, null, defaultGraph()))
+    .filter(
+      ({ predicate, object }) =>
+        // The Access Grant data model is known, so by elimination any unknown
+        // field is a custom one.
+        !WELL_KNOWN_FIELDS.some((wellKnown) => wellKnown.equals(predicate)) &&
+        // Nested objects are not supported.
+        object.termType === "Literal",
+    )
+    .map(({ predicate, object }) => ({
+      // The type assertion is okay, because we filter on the term type.
+      [`${predicate.value}`]: castLiteral(object as Literal),
+    }))
+    .reduce(
+      (acc, cur) => {
+        // There is a single key in the current object.
+        const curKey = Object.keys(cur)[0];
+        if (acc[curKey] !== undefined) {
+          // FIXME use inrupt error
+          throw new Error(
+            `Expected single values for custom fields, found multiple for ${curKey}`,
+          );
+        }
+        return Object.assign(acc, cur);
+      },
+      {} as Record<string, unknown>,
+    );
 }
 
 /**

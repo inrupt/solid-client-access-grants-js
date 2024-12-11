@@ -575,6 +575,15 @@ describe("getters", () => {
     it("returns an empty object if no custom fields are found", async () => {
       expect(getCustomFields(await mockGConsentRequest())).toStrictEqual({});
     });
+
+    it("throws on multiple values for a single key", async () => {
+      const gConsentRequest = await mockGConsentRequest({}, (r) => {
+        Object.assign(r.credentialSubject.hasConsent, {
+          "https://example.org/ns/customBoolean": [true, false],
+        });
+      });
+      expect(() => getCustomFields(gConsentRequest)).toThrow();
+    });
   });
 
   describe("getCustomInteger", () => {
