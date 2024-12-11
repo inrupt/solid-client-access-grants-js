@@ -94,7 +94,10 @@ export function initializeGrantParameters(
           inherit: requestOverride?.inherit ?? getInherit(requestVc),
           customFields:
             requestOverride?.customFields !== undefined
-              ? toJson(requestOverride?.customFields)
+              ? {
+                  ...getCustomFields(requestVc),
+                  ...toJson(requestOverride?.customFields),
+                }
               : getCustomFields(requestVc),
         };
   if (requestOverride?.expirationDate === null) {

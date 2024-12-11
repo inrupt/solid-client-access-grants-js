@@ -40,7 +40,7 @@ describe("Index exports", () => {
       "isValidAccessGrant",
       "getAccessModes",
       "getCustomBoolean",
-      "getCustomDouble",
+      "getCustomFloat",
       "getCustomFields",
       "getCustomInteger",
       "getCustomString",

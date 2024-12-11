@@ -33,7 +33,7 @@ import {
   getConsent,
   getCredentialSubject,
   getCustomFields,
-  getCustomDouble,
+  getCustomFloat,
   getExpirationDate,
   getId,
   getInbox,
@@ -564,7 +564,7 @@ describe("getters", () => {
       const gConsentRequest = await mockGConsentRequest({
         custom: customFields,
       });
-      expect(getCustomFields(gConsentRequest)).toStrictEqual({
+      expect(getCustomFields(gConsentRequest)).toEqual({
         "https://example.org/ns/customString": "customValue",
         "https://example.org/ns/customBoolean": true,
         "https://example.org/ns/customInt": 1,
@@ -574,6 +574,15 @@ describe("getters", () => {
 
     it("returns an empty object if no custom fields are found", async () => {
       expect(getCustomFields(await mockGConsentRequest())).toStrictEqual({});
+    });
+
+    it("throws on multiple values for a single key", async () => {
+      const gConsentRequest = await mockGConsentRequest({}, (r) => {
+        Object.assign(r.credentialSubject.hasConsent, {
+          "https://example.org/ns/customBoolean": [true, false],
+        });
+      });
+      expect(() => getCustomFields(gConsentRequest)).toThrow();
     });
   });
 
@@ -595,6 +604,66 @@ describe("getters", () => {
       );
       expect(i).toBe(1);
     });
+
+    it("returns undefined if no matching custom field is available", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customInt"),
+          value: 1,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const i: number | undefined = getCustomInteger(
+        gConsentRequest,
+        new URL("https://example.org/ns/anotherCustomInt"),
+      );
+      expect(i).toBeUndefined();
+    });
+
+    it("returns undefined if no custom field is available", async () => {
+      const gConsentRequest = await mockGConsentRequest();
+      // This shows the typing of the return is correct.
+      const i: number | undefined = getCustomInteger(
+        gConsentRequest,
+        new URL("https://example.org/ns/customInt"),
+      );
+      expect(i).toBeUndefined();
+    });
+
+    it("throws if more than one value is available", async () => {
+      const gConsentRequest = await mockGConsentRequest({}, (r) => {
+        Object.assign(r.credentialSubject.hasConsent, {
+          "https://example.org/ns/customInt": [1, 2],
+        });
+      });
+      expect(() =>
+        getCustomInteger(
+          gConsentRequest,
+          new URL("https://example.org/ns/customInt"),
+        ),
+      ).toThrow();
+    });
+
+    it("throws on type mismatch", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customInt"),
+          value: "not an int",
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomInteger(
+          gConsentRequest,
+          new URL("https://example.org/ns/customInt"),
+        ),
+      ).toThrow();
+    });
   });
 
   describe("getCustomBoolean", () => {
@@ -615,13 +684,73 @@ describe("getters", () => {
       );
       expect(bool).toBe(true);
     });
-  });
 
-  describe("getCustomDouble", () => {
-    it("gets a double value from an access request custom field", async () => {
+    it("returns undefined if no matching custom field is available", async () => {
       const customFields = [
         {
-          key: new URL("https://example.org/ns/customDouble"),
+          key: new URL("https://example.org/ns/customBoolean"),
+          value: true,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const b: boolean | undefined = getCustomBoolean(
+        gConsentRequest,
+        new URL("https://example.org/ns/anotherCustomBoolean"),
+      );
+      expect(b).toBeUndefined();
+    });
+
+    it("returns undefined if no custom field is available", async () => {
+      const gConsentRequest = await mockGConsentRequest();
+      // This shows the typing of the return is correct.
+      const b: boolean | undefined = getCustomBoolean(
+        gConsentRequest,
+        new URL("https://example.org/ns/customBoolean"),
+      );
+      expect(b).toBeUndefined();
+    });
+
+    it("throws if more than one value is available", async () => {
+      const gConsentRequest = await mockGConsentRequest({}, (r) => {
+        Object.assign(r.credentialSubject.hasConsent, {
+          "https://example.org/ns/customBoolean": [true, false],
+        });
+      });
+      expect(() =>
+        getCustomBoolean(
+          gConsentRequest,
+          new URL("https://example.org/ns/customBoolean"),
+        ),
+      ).toThrow();
+    });
+
+    it("throws on type mismatch", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customBoolean"),
+          value: "not a boolean",
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomBoolean(
+          gConsentRequest,
+          new URL("https://example.org/ns/customBoolean"),
+        ),
+      ).toThrow();
+    });
+  });
+
+  describe("getCustomFloat", () => {
+    it("gets a float value from an access request custom field", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customFloat"),
           value: 1.1,
         },
       ];
@@ -629,11 +758,71 @@ describe("getters", () => {
         custom: customFields,
       });
       // This shows the typing of the return is correct.
-      const d: number | undefined = getCustomDouble(
+      const d: number | undefined = getCustomFloat(
         gConsentRequest,
-        new URL("https://example.org/ns/customDouble"),
+        new URL("https://example.org/ns/customFloat"),
       );
       expect(d).toBe(1.1);
+    });
+
+    it("returns undefined if no matching custom field is available", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customFloat"),
+          value: true,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const d: number | undefined = getCustomFloat(
+        gConsentRequest,
+        new URL("https://example.org/ns/anotherCustomFloat"),
+      );
+      expect(d).toBeUndefined();
+    });
+
+    it("returns undefined if no custom field is available", async () => {
+      const gConsentRequest = await mockGConsentRequest();
+      // This shows the typing of the return is correct.
+      const d: number | undefined = getCustomFloat(
+        gConsentRequest,
+        new URL("https://example.org/ns/customFloat"),
+      );
+      expect(d).toBeUndefined();
+    });
+
+    it("throws if more than one value is available", async () => {
+      const gConsentRequest = await mockGConsentRequest({}, (r) => {
+        Object.assign(r.credentialSubject.hasConsent, {
+          "https://example.org/ns/customFloat": [1.1, 2.2],
+        });
+      });
+      expect(() =>
+        getCustomFloat(
+          gConsentRequest,
+          new URL("https://example.org/ns/customFloat"),
+        ),
+      ).toThrow();
+    });
+
+    it("throws on type mismatch", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customFloat"),
+          value: "not a float",
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomFloat(
+          gConsentRequest,
+          new URL("https://example.org/ns/customFloat"),
+        ),
+      ).toThrow();
     });
   });
 
@@ -654,6 +843,70 @@ describe("getters", () => {
         new URL("https://example.org/ns/customString"),
       );
       expect(s).toBe("some value");
+    });
+
+    it("returns undefined if no matching custom field is available", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customString"),
+          value: true,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      // This shows the typing of the return is correct.
+      const s: string | undefined = getCustomString(
+        gConsentRequest,
+        new URL("https://example.org/ns/anotherCustomString"),
+      );
+      expect(s).toBeUndefined();
+    });
+
+    it("returns undefined if no custom field is available", async () => {
+      const gConsentRequest = await mockGConsentRequest();
+      // This shows the typing of the return is correct.
+      const s: string | undefined = getCustomString(
+        gConsentRequest,
+        new URL("https://example.org/ns/customString"),
+      );
+      expect(s).toBeUndefined();
+    });
+
+    it("throws if more than one value is available", async () => {
+      const gConsentRequest = await mockGConsentRequest({}, (r) => {
+        Object.assign(r.credentialSubject.hasConsent, {
+          "https://example.org/ns/customString": [
+            "some value",
+            "some other value",
+          ],
+        });
+      });
+      expect(() =>
+        getCustomString(
+          gConsentRequest,
+          new URL("https://example.org/ns/customString"),
+        ),
+      ).toThrow();
+    });
+
+    it("throws on type mismatch", async () => {
+      const customFields = [
+        {
+          key: new URL("https://example.org/ns/customString"),
+          // Not a string
+          value: false,
+        },
+      ];
+      const gConsentRequest = await mockGConsentRequest({
+        custom: customFields,
+      });
+      expect(() =>
+        getCustomString(
+          gConsentRequest,
+          new URL("https://example.org/ns/customString"),
+        ),
+      ).toThrow();
     });
   });
 
