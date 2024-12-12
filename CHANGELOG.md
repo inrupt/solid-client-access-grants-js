@@ -16,9 +16,8 @@ The following changes are pending, and will be applied on the next major release
   into Access Credentials (both Access Requests and Access Grants). This feature is available
   via a new option introduced in `issueAccessRequest` and `approveAccessRequest` to write the
   custom fields, and via a set of dedicated getters in the `getters/` module. A generic getter
-  is introduced, `getCustomFields`, as well as a set of typed helpers, such as `getCustomInteger`
-  and `getCustomIntegers`. Typed helpers are available for integers, floats, strings and booleans,
-  with a scalar and array version of each.
+  is introduced, `getCustomFields`, as well as a set of typed helpers, such as `getCustomInteger`.
+  Typed helpers are available for integers, floats, strings and booleans.
 
 ## [3.1.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.1.1) - 2024-10-23
 
