@@ -523,8 +523,8 @@ function deserializeBoolean(serialized: Literal): boolean | undefined {
  *     },
  *   ]),
  * });
- * // s is true
- * const s = getCustomBoolean(accessRequest, new URL("https://example.org/ns/customBoolean"));
+ * // b is true
+ * const b = getCustomBoolean(accessRequest, new URL("https://example.org/ns/customBoolean"));
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
@@ -566,8 +566,8 @@ function deserizalizeDouble(serialized: Literal): number | undefined {
  *     },
  *   ]),
  * });
- * // d is 1.1
- * const d = getCustomFloat(accessRequest, new URL("https://example.org/ns/customFloat"));
+ * // f is 1.1
+ * const f = getCustomFloat(accessRequest, new URL("https://example.org/ns/customFloat"));
  * ```
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
