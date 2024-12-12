@@ -543,7 +543,7 @@ export function getCustomBoolean(
   );
 }
 
-function deserizalizeDouble(serialized: Literal): number | undefined {
+function deserializeFloat(serialized: Literal): number | undefined {
   if (!serialized.datatype.equals(xmlSchemaTypes.double)) {
     return undefined;
   }
@@ -578,10 +578,10 @@ export function getCustomFloat(
   accessCredential: DatasetWithId,
   field: URL,
 ): number | undefined {
-  return deserializeField(accessCredential, field, deserizalizeDouble, "float");
+  return deserializeField(accessCredential, field, deserializeFloat, "float");
 }
 
-function deserizalizeInteger(serialized: Literal): number | undefined {
+function deserializeInteger(serialized: Literal): number | undefined {
   if (!serialized.datatype.equals(xmlSchemaTypes.integer)) {
     return undefined;
   }
@@ -619,7 +619,7 @@ export function getCustomInteger(
   return deserializeField(
     accessCredential,
     field,
-    deserizalizeInteger,
+    deserializeInteger,
     "integer",
   );
 }
@@ -665,10 +665,10 @@ function castLiteral(lit: Literal): unknown {
     return deserializeBoolean(lit);
   }
   if (lit.datatype.equals(xmlSchemaTypes.double)) {
-    return deserizalizeDouble(lit);
+    return deserializeFloat(lit);
   }
   if (lit.datatype.equals(xmlSchemaTypes.integer)) {
-    return deserizalizeInteger(lit);
+    return deserializeInteger(lit);
   }
   if (lit.datatype.equals(xmlSchemaTypes.string)) {
     return lit.value;
