@@ -22,6 +22,8 @@
 import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 
+import type { NamedNode } from "n3";
+import { INHERIT, acl, gc } from "../../common/constants";
 import type { CustomField } from "../../type/CustomField";
 import {
   issueAccessRequest,
@@ -576,8 +578,20 @@ describe.each([true, false, undefined])(
           returnLegacyJsonld,
           customFields: new Set([
             {
-              key: new URL("https://example.org/ns/customField"),
-              value: "customValue",
+              key: new URL("https://example.org/ns/customString"),
+              value: "custom value",
+            },
+            {
+              key: new URL("https://example.org/ns/customBoolean"),
+              value: true,
+            },
+            {
+              key: new URL("https://example.org/ns/customInt"),
+              value: 1,
+            },
+            {
+              key: new URL("https://example.org/ns/customFloat"),
+              value: 1.1,
             },
           ]),
         },
@@ -591,7 +605,10 @@ describe.each([true, false, undefined])(
             hasStatus: "https://w3id.org/GConsent#ConsentStatusRequested",
             forPersonalData: ["https://some.pod/resource"],
             isConsentForDataSubject: "https://some.pod/profile#you",
-            "https://example.org/ns/customField": "customValue",
+            "https://example.org/ns/customString": "custom value",
+            "https://example.org/ns/customBoolean": true,
+            "https://example.org/ns/customInt": 1,
+            "https://example.org/ns/customFloat": 1.1,
           },
         }),
         expect.objectContaining({
@@ -599,6 +616,35 @@ describe.each([true, false, undefined])(
         }),
         expect.anything(),
       );
+    });
+
+    it("throws if the same key is used for multiple custom fields", async () => {
+      mockAccessApiEndpoint();
+
+      await expect(() =>
+        issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+            resources: ["https://some.pod/resource"],
+            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+          },
+          {
+            fetch: jest.fn<typeof fetch>(),
+            returnLegacyJsonld,
+            customFields: new Set([
+              {
+                key: new URL("https://example.org/ns/customField"),
+                value: "custom string",
+              },
+              {
+                key: new URL("https://example.org/ns/customField"),
+                value: "another string",
+              },
+            ]),
+          },
+        ),
+      ).rejects.toThrow();
     });
 
     it("throws on invalid custom fields", async () => {
@@ -647,31 +693,6 @@ describe.each([true, false, undefined])(
           },
         ),
       ).rejects.toThrow();
-    });
-
-    it("throws if using reserved predicates as custom fields", async () => {
-      mockAccessApiEndpoint();
-
-      await expect(() =>
-        issueAccessRequest(
-          {
-            access: { read: true },
-            resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-            resources: ["https://some.pod/resource"],
-            requestorInboxUrl: MOCK_REQUESTOR_INBOX,
-          },
-          {
-            fetch: jest.fn<typeof fetch>(),
-            returnLegacyJsonld,
-            customFields: new Set([
-              {
-                key: new URL("https://w3id.org/GConsent#forPersonalData"),
-                value: "customValue",
-              },
-            ]),
-          },
-        ),
-      ).rejects.toThrow();
 
       await expect(() =>
         issueAccessRequest(
@@ -687,7 +708,7 @@ describe.each([true, false, undefined])(
             customFields: new Set([
               {
                 key: new URL("https://example.org/ns/customField"),
-                value: { notA: "literal" },
+                value: ["not a", "scalar"],
                 // Mimic a user passing in bad data not caught by a TS compiler
               } as unknown as CustomField,
             ]),
@@ -695,5 +716,41 @@ describe.each([true, false, undefined])(
         ),
       ).rejects.toThrow();
     });
+
+    it.each([
+      [gc.forPersonalData],
+      [gc.forPurpose],
+      [gc.isProvidedTo],
+      [gc.isProvidedToController],
+      [gc.isProvidedToPerson],
+      [acl.mode],
+      [INHERIT],
+    ])(
+      "throws if using reserved predicate %s as custom fields",
+      async (reserved: NamedNode) => {
+        mockAccessApiEndpoint();
+
+        await expect(() =>
+          issueAccessRequest(
+            {
+              access: { read: true },
+              resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+              resources: ["https://some.pod/resource"],
+              requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+            },
+            {
+              fetch: jest.fn<typeof fetch>(),
+              returnLegacyJsonld,
+              customFields: new Set([
+                {
+                  key: new URL(reserved.value),
+                  value: "customValue",
+                },
+              ]),
+            },
+          ),
+        ).rejects.toThrow();
+      },
+    );
   },
 );

@@ -25,7 +25,7 @@ export type CustomField = {
   /* The custom field name (this must be a URL). */
   key: URL;
   /* The custom field value (this must be a literal). */
-  value: string | number | boolean;
+  value: string | number | boolean | undefined;
 };
 
 const WELL_KNOWN_FIELDS = [
@@ -68,11 +68,31 @@ export const toJson = (
             `All custom fields keys must be URL objects, found ${field.key}`,
           );
         }
+        if (
+          !["string", "number", "boolean", "undefined"].includes(
+            typeof field.value,
+          )
+        ) {
+          // FIXME use inrupt error library
+          throw new Error(
+            `All custom fields values must be literals, found ${JSON.stringify(field.value)} (of type ${typeof field.value})`,
+          );
+        }
         return { [`${field.key.toString()}`]: field.value };
       })
       // Collapse all the JSON object entries into a single object.
       .reduce(
-        (acc, cur) => Object.assign(acc, cur),
+        (acc, cur) => {
+          // We know the current object has a single key.
+          if (acc[Object.keys(cur)[0]] !== undefined) {
+            // If the provided key already exists, the input is invalid.
+            // FIXME use inrupt error library
+            throw new Error(
+              `Each custom field key must be unique. Found multiple values for ${Object.keys(cur)[0]}`,
+            );
+          }
+          return Object.assign(acc, cur);
+        },
         {} as Record<string, CustomField["value"]>,
       )
   );

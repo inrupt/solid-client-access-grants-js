@@ -26,7 +26,7 @@ export type { AccessGrantWrapper } from "./getters";
 export {
   getAccessModes,
   getCustomBoolean,
-  getCustomDouble,
+  getCustomFloat,
   getCustomFields,
   getCustomInteger,
   getCustomString,

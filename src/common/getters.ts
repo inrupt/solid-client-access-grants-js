@@ -212,345 +212,6 @@ export function getPurposes(vc: DatasetWithId): string[] {
   return purposes;
 }
 
-function deserializeFields<T>(
-  vc: DatasetWithId,
-  field: URL,
-  deserializer: (value: string) => T,
-): NonNullable<T>[] {
-  return Array.from(
-    vc.match(getConsent(vc), namedNode(field.href), null, defaultGraph()),
-  )
-    .map((q) => q.object.value)
-    .map(deserializer)
-    .filter((candidate) => candidate !== undefined) as NonNullable<T>[];
-}
-
-function deserializeBoolean(serialized: string): boolean | undefined {
-  if (serialized === "true") {
-    return true;
-  }
-  if (serialized === "false") {
-    return false;
-  }
-  return undefined;
-}
-
-/**
- * Reads the custom boolean value with the provided name in the consent section of the provided Access Credential.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customBoolean"),
- *       value: [true, false, true],
- *     },
- *   ]),
- * });
- * // s is [true, false, true]
- * const s = getCustomBoolean(accessRequest, new URL("https://example.org/ns/customBoolean"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
- * @since unreleased
- */
-export function getCustomBooleans(vc: DatasetWithId, field: URL): boolean[] {
-  return deserializeFields(vc, field, deserializeBoolean);
-}
-
-/**
- * Reads the custom boolean array value with the provided name in the consent section of the provided Access Credential.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customBoolean"),
- *       value: true,
- *     },
- *   ]),
- * });
- * // s is true
- * const s = getCustomBoolean(accessRequest, new URL("https://example.org/ns/customBoolean"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
- * @since unreleased
- */
-export function getCustomBoolean(
-  vc: DatasetWithId,
-  field: URL,
-): boolean | undefined {
-  // Unsure yet: should this throw if there are more than one value?
-  return getCustomBooleans(vc, field)[0];
-}
-
-function deserizalizeDouble(serialized: string): number | undefined {
-  const val = Number.parseFloat(serialized);
-  return Number.isNaN(val) ? undefined : val;
-}
-
-/**
- * Reads the custom double array value with the provided name in the consent section of the provided Access Credential.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customDouble"),
- *       value: [1.1, 2.2, 3.3],
- *     },
- *   ]),
- * });
- * // d is [1.1, 2.2, 3.3]
- * const d = getCustomDoubles(accessRequest, new URL("https://example.org/ns/customDouble"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
- * @since unreleased
- */
-export function getCustomDoubles(vc: DatasetWithId, field: URL): number[] {
-  return deserializeFields(vc, field, deserizalizeDouble);
-}
-
-/**
- * Reads the custom double value with the provided name in the consent section of the provided Access Credential.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customDouble"),
- *       value: 1.1,
- *     },
- *   ]),
- * });
- * // d is 1.1
- * const d = getCustomDouble(accessRequest, new URL("https://example.org/ns/customDouble"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
- * @since unreleased
- */
-export function getCustomDouble(
-  vc: DatasetWithId,
-  field: URL,
-): number | undefined {
-  // Unsure yet: should this throw if there are more than one value?
-  return getCustomDoubles(vc, field)[0];
-}
-
-function deserizalizeInteger(serialized: string): number | undefined {
-  const val = Number.parseInt(serialized, 10);
-  return Number.isNaN(val) ? undefined : val;
-}
-
-/**
- * Reads the custom integer array value with the provided name in the consent section of the provided Access Credential.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customInteger"),
- *       value: [1, 2, 3],
- *     },
- *   ]),
- * });
- * // i is [1, 2, 3]
- * const i = getCustomIntegers(accessRequest, new URL("https://example.org/ns/customInteger"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
- * @since unreleased
- */
-export function getCustomIntegers(vc: DatasetWithId, field: URL): number[] {
-  return deserializeFields(vc, field, deserizalizeInteger);
-}
-
-/**
- * Reads the custom integer value with the provided name in the consent section of the provided Access Credential.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customInteger"),
- *       value: 1,
- *     },
- *   ]),
- * });
- * // i is 1
- * const i = getCustomString(accessRequest, new URL("https://example.org/ns/customInteger"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access request)
- * @returns the value of the custom field with the provided name if it is a boolean, undefined otherwise.
- * @since unreleased
- */
-export function getCustomInteger(
-  vc: DatasetWithId,
-  field: URL,
-): number | undefined {
-  // Unsure yet: should this throw if there are more than one value?
-  return getCustomIntegers(vc, field)[0];
-}
-
-/**
- * Reads the custom string array value with the provided name in the consent section of the provided Access Credential.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customString"),
- *       value: ["custom value", "another value"],
- *     },
- *   ]),
- * });
- * // s is ["custom value", "another value"]
- * const s = getCustomStrings(accessRequest, new URL("https://example.org/ns/customString"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access request)
- * @returns the value of the custom field with the provided name if it is a string, undefined otherwise.
- * @since unreleased
- */
-export function getCustomStrings(vc: DatasetWithId, field: URL): string[] {
-  return deserializeFields(vc, field, (value: string) => value);
-}
-
-/**
- * Reads the custom string value with the provided name in the consent section of the provided Access Credential.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customString"),
- *       value: "custom value",
- *     },
- *   ]),
- * });
- * // s is "custom value"
- * const s = getCustomString(accessRequest, new URL("https://example.org/ns/customString"));
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access request)
- * @returns the value of the custom field with the provided name if it is a string, undefined otherwise.
- * @since unreleased
- */
-export function getCustomString(
-  vc: DatasetWithId,
-  field: URL,
-): string | undefined {
-  // Unsure yet: should this throw if there are more than one value?
-  return getCustomStrings(vc, field)[0];
-}
-
-const xmlSchemaTypes = {
-  boolean: namedNode("http://www.w3.org/2001/XMLSchema#boolean"),
-  double: namedNode("http://www.w3.org/2001/XMLSchema#double"),
-  integer: namedNode("http://www.w3.org/2001/XMLSchema#integer"),
-  string: namedNode("http://www.w3.org/2001/XMLSchema#string"),
-} as const;
-
-function castLiteral(lit: Literal): unknown {
-  if (lit.datatype.equals(xmlSchemaTypes.boolean)) {
-    return deserializeBoolean(lit.value);
-  }
-  if (lit.datatype.equals(xmlSchemaTypes.double)) {
-    return deserizalizeDouble(lit.value);
-  }
-  if (lit.datatype.equals(xmlSchemaTypes.integer)) {
-    return deserizalizeInteger(lit.value);
-  }
-  if (lit.datatype.equals(xmlSchemaTypes.string)) {
-    return lit.value;
-  }
-  throw new Error(`Unsupported literal type ${lit.datatype.value}`);
-}
-
-const WELL_KNOWN_FIELDS = [
-  gc.forPersonalData,
-  gc.forPurpose,
-  gc.isProvidedTo,
-  gc.isProvidedToController,
-  gc.isProvidedToPerson,
-  acl.mode,
-  INHERIT,
-];
-
-/**
- * Reads all the custom fields in the consent section of the provided Access Credential.
- *
- * @example
- * ```
- * const accessRequest = await issueAccessRequest({...}, {
- *  ...,
- *  customFields: new Set([
- *     {
- *       key: new URL("https://example.org/ns/customString"),
- *       value: "custom value",
- *     },
- *     {
- *       key: new URL("https://example.org/ns/customInteger"),
- *       value: 1,
- *     },
- *   ]),
- * });
- * const customFields = getCustomFields(accessRequest);
- * // s is "custom value"
- * const s = customFields["https://example.org/ns/customString"];
- * // i is 1
- * const i = customFields["https://example.org/ns/custominteger"];
- * ```
- *
- * @param accessCredential The Access Credential (Access Grant or Access request)
- * @returns an object keyed by the custom fields names, associated to their values.
- * @since unreleased
- */
-export function getCustomFields(
-  accessCredential: DatasetWithId,
-): Record<string, unknown> {
-  const consent = getConsent(accessCredential);
-  return Array.from(accessCredential.match(consent, null, null, defaultGraph()))
-    .filter(
-      ({ predicate, object }) =>
-        // The Access Grant data model is known, so by elimination any unknown
-        // field is a custom one.
-        !WELL_KNOWN_FIELDS.some((wellKnown) => wellKnown.equals(predicate)) &&
-        // Nested objects are not supported.
-        object.termType === "Literal",
-    )
-    .map(({ predicate, object }) => ({
-      // The type assertion is okay, because we filter on the term type.
-      [`${predicate.value}`]: castLiteral(object as Literal),
-    }))
-    .reduce((acc, cur) => ({ ...acc, ...cur }), {} as Record<string, unknown>);
-}
-
 export function isGConsentAccessGrant(vc: DatasetWithId): boolean {
   const credentialSubject = getCredentialSubject(vc);
   const providedConsent = getSingleObject(
@@ -773,6 +434,321 @@ export function getInherit(vc: DatasetWithId): boolean {
       defaultGraph(),
     ),
   );
+}
+
+/**
+ * Internal function. Deserializes a literal using the provided function.
+ * If the literal cannot be deserialized as expected (e.g. an attempt to
+ * deserialize a string as an integer), an error is thrown.
+ *
+ * @hidden
+ */
+function deserializeFields<T>(
+  vc: DatasetWithId,
+  field: URL,
+  deserializer: (value: Literal) => T | undefined,
+  type: string,
+): T[] {
+  return Array.from(
+    vc.match(getConsent(vc), namedNode(field.href), null, defaultGraph()),
+  )
+    .map((q) => {
+      if (q.object.termType !== "Literal") {
+        throw new Error(
+          `Expected value object for predicate ${field.href} to be a literal, found ${q.object.termType}.`,
+        );
+      }
+      return q.object as Literal;
+    })
+    .map((object) => {
+      const result = deserializer(object);
+      if (result === undefined) {
+        // FIXME use inrupt error library
+        throw new Error(
+          `Failed to deserialize value ${object.value} for predicate ${field.href} as type ${type}.`,
+        );
+      }
+      return result;
+    });
+}
+
+function deserializeField<T>(
+  vc: DatasetWithId,
+  field: URL,
+  deserializer: (value: Literal) => T | undefined,
+  type: string,
+): T | undefined {
+  const result = deserializeFields(vc, field, deserializer, type);
+  if (result.length > 1) {
+    // FIXME use inrupt error library
+    throw new Error(
+      `Expected one value for predicate ${field.href}, found many: ${result}`,
+    );
+  }
+  return result[0];
+}
+
+const xmlSchemaTypes = {
+  boolean: namedNode("http://www.w3.org/2001/XMLSchema#boolean"),
+  double: namedNode("http://www.w3.org/2001/XMLSchema#double"),
+  integer: namedNode("http://www.w3.org/2001/XMLSchema#integer"),
+  string: namedNode("http://www.w3.org/2001/XMLSchema#string"),
+} as const;
+
+function deserializeBoolean(serialized: Literal): boolean | undefined {
+  if (!serialized.datatype.equals(xmlSchemaTypes.boolean)) {
+    return undefined;
+  }
+  if (serialized.value === "true") {
+    return true;
+  }
+  if (serialized.value === "false") {
+    return false;
+  }
+  return undefined;
+}
+
+/**
+ * Reads the custom boolean value with the provided name in the consent section of the provided Access Credential.
+ * Throws on type mismatch, and returns `undefined` if no values are found.
+ *
+ * @example
+ * ```
+ * const accessRequest = await issueAccessRequest({...}, {
+ *  ...,
+ *  customFields: new Set([
+ *     {
+ *       key: new URL("https://example.org/ns/customBoolean"),
+ *       value: true,
+ *     },
+ *   ]),
+ * });
+ * // b is true
+ * const b = getCustomBoolean(accessRequest, new URL("https://example.org/ns/customBoolean"));
+ * ```
+ *
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
+ * @returns the custom boolean field with the provided name
+ * @since unreleased
+ */
+export function getCustomBoolean(
+  accessCredential: DatasetWithId,
+  field: URL,
+): boolean | undefined {
+  return deserializeField(
+    accessCredential,
+    field,
+    deserializeBoolean,
+    "boolean",
+  );
+}
+
+function deserializeFloat(serialized: Literal): number | undefined {
+  if (!serialized.datatype.equals(xmlSchemaTypes.double)) {
+    return undefined;
+  }
+  const val = Number.parseFloat(serialized.value);
+  return Number.isNaN(val) ? undefined : val;
+}
+
+/**
+ * Reads the custom float value with the provided name in the consent section of the provided Access Credential.
+ * Throws on type mismatch, and returns `undefined` if no values are found.
+ *
+ * @example
+ * ```
+ * const accessRequest = await issueAccessRequest({...}, {
+ *  ...,
+ *  customFields: new Set([
+ *     {
+ *       key: new URL("https://example.org/ns/customFloat"),
+ *       value: 1.1,
+ *     },
+ *   ]),
+ * });
+ * // f is 1.1
+ * const f = getCustomFloat(accessRequest, new URL("https://example.org/ns/customFloat"));
+ * ```
+ *
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
+ * @returns the custom float field with the provided name
+ * @since unreleased
+ */
+export function getCustomFloat(
+  accessCredential: DatasetWithId,
+  field: URL,
+): number | undefined {
+  return deserializeField(accessCredential, field, deserializeFloat, "float");
+}
+
+function deserializeInteger(serialized: Literal): number | undefined {
+  if (!serialized.datatype.equals(xmlSchemaTypes.integer)) {
+    return undefined;
+  }
+  const val = Number.parseInt(serialized.value, 10);
+  return Number.isNaN(val) ? undefined : val;
+}
+
+/**
+ * Reads the custom integer value with the provided name in the consent section of the provided Access Credential.
+ * Throws on type mismatch, and returns `undefined` if no values are found.
+ *
+ * @example
+ * ```
+ * const accessRequest = await issueAccessRequest({...}, {
+ *  ...,
+ *  customFields: new Set([
+ *     {
+ *       key: new URL("https://example.org/ns/customInteger"),
+ *       value: 1,
+ *     },
+ *   ]),
+ * });
+ * // i is 1
+ * const i = getCustomInteger(accessRequest, new URL("https://example.org/ns/customInteger"));
+ * ```
+ *
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
+ * @returns the custom integer field with the provided name
+ * @since unreleased
+ */
+export function getCustomInteger(
+  accessCredential: DatasetWithId,
+  field: URL,
+): number | undefined {
+  return deserializeField(
+    accessCredential,
+    field,
+    deserializeInteger,
+    "integer",
+  );
+}
+
+/**
+ * Reads the custom string value with the provided name in the consent section of the provided Access Credential.
+ * Throws on type mismatch, and returns `undefined` if no values are found.
+ *
+ * @example
+ * ```
+ * const accessRequest = await issueAccessRequest({...}, {
+ *  ...,
+ *  customFields: new Set([
+ *     {
+ *       key: new URL("https://example.org/ns/customString"),
+ *       value: "custom value",
+ *     },
+ *   ]),
+ * });
+ * // s is "custom value"
+ * const s = getCustomString(accessRequest, new URL("https://example.org/ns/customString"));
+ * ```
+ *
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
+ * @returns the custom string field with the provided name
+ * @since unreleased
+ */
+export function getCustomString(
+  accessCredential: DatasetWithId,
+  field: URL,
+): string | undefined {
+  return deserializeField(
+    accessCredential,
+    field,
+    (str: Literal) =>
+      str.datatype.equals(xmlSchemaTypes.string) ? str.value : undefined,
+    "string",
+  );
+}
+
+function castLiteral(lit: Literal): unknown {
+  if (lit.datatype.equals(xmlSchemaTypes.boolean)) {
+    return deserializeBoolean(lit);
+  }
+  if (lit.datatype.equals(xmlSchemaTypes.double)) {
+    return deserializeFloat(lit);
+  }
+  if (lit.datatype.equals(xmlSchemaTypes.integer)) {
+    return deserializeInteger(lit);
+  }
+  if (lit.datatype.equals(xmlSchemaTypes.string)) {
+    return lit.value;
+  }
+  throw new Error(`Unsupported literal type ${lit.datatype.value}`);
+}
+
+const WELL_KNOWN_FIELDS = [
+  gc.forPersonalData,
+  gc.forPurpose,
+  gc.isProvidedTo,
+  gc.isProvidedToController,
+  gc.isProvidedToPerson,
+  gc.hasStatus,
+  gc.isConsentForDataSubject,
+  acl.mode,
+  INHERIT,
+] as const;
+
+/**
+ * Reads all the custom fields in the consent section of the provided Access Credential.
+ * An empty object will be returned if no custom fields are found.
+ *
+ * @example
+ * ```
+ * const accessRequest = await issueAccessRequest({...}, {
+ *  ...,
+ *  customFields: new Set([
+ *     {
+ *       key: new URL("https://example.org/ns/customString"),
+ *       value: "custom value",
+ *     },
+ *     {
+ *       key: new URL("https://example.org/ns/customInteger"),
+ *       value: 1,
+ *     },
+ *   ]),
+ * });
+ * const customFields = getCustomFields(accessRequest);
+ * // s is "custom value"
+ * const s = customFields["https://example.org/ns/customString"];
+ * // i is 1
+ * const i = customFields["https://example.org/ns/custominteger"];
+ * ```
+ *
+ * @param accessCredential The Access Credential (Access Grant or Access Request)
+ * @returns an object keyed by the custom fields names, associated to their values.
+ * @since unreleased
+ */
+export function getCustomFields(
+  accessCredential: DatasetWithId,
+): Record<string, unknown> {
+  const consent = getConsent(accessCredential);
+  return Array.from(accessCredential.match(consent, null, null, defaultGraph()))
+    .filter(
+      ({ predicate, object }) =>
+        // The Access Grant data model is known, so by elimination any unknown
+        // field is a custom one.
+        !WELL_KNOWN_FIELDS.some((wellKnown) => wellKnown.equals(predicate)) &&
+        // Nested objects are not supported.
+        object.termType === "Literal",
+    )
+    .map(({ predicate, object }) => ({
+      // The type assertion is okay, because we filter on the term type.
+      [`${predicate.value}`]: castLiteral(object as Literal),
+    }))
+    .reduce(
+      (acc, cur) => {
+        // There is a single key in the current object.
+        const curKey = Object.keys(cur)[0];
+        if (acc[curKey] !== undefined) {
+          // FIXME use inrupt error
+          throw new Error(
+            `Expected single values for custom fields, found multiple for ${curKey}`,
+          );
+        }
+        return Object.assign(acc, cur);
+      },
+      {} as Record<string, unknown>,
+    );
 }
 
 /**

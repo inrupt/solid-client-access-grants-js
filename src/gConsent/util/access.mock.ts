@@ -32,12 +32,14 @@ import {
   MOCK_CONTEXT,
 } from "../constants";
 import { normalizeAccessGrant } from "../manage/approveAccessRequest";
-import type { CustomField } from "../../type/CustomField";
+import { toJson, type CustomField } from "../../type/CustomField";
 import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import type { AccessGrant } from "../type/AccessGrant";
 import type { AccessRequest } from "../type/AccessRequest";
 
 type RequestVcOptions = Partial<{
+  subjectId: string;
+  inbox: string;
   issuer: string;
   resources: UrlString[];
   modes: ResourceAccessMode[];
@@ -56,10 +58,9 @@ export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
       | string
       | undefined,
   };
-  options?.custom?.forEach((field) => {
-    Object.assign(hasConsent, { [`${field.key.href}`]: field.value });
-  });
-
+  if (options?.custom !== undefined) {
+    Object.assign(hasConsent, toJson(new Set(options?.custom)));
+  }
   if (options?.resourceOwner === null) {
     delete hasConsent.isConsentForDataSubject;
   } else if (options?.resourceOwner) {
@@ -118,15 +119,7 @@ export const mockAccessRequestVc = async (
   )) as unknown as AccessRequest;
 };
 
-export const mockAccessGrantObject = (
-  options?: Partial<{
-    issuer: string;
-    subjectId: string;
-    inherit: boolean;
-    resources: string[];
-    inbox: string;
-  }>,
-) => ({
+export const mockAccessGrantObject = (options?: RequestVcOptions) => ({
   "@context": MOCK_CONTEXT,
   id: "https://some.credential",
   credentialSubject: {
@@ -137,6 +130,7 @@ export const mockAccessGrantObject = (
       mode: ["http://www.w3.org/ns/auth/acl#Read"],
       isProvidedTo: "https://some.requestor",
       inherit: options?.inherit ?? true,
+      ...toJson(new Set(options?.custom)),
     },
     inbox: options?.inbox,
   },
@@ -154,14 +148,7 @@ export const mockAccessGrantObject = (
 });
 
 export const mockAccessGrantVc = async (
-  options?: Partial<{
-    issuer: string;
-    subjectId: string;
-    inherit: boolean;
-    resources: string[];
-    purposes: string[];
-    inbox: string;
-  }>,
+  options?: RequestVcOptions,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   modify?: (asObject: Record<string, any>) => void,
 ): Promise<AccessGrant> => {
