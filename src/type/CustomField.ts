@@ -20,7 +20,7 @@
 //
 
 import { INHERIT, acl, gc } from "../common/constants";
-import { AccessGrantError } from "../common/errors";
+import { AccessGrantError } from "../common/errors/AccessGrantError";
 
 export type CustomField = {
   /* The custom field name (this must be a URL). */

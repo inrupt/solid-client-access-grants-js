@@ -21,4 +21,7 @@
 
 import { InruptClientError } from "@inrupt/solid-client-errors";
 
-export class AccessGrantError extends InruptClientError { };
+/**
+ * Superclass of errors thrown in the context of using an Access Grant to get access to a resource.
+ */
+export class UmaError extends InruptClientError {}
