@@ -76,7 +76,14 @@ import {
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
 } from "../../src/index";
-import { getInherit, getPurposes } from "../../src/common/getters";
+import {
+  getCustomBoolean,
+  getCustomFields,
+  getCustomInteger,
+  getCustomString,
+  getInherit,
+  getPurposes,
+} from "../../src/common/getters";
 import { toBeEqual } from "../../src/gConsent/util/toBeEqual.mock";
 
 const { namedNode } = DataFactory;
@@ -585,6 +592,110 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               append: false,
             }),
           );
+        });
+
+        it("supports custom fields", async () => {
+          const r = await issueAccessRequest(
+            {
+              access: { read: true },
+              resourceOwner: "https://example.org/owner",
+              resources: ["https://example.org/resource"],
+              expirationDate: new Date(Date.now() + 60 * 60 * 1000),
+            },
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              returnLegacyJsonld: false,
+              accessEndpoint: vcProvider,
+              customFields: new Set([
+                {
+                  key: new URL("https://example.org/myProperty"),
+                  value: "some value",
+                },
+                {
+                  key: new URL("https://example.org/myRequestProperty"),
+                  value: true,
+                },
+                {
+                  key: new URL("https://example.org/myOverriddenProperty"),
+                  value: "some overridden value",
+                },
+              ]),
+            },
+          );
+          const g = await approveAccessRequest(
+            r,
+            {
+              customFields: new Set([
+                {
+                  key: new URL("https://example.org/myOverriddenProperty"),
+                  value: "some overriding value",
+                },
+                {
+                  key: new URL("https://example.org/myGrantProperty"),
+                  value: 1,
+                },
+                {
+                  key: new URL("https://example.org/myRequestProperty"),
+                  value: undefined,
+                },
+              ]),
+            },
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              returnLegacyJsonld: false,
+              accessEndpoint: vcProvider,
+              updateAcr: false,
+            },
+          );
+          // Check custom fields on request.
+          expect(
+            getCustomBoolean(
+              r,
+              new URL("https://example.org/myRequestProperty"),
+            ),
+          ).toBe(true);
+          expect(
+            getCustomString(r, new URL("https://example.org/myProperty")),
+          ).toBe("some value");
+          expect(
+            getCustomString(
+              r,
+              new URL("https://example.org/myOverriddenProperty"),
+            ),
+          ).toBe("some overridden value");
+          expect(getCustomFields(r)).toEqual({
+            "https://example.org/myRequestProperty": true,
+            "https://example.org/myProperty": "some value",
+            "https://example.org/myOverriddenProperty": "some overridden value",
+          });
+
+          // Check custom fields on grant.
+          expect(
+            getCustomBoolean(
+              g,
+              new URL("https://example.org/myRequestProperty"),
+            ),
+            // This should have been erased.
+          ).toBeUndefined();
+          expect(
+            getCustomString(g, new URL("https://example.org/myProperty")),
+            // This should be unchanged
+          ).toBe("some value");
+          expect(
+            getCustomString(
+              g,
+              new URL("https://example.org/myOverriddenProperty"),
+            ),
+            // This should be overridden
+          ).toBe("some overriding value");
+          expect(
+            getCustomInteger(g, new URL("https://example.org/myGrantProperty")),
+          ).toBe(1);
+          expect(getCustomFields(g)).toEqual({
+            "https://example.org/myGrantProperty": 1,
+            "https://example.org/myProperty": "some value",
+            "https://example.org/myOverriddenProperty": "some overriding value",
+          });
         });
       });
 
