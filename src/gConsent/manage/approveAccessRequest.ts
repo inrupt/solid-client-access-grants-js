@@ -52,6 +52,7 @@ import { initializeGrantParameters } from "../util/initializeGrantParameters";
 import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { toVcDataset } from "../../common/util/toVcDataset";
 import type { CustomField } from "../../type/CustomField";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 export type ApproveAccessRequestOverrides = Omit<
   Omit<AccessGrantParameters, "status">,
@@ -75,7 +76,7 @@ export function normalizeAccessGrant<T extends VerifiableCredentialBase>(
   // Proper type checking is performed after normalization, so casting here is fine.
   const normalized = { ...accessGrant } as unknown as AccessGrant;
   if (normalized.credentialSubject.providedConsent === undefined) {
-    throw new Error(
+    throw new AccessGrantError(
       `[${normalized.id}] is not an Access Grant: missing field "credentialSubject.providedConsent".`,
     );
   }
@@ -128,7 +129,7 @@ async function addVcMatcher(
       );
       // eslint-disable-next-line camelcase
       if (!acp_ess_2.hasAccessibleAcr(resourceInfo)) {
-        throw new Error(
+        throw new AccessGrantError(
           "The current user does not have access to the resource's Access Control Resource. Either they have insufficiant credentials, or the resource is not controlled using ACP. In either case, an Access Grant cannot be issued.",
         );
       }
@@ -340,7 +341,7 @@ export async function approveAccessRequest(
         !isAccessGrant(accessGrant)
       : !isRdfjsBaseAccessGrantVerifiableCredential(accessGrant)
   ) {
-    throw new Error(
+    throw new AccessGrantError(
       `Unexpected response when approving Access Request, the result is not an Access Grant: ${JSON.stringify(
         accessGrant,
       )}`,

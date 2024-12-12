@@ -31,6 +31,7 @@ import {
 import { getBaseAccess } from "../../gConsent/util/getBaseAccessVerifiableCredential";
 import { getSessionFetch } from "../util/getSessionFetch";
 import { toVcDataset } from "../util/toVcDataset";
+import { AccessGrantError } from "../errors/AccessGrantError";
 
 /**
  * Makes a request to the access server to verify the validity of a given Verifiable Credential.
@@ -52,7 +53,7 @@ async function isValidAccessGrant(
   const validVc = await toVcDataset(vc, options);
 
   if (validVc === undefined) {
-    throw new Error(
+    throw new AccessGrantError(
       `Invalid argument: expected either a VC URL or a RDFJS DatasetCore, received ${vc}`,
     );
   }
@@ -66,7 +67,7 @@ async function isValidAccessGrant(
       .verifierService;
 
   if (verifierEndpoint === undefined) {
-    throw new Error(
+    throw new AccessGrantError(
       `The VC service provider ${getIssuer(
         vcObject,
       )} does not advertize for a verifier service in its .well-known/vc-configuration document`,

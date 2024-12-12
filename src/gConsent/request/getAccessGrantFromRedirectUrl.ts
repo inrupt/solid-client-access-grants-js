@@ -24,6 +24,7 @@ import type { DatasetWithId } from "@inrupt/solid-client-vc";
 import { getAccessGrant } from "../manage";
 import { GRANT_VC_URL_PARAM_NAME } from "../manage/redirectToRequestor";
 import type { AccessGrant } from "../type/AccessGrant";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 /**
  * Get the Access Grant out of the incoming redirect from the Access Management app.
@@ -83,7 +84,7 @@ export async function getAccessGrantFromRedirectUrl(
     GRANT_VC_URL_PARAM_NAME,
   );
   if (accessGrantIri === null) {
-    throw new Error(
+    throw new AccessGrantError(
       `The provided redirect URL [${redirectUrl}] is missing the expected [${GRANT_VC_URL_PARAM_NAME}] query parameter`,
     );
   }

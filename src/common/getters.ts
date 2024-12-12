@@ -327,7 +327,7 @@ export function getRequestor(vc: DatasetWithId): string {
     );
   }
 
-  throw new Error(`No requestor found.`);
+  throw new AccessGrantError(`No requestor found.`);
 }
 
 /**

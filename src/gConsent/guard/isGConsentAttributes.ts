@@ -30,6 +30,7 @@ import { RESOURCE_ACCESS_MODE } from "../../type/ResourceAccessMode";
 import { isUnknownObject } from "./isUnknownObject";
 import type { GConsentStatus } from "../type/GConsentStatus";
 import { acl, gc } from "../../common/constants";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 const { defaultGraph } = DataFactory;
 
@@ -104,7 +105,7 @@ export function isRdfjsGConsentAttributes(
   );
 
   if (forPersonalData.size === 0) {
-    throw new Error("No Personal Data specified for Access Grant");
+    throw new AccessGrantError("No Personal Data specified for Access Grant");
   }
 
   for (const { object } of forPersonalData) {

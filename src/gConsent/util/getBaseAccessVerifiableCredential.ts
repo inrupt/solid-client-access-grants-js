@@ -26,6 +26,7 @@ import { DataFactory } from "n3";
 import { TYPE, gc } from "../../common/constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getConsent } from "../../common/getters";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 const { quad, namedNode } = DataFactory;
 
@@ -36,12 +37,12 @@ export async function getBaseAccess(
   hasStatus?: NamedNode,
 ) {
   if (type && !vc.has(quad(namedNode(getId(vc)), TYPE, type))) {
-    throw new Error(
+    throw new AccessGrantError(
       `An error occurred when type checking the VC: Not of type [${type.value}].`,
     );
   }
   if (hasStatus && !vc.has(quad(getConsent(vc), gc.hasStatus, hasStatus))) {
-    throw new Error(
+    throw new AccessGrantError(
       `An error occurred when type checking the VC: status not [${hasStatus.value}].`,
     );
   }

@@ -35,6 +35,7 @@ import type { FetchOptions } from "../../type/FetchOptions";
 import type { RedirectOptions } from "../../type/RedirectOptions";
 import { getResources } from "../../common";
 import { toVcDataset } from "../../common/util/toVcDataset";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 export const REQUEST_VC_URL_PARAM_NAME = "requestVcUrl";
 export const REDIRECT_URL_PARAM_NAME = "redirectUrl";
@@ -104,7 +105,7 @@ export async function redirectToAccessManagementUi(
   const validVc = await toVcDataset(accessRequestVc, options);
 
   if (validVc === undefined) {
-    throw new Error(
+    throw new AccessGrantError(
       `Invalid argument: expected either a VC URL or a RDFJS DatasetCore, received ${accessRequestVc}`,
     );
   }
@@ -123,7 +124,7 @@ export async function redirectToAccessManagementUi(
   });
 
   if (accessManagementUi === undefined) {
-    throw new Error(
+    throw new AccessGrantError(
       `Cannot discover access management UI URL for [${resourceUrl}]${
         options.resourceOwner ? `, neither from [${options.resourceOwner}]` : ""
       }`,

@@ -53,6 +53,7 @@ import { accessToResourceAccessModeArray } from "./accessToResourceAccessModeArr
 import { isBaseRequest } from "../guard/isBaseRequest";
 import type { AccessCredentialType } from "../type/AccessCredentialType";
 import type { CustomField } from "../../type/CustomField";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 function getGConsentAttributes(
   params: AccessRequestParameters,
@@ -210,13 +211,13 @@ export async function issueAccessVc(
     hasConsent &&
     vcBody.credentialSubject.hasConsent.forPersonalData.length <= 0
   ) {
-    throw new Error("There are no resources in the access request!");
+    throw new AccessGrantError("There are no resources in the access request!");
   } else if (
     !hasConsent &&
     (vcBody as BaseGrantBody).credentialSubject.providedConsent.forPersonalData
       .length <= 0
   ) {
-    throw new Error("There are no resources in the access grant!");
+    throw new AccessGrantError("There are no resources in the access grant");
   }
 
   const targetResourceIri = isBaseRequest(vcBody)

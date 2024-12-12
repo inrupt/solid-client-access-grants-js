@@ -21,6 +21,7 @@
 
 import type { UrlString } from "@inrupt/solid-client";
 import type { RedirectOptions } from "../../type/RedirectOptions";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 /**
  * Internal function implementing redirection with some query parameters.
@@ -42,7 +43,7 @@ export async function redirectWithParameters(
     options.redirectCallback(targetUrl.href);
   } else {
     if (typeof window === "undefined") {
-      throw new Error(
+      throw new AccessGrantError(
         "In a non-browser environment, a redirectCallback must be provided by the user.",
       );
     }
