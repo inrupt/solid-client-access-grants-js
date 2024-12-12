@@ -34,15 +34,9 @@ import type {
   Term,
 } from "@rdfjs/types";
 import { DataFactory } from "n3";
-import type {
-  AccessGrant,
-  AccessGrantGConsent,
-} from "../gConsent/type/AccessGrant";
+import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessModes } from "../type/AccessModes";
 import { INHERIT, TYPE, XSD_BOOLEAN, acl, gc, ldp } from "./constants";
-import { isAccessGrant } from "../gConsent/guard/isAccessGrant";
-import { isAccessRequest } from "../gConsent/guard/isAccessRequest";
-import type { AccessRequest } from "../gConsent";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
