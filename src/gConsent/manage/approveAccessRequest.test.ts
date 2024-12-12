@@ -482,13 +482,6 @@ describe("approveAccessRequest", () => {
           "https://example.org/ns/customBoolean": true,
           "https://example.org/ns/customInt": 1,
           "https://example.org/ns/customFloat": 1.1,
-          "https://example.org/ns/customStringArray": [
-            "customValue",
-            "otherCustomValue",
-          ],
-          "https://example.org/ns/customBooleanArray": [true, false],
-          "https://example.org/ns/customIntArray": [1, 2],
-          "https://example.org/ns/customFloatArray": [1.1, 2.2],
         }),
         inbox: accessRequestVc.credentialSubject.inbox,
       }),

@@ -618,13 +618,6 @@ describe.each([true, false, undefined])(
 
     it("throws if the same key is used for multiple custom fields", async () => {
       mockAccessApiEndpoint();
-      const mockedIssue = jest.spyOn(
-        jest.requireMock("@inrupt/solid-client-vc") as {
-          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
-        },
-        "issueVerifiableCredential",
-      );
-      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
 
       await expect(() =>
         issueAccessRequest(
