@@ -37,6 +37,7 @@ import { DataFactory } from "n3";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessModes } from "../type/AccessModes";
 import { INHERIT, TYPE, XSD_BOOLEAN, acl, gc, ldp } from "./constants";
+import { AccessGrantError } from "./errors";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
@@ -463,8 +464,7 @@ function deserializeFields<T>(
     .map((object) => {
       const result = deserializer(object);
       if (result === undefined) {
-        // FIXME use inrupt error library
-        throw new Error(
+        throw new AccessGrantError(
           `Failed to deserialize value ${object.value} for predicate ${field.href} as type ${type}.`,
         );
       }
@@ -480,8 +480,7 @@ function deserializeField<T>(
 ): T | undefined {
   const result = deserializeFields(vc, field, deserializer, type);
   if (result.length > 1) {
-    // FIXME use inrupt error library
-    throw new Error(
+    throw new AccessGrantError(
       `Expected one value for predicate ${field.href}, found many: ${result}`,
     );
   }
@@ -740,8 +739,7 @@ export function getCustomFields(
         // There is a single key in the current object.
         const curKey = Object.keys(cur)[0];
         if (acc[curKey] !== undefined) {
-          // FIXME use inrupt error
-          throw new Error(
+          throw new AccessGrantError(
             `Expected single values for custom fields, found multiple for ${curKey}`,
           );
         }
