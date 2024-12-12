@@ -25,7 +25,7 @@ export type CustomField = {
   /* The custom field name (this must be a URL). */
   key: URL;
   /* The custom field value (this must be a literal). */
-  value: string | number | boolean;
+  value: string | number | boolean | undefined;
 };
 
 const WELL_KNOWN_FIELDS = [
@@ -68,7 +68,11 @@ export const toJson = (
             `All custom fields keys must be URL objects, found ${field.key}`,
           );
         }
-        if (!["string", "number", "boolean"].includes(typeof field.value)) {
+        if (
+          !["string", "number", "boolean", "undefined"].includes(
+            typeof field.value,
+          )
+        ) {
           // FIXME use inrupt error library
           throw new Error(
             `All custom fields values must be literals, found ${JSON.stringify(field.value)} (of type ${typeof field.value})`,
