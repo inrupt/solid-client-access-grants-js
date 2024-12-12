@@ -465,7 +465,7 @@ function deserializeFields<T>(
       if (result === undefined) {
         // FIXME use inrupt error library
         throw new Error(
-          `Error deserializing value ${object} for predicate ${field.href} as type ${type}.`,
+          `Failed to deserialize value ${object.value} for predicate ${field.href} as type ${type}.`,
         );
       }
       return result;

@@ -71,7 +71,7 @@ export const toJson = (
         if (!["string", "number", "boolean"].includes(typeof field.value)) {
           // FIXME use inrupt error library
           throw new Error(
-            `All custom fields values must be literals, found ${field.value} (or type ${typeof field.value})`,
+            `All custom fields values must be literals, found ${JSON.stringify(field.value)} (of type ${typeof field.value})`,
           );
         }
         return { [`${field.key.toString()}`]: field.value };
