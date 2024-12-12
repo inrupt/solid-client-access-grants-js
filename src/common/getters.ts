@@ -455,7 +455,7 @@ function deserializeFields<T>(
     .map((q) => {
       if (q.object.termType !== "Literal") {
         throw new Error(
-          `Expected value object for predicate ${field.href} to be a litteral, found ${q.object.termType}.`,
+          `Expected value object for predicate ${field.href} to be a literal, found ${q.object.termType}.`,
         );
       }
       return q.object as Literal;
