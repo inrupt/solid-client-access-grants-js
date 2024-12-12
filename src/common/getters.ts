@@ -448,7 +448,7 @@ function deserializeFields<T>(
   field: URL,
   deserializer: (value: Literal) => T | undefined,
   type: string,
-): NonNullable<T>[] {
+): T[] {
   return Array.from(
     vc.match(getConsent(vc), namedNode(field.href), null, defaultGraph()),
   )
@@ -469,8 +469,7 @@ function deserializeFields<T>(
         );
       }
       return result;
-      // FIXME why isn't TS happy about the filtering out of undefined?
-    }) as NonNullable<T>[];
+    });
 }
 
 function deserializeField<T>(
