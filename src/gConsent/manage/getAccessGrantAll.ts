@@ -47,6 +47,7 @@ import {
 import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { gc } from "../../common/constants";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
@@ -157,7 +158,9 @@ async function getAccessGrantAll(
   } = {},
 ): Promise<Array<DatasetWithId>> {
   if (!params.resource && !options.accessEndpoint) {
-    throw new Error("resource and accessEndpoint cannot both be undefined");
+    throw new AccessGrantError(
+      "resource and accessEndpoint cannot both be undefined",
+    );
   }
   const sessionFetch = await getSessionFetch(options);
   // TODO: Fix access API endpoint retrieval (should include all the different API endpoints)

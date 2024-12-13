@@ -22,6 +22,7 @@
 import type { UrlString } from "@inrupt/solid-client";
 import { parse } from "auth-header";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 async function getAccessEndpointForResource(
   resource: UrlString,
@@ -30,14 +31,14 @@ async function getAccessEndpointForResource(
   // authorization server.
   const response = await fetch(resource);
   if (!response.headers.has("WWW-Authenticate")) {
-    throw new Error(
+    throw new AccessGrantError(
       `Expected a 401 error with a WWW-Authenticate header, got a [${response.status}: ${response.statusText}] response lacking the WWW-Authenticate header.`,
     );
   }
   const authHeader = response.headers.get("WWW-Authenticate") as string;
   const authHeaderToken = parse(authHeader);
   if (authHeaderToken.scheme !== "UMA") {
-    throw new Error(
+    throw new AccessGrantError(
       `Unsupported authorization scheme: [${authHeaderToken.scheme}]`,
     );
   }
@@ -49,7 +50,7 @@ async function getAccessEndpointForResource(
   const rawDiscoveryDocument = await fetch(wellKnownIri.href);
   const discoveryDocument = await rawDiscoveryDocument.json();
   if (typeof discoveryDocument.verifiable_credential_issuer !== "string") {
-    throw new Error(
+    throw new AccessGrantError(
       `No access issuer listed for property [verifiable_credential_issuer] in [${JSON.stringify(
         discoveryDocument,
       )}]`,
@@ -76,7 +77,7 @@ async function getAccessApiEndpoint(
   try {
     return await getAccessEndpointForResource(resource.toString());
   } catch (e: unknown) {
-    throw new Error(
+    throw new AccessGrantError(
       `Couldn't figure out the Access Grant issuer from the resources: ${e}`,
     );
   }

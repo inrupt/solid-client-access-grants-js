@@ -20,6 +20,7 @@
 //
 
 import { INHERIT, acl, gc } from "../common/constants";
+import { AccessGrantError } from "../common/errors/AccessGrantError";
 
 export type CustomField = {
   /* The custom field name (this must be a URL). */
@@ -57,14 +58,12 @@ export const toJson = (
       // and change the validated CustomField into a plain JSON object entry.
       .map((field) => {
         if (isWellKnown(field.key)) {
-          // FIXME use inrupt error library
-          throw new Error(
+          throw new AccessGrantError(
             `${field.key.href} is a reserved field, and cannot be used as a custom field`,
           );
         }
         if (typeof field.key !== "object") {
-          // FIXME use inrupt error library
-          throw new Error(
+          throw new AccessGrantError(
             `All custom fields keys must be URL objects, found ${field.key}`,
           );
         }
@@ -73,8 +72,7 @@ export const toJson = (
             typeof field.value,
           )
         ) {
-          // FIXME use inrupt error library
-          throw new Error(
+          throw new AccessGrantError(
             `All custom fields values must be literals, found ${JSON.stringify(field.value)} (of type ${typeof field.value})`,
           );
         }
@@ -86,8 +84,7 @@ export const toJson = (
           // We know the current object has a single key.
           if (acc[Object.keys(cur)[0]] !== undefined) {
             // If the provided key already exists, the input is invalid.
-            // FIXME use inrupt error library
-            throw new Error(
+            throw new AccessGrantError(
               `Each custom field key must be unique. Found multiple values for ${Object.keys(cur)[0]}`,
             );
           }

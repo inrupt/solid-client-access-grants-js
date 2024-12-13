@@ -37,6 +37,7 @@ import { DataFactory } from "n3";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessModes } from "../type/AccessModes";
 import { INHERIT, TYPE, XSD_BOOLEAN, acl, gc, ldp } from "./constants";
+import { AccessGrantError } from "./errors/AccessGrantError";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
 
@@ -101,13 +102,15 @@ export function getSingleObject(
   }
 
   if (results.length !== 1) {
-    throw new Error(`Expected exactly one result. Found ${results.length}.`);
+    throw new AccessGrantError(
+      `Expected exactly one result. Found ${results.length}.`,
+    );
   }
 
   const [{ object }] = results;
   const expectedTypes = type ? [type] : ["NamedNode", "BlankNode"];
   if (!expectedTypes.includes(object.termType)) {
-    throw new Error(
+    throw new AccessGrantError(
       `Expected [${object.value}] to be a ${expectedTypes.join(
         " or ",
       )}. Found [${object.termType}]`,
@@ -134,13 +137,13 @@ export function getConsent(vc: DatasetWithId) {
     ...vc.match(credentialSubject, gc.hasConsent, null, defaultGraph()),
   ];
   if (consents.length !== 1) {
-    throw new Error(
+    throw new AccessGrantError(
       `Expected exactly 1 consent value. Found ${consents.length}.`,
     );
   }
   const [{ object }] = consents;
   if (object.termType !== "BlankNode" && object.termType !== "NamedNode") {
-    throw new Error(
+    throw new AccessGrantError(
       `Expected consent to be a Named Node or Blank Node, instead got [${object.termType}].`,
     );
   }
@@ -169,7 +172,7 @@ export function getResources(vc: DatasetWithId): string[] {
     defaultGraph(),
   )) {
     if (object.termType !== "NamedNode") {
-      throw new Error(
+      throw new AccessGrantError(
         `Expected resource to be a Named Node. Instead got [${object.value}] with term type [${object.termType}]`,
       );
     }
@@ -202,7 +205,7 @@ export function getPurposes(vc: DatasetWithId): string[] {
     defaultGraph(),
   )) {
     if (object.termType !== "NamedNode") {
-      throw new Error(
+      throw new AccessGrantError(
         `Expected purpose to be Named Node. Instead got [${object.value}] with term type [${object.termType}]`,
       );
     }
@@ -319,12 +322,12 @@ export function getRequestor(vc: DatasetWithId): string {
   }
 
   if (candidateResults.length > 1) {
-    throw new Error(
+    throw new AccessGrantError(
       `Too many requestors found. Expected one, found ${candidateResults}`,
     );
   }
 
-  throw new Error(`No requestor found.`);
+  throw new AccessGrantError(`No requestor found.`);
 }
 
 /**
@@ -400,7 +403,7 @@ export function getTypes(vc: DatasetWithId): string[] {
 
   for (const result of results) {
     if (result.termType !== "NamedNode") {
-      throw new Error(
+      throw new AccessGrantError(
         `Expected every type to be a Named Node, but found [${result.value}] with term type [${result.termType}]`,
       );
     }
@@ -454,7 +457,7 @@ function deserializeFields<T>(
   )
     .map((q) => {
       if (q.object.termType !== "Literal") {
-        throw new Error(
+        throw new AccessGrantError(
           `Expected value object for predicate ${field.href} to be a literal, found ${q.object.termType}.`,
         );
       }
@@ -463,8 +466,7 @@ function deserializeFields<T>(
     .map((object) => {
       const result = deserializer(object);
       if (result === undefined) {
-        // FIXME use inrupt error library
-        throw new Error(
+        throw new AccessGrantError(
           `Failed to deserialize value ${object.value} for predicate ${field.href} as type ${type}.`,
         );
       }
@@ -480,8 +482,7 @@ function deserializeField<T>(
 ): T | undefined {
   const result = deserializeFields(vc, field, deserializer, type);
   if (result.length > 1) {
-    // FIXME use inrupt error library
-    throw new Error(
+    throw new AccessGrantError(
       `Expected one value for predicate ${field.href}, found many: ${result}`,
     );
   }
@@ -673,7 +674,7 @@ function castLiteral(lit: Literal): unknown {
   if (lit.datatype.equals(xmlSchemaTypes.string)) {
     return lit.value;
   }
-  throw new Error(`Unsupported literal type ${lit.datatype.value}`);
+  throw new AccessGrantError(`Unsupported literal type ${lit.datatype.value}`);
 }
 
 const WELL_KNOWN_FIELDS = [
@@ -740,8 +741,7 @@ export function getCustomFields(
         // There is a single key in the current object.
         const curKey = Object.keys(cur)[0];
         if (acc[curKey] !== undefined) {
-          // FIXME use inrupt error
-          throw new Error(
+          throw new AccessGrantError(
             `Expected single values for custom fields, found multiple for ${curKey}`,
           );
         }

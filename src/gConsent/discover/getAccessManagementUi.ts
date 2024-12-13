@@ -30,6 +30,7 @@ import {
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { PIM_STORAGE, PREFERRED_CONSENT_MANAGEMENT_UI } from "../constants";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 interface AccessManagementUiFromProfile {
   accessEndpoint?: UrlString;
@@ -48,12 +49,14 @@ async function getAccessManagementUiFromProfile(
       fetch: options.fetch,
     });
   } catch (e) {
-    throw new Error(`Cannot get the Access Management UI for ${webId}: ${e}.`);
+    throw new AccessGrantError(
+      `Cannot get the Access Management UI for ${webId}: ${e}.`,
+    );
   }
 
   const profile = getThing(webIdDocument, webId);
   if (profile === null) {
-    throw new Error(
+    throw new AccessGrantError(
       `Cannot get the Access Management UI for ${webId}: the WebID cannot be dereferenced.`,
     );
   }

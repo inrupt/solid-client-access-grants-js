@@ -33,6 +33,7 @@ import { getGrantBody, issueAccessVc } from "../util/issueAccessVc";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { toVcDataset } from "../../common/util/toVcDataset";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 /**
  * Deny an access request. The content of the denied access request is provided
@@ -95,7 +96,7 @@ async function denyAccessRequest(
   const validVc = await toVcDataset(vc, options);
 
   if (validVc === undefined) {
-    throw new Error(
+    throw new AccessGrantError(
       `Invalid argument: expected either a VC URL or a RDFJS DatasetCore, received ${vc}`,
     );
   }

@@ -36,6 +36,7 @@ import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { toVcDataset } from "../../common/util/toVcDataset";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 const { quad, namedNode } = DataFactory;
 
@@ -57,7 +58,7 @@ async function revokeAccessCredential(
   const validVc = await toVcDataset(vc, options);
 
   if (validVc === undefined) {
-    throw new Error(
+    throw new AccessGrantError(
       `Invalid argument: expected either a VC URL or a RDFJS DatasetCore, received ${vc}`,
     );
   }

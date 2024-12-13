@@ -30,6 +30,7 @@ import {
   CONTEXT_ESS_DEFAULT,
   PRESENTATION_TYPE_BASE,
 } from "../gConsent/constants";
+import { UmaError } from "../common/errors/UmaError";
 
 const WWW_AUTH_HEADER = "www-authenticate";
 const VC_CLAIM_TOKEN_TYPE = "https://www.w3.org/TR/vc-data-model/#json-ld";
@@ -75,7 +76,7 @@ export async function getUmaConfiguration(
   const configurationUrl = new URL(UMA_CONFIG_PATH, authIri).href;
   const response = await fetch(configurationUrl);
   return response.json().catch((e) => {
-    throw new Error(
+    throw new UmaError(
       `Parsing the UMA configuration found at ${configurationUrl} failed with the following error: ${e.toString()}`,
     );
   });
@@ -178,18 +179,18 @@ export async function fetchWithVc(
   const wwwAuthentication = headers.get(WWW_AUTH_HEADER);
 
   if (!wwwAuthentication) {
-    throw new Error(NO_WWW_AUTH_HEADER_ERROR);
+    throw new UmaError(NO_WWW_AUTH_HEADER_ERROR);
   }
 
   const authTicket = parseUMAAuthTicket(wwwAuthentication);
   const authIri = parseUMAAuthIri(wwwAuthentication);
 
   if (!authTicket) {
-    throw new Error(NO_WWW_AUTH_HEADER_UMA_TICKET_ERROR);
+    throw new UmaError(NO_WWW_AUTH_HEADER_UMA_TICKET_ERROR);
   }
 
   if (!authIri) {
-    throw new Error(NO_WWW_AUTH_HEADER_UMA_IRI_ERROR);
+    throw new UmaError(NO_WWW_AUTH_HEADER_UMA_IRI_ERROR);
   }
 
   const umaConfiguration = await getUmaConfiguration(authIri);
@@ -203,7 +204,7 @@ export async function fetchWithVc(
   );
 
   if (!accessToken) {
-    throw new Error(NO_ACCESS_TOKEN_RETURNED);
+    throw new UmaError(NO_ACCESS_TOKEN_RETURNED);
   }
 
   return boundFetch(accessToken);

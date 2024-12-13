@@ -28,6 +28,7 @@ import {
 import type { AccessRequest } from "../type/AccessRequest";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import { normalizeAccessRequest } from "../request/issueAccessRequest";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 /**
  * Fetch the Access Request from the given URL.
@@ -94,7 +95,7 @@ export async function getAccessRequest(
     });
 
     if (!isRdfjsAccessRequest(accessRequest)) {
-      throw new Error(
+      throw new AccessGrantError(
         `${JSON.stringify(accessRequest)} is not an Access Request`,
       );
     }
@@ -107,7 +108,7 @@ export async function getAccessRequest(
   });
 
   if (!isAccessRequest(accessRequest)) {
-    throw new Error(
+    throw new AccessGrantError(
       `${JSON.stringify(accessRequest, null, 2)} is not an Access Request`,
     );
   }

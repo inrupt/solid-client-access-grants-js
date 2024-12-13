@@ -27,11 +27,12 @@ import {
 } from "../discover/redirectToAccessManagementUi";
 import type { AccessRequest } from "../type/AccessRequest";
 import getAccessRequest from "./getAccessRequest";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 function getSearchParam(url: URL, param: string) {
   const value = url.searchParams.get(param);
   if (value === null) {
-    throw new Error(
+    throw new AccessGrantError(
       `The provided redirect URL [${url.toString()}] is missing the expected [${param}] query parameter`,
     );
   }

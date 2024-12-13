@@ -31,6 +31,7 @@ import {
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import type { AccessGrant } from "../type/AccessGrant";
 import { normalizeAccessGrant } from "./approveAccessRequest";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 /**
  * Retrieve the Access Grant associated to the given URL.
@@ -105,7 +106,7 @@ export async function getAccessGrant(
       !isRdfjsBaseAccessGrantVerifiableCredential(data) ||
       !isGConsentAccessGrant(data)
     ) {
-      throw new Error(
+      throw new AccessGrantError(
         `Unexpected response when resolving [${vcUrl}], the result is not an Access Grant: ${JSON.stringify(
           data,
           null,
@@ -121,7 +122,7 @@ export async function getAccessGrant(
     normalize: normalizeAccessGrant,
   });
   if (!isBaseAccessGrantVerifiableCredential(data) || !isAccessGrant(data)) {
-    throw new Error(
+    throw new AccessGrantError(
       `Unexpected response when resolving [${vcUrl}], the result is not an Access Grant: ${JSON.stringify(
         data,
       )}`,
