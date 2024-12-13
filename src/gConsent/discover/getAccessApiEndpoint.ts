@@ -23,7 +23,6 @@ import type { UrlString } from "@inrupt/solid-client";
 import { parse } from "auth-header";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
-import { UmaError } from "../../common/errors/UmaError";
 
 async function getAccessEndpointForResource(
   resource: UrlString,
