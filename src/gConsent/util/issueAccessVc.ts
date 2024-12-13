@@ -211,7 +211,7 @@ export async function issueAccessVc(
     hasConsent &&
     vcBody.credentialSubject.hasConsent.forPersonalData.length <= 0
   ) {
-    throw new AccessGrantError("There are no resources in the access request!");
+    throw new AccessGrantError("There are no resources in the access request");
   } else if (
     !hasConsent &&
     (vcBody as BaseGrantBody).credentialSubject.providedConsent.forPersonalData
