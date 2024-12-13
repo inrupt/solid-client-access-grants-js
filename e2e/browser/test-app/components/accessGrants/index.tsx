@@ -74,7 +74,7 @@ function AccessCredential({
       </p>
       <p>
         Custom fields:{" "}
-        <span data-testid="crendential-custom">
+        <span data-testid="credential-custom">
           {JSON.stringify(getCustomFields(vc))}
         </span>
       </p>
@@ -189,6 +189,7 @@ export default function AccessController({
       fetch: session.fetch,
     });
     setAccessRequest(undefined);
+    setAccessRequestUrl(undefined);
   };
 
   const handleCallAuthedGrant = async () => {
@@ -201,7 +202,7 @@ export default function AccessController({
   };
 
   const handleAccessRequest = async () => {
-    if (accessRequestUrl === undefined || URL.canParse(accessRequestUrl)) {
+    if (accessRequestUrl === undefined || !URL.canParse(accessRequestUrl)) {
       console.error(
         "Please issue an Access Request and provide its URL before being redirected.",
       );
@@ -320,6 +321,7 @@ export default function AccessController({
           onChange={(e) => {
             setAccessRequestUrl(e.currentTarget.value);
           }}
+          value={accessRequestUrl}
         />
       </p>
       <div>

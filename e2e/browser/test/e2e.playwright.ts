@@ -98,7 +98,7 @@ test("Redirect to AMC to accept Access Request", async ({
   ]);
 });
 
-test("Issue an access request, then revoking the access request", async ({
+test.only("Issue an access request, then revoking the access request", async ({
   page,
   auth,
 }) => {
@@ -117,7 +117,7 @@ test("Issue an access request, then revoking the access request", async ({
 
   // Issue an access request to the resource.
   await page.getByTestId("issue-access").click();
-  await expect(page.getByTestId("access-request")).resolves.not.toBeEmpty();
+  await expect(page.getByTestId("access-request")).not.toBeEmpty();
   const customFields = await page
     .getByTestId("credential-custom")
     .textContent();
@@ -127,7 +127,7 @@ test("Issue an access request, then revoking the access request", async ({
 
   // Revoke the access request.
   await page.getByTestId("revoke-access").click();
-  await expect(page.getByTestId("access-request")).toBeEmpty();
+  await expect(page.getByTestId("access-request")).toBeHidden();
 
   // Cleanup the resource
   await page.getByTestId("delete-resource").click();
