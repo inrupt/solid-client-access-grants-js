@@ -88,6 +88,7 @@ export default function AccessController({
   setErrorMessage: (msg: string) => void;
 }) {
   const [accessGrant, setAccessGrant] = useState<AccessGrant>();
+  const [accessRequestUrl, setAccessRequestUrl] = useState<string>();
   const [accessRequest, setAccessRequest] = useState<DatasetWithId>();
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
   const [customInt, setCustomInt] = useState<number>();
@@ -176,6 +177,7 @@ export default function AccessController({
       },
     );
     setAccessRequest(accessRequestReturned);
+    setAccessRequestUrl(accessRequestReturned.id);
   };
 
   const handleRevoke = async () => {
@@ -199,15 +201,20 @@ export default function AccessController({
   };
 
   const handleAccessRequest = async () => {
+    if (accessRequestUrl === undefined || URL.canParse(accessRequestUrl)) {
+      console.error(
+        "Please issue an Access Request and provide its URL before being redirected.",
+      );
+      return;
+    }
     await redirectToAccessManagementUi(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      accessRequest!,
+      accessRequestUrl,
       `http://localhost:3000/`,
       {
         redirectCallback: (url: string) => {
           window.location.replace(url);
         },
-        fallbackAccessManagementUi: "http://localhost:3001/accessRequest/", // `https://amc.inrupt.com/accessRequest/`,
+        fallbackAccessManagementUi: "https://amc.inrupt.com/accessRequest/",
         fetch: session.fetch,
       },
     );
@@ -310,9 +317,9 @@ export default function AccessController({
           id="request-id"
           data-testid="access-request-id"
           placeholder="Access Request URL"
-          // onChange={(e) => {
-          //   setAccessRequest(e.currentTarget.value);
-          // }}
+          onChange={(e) => {
+            setAccessRequestUrl(e.currentTarget.value);
+          }}
         />
       </p>
       <div>
