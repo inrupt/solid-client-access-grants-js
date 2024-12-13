@@ -40,7 +40,7 @@ import {
   getSourceUrl,
   deleteFile,
 } from "@inrupt/solid-client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 
 const session = getDefaultSession();
@@ -339,10 +339,12 @@ export default function AccessController({
         </button>
       </div>
       <p>
-        Issued access request: <AccessCredential vc={accessRequest} />
+        Issued access request:{" "}
+        <AccessCredential vc={accessRequest} testId="access-request" />
       </p>
       <p>
-        Granted access: <AccessCredential vc={accessGrant} />
+        Granted access:{" "}
+        <AccessCredential vc={accessGrant} testId="access-grant" />
       </p>
 
       <button
