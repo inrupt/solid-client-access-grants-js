@@ -98,7 +98,7 @@ test("Redirect to AMC to accept Access Request", async ({
   ]);
 });
 
-test.only("Issue an access request, then revoking the access request", async ({
+test("Issue an access request, then revoking the access request", async ({
   page,
   auth,
 }) => {
