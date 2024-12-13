@@ -60,15 +60,15 @@ function AccessCredential({
     <div data-testid={testId}>
       <p>
         Resource owner:{" "}
-        <span data-testid="crendential-owner">{getResourceOwner(vc)}</span>
+        <span data-testid="credential-owner">{getResourceOwner(vc)}</span>
       </p>
       <p>
         Requested resources:{" "}
-        <span data-testid="crendential-resources">{getResources(vc)}</span>
+        <span data-testid="credential-resources">{getResources(vc)}</span>
       </p>
       <p>
         Requested modes:{" "}
-        <span data-testid="crendential-modes">
+        <span data-testid="credential-modes">
           {JSON.stringify(getAccessModes(vc))}
         </span>
       </p>
