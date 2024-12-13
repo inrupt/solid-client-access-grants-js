@@ -20,12 +20,19 @@
 //
 
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
-import type { AccessGrant } from "@inrupt/solid-client-access-grants";
+import type {
+  AccessGrant,
+  DatasetWithId,
+} from "@inrupt/solid-client-access-grants";
 import {
   issueAccessRequest,
   redirectToAccessManagementUi,
   getAccessGrant,
   cancelAccessRequest,
+  getCustomFields,
+  getResourceOwner,
+  getResources,
+  getAccessModes,
 } from "@inrupt/solid-client-access-grants";
 import {
   getPodUrlAll,
@@ -39,14 +46,63 @@ import { useRouter } from "next/router";
 const session = getDefaultSession();
 const SHARED_FILE_CONTENT = "Some content.\n";
 
+function AccessCredential({
+  vc,
+  testId,
+}: {
+  vc: DatasetWithId | undefined;
+  testId: "access-request" | "access-grant";
+}) {
+  if (vc === undefined) {
+    return undefined;
+  }
+  return (
+    <div data-testid={testId}>
+      <p>
+        Resource owner:{" "}
+        <span data-testid="credential-owner">{getResourceOwner(vc)}</span>
+      </p>
+      <p>
+        Requested resources:{" "}
+        <span data-testid="credential-resources">{getResources(vc)}</span>
+      </p>
+      <p>
+        Requested modes:{" "}
+        <span data-testid="credential-modes">
+          {JSON.stringify(getAccessModes(vc))}
+        </span>
+      </p>
+      <p>
+        Custom fields:{" "}
+        <span data-testid="credential-custom">
+          {JSON.stringify(getCustomFields(vc))}
+        </span>
+      </p>
+    </div>
+  );
+}
+
 export default function AccessController({
   setErrorMessage,
 }: {
   setErrorMessage: (msg: string) => void;
 }) {
   const [accessGrant, setAccessGrant] = useState<AccessGrant>();
-  const [accessRequest, setAccessRequest] = useState<string>();
+  const [accessRequestUrl, setAccessRequestUrl] = useState<string>();
+  const [accessRequest, setAccessRequest] = useState<DatasetWithId>();
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
+  const [customInt, setCustomInt] = useState<number>();
+  const [customIntUrl, setCustomIntUrl] = useState<string>(
+    "https://example.org/my-int",
+  );
+  const [customStr, setCustomStr] = useState<string>();
+  const [customStrUrl, setCustomStrUrl] = useState<string>(
+    "https://example.org/my-string",
+  );
+  const [customBoolean, setCustomBoolean] = useState<boolean>();
+  const [customBooleanUrl, setCustomBooleanUrl] = useState<string>(
+    "https://example.org/my-boolean",
+  );
   const router = useRouter();
 
   const handleCreate = async () => {
@@ -103,9 +159,25 @@ export default function AccessController({
       },
       {
         fetch: session.fetch,
+        returnLegacyJsonld: false,
+        customFields: new Set([
+          {
+            key: new URL(customIntUrl),
+            value: customInt!,
+          },
+          {
+            key: new URL(customStrUrl),
+            value: customStr!,
+          },
+          {
+            key: new URL(customBooleanUrl),
+            value: customBoolean!,
+          },
+        ]),
       },
     );
     setAccessRequest(accessRequestReturned);
+    setAccessRequestUrl(accessRequestReturned.id);
   };
 
   const handleRevoke = async () => {
@@ -117,6 +189,7 @@ export default function AccessController({
       fetch: session.fetch,
     });
     setAccessRequest(undefined);
+    setAccessRequestUrl(undefined);
   };
 
   const handleCallAuthedGrant = async () => {
@@ -129,15 +202,20 @@ export default function AccessController({
   };
 
   const handleAccessRequest = async () => {
+    if (accessRequestUrl === undefined || !URL.canParse(accessRequestUrl)) {
+      console.error(
+        "Please issue an Access Request and provide its URL before being redirected.",
+      );
+      return;
+    }
     await redirectToAccessManagementUi(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      accessRequest!,
+      accessRequestUrl,
       `http://localhost:3000/`,
       {
         redirectCallback: (url: string) => {
           window.location.replace(url);
         },
-        fallbackAccessManagementUi: `https://amc.inrupt.com/accessRequest/`,
+        fallbackAccessManagementUi: "https://amc.inrupt.com/accessRequest/",
         fetch: session.fetch,
       },
     );
@@ -182,14 +260,68 @@ export default function AccessController({
         <span data-testid="resource-iri">{sharedResourceIri}</span>
       </p>
       <p>
+        Custom fields:{" "}
+        <form>
+          <input
+            id="customIntUrl"
+            name="customIntUrl"
+            value={customIntUrl}
+            onChange={(e) => setCustomIntUrl(e.currentTarget.value)}
+          />
+          {": "}
+          <input
+            type="number"
+            id="customInt"
+            name="customInt"
+            value={customInt}
+            onChange={(e) =>
+              setCustomInt(Number.parseInt(e.currentTarget.value, 10))
+            }
+          />
+          <br />
+          <input
+            data-testid="input-custom-string-url"
+            id="customStrUrl"
+            name="customStrUrl"
+            value={customStrUrl}
+            onChange={(e) => setCustomStrUrl(e.currentTarget.value)}
+          />
+          {": "}
+          <input
+            data-testid="input-custom-string"
+            id="customText"
+            name="customText"
+            value={customStr}
+            onChange={(e) => setCustomStr(e.currentTarget.value)}
+          />
+          <br />
+          <input
+            id="customBooleanUrl"
+            name="customBooleanUrl"
+            value={customBooleanUrl}
+            onChange={(e) => setCustomBooleanUrl(e.currentTarget.value)}
+          />
+          {": "}
+          <input
+            id="customBoolean"
+            name="customBoolean"
+            type="checkbox"
+            checked={customBoolean}
+            onClick={() => setCustomBoolean((prev) => !prev)}
+          />
+          <br />
+        </form>
+      </p>
+      <p>
         Access Request to Approve:{" "}
         <input
           id="request-id"
           data-testid="access-request-id"
           placeholder="Access Request URL"
           onChange={(e) => {
-            setAccessRequest(e.currentTarget.value);
+            setAccessRequestUrl(e.currentTarget.value);
           }}
+          value={accessRequestUrl}
         />
       </p>
       <div>
@@ -217,15 +349,11 @@ export default function AccessController({
       </div>
       <p>
         Issued access request:{" "}
-        <pre data-testid="access-request">
-          {accessRequest && JSON.stringify(accessRequest, null, 2)}
-        </pre>
+        <AccessCredential vc={accessRequest} testId="access-request" />
       </p>
       <p>
         Granted access:{" "}
-        <pre data-testid="access-grant">
-          {accessGrant && JSON.stringify(accessGrant, null, 2)}
-        </pre>
+        <AccessCredential vc={accessGrant} testId="access-grant" />
       </p>
 
       <button
