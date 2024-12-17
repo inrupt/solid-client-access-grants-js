@@ -46,6 +46,14 @@ export {
 } from "./request";
 
 export {
+  CredentialFilter,
+  CredentialResult,
+  CredentialStatus,
+  CredentialType,
+  query,
+} from "./query/query";
+
+export {
   approveAccessRequest,
   denyAccessRequest,
   getAccessGrant,

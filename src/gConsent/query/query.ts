@@ -24,28 +24,36 @@ import LinkHeader from "http-link-header";
 import { handleErrorResponse } from "@inrupt/solid-client-errors";
 import type { DatasetWithId } from "@inrupt/solid-client-vc";
 import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
+import type { UrlString } from "@inrupt/solid-client";
+
+export type CredentialStatus =
+  | "Pending"
+  | "Denied"
+  | "Granted"
+  | "Canceled"
+  | "Expired"
+  | "Active"
+  | "Revoked";
+
+export type CredentialType =
+  | "SolidAccessRequest"
+  | "SolidAccessGrant"
+  | "SolidAccessDenial";
 
 export type CredentialFilter = {
-  type?: "SolidAccessRequest" | "SolidAccessGrant" | "SolidAccessDenial";
-  status?:
-    | "Pending"
-    | "Denied"
-    | "Granted"
-    | "Canceled"
-    | "Expired"
-    | "Active"
-    | "Revoked";
-  fromAgent?: string;
-  toAgent?: string;
-  resource?: string;
-  purpose?: string;
+  type?: CredentialType;
+  status?: CredentialStatus;
+  fromAgent?: UrlString;
+  toAgent?: UrlString;
+  resource?: UrlString;
+  purpose?: UrlString;
   issuedWithin?: "P1D" | "P7D" | "P1M" | "P3M";
   revokedWithin?: "P1D" | "P7D" | "P1M" | "P3M";
   pageSize?: number;
   page?: string;
 };
 
-const FILTER_ELEMENTS: (keyof CredentialFilter)[] = [
+const FILTER_ELEMENTS: Array<keyof CredentialFilter> = [
   "fromAgent",
   "issuedWithin",
   "page",
@@ -68,13 +76,6 @@ const isSupportedFilterElement = (x: unknown): x is SupportedFilterElements =>
   FILTER_ELEMENTS.includes(x as keyof CredentialFilter);
 
 const PAGING_RELS = ["first", "last", "prev", "next"] as const;
-
-type SupportedPagingRels =
-  typeof PAGING_RELS extends Array<infer E> ? E : never;
-
-// The type assertion is okay in the context of the type guard.
-const isSupportedPagingRel = (x: unknown): x is SupportedPagingRels =>
-  PAGING_RELS.includes(x as SupportedPagingRels);
 
 export type CredentialResult = {
   items: DatasetWithId[];
@@ -126,7 +127,9 @@ async function toCredentialResult(
   }
   const body = await response.json();
   if (!hasItems(body) || !body.items.every(isObjectWithId)) {
-    return result;
+    throw Error(
+      `Unexpected response, no items found in ${JSON.stringify(body)}`,
+    );
   }
   result.items = await Promise.all(
     body.items.map((vc) => {
@@ -136,8 +139,8 @@ async function toCredentialResult(
   return result;
 }
 
-function addQueryParams(filter: CredentialFilter, url: URL): URL {
-  const result = new URL(url);
+function toQueryUrl(endpoint: URL, filter: CredentialFilter): URL {
+  const result = new URL(endpoint);
   Object.entries(filter).forEach(([key, value]) => {
     result.searchParams.append(key, value.toString());
   });
@@ -151,7 +154,7 @@ export async function query(
     fetch?: typeof fetch;
   },
 ): Promise<CredentialResult> {
-  const queryUrl = addQueryParams(filter, queryEndpoint);
+  const queryUrl = toQueryUrl(queryEndpoint, filter);
   const response = await (options.fetch ?? fetch)(queryUrl);
   if (!response.ok) {
     throw handleErrorResponse(

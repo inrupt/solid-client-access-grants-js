@@ -46,6 +46,10 @@ export { CredentialIsAccessGrantAny } from "./type/AccessGrant";
 export {
   approveAccessRequest,
   cancelAccessRequest,
+  CredentialFilter,
+  CredentialResult,
+  CredentialStatus,
+  CredentialType,
   denyAccessRequest,
   getAccessApiEndpoint,
   getAccessGrant,
@@ -55,6 +59,7 @@ export {
   getAccessManagementUi,
   getAccessRequestFromRedirectUrl,
   issueAccessRequest,
+  query,
   redirectToAccessManagementUi,
   redirectToRequestor,
   revokeAccessGrant,
@@ -62,12 +67,6 @@ export {
   REDIRECT_URL_PARAM_NAME,
   REQUEST_VC_URL_PARAM_NAME,
 } from "./gConsent";
-
-export {
-  query,
-  CredentialFilter,
-  CredentialResult,
-} from "./gConsent/query/query";
 
 // Add an API object to the exports to allow explicitly relying on the gConsent-based
 // functions even when not relying on named exports.
