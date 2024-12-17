@@ -23,6 +23,7 @@ import LinkHeader from "http-link-header";
 
 import { handleErrorResponse } from "@inrupt/solid-client-errors";
 import type { DatasetWithId } from "@inrupt/solid-client-vc";
+import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 
 export type CredentialFilter = {
   type?: "SolidAccessRequest" | "SolidAccessGrant" | "SolidAccessDenial";
@@ -93,7 +94,19 @@ function toCredentialFilter(url: URL): CredentialFilter {
   return filter;
 }
 
-function toCredentialResult(response: Response): CredentialResult {
+function hasItems(x: unknown): x is { items: unknown[] } {
+  const candidate = x as { items: unknown };
+  return candidate.items !== undefined && Array.isArray(candidate.items);
+}
+
+function isObjectWithId(x: unknown): x is { id: string } {
+  const candidate = x as { id: string };
+  return typeof candidate.id === "string";
+}
+
+async function toCredentialResult(
+  response: Response,
+): Promise<CredentialResult> {
   const result: CredentialResult = { items: [] };
   const linkHeader = response.headers.get("Link");
   if (linkHeader !== null) {
@@ -111,7 +124,15 @@ function toCredentialResult(response: Response): CredentialResult {
       result[rel] = toCredentialFilter(new URL(link[0].uri));
     });
   }
-  // TODO parse the body to get the results
+  const body = await response.json();
+  if (!hasItems(body) || !body.items.every(isObjectWithId)) {
+    return result;
+  }
+  result.items = await Promise.all(
+    body.items.map((vc) => {
+      return verifiableCredentialToDataset(vc);
+    }),
+  );
   return result;
 }
 
