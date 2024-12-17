@@ -50,6 +50,7 @@ export {
   CredentialResult,
   CredentialStatus,
   CredentialType,
+  DURATION,
   query,
 } from "./query/query";
 

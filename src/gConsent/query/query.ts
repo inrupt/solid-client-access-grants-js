@@ -40,6 +40,13 @@ export type CredentialType =
   | "SolidAccessGrant"
   | "SolidAccessDenial";
 
+export const DURATION = {
+  ONE_DAY: "P1D",
+  ONE_WEEK: "P7D",
+  ONE_MONTH: "P1M",
+  THREE_MONTHS: "P3M",
+} as const;
+
 export type CredentialFilter = {
   type?: CredentialType;
   status?: CredentialStatus;
@@ -147,6 +154,38 @@ function toQueryUrl(endpoint: URL, filter: CredentialFilter): URL {
   return result;
 }
 
+/**
+ * Query for Access Requests or Access Grants based on a given filter.
+ *
+ * @param filter the query filter
+ * @param options query options
+ * @returns a paginated set of Access Credential matching the given filter
+ * @since unreleased
+ *
+ * @example
+ * ```
+ *  // Get the first results page.
+ *  const activeGrantsToday = await query(
+ *       {
+ *         type: "SolidAccessGrant",
+ *         status: "Active",
+ *         issuedWithin: DURATION.ONE_DAY,
+ *       },
+ *       {
+ *         fetch: session.fetch,
+ *         queryEndpoint: config.queryEndpoint,
+ *       },
+ *     );
+ * // Get the next results page.
+ * const activeGrantsToday2 = await query(
+ *       activeGrantsToday.next,
+ *       {
+ *         fetch: session.fetch,
+ *         queryEndpoint: config.queryEndpoint,
+ *       },
+ *     );
+ * ```
+ */
 export async function query(
   filter: CredentialFilter,
   options: {

@@ -51,6 +51,7 @@ export {
   CredentialStatus,
   CredentialType,
   denyAccessRequest,
+  DURATION,
   getAccessApiEndpoint,
   getAccessGrant,
   getAccessGrantAll,
