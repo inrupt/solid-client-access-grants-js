@@ -26,6 +26,9 @@ import type { DatasetWithId } from "@inrupt/solid-client-vc";
 import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
 
+/**
+ * Supported Access Credentials status
+ */
 export type CredentialStatus =
   | "Pending"
   | "Denied"
@@ -35,11 +38,17 @@ export type CredentialStatus =
   | "Active"
   | "Revoked";
 
+/**
+ * Supported Access Credential types
+ */
 export type CredentialType =
   | "SolidAccessRequest"
   | "SolidAccessGrant"
   | "SolidAccessDenial";
 
+/**
+ * Supported durations for Access Credential filtering.
+ */
 export const DURATION = {
   ONE_DAY: "P1D",
   ONE_WEEK: "P7D",
@@ -48,15 +57,45 @@ export const DURATION = {
 } as const;
 
 export type CredentialFilter = {
+  /**
+   * The Access Credential type (e.g. Access Request, Access Grant...)
+   */
   type?: CredentialType;
+  /**
+   * The Access Credential status (e.g. Active, Revoked...)
+   */
   status?: CredentialStatus;
+  /**
+   * WebID of the Agent who issued the Access Credential.
+   */
   fromAgent?: UrlString;
+  /**
+   * WebID of the Agent who is the Access Credential recipient.
+   */
   toAgent?: UrlString;
+  /**
+   * URL of the resource featured in the Access Credential.
+   */
   resource?: UrlString;
+  /**
+   * URL of the Access Credential purpose.
+   */
   purpose?: UrlString;
+  /**
+   * Interval (expressed using ISO 8601) during which the Credential was issued.
+   */
   issuedWithin?: "P1D" | "P7D" | "P1M" | "P3M";
+  /**
+   * Interval (expressed using ISO 8601) during which the Credential was revoked.
+   */
   revokedWithin?: "P1D" | "P7D" | "P1M" | "P3M";
+  /**
+   * Number of items per page.
+   */
   pageSize?: number;
+  /**
+   * Target page (for result pagination).
+   */
   page?: string;
 };
 
@@ -85,10 +124,25 @@ const isSupportedFilterElement = (x: unknown): x is SupportedFilterElements =>
 const PAGING_RELS = ["first", "last", "prev", "next"] as const;
 
 export type CredentialResult = {
+  /**
+   * Page of Access Credentials matching the query.
+   */
   items: DatasetWithId[];
+  /**
+   * First page of query results.
+   */
   first?: CredentialFilter;
+  /**
+   * Previous page of query results.
+   */
   prev?: CredentialFilter;
+  /**
+   * Next page of query results.
+   */
   next?: CredentialFilter;
+  /**
+   * Last page of query results.
+   */
   last?: CredentialFilter;
 };
 

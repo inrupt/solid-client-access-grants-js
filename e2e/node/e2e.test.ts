@@ -52,7 +52,6 @@ import * as sc from "@inrupt/solid-client";
 import { custom } from "openid-client";
 import type { AccessGrant, AccessRequest } from "../../src/index";
 import {
-  DURATION,
   approveAccessRequest,
   createContainerInContainer,
   denyAccessRequest,
@@ -1751,7 +1750,11 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
       );
       expect(onType.items).not.toHaveLength(0);
       const onTypeAndStatus = await query(
-        { type: "SolidAccessGrant", status: "Active" },
+        {
+          type: "SolidAccessGrant",
+          status: "Active",
+          issuedWithin: DURATION.ONE_DAY,
+        },
         {
           fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
           // FIXME add query endpoint discovery check.
