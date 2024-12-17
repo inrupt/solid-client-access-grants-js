@@ -71,6 +71,7 @@ import {
   isValidAccessGrant,
   issueAccessRequest,
   overwriteFile,
+  query,
   revokeAccessGrant,
   saveFileInContainer,
   saveSolidDatasetAt,
@@ -1712,4 +1713,51 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
       });
     },
   );
+
+  describe.only("query endpoint", () => {
+    it("can navigate the paginated results", async () => {
+      const allCredentialsPageOne = await query(
+        { pageSize: 10 },
+        {
+          fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+          // FIXME add query endpoint discovery check.
+          queryEndpoint: new URL("query", vcProvider),
+        },
+      );
+      // We should get the expected page length.
+      expect(allCredentialsPageOne.items).toHaveLength(10);
+      // The first page should not have a "prev" link.
+      expect(allCredentialsPageOne.prev).toBeUndefined();
+      expect(allCredentialsPageOne.next).toBeDefined();
+
+      // Go to the next result page
+      const allCredentialsPageTwo = await query(allCredentialsPageOne.next!, {
+        fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+        // FIXME add query endpoint discovery check.
+        queryEndpoint: new URL("query", vcProvider),
+      });
+      expect(allCredentialsPageTwo.items).toHaveLength(10);
+    });
+
+    it("can filter based on credential type", async () => {
+      const allGrantsPageOne = await query(
+        { type: "SolidAccessGrant" },
+        {
+          fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+          // FIXME add query endpoint discovery check.
+          queryEndpoint: new URL("query", vcProvider),
+        },
+      );
+      expect(allGrantsPageOne.items).not.toHaveLength(0);
+      const allGrantsPageOne = await query(
+        { type: "SolidAccessGrant" },
+        {
+          fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+          // FIXME add query endpoint discovery check.
+          queryEndpoint: new URL("query", vcProvider),
+        },
+      );
+      expect(allGrantsPageOne.items).not.toHaveLength(0);
+    });
+  });
 });
