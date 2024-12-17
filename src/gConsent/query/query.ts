@@ -148,13 +148,13 @@ function toQueryUrl(endpoint: URL, filter: CredentialFilter): URL {
 }
 
 export async function query(
-  queryEndpoint: URL,
   filter: CredentialFilter,
   options: {
     fetch?: typeof fetch;
+    queryEndpoint: URL;
   },
 ): Promise<CredentialResult> {
-  const queryUrl = toQueryUrl(queryEndpoint, filter);
+  const queryUrl = toQueryUrl(options.queryEndpoint, filter);
   const response = await (options.fetch ?? fetch)(queryUrl);
   if (!response.ok) {
     throw handleErrorResponse(
