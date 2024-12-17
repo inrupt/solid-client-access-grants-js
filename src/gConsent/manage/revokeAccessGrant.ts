@@ -71,7 +71,7 @@ async function revokeAccessCredential(
         !credential.has(quad(namedNode(getId(credential)), TYPE, vcType)),
     )
   ) {
-    throw new Error(
+    throw new AccessGrantError(
       `An error occurred when type checking the VC: Not of type [${types.map((type) => type.value).join("] or [")}]`,
     );
   }

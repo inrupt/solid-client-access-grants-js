@@ -165,7 +165,7 @@ async function issueAccessRequest(
     normalize: normalizeAccessRequest,
   });
   if (!isAccessRequest(accessRequest)) {
-    throw new Error(
+    throw new AccessGrantError(
       `${JSON.stringify(accessRequest)} is not an Access Request`,
     );
   }
