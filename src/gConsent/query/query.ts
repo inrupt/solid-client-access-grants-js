@@ -22,11 +22,18 @@
 import LinkHeader from "http-link-header";
 
 import { handleErrorResponse } from "@inrupt/solid-client-errors";
-import { DatasetWithId } from "@inrupt/solid-client-vc";
+import type { DatasetWithId } from "@inrupt/solid-client-vc";
 
 export type CredentialFilter = {
   type?: "SolidAccessRequest" | "SolidAccessGrant" | "SolidAccessDenial";
-  status?: "Pending" | "Denied" | "Granted" | "Canceled" | "Expired" | "Active" | "Revoked";
+  status?:
+    | "Pending"
+    | "Denied"
+    | "Granted"
+    | "Canceled"
+    | "Expired"
+    | "Active"
+    | "Revoked";
   fromAgent?: string;
   toAgent?: string;
   resource?: string;
@@ -38,7 +45,16 @@ export type CredentialFilter = {
 };
 
 const FILTER_ELEMENTS: (keyof CredentialFilter)[] = [
-  "fromAgent","issuedWithin","page","pageSize","purpose","resource","revokedWithin","status","toAgent","type"
+  "fromAgent",
+  "issuedWithin",
+  "page",
+  "pageSize",
+  "purpose",
+  "resource",
+  "revokedWithin",
+  "status",
+  "toAgent",
+  "type",
 ] as const;
 
 // The following ensures that, when we add a value to the FILTER_ELEMENTS array, TS complains
@@ -47,17 +63,17 @@ type SupportedFilterElements =
   typeof FILTER_ELEMENTS extends Array<infer E> ? E : never;
 
 // The type assertion is okay in the context of the type guard.
-const isSupportedFilterElement = (x: unknown): x is SupportedFilterElements => FILTER_ELEMENTS.includes(x as keyof CredentialFilter);
+const isSupportedFilterElement = (x: unknown): x is SupportedFilterElements =>
+  FILTER_ELEMENTS.includes(x as keyof CredentialFilter);
 
-const PAGING_RELS = [
-  "first", "last", "prev", "next"
-] as const;
+const PAGING_RELS = ["first", "last", "prev", "next"] as const;
 
 type SupportedPagingRels =
   typeof PAGING_RELS extends Array<infer E> ? E : never;
 
 // The type assertion is okay in the context of the type guard.
-const isSupportedPagingRel = (x: unknown): x is SupportedPagingRels => PAGING_RELS.includes(x as SupportedPagingRels);
+const isSupportedPagingRel = (x: unknown): x is SupportedPagingRels =>
+  PAGING_RELS.includes(x as SupportedPagingRels);
 
 export type CredentialResult = {
   items: DatasetWithId[];
@@ -66,6 +82,46 @@ export type CredentialResult = {
   next?: CredentialFilter;
   last?: CredentialFilter;
 };
+
+function toCredentialFilter(url: URL): CredentialFilter {
+  const filter: CredentialFilter = {};
+  url.searchParams.forEach((value, key) => {
+    if (isSupportedFilterElement(key)) {
+      Object.assign(filter, { [`${key}`]: value });
+    }
+  });
+  return filter;
+}
+
+function toCredentialResult(response: Response): CredentialResult {
+  const result: CredentialResult = { items: [] };
+  const linkHeader = response.headers.get("Link");
+  if (linkHeader !== null) {
+    const parsedLinks = LinkHeader.parse(linkHeader);
+    PAGING_RELS.forEach((rel) => {
+      const link = parsedLinks.get("rel", rel);
+      if (link.length > 1) {
+        throw Error(
+          `Unexpected response, found more than one ${rel} Link headers.`,
+        );
+      }
+      if (link.length === 0) {
+        return;
+      }
+      result[rel] = toCredentialFilter(new URL(link[0].uri));
+    });
+  }
+  // TODO parse the body to get the results
+  return result;
+}
+
+function addQueryParams(filter: CredentialFilter, url: URL): URL {
+  const result = new URL(url);
+  Object.entries(filter).forEach(([key, value]) => {
+    result.searchParams.append(key, value.toString());
+  });
+  return result;
+}
 
 export async function query(
   queryEndpoint: URL,
@@ -84,39 +140,4 @@ export async function query(
     );
   }
   return toCredentialResult(response);
-}
-
-function addQueryParams(filter: CredentialFilter, url: URL): URL {
-  const result = new URL(url);
-  Object.entries(filter).forEach(([key, value]) => {
-    result.searchParams.append(key, value.toString());
-  })
-  return result;
-}
-
-function toCredentialFilter(url: URL): CredentialFilter {
-  const filter: CredentialFilter = {};
-  url.searchParams.forEach((value, key) => {
-    if (isSupportedFilterElement(key)) {
-      Object.assign(filter, { key: value });
-    }
-  });
-  return filter;
-}
-
-function toCredentialResult(response: Response): CredentialResult {
-  const result: CredentialResult = {items: []};
-  const linkHeader = response.headers.get("Link");
-  if (linkHeader !== null) {
-    const parsedLinks = LinkHeader.parse(linkHeader);
-    PAGING_RELS.forEach((rel) => {
-      const link = parsedLinks.get("rel", rel);
-      if (link.length > 1) {
-        throw Error(`Unexpected response, found more than one ${rel} Link headers.`)
-      }
-      result[rel] = toCredentialFilter(new URL(link[0].uri));
-    });
-  }
-  // TODO parse the body to get the results
-  return result;
 }
