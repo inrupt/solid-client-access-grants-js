@@ -1503,7 +1503,6 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         let accessGrant: AccessGrant;
         let testFileIri: string;
         let testContainerIri: string;
-        let testContainerIriChild: string;
         const testFileContent = "This is a test.";
 
         beforeEach(async () => {
@@ -1561,20 +1560,6 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
             }),
           );
-
-          if (testContainerIriChild !== undefined) {
-            // This resource is only created in some tests, but cleaning it up here
-            // rather than in the test ensures it is properly removed even on test
-            // failure.
-            await retryAsync(() =>
-              sc.deleteContainer(testContainerIriChild, {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
-              }),
-            );
-          }
 
           await retryAsync(() =>
             sc.deleteContainer(testContainerIri, {
