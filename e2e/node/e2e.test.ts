@@ -52,6 +52,7 @@ import * as sc from "@inrupt/solid-client";
 import { custom } from "openid-client";
 import type { AccessGrant, AccessRequest } from "../../src/index";
 import {
+  DURATION,
   approveAccessRequest,
   createContainerInContainer,
   denyAccessRequest,
@@ -1714,7 +1715,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
     },
   );
 
-  describe.only("query endpoint", () => {
+  describe("query endpoint", () => {
     it("can navigate the paginated results", async () => {
       const allCredentialsPageOne = await query(
         { pageSize: 10 },
@@ -1739,8 +1740,8 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
       expect(allCredentialsPageTwo.items).toHaveLength(10);
     });
 
-    it("can filter based on credential type", async () => {
-      const allGrantsPageOne = await query(
+    it("can filter based on one or more criteria", async () => {
+      const onType = await query(
         { type: "SolidAccessGrant" },
         {
           fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -1748,16 +1749,19 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           queryEndpoint: new URL("query", vcProvider),
         },
       );
-      expect(allGrantsPageOne.items).not.toHaveLength(0);
-      const allGrantsPageOne = await query(
-        { type: "SolidAccessGrant" },
+      expect(onType.items).not.toHaveLength(0);
+      const onTypeAndStatus = await query(
+        { type: "SolidAccessGrant", status: "Active" },
         {
           fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
           // FIXME add query endpoint discovery check.
           queryEndpoint: new URL("query", vcProvider),
         },
       );
-      expect(allGrantsPageOne.items).not.toHaveLength(0);
+      expect(onTypeAndStatus.items).not.toHaveLength(0);
+      expect(onTypeAndStatus.items.length).toBeLessThanOrEqual(
+        onType.items.length,
+      );
     });
   });
 });
