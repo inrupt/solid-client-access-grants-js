@@ -20,7 +20,6 @@
 //
 
 import { jest, it, describe, expect } from "@jest/globals";
-import { detail } from "rdf-namespaces/dist/fhir";
 import type { CredentialFilter } from "./query";
 import { DURATION, query } from "./query";
 import { mockAccessGrantVc } from "../util/access.mock";
