@@ -52,6 +52,7 @@ import * as sc from "@inrupt/solid-client";
 import { custom } from "openid-client";
 import type { AccessGrant, AccessRequest } from "../../src/index";
 import {
+  DURATION,
   approveAccessRequest,
   createContainerInContainer,
   denyAccessRequest,
