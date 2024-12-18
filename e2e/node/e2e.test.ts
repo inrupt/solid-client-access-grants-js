@@ -87,6 +87,7 @@ import {
   getPurposes,
 } from "../../src/common/getters";
 import { toBeEqual } from "../../src/gConsent/util/toBeEqual.mock";
+import { paginateQuery } from "../../src/gConsent/query/query";
 
 const { namedNode } = DataFactory;
 
@@ -1767,5 +1768,19 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         onType.items.length,
       );
     });
+  });
+
+  it("can iterate through pages", async () => {
+    const pages = paginateQuery(
+      {},
+      {
+        fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+        // FIXME add query endpoint discovery check.
+        queryEndpoint: new URL("query", vcProvider),
+      },
+    );
+    for await (const page of pages) {
+      expect(page.items).not.toHaveLength(0);
+    }
   });
 });
