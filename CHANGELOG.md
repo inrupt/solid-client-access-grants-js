@@ -6,11 +6,17 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 The following changes are pending, and will be applied on the next major release:
 
-- The `status` parameter for `getAccessGrantAll` will default to `all` rather than `granted`.
+- The `getAccessGrantAll` function is deprecated. It can be replaced with `query`.
+  Although the two functions behavior is different, they can be used to achieve
+  similar results.
+- The `gConsent` and all of `gConsent/*` submodules are deprecated. The former can
+  be replaced by a regular import of the library, and the latters can be replaced
+  with the equivalent non-gConsent submodules (e.g. `gConsent/manage` can be replaced
+  with `manage`). There is no functionality change between the two.
 
 ## Unreleased
 
-### New feature (alpha)
+### New feature
 
 - Add support for custom fields. Applications are now able to read and write custom fields
   into Access Credentials (both Access Requests and Access Grants). This feature is available
@@ -18,6 +24,8 @@ The following changes are pending, and will be applied on the next major release
   custom fields, and via a set of dedicated getters in the `getters/` module. A generic getter
   is introduced, `getCustomFields`, as well as a set of typed helpers, such as `getCustomInteger`.
   Typed helpers are available for integers, floats, strings and booleans.
+- Support new query endpoint: the new `query` function allows to query for Access Credentials using
+  the newly introduce ESS endpoint.
 
 ## [3.1.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.1.1) - 2024-10-23
 
