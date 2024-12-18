@@ -45,6 +45,7 @@
     "./fetch": "./dist/resource/index.mjs",
     "./discover": "./dist/gConsent/discover/index.mjs",
     "./manage": "./dist/gConsent/manage/index.mjs",
+    "./query": "./dist/gConsent/query/query.mjs",
     "./request": "./dist/gConsent/request/index.mjs",
     "./verify": "./dist/common/verify/index.mjs",
     "./getters": "./dist/common/getters.mjs",
@@ -60,6 +61,9 @@
       ],
       "manage": [
         "dist/gConsent/manage/index.d.ts"
+      ],
+      "query": [
+        "dist/gConsent/query/query.d.ts"
       ],
       "request": [
         "dist/gConsent/request/index.d.ts"
