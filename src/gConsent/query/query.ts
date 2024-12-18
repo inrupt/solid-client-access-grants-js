@@ -265,3 +265,22 @@ export async function query(
   }
   return toCredentialResult(response);
 }
+
+export async function* paginateQuery(
+  filter: CredentialFilter,
+  options: {
+    fetch: typeof fetch;
+    queryEndpoint: URL;
+  },
+) {
+  let page = await query(filter, options);
+  while (page.next !== undefined) {
+    yield page;
+    // This is a generator, so we don't want to go through
+    // all the pages at once with a Promise.all approach.
+    // eslint-disable-next-line no-await-in-loop
+    page = await query(page.next, options);
+  }
+  // Return the last page.
+  yield page;
+}

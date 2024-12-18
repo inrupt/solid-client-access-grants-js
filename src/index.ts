@@ -60,6 +60,7 @@ export {
   getAccessManagementUi,
   getAccessRequestFromRedirectUrl,
   issueAccessRequest,
+  paginateQuery,
   query,
   redirectToAccessManagementUi,
   redirectToRequestor,
