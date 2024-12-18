@@ -203,7 +203,9 @@ async function toCredentialResult(
 function toQueryUrl(endpoint: URL, filter: CredentialFilter): URL {
   const result = new URL(endpoint);
   Object.entries(filter).forEach(([key, value]) => {
-    result.searchParams.append(key, value.toString());
+    if (isSupportedFilterElement(key)) {
+      result.searchParams.append(key, value.toString());
+    }
   });
   return result;
 }
@@ -243,12 +245,12 @@ function toQueryUrl(endpoint: URL, filter: CredentialFilter): URL {
 export async function query(
   filter: CredentialFilter,
   options: {
-    fetch?: typeof fetch;
+    fetch: typeof fetch;
     queryEndpoint: URL;
   },
 ): Promise<CredentialResult> {
   const queryUrl = toQueryUrl(options.queryEndpoint, filter);
-  const response = await (options.fetch ?? fetch)(queryUrl);
+  const response = await options.fetch(queryUrl);
   if (!response.ok) {
     throw handleErrorResponse(
       response,
