@@ -22,7 +22,7 @@
 import { jest, it, describe, expect } from "@jest/globals";
 import { detail } from "rdf-namespaces/dist/fhir";
 import type { CredentialFilter } from "./query";
-import { query } from "./query";
+import { DURATION, query } from "./query";
 import { mockAccessGrantVc } from "../util/access.mock";
 
 describe("query", () => {
@@ -146,5 +146,25 @@ describe("query", () => {
     expect(result.next).toStrictEqual(nextQueryParams);
     expect(result.last).toStrictEqual(lastQueryParams);
     expect(result.prev).toBeUndefined();
+  });
+
+  it("exposes utility constants for duration", async () => {
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          items: [],
+        }),
+      ),
+    );
+    await query(
+      { issuedWithin: DURATION.ONE_DAY, revokedWithin: DURATION.ONE_WEEK },
+      {
+        queryEndpoint: new URL("https://vc.example.org/query"),
+        fetch: mockedFetch,
+      },
+    );
+    expect(mockedFetch.mock.calls[0][0].toString()).toBe(
+      `https://vc.example.org/query?issuedWithin=P1D&revokedWithin=P7D`,
+    );
   });
 });
