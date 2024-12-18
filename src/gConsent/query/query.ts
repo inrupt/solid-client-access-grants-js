@@ -282,5 +282,5 @@ export async function* paginateQuery(
     page = await query(page.next, options);
   }
   // Return the last page.
-  yield page;
+  return page;
 }
