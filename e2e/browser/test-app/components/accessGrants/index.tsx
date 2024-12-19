@@ -41,7 +41,7 @@ import {
   deleteFile,
 } from "@inrupt/solid-client";
 import React, { useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const session = getDefaultSession();
 const SHARED_FILE_CONTENT = "Some content.\n";
@@ -259,7 +259,7 @@ export default function AccessController({
         Created resource:{" "}
         <span data-testid="resource-iri">{sharedResourceIri}</span>
       </p>
-      <p>
+      <div>
         Custom fields:{" "}
         <form>
           <input
@@ -311,7 +311,7 @@ export default function AccessController({
           />
           <br />
         </form>
-      </p>
+      </div>
       <p>
         Access Request to Approve:{" "}
         <input
