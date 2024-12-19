@@ -160,7 +160,7 @@ function toCredentialFilter(url: URL): CredentialFilter {
 async function parseQueryResponse(
   responseJson: unknown,
 ): Promise<DatasetWithId[]> {
-  // The type assertion here is immediatly checked.
+  // The type assertion here is immediately checked.
   const candidate = responseJson as { items: unknown };
   if (candidate.items === undefined || !Array.isArray(candidate.items)) {
     throw new AccessGrantError(
@@ -216,11 +216,11 @@ function toQueryUrl(endpoint: URL, filter: CredentialFilter): URL {
 }
 
 /**
- * Query for Access Credential (Access Requests, Access Grants or Access Denials) based on a given filter.
+ * Query for Access Credentials (Access Requests, Access Grants or Access Denials) based on a given filter.
  *
  * @param filter The query filter
  * @param options Query options
- * @returns a paginated set of  matching the given filter
+ * @returns a paginated set of Access Credentials matching the given filter
  * @since unreleased
  *
  * @example

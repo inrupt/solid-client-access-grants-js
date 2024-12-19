@@ -7,7 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 The following changes are pending, and will be applied on the next major release:
 
 - The `getAccessGrantAll` function is deprecated. It can be replaced with `query`.
-  Although the two functions behavior is different, they can be used to achieve
+  Although the two functions' behavior is different, they can be used to achieve
   similar results.
 - The `gConsent` and all of `gConsent/*` submodules are deprecated. The former can
   be replaced by a regular import of the library, and the latter can be replaced
