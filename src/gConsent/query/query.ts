@@ -27,7 +27,7 @@ import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
 
 /**
- * Supported Access Credentials status
+ * Supported Access Credential statuses
  */
 export type CredentialStatus =
   | "Pending"
@@ -58,11 +58,11 @@ export const DURATION = {
 
 export type CredentialFilter = {
   /**
-   * The Access Credential type (e.g. Access Request, Access Grant...)
+   * The Access Credential type (e.g. Access Request, Access Grant...).
    */
   type?: CredentialType;
   /**
-   * The Access Credential status (e.g. Active, Revoked...)
+   * The Access Credential status (e.g. Active, Revoked...).
    */
   status?: CredentialStatus;
   /**
@@ -82,11 +82,11 @@ export type CredentialFilter = {
    */
   purpose?: UrlString;
   /**
-   * Interval (expressed using ISO 8601) during which the Credential was issued.
+   * Period (expressed using ISO 8601) during which the Credential was issued.
    */
   issuedWithin?: "P1D" | "P7D" | "P1M" | "P3M";
   /**
-   * Interval (expressed using ISO 8601) during which the Credential was revoked.
+   * Period (expressed using ISO 8601) during which the Credential was revoked.
    */
   revokedWithin?: "P1D" | "P7D" | "P1M" | "P3M";
   /**
@@ -177,7 +177,7 @@ async function toCredentialResult(
       const link = parsedLinks.get("rel", rel);
       if (link.length > 1) {
         throw Error(
-          `Unexpected response, found more than one ${rel} Link headers.`,
+          `Unexpected response, found more than one [${rel}] Link headers.`,
         );
       }
       if (link.length === 0) {
@@ -213,15 +213,15 @@ function toQueryUrl(endpoint: URL, filter: CredentialFilter): URL {
 /**
  * Query for Access Requests or Access Grants based on a given filter.
  *
- * @param filter the query filter
- * @param options query options
+ * @param filter The query filter
+ * @param options Query options
  * @returns a paginated set of Access Credential matching the given filter
  * @since unreleased
  *
  * @example
  * ```
  *  // Get the first results page.
- *  const activeGrantsToday = await query(
+ *  const activeGrantsWithinDay = await query(
  *       {
  *         type: "SolidAccessGrant",
  *         status: "Active",
@@ -233,8 +233,8 @@ function toQueryUrl(endpoint: URL, filter: CredentialFilter): URL {
  *       },
  *     );
  * // Get the next results page.
- * const activeGrantsToday2 = await query(
- *       activeGrantsToday.next,
+ * const activeGrantsWithinDay2 = await query(
+ *       activeGrantsWithinDay.next,
  *       {
  *         fetch: session.fetch,
  *         queryEndpoint: config.queryEndpoint,

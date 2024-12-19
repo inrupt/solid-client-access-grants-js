@@ -10,7 +10,7 @@ The following changes are pending, and will be applied on the next major release
   Although the two functions behavior is different, they can be used to achieve
   similar results.
 - The `gConsent` and all of `gConsent/*` submodules are deprecated. The former can
-  be replaced by a regular import of the library, and the latters can be replaced
+  be replaced by a regular import of the library, and the latter can be replaced
   with the equivalent non-gConsent submodules (e.g. `gConsent/manage` can be replaced
   with `manage`). There is no functionality change between the two.
 
@@ -24,8 +24,8 @@ The following changes are pending, and will be applied on the next major release
   custom fields, and via a set of dedicated getters in the `getters/` module. A generic getter
   is introduced, `getCustomFields`, as well as a set of typed helpers, such as `getCustomInteger`.
   Typed helpers are available for integers, floats, strings and booleans.
-- Support new query endpoint: the new `query` function allows to query for Access Credentials using
-  the newly introduce ESS endpoint.
+- Support new query endpoint: the new `query` function enables querying for Access Credentials using
+  the newly introduced ESS endpoint.
 
 ## [3.1.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.1.1) - 2024-10-23
 
