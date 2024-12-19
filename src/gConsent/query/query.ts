@@ -25,6 +25,7 @@ import { handleErrorResponse } from "@inrupt/solid-client-errors";
 import type { DatasetWithId } from "@inrupt/solid-client-vc";
 import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 import type { UrlString } from "@inrupt/solid-client";
+import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 /**
  * Supported Access Credential statuses
@@ -156,14 +157,27 @@ function toCredentialFilter(url: URL): CredentialFilter {
   return filter;
 }
 
-function hasItems(x: unknown): x is { items: unknown[] } {
-  const candidate = x as { items: unknown };
-  return candidate.items !== undefined && Array.isArray(candidate.items);
-}
-
-function isObjectWithId(x: unknown): x is { id: string } {
-  const candidate = x as { id: string };
-  return typeof candidate.id === "string";
+async function parseQueryResponse(
+  responseJson: unknown,
+): Promise<DatasetWithId[]> {
+  const candidate = responseJson as { items: unknown };
+  if (candidate.items === undefined || !Array.isArray(candidate.items)) {
+    throw new AccessGrantError(
+      `Unexpected query response, no 'items' array found in ${JSON.stringify(responseJson)}`,
+    );
+  }
+  return Promise.all(
+    candidate.items.map((vc) => {
+      return verifiableCredentialToDataset(vc);
+    }),
+  ).catch((error) => {
+    throw new AccessGrantError(
+      `Unexpected query response, parsing the content of the 'items' array failed.`,
+      {
+        cause: error,
+      },
+    );
+  });
 }
 
 async function toCredentialResult(
@@ -186,17 +200,7 @@ async function toCredentialResult(
       result[rel] = toCredentialFilter(new URL(link[0].uri));
     });
   }
-  const body = await response.json();
-  if (!hasItems(body) || !body.items.every(isObjectWithId)) {
-    throw Error(
-      `Unexpected response, no items found in ${JSON.stringify(body)}`,
-    );
-  }
-  result.items = await Promise.all(
-    body.items.map((vc) => {
-      return verifiableCredentialToDataset(vc);
-    }),
-  );
+  result.items = await parseQueryResponse(await response.json());
   return result;
 }
 

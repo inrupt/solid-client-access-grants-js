@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
     /* Basic Options */
-    "target": "ES2018",
+    "target": "ES2022",
     "module": "commonjs",
     "moduleResolution": "node",
-    "lib": ["es2018", "dom"],
+    "lib": ["es2022", "dom"],
     "declaration": true,
     "outDir": "dist",
     "rootDir": "src",

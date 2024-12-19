@@ -166,4 +166,42 @@ describe("query", () => {
       `https://vc.example.org/query?issuedWithin=P1D&revokedWithin=P7D`,
     );
   });
+
+  it("throws if no 'items' array is present in the response", async () => {
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          notAnItemsArray: "some value",
+        }),
+      ),
+    );
+    await expect(
+      query(
+        {},
+        {
+          queryEndpoint: new URL("https://vc.example.org/query"),
+          fetch: mockedFetch,
+        },
+      ),
+    ).rejects.toThrow();
+  });
+
+  it("throws if invalid items are present in the response", async () => {
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          items: ["not a VC"],
+        }),
+      ),
+    );
+    await expect(
+      query(
+        {},
+        {
+          queryEndpoint: new URL("https://vc.example.org/query"),
+          fetch: mockedFetch,
+        },
+      ),
+    ).rejects.toThrow();
+  });
 });
