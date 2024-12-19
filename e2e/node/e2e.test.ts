@@ -52,6 +52,7 @@ import * as sc from "@inrupt/solid-client";
 import { custom } from "openid-client";
 import type { AccessGrant, AccessRequest } from "../../src/index";
 import {
+  DURATION,
   approveAccessRequest,
   createContainerInContainer,
   denyAccessRequest,
@@ -71,6 +72,7 @@ import {
   isValidAccessGrant,
   issueAccessRequest,
   overwriteFile,
+  query,
   revokeAccessGrant,
   saveFileInContainer,
   saveSolidDatasetAt,
@@ -1709,6 +1711,63 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           // Assert that the dataset was created correctly:
           expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
         });
+      });
+    },
+  );
+
+  describeIf(environmentFeatures?.QUERY_ENDPOINT === "true")(
+    "query endpoint",
+    () => {
+      it("can navigate the paginated results", async () => {
+        const allCredentialsPageOne = await query(
+          { pageSize: 10 },
+          {
+            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+            // FIXME add query endpoint discovery check.
+            queryEndpoint: new URL("query", vcProvider),
+          },
+        );
+        // We should get the expected page length.
+        expect(allCredentialsPageOne.items).toHaveLength(10);
+        // The first page should not have a "prev" link.
+        expect(allCredentialsPageOne.prev).toBeUndefined();
+        expect(allCredentialsPageOne.next).toBeDefined();
+
+        // Go to the next result page
+        const allCredentialsPageTwo = await query(allCredentialsPageOne.next!, {
+          fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+          // FIXME add query endpoint discovery check.
+          queryEndpoint: new URL("query", vcProvider),
+        });
+        expect(allCredentialsPageTwo.items).toHaveLength(10);
+      });
+
+      it("can filter based on one or more criteria", async () => {
+        const onType = await query(
+          { type: "SolidAccessGrant" },
+          {
+            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+            // FIXME add query endpoint discovery check.
+            queryEndpoint: new URL("query", vcProvider),
+          },
+        );
+        expect(onType.items).not.toHaveLength(0);
+        const onTypeAndStatus = await query(
+          {
+            type: "SolidAccessGrant",
+            status: "Active",
+            issuedWithin: DURATION.ONE_DAY,
+          },
+          {
+            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+            // FIXME add query endpoint discovery check.
+            queryEndpoint: new URL("query", vcProvider),
+          },
+        );
+        expect(onTypeAndStatus.items).not.toHaveLength(0);
+        expect(onTypeAndStatus.items.length).toBeLessThanOrEqual(
+          onType.items.length,
+        );
       });
     },
   );

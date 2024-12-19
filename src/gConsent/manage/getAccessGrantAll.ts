@@ -126,6 +126,7 @@ const getAncestorUrls = (resourceUrl: URL) => {
  *   with the environment you are requesting against.
  * @returns A promise resolving to an array of Access Grants matching the request.
  * @since 0.4.0
+ * @deprecated Use the new `query` method instead.
  */
 async function getAccessGrantAll(
   params: AccessParameters,
@@ -134,7 +135,7 @@ async function getAccessGrantAll(
   },
 ): Promise<Array<DatasetWithId>>;
 /**
- * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
+ * @deprecated Use the new `query` method instead.
  */
 async function getAccessGrantAll(
   params: AccessParameters,
@@ -143,7 +144,7 @@ async function getAccessGrantAll(
   },
 ): Promise<Array<VerifiableCredential>>;
 /**
- * @deprecated Please set returnLegacyJsonld: false and use RDFJS API
+ * @deprecated Use the new `query` method instead.
  */
 async function getAccessGrantAll(
   params: AccessParameters,
