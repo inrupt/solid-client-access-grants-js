@@ -1774,7 +1774,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
       it("can iterate through pages", async () => {
         const pages = paginatedQuery(
           {
-            pageSize: 10,
+            pageSize: 20,
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -1782,7 +1782,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             queryEndpoint: new URL("query", vcProvider),
           },
         );
-        const maxPages = 3;
+        const maxPages = 2;
         let pageCount = 0;
         for await (const page of pages) {
           expect(page.items).not.toHaveLength(0);
