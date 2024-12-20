@@ -206,6 +206,10 @@ describe("query", () => {
   });
 });
 
+// These tests don't check that the underlying query function
+// is called, so they lack the coverage for error conditions.
+// This is intentional, as workarounds for this cost more than
+// the value they provide.
 describe("paginatedQuery", () => {
   it("follows the pagination links", async () => {
     const nextQueryParams = {
