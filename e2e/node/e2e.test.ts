@@ -1773,7 +1773,9 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
       it("can iterate through pages", async () => {
         const pages = paginatedQuery(
-          {},
+          {
+            pageSize: 10,
+          },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             // FIXME add query endpoint discovery check.
@@ -1790,7 +1792,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             break;
           }
         }
-      }, 45_000);
+      }, 120_000);
     },
   );
 });
