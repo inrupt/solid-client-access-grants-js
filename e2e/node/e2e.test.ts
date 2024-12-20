@@ -1770,20 +1770,20 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           onType.items.length,
         );
       });
+
+      it("can iterate through pages", async () => {
+        const pages = paginatedQuery(
+          {},
+          {
+            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+            // FIXME add query endpoint discovery check.
+            queryEndpoint: new URL("query", vcProvider),
+          },
+        );
+        for await (const page of pages) {
+          expect(page.items).not.toHaveLength(0);
+        }
+      });
     },
   );
-
-  it("can iterate through pages", async () => {
-    const pages = paginatedQuery(
-      {},
-      {
-        fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-        // FIXME add query endpoint discovery check.
-        queryEndpoint: new URL("query", vcProvider),
-      },
-    );
-    for await (const page of pages) {
-      expect(page.items).not.toHaveLength(0);
-    }
-  });
 });
