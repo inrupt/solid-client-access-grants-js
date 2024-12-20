@@ -1780,10 +1780,17 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             queryEndpoint: new URL("query", vcProvider),
           },
         );
+        const maxPages = 3;
+        let pageCount = 0;
         for await (const page of pages) {
           expect(page.items).not.toHaveLength(0);
+          pageCount += 1;
+          // Avoid iterating for too long when there are a lot of results.
+          if (pageCount === maxPages) {
+            break;
+          }
         }
-      }, 30_000);
+      }, 45_000);
     },
   );
 });
