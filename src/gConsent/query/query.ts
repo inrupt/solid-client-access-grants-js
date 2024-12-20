@@ -216,7 +216,8 @@ function toQueryUrl(endpoint: URL, filter: CredentialFilter): URL {
 }
 
 /**
- * Query for Access Credentials (Access Requests, Access Grants or Access Denials) based on a given filter.
+ * Query for Access Credential (Access Requests, Access Grants or Access Denials) based on a given filter,
+ * and get a page of results.
  *
  * @param filter The query filter
  * @param options Query options
@@ -264,4 +265,46 @@ export async function query(
     );
   }
   return toCredentialResult(response);
+}
+
+/**
+ * Query for Access Credential (Access Requests, Access Grants or Access Denials) based on a given filter,
+ * and traverses all of the result pages.
+ *
+ * @param filter The query filter
+ * @param options Query options
+ * @returns an async iterator going through the result pages
+ * @since unreleased
+ *
+ * @example
+ * ```
+ *  const pages = paginatedQuery(
+ *     {},
+ *     {
+ *       fetch: session.fetch,
+ *       queryEndpoint: new URL("https://vc.example.org/query"),
+ *     },
+ *   );
+ *   for await (const page of pages) {
+ *     // do something with the result page.
+ *   }
+ * ```
+ */
+export async function* paginatedQuery(
+  filter: CredentialFilter,
+  options: {
+    fetch: typeof fetch;
+    queryEndpoint: URL;
+  },
+) {
+  let page = await query(filter, options);
+  while (page.next !== undefined) {
+    yield page;
+    // This is a generator, so we don't want to go through
+    // all the pages at once with a Promise.all approach.
+    // eslint-disable-next-line no-await-in-loop
+    page = await query(page.next, options);
+  }
+  // Return the last page.
+  yield page;
 }

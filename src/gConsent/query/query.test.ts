@@ -20,8 +20,8 @@
 //
 
 import { jest, it, describe, expect } from "@jest/globals";
-import type { CredentialFilter } from "./query";
-import { DURATION, query } from "./query";
+import type { CredentialFilter, CredentialResult } from "./query";
+import { DURATION, paginatedQuery, query } from "./query";
 import { mockAccessGrantVc } from "../util/access.mock";
 
 describe("query", () => {
@@ -203,5 +203,80 @@ describe("query", () => {
         },
       ),
     ).rejects.toThrow();
+  });
+});
+
+// These tests don't check that the underlying query function
+// is called, so they lack the coverage for error conditions.
+// This is intentional, as workarounds for this cost more than
+// the value they provide.
+describe("paginatedQuery", () => {
+  it("follows the pagination links", async () => {
+    const nextQueryParams = {
+      type: "SolidAccessGrant",
+      page: "6af7d740",
+      status: "Active",
+    };
+    const linkNext = `<https://vc.example.org/query?${new URLSearchParams(nextQueryParams)}>; rel="next"`;
+    const paginationHeaders = new Headers();
+    paginationHeaders.append("Link", linkNext);
+    const mockedGrant = await mockAccessGrantVc();
+    const pages: CredentialResult[] = [];
+    const mockedFetch = jest
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            items: [mockedGrant],
+          }),
+          {
+            headers: paginationHeaders,
+          },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            items: [mockedGrant],
+          }),
+          // The second response has no pagination headers to complete iteration.
+        ),
+      );
+
+    for await (const page of paginatedQuery(
+      {},
+      {
+        queryEndpoint: new URL("https://vc.example.org/query"),
+        fetch: mockedFetch,
+      },
+    )) {
+      expect(page.items).toHaveLength(1);
+      pages.push(page);
+    }
+    expect(pages).toHaveLength(2);
+  });
+
+  it("supports results not having a next page", async () => {
+    const mockedGrant = await mockAccessGrantVc();
+    const pages: CredentialResult[] = [];
+    const mockedFetch = jest.fn<typeof fetch>().mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          items: [mockedGrant],
+        }),
+      ),
+    );
+
+    for await (const page of paginatedQuery(
+      {},
+      {
+        queryEndpoint: new URL("https://vc.example.org/query"),
+        fetch: mockedFetch,
+      },
+    )) {
+      expect(page.items).toHaveLength(1);
+      pages.push(page);
+    }
+    expect(pages).toHaveLength(1);
   });
 });
