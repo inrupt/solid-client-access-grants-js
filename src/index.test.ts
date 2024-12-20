@@ -32,6 +32,8 @@ import {
   getAccessRequestFromRedirectUrl,
   isValidAccessGrant,
   issueAccessRequest,
+  query,
+  paginatedQuery,
   redirectToAccessManagementUi,
   redirectToRequestor,
   revokeAccessGrant,
@@ -81,6 +83,8 @@ describe("Index exports", () => {
     expect(fetchWithVc).toBeDefined();
     expect(getFile).toBeDefined();
     expect(overwriteFile).toBeDefined();
+    expect(paginatedQuery).toBeDefined();
+    expect(query).toBeDefined();
     expect(saveFileInContainer).toBeDefined();
     expect(createContainerInContainer).toBeDefined();
     expect(getSolidDataset).toBeDefined();
