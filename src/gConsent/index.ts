@@ -52,7 +52,7 @@ export {
   CredentialType,
   DURATION,
   query,
-  paginateQuery,
+  paginatedQuery,
 } from "./query/query";
 
 export {
