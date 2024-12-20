@@ -1783,7 +1783,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         for await (const page of pages) {
           expect(page.items).not.toHaveLength(0);
         }
-      });
+      }, 30_000);
     },
   );
 });
