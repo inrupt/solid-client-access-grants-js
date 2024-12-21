@@ -16,6 +16,8 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+## [3.2.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.2.0) - 2024-12-23
+
 ### New feature
 
 - Add support for custom fields. Applications are now able to read and write custom fields
