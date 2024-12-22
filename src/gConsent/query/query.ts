@@ -24,20 +24,22 @@ import LinkHeader from "http-link-header";
 import { handleErrorResponse } from "@inrupt/solid-client-errors";
 import type { DatasetWithId } from "@inrupt/solid-client-vc";
 import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
-import type { UrlString } from "@inrupt/solid-client";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 /**
- * Supported Access Credential statuses
+ * Supported Access Requests statuses
  */
-export type CredentialStatus =
+export type AccessRequestStatus =
   | "Pending"
   | "Denied"
   | "Granted"
   | "Canceled"
-  | "Expired"
-  | "Active"
-  | "Revoked";
+  | "Expired";
+
+/**
+ * Supported Access Grant statuses
+ */
+export type AccessGrantStatus = "Expired" | "Active" | "Revoked";
 
 /**
  * Supported Access Credential types
@@ -65,23 +67,23 @@ export type CredentialFilter = {
   /**
    * The Access Credential status (e.g. Active, Revoked...).
    */
-  status?: CredentialStatus;
+  status?: AccessRequestStatus | AccessGrantStatus;
   /**
    * WebID of the Agent who issued the Access Credential.
    */
-  fromAgent?: UrlString;
+  fromAgent?: URL;
   /**
    * WebID of the Agent who is the Access Credential recipient.
    */
-  toAgent?: UrlString;
+  toAgent?: URL;
   /**
    * URL of the resource featured in the Access Credential.
    */
-  resource?: UrlString;
+  resource?: URL;
   /**
    * URL of the Access Credential purpose.
    */
-  purpose?: UrlString;
+  purpose?: URL;
   /**
    * Period (expressed using ISO 8601) during which the Credential was issued.
    */
@@ -100,7 +102,23 @@ export type CredentialFilter = {
   page?: string;
 };
 
-const FILTER_ELEMENTS: Array<keyof CredentialFilter> = [
+export type AccessGrantFilter = CredentialFilter & {
+  type: "SolidAccessGrant";
+  /**
+   * The Access Grant status (e.g. Active, Revoked...).
+   */
+  status?: AccessGrantStatus;
+};
+
+export type AccessRequestFilter = CredentialFilter & {
+  type: "SolidAccessRequest";
+  /**
+   * The Access Request status (e.g. Pending, Granted...).
+   */
+  status?: AccessRequestStatus;
+};
+
+const FILTER_ELEMENTS: Array<keyof AccessGrantFilter | AccessRequestFilter> = [
   "fromAgent",
   "issuedWithin",
   "page",
@@ -132,19 +150,19 @@ export type CredentialResult = {
   /**
    * First page of query results.
    */
-  first?: CredentialFilter;
+  first?: AccessRequestFilter | AccessGrantFilter;
   /**
    * Previous page of query results.
    */
-  prev?: CredentialFilter;
+  prev?: AccessRequestFilter | AccessGrantFilter;
   /**
    * Next page of query results.
    */
-  next?: CredentialFilter;
+  next?: AccessRequestFilter | AccessGrantFilter;
   /**
    * Last page of query results.
    */
-  last?: CredentialFilter;
+  last?: AccessRequestFilter | AccessGrantFilter;
 };
 
 function toCredentialFilter(url: URL): CredentialFilter {
@@ -198,7 +216,11 @@ async function toCredentialResult(
       if (link.length === 0) {
         return;
       }
-      result[rel] = toCredentialFilter(new URL(link[0].uri));
+      // The type assertion here relies on the consistency of the server
+      // response with the client request, which must be AccessRequestFilter | AccessGrantFilter.
+      result[rel] = toCredentialFilter(new URL(link[0].uri)) as
+        | AccessRequestFilter
+        | AccessGrantFilter;
     });
   }
   result.items = await parseQueryResponse(await response.json());
@@ -249,7 +271,7 @@ function toQueryUrl(endpoint: URL, filter: CredentialFilter): URL {
  * ```
  */
 export async function query(
-  filter: CredentialFilter,
+  filter: AccessRequestFilter | AccessGrantFilter,
   options: {
     fetch: typeof fetch;
     queryEndpoint: URL;
@@ -291,7 +313,7 @@ export async function query(
  * ```
  */
 export async function* paginatedQuery(
-  filter: CredentialFilter,
+  filter: AccessRequestFilter | AccessGrantFilter,
   options: {
     fetch: typeof fetch;
     queryEndpoint: URL;

@@ -20,7 +20,7 @@
 //
 
 import { jest, it, describe, expect } from "@jest/globals";
-import type { CredentialFilter, CredentialResult } from "./query";
+import type { AccessGrantFilter, CredentialResult } from "./query";
 import { DURATION, paginatedQuery, query } from "./query";
 import { mockAccessGrantVc } from "../util/access.mock";
 
@@ -28,7 +28,9 @@ describe("query", () => {
   it("throws on server errors", async () => {
     await expect(() =>
       query(
-        {},
+        {
+          type: "SolidAccessRequest",
+        },
         {
           queryEndpoint: new URL("https://vc.example.org/query"),
           fetch: jest.fn<typeof fetch>().mockResolvedValue(
@@ -55,13 +57,13 @@ describe("query", () => {
         }),
       ),
     );
-    const filter: CredentialFilter = {
-      fromAgent: "https://example.org/from-some-agent",
+    const filter: AccessGrantFilter = {
+      fromAgent: new URL("https://example.org/from-some-agent"),
       issuedWithin: "P1D",
-      purpose: "https://example.org/some-purpose",
+      purpose: new URL("https://example.org/some-purpose"),
       revokedWithin: "P1D",
-      toAgent: "https://example.org/to-some-agent",
-      resource: "https://example.org/some-resource",
+      toAgent: new URL("https://example.org/to-some-agent"),
+      resource: new URL("https://example.org/some-resource"),
       type: "SolidAccessGrant",
       status: "Active",
       pageSize: 10,
@@ -72,8 +74,16 @@ describe("query", () => {
       fetch: mockedFetch,
     });
     const expectedQueryParams = new URLSearchParams({
-      ...filter,
-      pageSize: `${filter.pageSize}`,
+      fromAgent: "https://example.org/from-some-agent",
+      issuedWithin: "P1D",
+      purpose: "https://example.org/some-purpose",
+      revokedWithin: "P1D",
+      toAgent: "https://example.org/to-some-agent",
+      resource: "https://example.org/some-resource",
+      type: "SolidAccessGrant",
+      status: "Active",
+      pageSize: "10",
+      page: "some-page",
     });
     expect(mockedFetch.mock.calls[0][0].toString()).toBe(
       `https://vc.example.org/query?${expectedQueryParams}`,
@@ -91,7 +101,7 @@ describe("query", () => {
     const filter = {
       unknownKey: "some value",
     };
-    await query(filter as CredentialFilter, {
+    await query(filter as unknown as AccessGrantFilter, {
       queryEndpoint: new URL("https://vc.example.org/query"),
       fetch: mockedFetch,
     });
@@ -135,7 +145,9 @@ describe("query", () => {
       ),
     );
     const result = await query(
-      {},
+      {
+        type: "SolidAccessRequest",
+      },
       {
         queryEndpoint: new URL("https://vc.example.org/query"),
         fetch: mockedFetch,
@@ -156,14 +168,18 @@ describe("query", () => {
       ),
     );
     await query(
-      { issuedWithin: DURATION.ONE_DAY, revokedWithin: DURATION.ONE_WEEK },
+      {
+        issuedWithin: DURATION.ONE_DAY,
+        revokedWithin: DURATION.ONE_WEEK,
+        type: "SolidAccessRequest",
+      },
       {
         queryEndpoint: new URL("https://vc.example.org/query"),
         fetch: mockedFetch,
       },
     );
     expect(mockedFetch.mock.calls[0][0].toString()).toBe(
-      `https://vc.example.org/query?issuedWithin=P1D&revokedWithin=P7D`,
+      `https://vc.example.org/query?issuedWithin=P1D&revokedWithin=P7D&type=SolidAccessRequest`,
     );
   });
 
@@ -177,7 +193,9 @@ describe("query", () => {
     );
     await expect(
       query(
-        {},
+        {
+          type: "SolidAccessGrant",
+        },
         {
           queryEndpoint: new URL("https://vc.example.org/query"),
           fetch: mockedFetch,
@@ -196,7 +214,9 @@ describe("query", () => {
     );
     await expect(
       query(
-        {},
+        {
+          type: "SolidAccessRequest",
+        },
         {
           queryEndpoint: new URL("https://vc.example.org/query"),
           fetch: mockedFetch,
@@ -244,7 +264,9 @@ describe("paginatedQuery", () => {
       );
 
     for await (const page of paginatedQuery(
-      {},
+      {
+        type: "SolidAccessRequest",
+      },
       {
         queryEndpoint: new URL("https://vc.example.org/query"),
         fetch: mockedFetch,
@@ -268,7 +290,7 @@ describe("paginatedQuery", () => {
     );
 
     for await (const page of paginatedQuery(
-      {},
+      { type: "SolidAccessGrant" },
       {
         queryEndpoint: new URL("https://vc.example.org/query"),
         fetch: mockedFetch,
