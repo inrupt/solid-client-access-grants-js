@@ -1723,7 +1723,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         const allCredentialsPageOne = await query(
           {
             pageSize: 10,
-            type: "SolidAccessGrant"
+            type: "SolidAccessGrant",
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
