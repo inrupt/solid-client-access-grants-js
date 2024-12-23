@@ -48,7 +48,8 @@ export {
 export {
   CredentialFilter,
   CredentialResult,
-  CredentialStatus,
+  AccessRequestStatus,
+  AccessGrantStatus,
   CredentialType,
   DURATION,
   query,

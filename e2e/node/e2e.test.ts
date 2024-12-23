@@ -1721,7 +1721,10 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
     () => {
       it("can navigate the paginated results", async () => {
         const allCredentialsPageOne = await query(
-          { pageSize: 10 },
+          {
+            pageSize: 10,
+            type: "SolidAccessGrant",
+          },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             // FIXME add query endpoint discovery check.
@@ -1775,6 +1778,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         const pages = paginatedQuery(
           {
             pageSize: 20,
+            type: "SolidAccessRequest",
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
