@@ -18,12 +18,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-
-import React from "react";
-// This is boilerplate code
-/* eslint react/prop-types: 0, react/jsx-props-no-spreading: 0, @typescript-eslint/no-explicit-any: 0 */
-function MyApp({ Component, pageProps }: { Component: any; pageProps: any }) {
-  return <Component {...pageProps} />;
+export default function TestAppLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <main>{children}</main>
+      </body>
+    </html>
+  );
 }
-
-export default MyApp;
