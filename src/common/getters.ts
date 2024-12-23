@@ -530,7 +530,7 @@ function deserializeBoolean(serialized: Literal): boolean | undefined {
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the custom boolean field with the provided name
- * @since unreleased
+ * @since 3.2.0
  */
 export function getCustomBoolean(
   accessCredential: DatasetWithId,
@@ -573,7 +573,7 @@ function deserializeFloat(serialized: Literal): number | undefined {
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the custom float field with the provided name
- * @since unreleased
+ * @since 3.2.0
  */
 export function getCustomFloat(
   accessCredential: DatasetWithId,
@@ -611,7 +611,7 @@ function deserializeInteger(serialized: Literal): number | undefined {
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the custom integer field with the provided name
- * @since unreleased
+ * @since 3.2.0
  */
 export function getCustomInteger(
   accessCredential: DatasetWithId,
@@ -646,7 +646,7 @@ export function getCustomInteger(
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns the custom string field with the provided name
- * @since unreleased
+ * @since 3.2.0
  */
 export function getCustomString(
   accessCredential: DatasetWithId,
@@ -717,7 +717,7 @@ const WELL_KNOWN_FIELDS = [
  *
  * @param accessCredential The Access Credential (Access Grant or Access Request)
  * @returns an object keyed by the custom fields names, associated to their values.
- * @since unreleased
+ * @since 3.2.0
  */
 export function getCustomFields(
   accessCredential: DatasetWithId,
