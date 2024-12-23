@@ -27,7 +27,7 @@ import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 /**
- * Supported Access Requests statuses
+ * Supported Access Request statuses
  */
 export type AccessRequestStatus =
   | "Pending"
