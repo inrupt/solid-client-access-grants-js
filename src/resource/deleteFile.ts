@@ -39,7 +39,7 @@ import { fetchWithVc } from "../fetch";
  * @param options Optional properties to customise the request behaviour.
  * @returns A promise that resolves to a SolidDataset if successful, and that
  * rejects otherwise.
- * @since unreleased
+ * @since 2.4.0
  */
 export async function deleteFile(
   fileUrl: UrlString,

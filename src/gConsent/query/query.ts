@@ -244,7 +244,7 @@ function toQueryUrl(endpoint: URL, filter: CredentialFilter): URL {
  * @param filter The query filter
  * @param options Query options
  * @returns a paginated set of Access Credentials matching the given filter
- * @since unreleased
+ * @since 3.2.0
  *
  * @example
  * ```
@@ -296,7 +296,7 @@ export async function query(
  * @param filter The query filter
  * @param options Query options
  * @returns an async iterator going through the result pages
- * @since unreleased
+ * @since 3.2.0
  *
  * @example
  * ```
