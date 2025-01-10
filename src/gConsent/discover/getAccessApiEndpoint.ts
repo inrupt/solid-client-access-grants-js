@@ -67,7 +67,7 @@ async function getAccessEndpointForResource(
  * @returns The URL of the access request server.
  * @since 0.4.0
  */
-async function getAccessApiEndpoint(
+export async function getAccessApiEndpoint(
   resource: URL | UrlString,
   options: AccessBaseOptions = {},
 ): Promise<UrlString> {
@@ -83,6 +83,5 @@ async function getAccessApiEndpoint(
   }
 }
 
-export { getAccessApiEndpoint };
 export default getAccessApiEndpoint;
 export type { UrlString };

@@ -45,7 +45,7 @@ import { AccessGrantError } from "../../common/errors/AccessGrantError";
  * @returns A Verifiable Credential representing the denied access.
  * @since 0.0.1
  */
-async function denyAccessRequest(
+export async function denyAccessRequest(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
@@ -63,7 +63,7 @@ async function denyAccessRequest(
  * @deprecated Deprecated in favour of setting returnLegacyJsonld: false. This will be the default value in future
  * versions of this library.
  */
-async function denyAccessRequest(
+export async function denyAccessRequest(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
@@ -81,13 +81,13 @@ async function denyAccessRequest(
  * @deprecated Deprecated in favour of setting returnLegacyJsonld: false. This will be the default value in future
  * versions of this library.
  */
-async function denyAccessRequest(
+export async function denyAccessRequest(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
   },
 ): Promise<DatasetWithId>;
-async function denyAccessRequest(
+export async function denyAccessRequest(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
@@ -129,6 +129,5 @@ async function denyAccessRequest(
   });
 }
 
-export { denyAccessRequest };
 export default denyAccessRequest;
 export type { UrlString, VerifiableCredential };

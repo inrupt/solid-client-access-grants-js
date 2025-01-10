@@ -114,7 +114,7 @@ export async function getAccessManagementUiFromWellKnown(
  * @returns The URL where the user should be redirected, if discoverable.
  * @since 0.4.0
  */
-async function getAccessManagementUi(
+export async function getAccessManagementUi(
   webId: URL | UrlString,
   options: Pick<AccessBaseOptions, "fetch"> = {},
 ): Promise<UrlString | undefined> {
@@ -132,6 +132,5 @@ async function getAccessManagementUi(
   );
 }
 
-export { getAccessManagementUi };
 export default getAccessManagementUi;
 export type { UrlString };

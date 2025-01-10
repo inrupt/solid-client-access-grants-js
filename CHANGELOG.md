@@ -16,6 +16,12 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### Bugfix
+
+- Type declarations have been altered so that internal type declarations are no longer
+  partially exposed in the type declaration files. This prevents issues with some
+  frameworks, such as Angular, in particular with `revokeAccessCredential` being internal.
+
 ## [3.2.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.2.0) - 2024-12-23
 
 ### New feature

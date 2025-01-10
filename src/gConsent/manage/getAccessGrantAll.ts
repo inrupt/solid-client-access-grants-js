@@ -128,7 +128,7 @@ const getAncestorUrls = (resourceUrl: URL) => {
  * @since 0.4.0
  * @deprecated Use the new `query` method instead.
  */
-async function getAccessGrantAll(
+export async function getAccessGrantAll(
   params: AccessParameters,
   options: QueryOptions & {
     returnLegacyJsonld: false;
@@ -137,7 +137,7 @@ async function getAccessGrantAll(
 /**
  * @deprecated Use the new `query` method instead.
  */
-async function getAccessGrantAll(
+export async function getAccessGrantAll(
   params: AccessParameters,
   options?: QueryOptions & {
     returnLegacyJsonld?: true;
@@ -146,13 +146,13 @@ async function getAccessGrantAll(
 /**
  * @deprecated Use the new `query` method instead.
  */
-async function getAccessGrantAll(
+export async function getAccessGrantAll(
   params: AccessParameters,
   options?: QueryOptions & {
     returnLegacyJsonld?: boolean;
   },
 ): Promise<Array<DatasetWithId>>;
-async function getAccessGrantAll(
+export async function getAccessGrantAll(
   params: AccessParameters,
   options: QueryOptions & {
     returnLegacyJsonld?: boolean;
@@ -266,6 +266,5 @@ async function getAccessGrantAll(
   );
 }
 
-export { getAccessGrantAll };
 export default getAccessGrantAll;
 export type { IssueAccessRequestParameters, UrlString, VerifiableCredential };

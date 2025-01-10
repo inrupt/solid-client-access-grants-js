@@ -42,7 +42,7 @@ import { AccessGrantError } from "../errors/AccessGrantError";
  * @since 0.4.0
  */
 // TODO: Push verification further as this just checks it's a valid VC should we not type check the consent grant?
-async function isValidAccessGrant(
+export async function isValidAccessGrant(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options: {
     verificationEndpoint?: UrlString;
@@ -88,6 +88,5 @@ async function isValidAccessGrant(
   return response.json();
 }
 
-export { isValidAccessGrant };
 export default isValidAccessGrant;
 export type { UrlString, VerifiableCredential };

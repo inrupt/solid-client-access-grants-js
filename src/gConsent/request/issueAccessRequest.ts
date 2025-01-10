@@ -83,7 +83,7 @@ export function normalizeAccessRequest<T extends VerifiableCredentialBase>(
  * @returns A signed Verifiable Credential representing the access request.
  * @since 0.4.0
  */
-async function issueAccessRequest(
+export async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
@@ -99,7 +99,7 @@ async function issueAccessRequest(
  * @since 0.4.0
  * @deprecated Use RDFJS API instead of relying on the JSON structure by setting `returnLegacyJsonld` to false
  */
-async function issueAccessRequest(
+export async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
@@ -115,7 +115,7 @@ async function issueAccessRequest(
  * @since 0.4.0
  * @deprecated Use RDFJS API instead of relying on the JSON structure by setting `returnLegacyJsonld` to false
  */
-async function issueAccessRequest(
+export async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
@@ -125,14 +125,14 @@ async function issueAccessRequest(
 /**
  * @deprecated Please remove the `requestor` parameter.
  */
-async function issueAccessRequest(
+export async function issueAccessRequest(
   params: DeprecatedAccessRequestParameters,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
     customFields?: Set<CustomField>;
   },
 ): Promise<AccessRequest>;
-async function issueAccessRequest(
+export async function issueAccessRequest(
   params: IssueAccessRequestParameters,
   options: AccessBaseOptions & {
     customFields?: Set<CustomField>;
@@ -174,5 +174,4 @@ async function issueAccessRequest(
 }
 
 export default issueAccessRequest;
-export { issueAccessRequest };
 export type { IssueAccessRequestParameters, VerifiableCredential };
