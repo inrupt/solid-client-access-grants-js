@@ -38,13 +38,12 @@ import { solidVc } from "../../common/constants";
  * @returns A void promise
  * @since 0.0.1
  */
-async function cancelAccessRequest(
+export async function cancelAccessRequest(
   vc: VerifiableCredential | DatasetWithId | URL | UrlString,
   options: AccessBaseOptions = {},
 ): Promise<void> {
   return revokeAccessCredential(vc, [solidVc.SolidAccessRequest], options);
 }
 
-export { cancelAccessRequest };
 export default cancelAccessRequest;
 export type { VerifiableCredential, UrlString };

@@ -50,7 +50,7 @@ const { quad, namedNode } = DataFactory;
  * for getBaseAccess to get the credential.
  * @internal
  */
-async function revokeAccessCredential(
+export async function revokeAccessCredential(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   types: NamedNode<string>[],
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
@@ -93,7 +93,7 @@ async function revokeAccessCredential(
  * @returns A void promise.
  * @since 0.4.0
  */
-async function revokeAccessGrant(
+export async function revokeAccessGrant(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options: Omit<AccessBaseOptions, "accessEndpoint"> = {},
 ): Promise<void> {
@@ -104,6 +104,5 @@ async function revokeAccessGrant(
   );
 }
 
-export { revokeAccessGrant, revokeAccessCredential };
 export default revokeAccessGrant;
 export type { UrlString, VerifiableCredential };
