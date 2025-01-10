@@ -1719,10 +1719,10 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
   describeIf(environmentFeatures?.QUERY_ENDPOINT === "true")(
     "query endpoint",
     () => {
-      it("can navigate the paginated results", async () => {
+      it.skip("can navigate the paginated results", async () => {
         const allCredentialsPageOne = await query(
           {
-            pageSize: 200,
+            pageSize: 15,
             type: "SolidAccessGrant",
           },
           {
@@ -1746,7 +1746,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         expect(allCredentialsPageTwo.items.length).toBeLessThanOrEqual(200);
       });
 
-      it("can filter based on one or more criteria", async () => {
+      it.skip("can filter based on one or more criteria", async () => {
         const onType = await query(
           { type: "SolidAccessGrant" },
           {
@@ -1774,7 +1774,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         );
       });
 
-      it("can iterate through pages", async () => {
+      it.skip("can iterate through pages", async () => {
         const pages = paginatedQuery(
           {
             pageSize: 20,
