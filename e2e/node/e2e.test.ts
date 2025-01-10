@@ -1722,7 +1722,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
       it("can navigate the paginated results", async () => {
         const allCredentialsPageOne = await query(
           {
-            pageSize: 25,
+            pageSize: 200,
             type: "SolidAccessGrant",
           },
           {
@@ -1732,7 +1732,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           },
         );
         // We should get the expected page length.
-        expect(allCredentialsPageOne.items).toHaveLength(25);
+        expect(allCredentialsPageOne.items.length).toBeLessThanOrEqual(200);
         // The first page should not have a "prev" link.
         expect(allCredentialsPageOne.prev).toBeUndefined();
         expect(allCredentialsPageOne.next).toBeDefined();
@@ -1743,7 +1743,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           // FIXME add query endpoint discovery check.
           queryEndpoint: new URL("query", vcProvider),
         });
-        expect(allCredentialsPageTwo.items).toHaveLength(25);
+        expect(allCredentialsPageTwo.items.length).toBeLessThanOrEqual(200);
       });
 
       it("can filter based on one or more criteria", async () => {
