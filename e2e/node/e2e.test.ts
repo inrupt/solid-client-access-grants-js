@@ -1722,7 +1722,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
       it("can navigate the paginated results", async () => {
         const allCredentialsPageOne = await query(
           {
-            pageSize: 10,
+            pageSize: 25,
             type: "SolidAccessGrant",
           },
           {
@@ -1732,7 +1732,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           },
         );
         // We should get the expected page length.
-        expect(allCredentialsPageOne.items).toHaveLength(10);
+        expect(allCredentialsPageOne.items).toHaveLength(25);
         // The first page should not have a "prev" link.
         expect(allCredentialsPageOne.prev).toBeUndefined();
         expect(allCredentialsPageOne.next).toBeDefined();
