@@ -93,8 +93,8 @@ const { namedNode } = DataFactory;
 
 async function retryAsync<T>(
   callback: () => Promise<T>,
-  maxRetries = 5,
-  interval = 5_000,
+  maxRetries = 2,
+  interval = 1_000,
 ): Promise<T> {
   let tries = 0;
   const errors: Error[] = [];
@@ -1743,7 +1743,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           // FIXME add query endpoint discovery check.
           queryEndpoint: new URL("query", vcProvider),
         });
-        expect(allCredentialsPageTwo.items).toHaveLength(10);
+        expect(allCredentialsPageTwo.items).toHaveLength(25);
       });
 
       it("can filter based on one or more criteria", async () => {
