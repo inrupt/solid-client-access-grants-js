@@ -55,6 +55,37 @@ jest.mock("../discover/getAccessApiEndpoint", () => {
   };
 });
 
+const vcShape = ({
+  resource,
+  requestor,
+  status,
+  purpose,
+  mode,
+}: Partial<{
+  resource: URL;
+  requestor: string;
+  status:
+    | "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven"
+    | "https://w3id.org/GConsent#ConsentStatusDenied";
+  purpose: string[];
+  mode: string[];
+}>): any => ({
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://schema.inrupt.com/credentials/v2.jsonld",
+  ],
+  credentialSubject: {
+    providedConsent: {
+      isProvidedTo: requestor,
+      forPersonalData: resource ? [resource?.href] : undefined,
+      hasStatus:
+        status ?? "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+      forPurpose: purpose,
+      mode,
+    },
+  },
+});
+
 describe("getAccessGrantAll", () => {
   const resource = new URL(
     "https://pod.example/container-1/container-2/some-resource",
@@ -66,14 +97,7 @@ describe("getAccessGrantAll", () => {
   ];
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right default parameters", async () => {
-    const expectedDefaultVcShape = {
-      credentialSubject: {
-        providedConsent: {
-          forPersonalData: [resource.href],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-        },
-      },
-    };
+    const expectedDefaultVcShape = vcShape({ resource });
 
     await getAccessGrantAll({ resource: resource.href });
 
@@ -95,14 +119,7 @@ describe("getAccessGrantAll", () => {
 
   it("Calls @inrupt/solid-client-vc/getVerifiableCredentialAllFromShape with the right parameters if resource is not available", async () => {
     const requestor = "https://some.requestor";
-    const expectedDefaultVcShape = {
-      credentialSubject: {
-        providedConsent: {
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          isProvidedTo: requestor,
-        },
-      },
-    };
+    const expectedDefaultVcShape = vcShape({ requestor });
 
     await getAccessGrantAll(
       { requestor },
@@ -134,15 +151,10 @@ describe("getAccessGrantAll", () => {
       resource,
     };
 
-    const expectedVcShape = {
-      credentialSubject: {
-        providedConsent: {
-          forPersonalData: [resource.href],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          isProvidedTo: "https://some.requestor",
-        },
-      },
-    };
+    const expectedVcShape = vcShape({
+      resource,
+      requestor: "https://some.requestor",
+    });
 
     await getAccessGrantAll(paramsInput, {
       fetch: otherFetch,
@@ -169,15 +181,10 @@ describe("getAccessGrantAll", () => {
       status: "granted",
     };
 
-    const expectedVcShape = {
-      credentialSubject: {
-        providedConsent: {
-          forPersonalData: [resource.href],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          isProvidedTo: "https://some.requestor",
-        },
-      },
-    };
+    const expectedVcShape = vcShape({
+      resource,
+      requestor: "https://some.requestor",
+    });
 
     await getAccessGrantAll(paramsInput, {
       fetch: otherFetch,
@@ -204,15 +211,9 @@ describe("getAccessGrantAll", () => {
       status: "denied",
     };
 
-    const expectedVcShape = {
-      credentialSubject: {
-        providedConsent: {
-          forPersonalData: [resource.href],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
-          isProvidedTo: "https://some.requestor",
-        },
-      },
-    };
+    const expectedVcShape = vcShape({
+      status: "https://w3id.org/GConsent#ConsentStatusDenied",
+    });
 
     await getAccessGrantAll(paramsInput, {
       fetch: otherFetch,
@@ -239,15 +240,10 @@ describe("getAccessGrantAll", () => {
       status: "all",
     };
 
-    const expectedVcShapeOpen = {
-      credentialSubject: {
-        providedConsent: {
-          forPersonalData: [resource.href],
-          hasStatus: undefined,
-          isProvidedTo: "https://some.requestor",
-        },
-      },
-    };
+    const expectedVcShapeOpen = vcShape({
+      resource,
+      requestor: "https://some.requestor",
+    });
 
     await getAccessGrantAll(paramsInput, {
       fetch: otherFetch,
@@ -277,15 +273,10 @@ describe("getAccessGrantAll", () => {
       resource,
     };
 
-    const expectedVcShape = {
-      credentialSubject: {
-        providedConsent: {
-          forPersonalData: [resource.href],
-          forPurpose: paramsInput.purpose,
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-        },
-      },
-    };
+    const expectedVcShape = vcShape({
+      resource,
+      purpose: paramsInput.purpose,
+    });
 
     await getAccessGrantAll(paramsInput, {
       fetch: otherFetch,
@@ -315,15 +306,10 @@ describe("getAccessGrantAll", () => {
       resource,
     };
 
-    const expectedVcShape = {
-      credentialSubject: {
-        providedConsent: {
-          mode: ["http://www.w3.org/ns/auth/acl#Read"],
-          forPersonalData: [resource.href],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-        },
-      },
-    };
+    const expectedVcShape = vcShape({
+      resource,
+      mode: ["http://www.w3.org/ns/auth/acl#Read"],
+    });
 
     await getAccessGrantAll(paramsInput, {
       fetch: otherFetch,
@@ -367,14 +353,11 @@ describe("getAccessGrantAll", () => {
     // These are all the URLs for which a recursive Access Grant would grant access
     // to the target resource.
     const matchingUrls = [resource.href, ...resourceAncestors];
-    const expectedVcShape = matchingUrls.map((url) => ({
-      credentialSubject: {
-        providedConsent: {
-          forPersonalData: [url],
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-        },
-      },
-    }));
+    const expectedVcShape = matchingUrls.map((url) =>
+      vcShape({
+        resource: new URL(url),
+      }),
+    );
 
     await getAccessGrantAll({ resource: resource.href });
 

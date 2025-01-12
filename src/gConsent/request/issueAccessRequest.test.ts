@@ -37,10 +37,7 @@ import {
   MOCK_RESOURCE_OWNER_IRI,
 } from "./request.mock";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
-import {
-  ACCESS_GRANT_CONTEXT_DEFAULT,
-  GC_CONSENT_STATUS_REQUESTED_ABBREV,
-} from "../constants";
+import { GC_CONSENT_STATUS_REQUESTED_ABBREV } from "../constants";
 import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import type { AccessRequest } from "../type/AccessRequest";
 
@@ -78,8 +75,7 @@ describe("getRequestBody", () => {
     expect(requestBody).toStrictEqual({
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
-        "https://schema.inrupt.com/credentials/v1.jsonld",
-        "https://vc.inrupt.com/credentials/v1",
+        "https://schema.inrupt.com/credentials/v2.jsonld",
       ],
       credentialSubject: {
         hasConsent: {
@@ -114,8 +110,7 @@ describe("getRequestBody", () => {
     expect(requestBody).toStrictEqual({
       "@context": [
         "https://www.w3.org/2018/credentials/v1",
-        "https://schema.inrupt.com/credentials/v1.jsonld",
-        "https://vc.inrupt.com/credentials/v1",
+        "https://schema.inrupt.com/credentials/v2.jsonld",
       ],
       credentialSubject: {
         hasConsent: {
@@ -242,54 +237,6 @@ describe.each([true, false, undefined])(
           },
         ),
       ).rejects.toThrow();
-    });
-
-    it("computes the correct context based on the issuer", async () => {
-      mockAccessApiEndpoint();
-      const mockedIssue = jest.spyOn(
-        jest.requireMock("@inrupt/solid-client-vc") as {
-          issueVerifiableCredential: typeof VcLibrary.issueVerifiableCredential;
-        },
-        "issueVerifiableCredential",
-      );
-      mockedIssue.mockResolvedValueOnce(mockAccessRequest);
-
-      await issueAccessRequest(
-        {
-          access: { read: true },
-          resourceOwner: MOCK_RESOURCE_OWNER_IRI,
-          resources: ["https://some.pod/resource"],
-          requestorInboxUrl: MOCK_REQUESTOR_INBOX,
-        },
-        {
-          fetch: jest.fn<typeof fetch>(),
-          returnLegacyJsonld,
-        },
-      );
-
-      // Casting is required because TS picks up the deprecated signature.
-      const subjectClaims = mockedIssue.mock
-        .calls[0][1] as unknown as VcLibrary.JsonLd;
-      const credentialClaims = mockedIssue.mock.calls[0][2] as unknown as
-        | VcLibrary.JsonLd
-        | undefined;
-
-      expect(subjectClaims).toStrictEqual(
-        expect.objectContaining({
-          "@context": expect.arrayContaining([
-            "https://access-issuer.iri/credentials/v1",
-          ]),
-        }),
-      );
-
-      // Ensure that the default context has been removed
-      expect(subjectClaims["@context"]).not.toContain(
-        ACCESS_GRANT_CONTEXT_DEFAULT,
-      );
-
-      expect(credentialClaims?.["@context"]).not.toContain(
-        ACCESS_GRANT_CONTEXT_DEFAULT,
-      );
     });
 
     it("sends a proper access with consent request", async () => {

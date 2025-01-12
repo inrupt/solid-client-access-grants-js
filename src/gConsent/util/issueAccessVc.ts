@@ -29,7 +29,6 @@ import {
   ACCESS_GRANT_CONTEXT_DEFAULT,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_REQUEST,
-  instanciateEssAccessGrantContext,
 } from "../constants";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
@@ -237,13 +236,11 @@ export async function issueAccessVc(
   const issuedVc = await issueVerifiableCredential(
     accessIssuerEndpoint.href,
     {
-      "@context": instanciateEssAccessGrantContext(
-        accessIssuerEndpoint.hostname,
-      ),
+      "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
       ...vcBody.credentialSubject,
     },
     {
-      // All the required context is provided by instanciateEssAccessGrantContext,
+      // All the required context is provided by ACCESS_GRANT_CONTEXT_DEFAULT,
       // and vcBody contains a default context we don't want to include in the
       // result VC.
       "@context": [],

@@ -170,7 +170,7 @@ describe("exchangeTicketForAccessToken", () => {
           JSON.stringify({
             "@context": [
               "https://www.w3.org/2018/credentials/v1",
-              "https://schema.inrupt.com/credentials/v1.jsonld",
+              "https://schema.inrupt.com/credentials/v2.jsonld",
             ],
             type: ["VerifiablePresentation"],
             verifiableCredential: [MOCK_VC],
