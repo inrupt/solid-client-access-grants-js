@@ -213,6 +213,8 @@ describe("getAccessGrantAll", () => {
 
     const expectedVcShape = vcShape({
       status: "https://w3id.org/GConsent#ConsentStatusDenied",
+      resource,
+      requestor: "https://some.requestor",
     });
 
     await getAccessGrantAll(paramsInput, {
