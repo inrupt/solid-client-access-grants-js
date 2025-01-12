@@ -82,7 +82,8 @@ const vcShape = ({
       hasStatus:
         status === null
           ? undefined
-          : status ?? "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          : (status ??
+            "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven"),
       forPurpose: purpose,
       mode,
     },
