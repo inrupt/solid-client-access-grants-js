@@ -66,7 +66,8 @@ const vcShape = ({
   requestor: string;
   status:
     | "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven"
-    | "https://w3id.org/GConsent#ConsentStatusDenied";
+    | "https://w3id.org/GConsent#ConsentStatusDenied"
+    | null;
   purpose: string[];
   mode: string[];
 }>): any => ({
@@ -79,7 +80,9 @@ const vcShape = ({
       isProvidedTo: requestor,
       forPersonalData: resource ? [resource?.href] : undefined,
       hasStatus:
-        status ?? "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+        status === null
+          ? undefined
+          : status ?? "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
       forPurpose: purpose,
       mode,
     },
@@ -245,6 +248,7 @@ describe("getAccessGrantAll", () => {
     const expectedVcShapeOpen = vcShape({
       resource,
       requestor: "https://some.requestor",
+      status: null,
     });
 
     await getAccessGrantAll(paramsInput, {
