@@ -57,7 +57,7 @@ import { isBaseRequest } from "../guard/isBaseRequest";
 import type { AccessCredentialType } from "../type/AccessCredentialType";
 import type { CustomField } from "../../type/CustomField";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
-import { AccessGrantContext } from "../type/AccessGrantContext";
+import type { AccessGrantContext } from "../type/AccessGrantContext";
 
 function getGConsentAttributes(
   params: AccessRequestParameters,
