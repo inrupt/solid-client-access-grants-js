@@ -20,6 +20,7 @@
 //
 
 import { gc } from "../common/constants";
+import { DEFAULT_CONTEXT } from "../common/providerConfig";
 
 export const GC_CONSENT_STATUS_DENIED_ABBREV = "ConsentStatusDenied";
 export const GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV =
@@ -36,9 +37,6 @@ export const PREFERRED_CONSENT_MANAGEMENT_UI =
   "http://inrupt.com/ns/ess#ConsentManagementUI";
 
 export const CONTEXT_VC_W3C = "https://www.w3.org/2018/credentials/v1" as const;
-// This static context is used from ESS 2.3.0.
-export const CONTEXT_ESS_DEFAULT =
-  "https://schema.inrupt.com/credentials/v2.jsonld" as const;
 
 const extraContext = [
   "https://w3id.org/security/data-integrity/v1",
@@ -47,14 +45,9 @@ const extraContext = [
   "https://w3id.org/security/suites/ed25519-2020/v1",
 ];
 
-// A default context value is provided for mocking purpose accross the codebase.
-export const ACCESS_GRANT_CONTEXT_DEFAULT = [
-  CONTEXT_VC_W3C,
-  CONTEXT_ESS_DEFAULT,
-] as const;
-
 export const MOCK_CONTEXT = [
-  ...ACCESS_GRANT_CONTEXT_DEFAULT,
+  CONTEXT_VC_W3C,
+  DEFAULT_CONTEXT,
   ...extraContext,
 ] as const;
 

@@ -25,12 +25,9 @@ import type {
 } from "@inrupt/solid-client-vc";
 import type { UmaConfiguration } from "../type/UmaConfiguration";
 import type { FetchOptions } from "../type/FetchOptions";
-import {
-  CONTEXT_VC_W3C,
-  CONTEXT_ESS_DEFAULT,
-  PRESENTATION_TYPE_BASE,
-} from "../gConsent/constants";
+import { CONTEXT_VC_W3C, PRESENTATION_TYPE_BASE } from "../gConsent/constants";
 import { UmaError } from "../common/errors/UmaError";
+import { DEFAULT_CONTEXT } from "../common/providerConfig";
 
 const WWW_AUTH_HEADER = "www-authenticate";
 const VC_CLAIM_TOKEN_TYPE = "https://www.w3.org/TR/vc-data-model/#json-ld";
@@ -102,7 +99,7 @@ export async function exchangeTicketForAccessToken(
   authFetch: typeof fetch,
 ): Promise<string | null> {
   const credentialPresentation = {
-    "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
+    "@context": [CONTEXT_VC_W3C, DEFAULT_CONTEXT],
     type: [PRESENTATION_TYPE_BASE],
     verifiableCredential: [accessGrant],
   };

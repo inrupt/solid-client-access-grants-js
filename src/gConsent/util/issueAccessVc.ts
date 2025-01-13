@@ -26,10 +26,14 @@ import type {
 } from "@inrupt/solid-client-vc";
 import { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
-  ACCESS_GRANT_CONTEXT_DEFAULT,
+  CONTEXT_VC_W3C,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_REQUEST,
 } from "../constants";
+import {
+  buildProviderContext,
+  DEFAULT_CONTEXT,
+} from "../../common/providerConfig";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type {
@@ -104,7 +108,7 @@ function getBaseBody(
   type: "BaseRequestBody" | "BaseGrantBody",
 ): BaseRequestPayload | BaseGrantPayload {
   const body = {
-    "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
+    "@context": [CONTEXT_VC_W3C, DEFAULT_CONTEXT],
     type: [
       type === "BaseGrantBody"
         ? CREDENTIAL_TYPE_ACCESS_GRANT
@@ -228,15 +232,15 @@ export async function issueAccessVc(
   // It seems like the issuer endpoint should be discovered from the well-known direcly
   // And the access endpoint should be an object with one URI per service
   // (issuer service, verifier service... supposedly status and query and vc???)
-  const accessIssuerEndpoint = new URL(
-    "issue",
+  const provider = new URL(
     await getAccessApiEndpoint(targetResourceIri, options),
   );
+  const accessIssuerEndpoint = new URL("issue", provider);
 
   const issuedVc = await issueVerifiableCredential(
     accessIssuerEndpoint.href,
     {
-      "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
+      "@context": await buildProviderContext(provider),
       ...vcBody.credentialSubject,
     },
     {

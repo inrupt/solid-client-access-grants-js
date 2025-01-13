@@ -26,7 +26,6 @@ import type {
 } from "@inrupt/solid-client-vc";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
-  CONTEXT_ESS_DEFAULT,
   CONTEXT_VC_W3C,
   CREDENTIAL_TYPE_ACCESS_DENIAL,
   CREDENTIAL_TYPE_ACCESS_GRANT,
@@ -48,6 +47,7 @@ import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { gc } from "../../common/constants";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
+import { DEFAULT_CONTEXT } from "../../common/providerConfig";
 
 export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
@@ -192,7 +192,7 @@ export async function getAccessGrantAll(
 
   const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
     ancestorUrls.map((url) => ({
-      "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
+      "@context": [CONTEXT_VC_W3C, DEFAULT_CONTEXT],
       type,
       credentialSubject: {
         providedConsent: {

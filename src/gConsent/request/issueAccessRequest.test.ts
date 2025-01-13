@@ -40,6 +40,7 @@ import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import { GC_CONSENT_STATUS_REQUESTED_ABBREV } from "../constants";
 import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import type { AccessRequest } from "../type/AccessRequest";
+import { cacheProvider, DEFAULT_CONTEXT } from "../../common/providerConfig";
 
 jest.mock("@inrupt/solid-client", () => {
   // TypeScript can't infer the type of modules imported via Jest;
@@ -143,6 +144,12 @@ describe.each([true, false, undefined])(
     beforeAll(async () => {
       mockAccessRequest = await mockAccessRequestVc();
       mockAccessGrant = await mockAccessGrantVc();
+      cacheProvider(new URL(MOCKED_ACCESS_ISSUER).href, {
+        context: DEFAULT_CONTEXT,
+      });
+      cacheProvider(new URL("https://some.access-endpoint.override/").href, {
+        context: DEFAULT_CONTEXT,
+      });
     });
 
     it("sends a proper access request", async () => {
