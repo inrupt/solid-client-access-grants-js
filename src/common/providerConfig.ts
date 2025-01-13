@@ -79,6 +79,7 @@ export async function getIssuerContext(
     const selfHosted = instantiateSelfHosted(issuer.hostname);
     // If no canonical context is being used, check for self-hosted (applicable to ESS 2.2).
     if (providerCtx === undefined && contexts.indexOf(selfHosted) !== -1) {
+      // If the well-known config uses a self-hosted context, canonical v1 should be used.
       [providerCtx] = SUPPORTED_CONTEXTS;
     }
     if (providerCtx !== undefined) {

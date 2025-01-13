@@ -47,7 +47,10 @@ import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { gc } from "../../common/constants";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
-import { DEFAULT_CONTEXT } from "../../common/providerConfig";
+import {
+  buildProviderContext,
+  DEFAULT_CONTEXT,
+} from "../../common/providerConfig";
 
 export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
@@ -165,12 +168,11 @@ export async function getAccessGrantAll(
   }
   const sessionFetch = await getSessionFetch(options);
   // TODO: Fix access API endpoint retrieval (should include all the different API endpoints)
-  const queryEndpoint = options.accessEndpoint
-    ? new URL("derive", options.accessEndpoint)
-    : new URL(
-        "derive",
-        await getAccessApiEndpoint(params.resource as string, options),
-      );
+  const baseUrl = new URL(
+    options.accessEndpoint ??
+      (await getAccessApiEndpoint(params.resource as string, options)),
+  );
+  const queryEndpoint = new URL("derive", baseUrl);
 
   const ancestorUrls = params.resource
     ? getAncestorUrls(
@@ -192,7 +194,7 @@ export async function getAccessGrantAll(
 
   const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
     ancestorUrls.map((url) => ({
-      "@context": [CONTEXT_VC_W3C, DEFAULT_CONTEXT],
+      "@context": buildProviderContext(baseUrl),
       type,
       credentialSubject: {
         providedConsent: {
