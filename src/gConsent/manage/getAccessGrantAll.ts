@@ -26,7 +26,6 @@ import type {
 } from "@inrupt/solid-client-vc";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
-  CONTEXT_VC_W3C,
   CREDENTIAL_TYPE_ACCESS_DENIAL,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_BASE,
@@ -47,10 +46,7 @@ import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { gc } from "../../common/constants";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
-import {
-  buildProviderContext,
-  DEFAULT_CONTEXT,
-} from "../../common/providerConfig";
+import { buildProviderContext } from "../../common/providerConfig";
 
 export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {

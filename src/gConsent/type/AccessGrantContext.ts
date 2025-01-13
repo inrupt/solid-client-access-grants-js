@@ -22,5 +22,7 @@
 import { CONTEXT_VC_W3C } from "../constants";
 import { DEFAULT_CONTEXT } from "../../common/providerConfig";
 
+// I am not sure of the syntax to inline this in the typeof.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const defaultContext = [CONTEXT_VC_W3C, DEFAULT_CONTEXT] as const;
 export type AccessGrantContext = typeof defaultContext;
