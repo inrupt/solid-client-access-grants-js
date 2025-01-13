@@ -168,10 +168,7 @@ describe("exchangeTicketForAccessToken", () => {
       body: new URLSearchParams({
         claim_token: isomorphicBtoa(
           JSON.stringify({
-            "@context": [
-              "https://www.w3.org/2018/credentials/v1",
-              "https://schema.inrupt.com/credentials/v2.jsonld",
-            ],
+            "@context": ["https://www.w3.org/2018/credentials/v1"],
             type: ["VerifiablePresentation"],
             verifiableCredential: [MOCK_VC],
           }),
