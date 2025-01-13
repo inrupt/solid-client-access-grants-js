@@ -118,7 +118,6 @@ export async function exchangeTicketForAccessToken(
 
   try {
     const data = await response.json();
-    console.log(data);
     return data.access_token || null;
   } catch {
     // An error being thrown here means that the response body doesn't parse as JSON.
