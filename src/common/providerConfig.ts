@@ -60,6 +60,11 @@ export function clearProviderCache() {
   });
 }
 
+/**
+ * This internal function negotiates the most recent context supported by both the provider and the client.
+ * It also caches the result in memory so that the VC provider configuration is only fetched once.
+ * FIXME: use proper caching for eventual eviction.
+ */
 export async function getIssuerContext(
   issuer: URL,
 ): Promise<(typeof SUPPORTED_CONTEXTS)[number] | undefined | string> {
