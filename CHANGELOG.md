@@ -16,13 +16,15 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+## [3.2.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.2.1) - 2025-01-13
+
 ### New feature
 
 - Passes the v2 of the JSON-LD context for Access Grants when issuing and using the
-  `/derive` endpoint. This allows the server to return all Access Credentials understood
-  by the client, both v1 and v2. Clients prior to this version will issue and retrieve
-  Access Credentials with a v1 context (and will not be able to use features introduced
-  in v2).
+  `/derive` endpoint for VC providers supporting it. This allows the server to return
+  all Access Credentials understood by the client, both v1 and v2. Clients prior to
+  this version will issue and retrieve Access Credentials with a v1 context (and will
+  not be able to use features introduced in v2).
 
 ### Bugfix
 
