@@ -21,11 +21,11 @@
 
 import type { UrlString } from "@inrupt/solid-client";
 import type {
-  ACCESS_GRANT_CONTEXT_DEFAULT,
   GC_CONSENT_STATUS_DENIED_ABBREV,
   GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV,
   GC_CONSENT_STATUS_REQUESTED_ABBREV,
 } from "../constants";
+import type { AccessGrantContext } from "./AccessGrantContext";
 import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import type { GConsentStatus } from "./GConsentStatus";
 import type { AccessCredentialType } from "./AccessCredentialType";
@@ -70,7 +70,7 @@ export type GrantCredentialSubject = Required<
 export type GrantCredentialSubjectPayload = Omit<GrantCredentialSubject, "id">;
 
 export type BaseAccessVcBody = {
-  "@context": typeof ACCESS_GRANT_CONTEXT_DEFAULT;
+  "@context": AccessGrantContext;
   type: AccessCredentialType[];
   credentialSubject:
     | RequestCredentialSubject

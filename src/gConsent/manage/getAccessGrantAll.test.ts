@@ -19,7 +19,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { jest, it, describe, expect } from "@jest/globals";
+import { jest, it, describe, expect, beforeAll } from "@jest/globals";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import * as VcModule from "@inrupt/solid-client-vc";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
@@ -31,6 +31,7 @@ import { getAccessGrantAll } from "./getAccessGrantAll";
 import { getAccessApiEndpoint } from "../discover/getAccessApiEndpoint";
 import { mockAccessGrantVc } from "../util/access.mock";
 import { normalizeAccessGrant } from "./approveAccessRequest";
+import { cacheProvider, DEFAULT_CONTEXT } from "../../common/providerConfig";
 
 const otherFetch = jest.fn<typeof fetch>();
 
@@ -91,6 +92,20 @@ const vcShape = ({
 });
 
 describe("getAccessGrantAll", () => {
+  beforeAll(async () => {
+    // Different VC provider URLs are used in these tests.
+    // FIXME: clean this up.
+    cacheProvider(new URL("https://some.api.endpoint/").href, {
+      context: DEFAULT_CONTEXT,
+    });
+    cacheProvider(new URL("https://example.org/vc/").href, {
+      context: DEFAULT_CONTEXT,
+    });
+    cacheProvider(new URL("https://some.api.endpoint/derive").href, {
+      context: DEFAULT_CONTEXT,
+    });
+  });
+
   const resource = new URL(
     "https://pod.example/container-1/container-2/some-resource",
   );

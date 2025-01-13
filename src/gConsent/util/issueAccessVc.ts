@@ -57,6 +57,7 @@ import { isBaseRequest } from "../guard/isBaseRequest";
 import type { AccessCredentialType } from "../type/AccessCredentialType";
 import type { CustomField } from "../../type/CustomField";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
+import { AccessGrantContext } from "../type/AccessGrantContext";
 
 function getGConsentAttributes(
   params: AccessRequestParameters,
@@ -108,7 +109,7 @@ function getBaseBody(
   type: "BaseRequestBody" | "BaseGrantBody",
 ): BaseRequestPayload | BaseGrantPayload {
   const body = {
-    "@context": [CONTEXT_VC_W3C, DEFAULT_CONTEXT],
+    "@context": [CONTEXT_VC_W3C, DEFAULT_CONTEXT] as AccessGrantContext,
     type: [
       type === "BaseGrantBody"
         ? CREDENTIAL_TYPE_ACCESS_GRANT

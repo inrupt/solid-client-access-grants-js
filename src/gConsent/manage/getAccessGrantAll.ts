@@ -47,6 +47,7 @@ import { normalizeAccessGrant } from "./approveAccessRequest";
 import { gc } from "../../common/constants";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
 import { buildProviderContext } from "../../common/providerConfig";
+import type { AccessGrantContext } from "../type/AccessGrantContext";
 
 export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
@@ -189,23 +190,28 @@ export async function getAccessGrantAll(
   }
 
   const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
-    ancestorUrls.map((url) => ({
-      "@context": buildProviderContext(baseUrl),
-      type,
-      credentialSubject: {
-        providedConsent: {
-          hasStatus: {
-            granted: gc.ConsentStatusExplicitlyGiven.value,
-            denied: gc.ConsentStatusDenied.value,
-            all: undefined,
-          }[statusShorthand],
-          forPersonalData: url ? [url.href] : undefined,
-          forPurpose: params.purpose,
-          isProvidedTo: params.requestor,
-          mode: specifiedModes.length > 0 ? specifiedModes : undefined,
+    await Promise.all(
+      ancestorUrls.map(async (url) => ({
+        "@context": (await buildProviderContext(
+          baseUrl,
+          // FIXME clean this up.
+        )) as unknown as AccessGrantContext,
+        type,
+        credentialSubject: {
+          providedConsent: {
+            hasStatus: {
+              granted: gc.ConsentStatusExplicitlyGiven.value,
+              denied: gc.ConsentStatusDenied.value,
+              all: undefined,
+            }[statusShorthand],
+            forPersonalData: url ? [url.href] : undefined,
+            forPurpose: params.purpose,
+            isProvidedTo: params.requestor,
+            mode: specifiedModes.length > 0 ? specifiedModes : undefined,
+          },
         },
-      },
-    }));
+      })),
+    );
 
   let result: DatasetWithId[];
 
