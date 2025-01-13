@@ -244,7 +244,7 @@ export async function issueAccessVc(
       ...vcBody.credentialSubject,
     },
     {
-      // All the required context is provided by ACCESS_GRANT_CONTEXT_DEFAULT,
+      // All the required context is provided by buildProviderContext,
       // and vcBody contains a default context we don't want to include in the
       // result VC.
       "@context": [],

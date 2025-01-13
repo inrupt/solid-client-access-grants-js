@@ -37,6 +37,9 @@ export const PREFERRED_CONSENT_MANAGEMENT_UI =
   "http://inrupt.com/ns/ess#ConsentManagementUI";
 
 export const CONTEXT_VC_W3C = "https://www.w3.org/2018/credentials/v1" as const;
+export const ACCESS_GRANT_CONTEXT_DEFAULT = [
+  CONTEXT_VC_W3C, DEFAULT_CONTEXT,
+] as const;
 
 const extraContext = [
   "https://w3id.org/security/data-integrity/v1",
