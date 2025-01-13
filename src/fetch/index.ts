@@ -99,7 +99,8 @@ export async function exchangeTicketForAccessToken(
   authFetch: typeof fetch,
 ): Promise<string | null> {
   const credentialPresentation = {
-    "@context": [CONTEXT_VC_W3C, DEFAULT_CONTEXT],
+    // This is the presentation context, so only the W3C context is required.
+    "@context": [CONTEXT_VC_W3C],
     type: [PRESENTATION_TYPE_BASE],
     verifiableCredential: [accessGrant],
   };
@@ -118,6 +119,7 @@ export async function exchangeTicketForAccessToken(
 
   try {
     const data = await response.json();
+    console.log(data);
     return data.access_token || null;
   } catch {
     // An error being thrown here means that the response body doesn't parse as JSON.
