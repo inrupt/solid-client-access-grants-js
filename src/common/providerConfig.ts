@@ -25,6 +25,11 @@ export const SUPPORTED_CONTEXTS = [
   "https://schema.inrupt.com/credentials/v1.jsonld",
   "https://schema.inrupt.com/credentials/v2.jsonld",
 ] as const;
+
+const SELF_HOSTED_URI_TEMPLATE = "https://{DOMAIN}/credentials/v1";
+const instantiateSelfHosted = (domain: string) =>
+  SELF_HOSTED_URI_TEMPLATE.replace("{DOMAIN}", domain);
+
 // The type assertion is required because TS doesn't validate the const array size vs the index.
 export const DEFAULT_CONTEXT = SUPPORTED_CONTEXTS.at(
   -1,
@@ -32,7 +37,7 @@ export const DEFAULT_CONTEXT = SUPPORTED_CONTEXTS.at(
 const WELL_KNOWN_CONFIG = "/.well-known/vc-configuration";
 
 export type AccessProvider = {
-  context: (typeof SUPPORTED_CONTEXTS)[number];
+  context: (typeof SUPPORTED_CONTEXTS)[number] | string;
 };
 
 const providerCache: Record<string, AccessProvider> = {};
@@ -57,7 +62,7 @@ export function clearProviderCache() {
 
 export async function getIssuerContext(
   issuer: URL,
-): Promise<(typeof SUPPORTED_CONTEXTS)[number] | undefined> {
+): Promise<(typeof SUPPORTED_CONTEXTS)[number] | undefined | string> {
   if (providerCache[issuer.href] !== undefined) {
     return providerCache[issuer.href].context;
   }
@@ -66,12 +71,19 @@ export async function getIssuerContext(
   try {
     const config = await response.json();
     const contexts = config["@context"] as Array<string>;
-    const providerCtx = contexts.find((ctx) =>
+    let providerCtx = contexts.find((ctx) =>
       // Typescript is too strict validating consts.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       SUPPORTED_CONTEXTS.includes(ctx as any),
-    ) as (typeof SUPPORTED_CONTEXTS)[number];
-    providerCache[issuer.href] = { context: providerCtx };
+    );
+    const selfHosted = instantiateSelfHosted(issuer.hostname);
+    // If no canonical context is being used, check for self-hosted (applicable to ESS 2.2).
+    if (providerCtx === undefined && contexts.indexOf(selfHosted) !== -1) {
+      [providerCtx] = SUPPORTED_CONTEXTS;
+    }
+    if (providerCtx !== undefined) {
+      providerCache[issuer.href] = { context: providerCtx };
+    }
     return providerCtx;
   } catch (e) {
     // We don't want this issue to be swallowed silently.

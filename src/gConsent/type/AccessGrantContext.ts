@@ -19,6 +19,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import type { ACCESS_GRANT_CONTEXT_DEFAULT } from "../constants";
+import { CONTEXT_VC_W3C } from "../constants";
+import { DEFAULT_CONTEXT } from "../../common/providerConfig";
 
-export type AccessGrantContext = typeof ACCESS_GRANT_CONTEXT_DEFAULT;
+const defaultContext = [CONTEXT_VC_W3C, DEFAULT_CONTEXT] as const;
+export type AccessGrantContext = typeof defaultContext;
