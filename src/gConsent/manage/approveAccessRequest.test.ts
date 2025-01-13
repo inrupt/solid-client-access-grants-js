@@ -39,7 +39,6 @@ import {
   mockConsentRequestVc,
 } from "../util/access.mock";
 import { cacheProvider, DEFAULT_CONTEXT } from "../../common/providerConfig";
-import { mockProviderConfig } from "../../common/providerConfig.mock";
 
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual(
