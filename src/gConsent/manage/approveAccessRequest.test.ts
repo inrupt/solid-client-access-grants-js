@@ -38,6 +38,7 @@ import {
   mockConsentGrantVc,
   mockConsentRequestVc,
 } from "../util/access.mock";
+import { cacheProvider, DEFAULT_CONTEXT } from "../../common/providerConfig";
 
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual(
@@ -145,6 +146,9 @@ describe("approveAccessRequest", () => {
     accessGrantVc = await mockAccessGrantVc();
     consentRequestVc = await mockConsentRequestVc();
     consentGrantVc = await mockConsentGrantVc();
+    cacheProvider(new URL(MOCKED_ACCESS_ISSUER).href, {
+      context: DEFAULT_CONTEXT,
+    });
   });
 
   // FIXME: This test must run before the other tests mocking the ACP client.
@@ -349,6 +353,9 @@ describe("approveAccessRequest", () => {
 
   it("uses the provided access endpoint, if any", async () => {
     mockAcpClient();
+    cacheProvider(new URL("https://some.consent-endpoint.override/").href, {
+      context: DEFAULT_CONTEXT,
+    });
     const mockedVcModule = jest.requireMock(
       "@inrupt/solid-client-vc",
     ) as typeof VcClient;

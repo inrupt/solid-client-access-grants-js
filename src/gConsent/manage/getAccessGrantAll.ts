@@ -26,8 +26,6 @@ import type {
 } from "@inrupt/solid-client-vc";
 import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
 import {
-  CONTEXT_ESS_DEFAULT,
-  CONTEXT_VC_W3C,
   CREDENTIAL_TYPE_ACCESS_DENIAL,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_BASE,
@@ -48,6 +46,8 @@ import { getInherit, getResources } from "../../common/getters";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { gc } from "../../common/constants";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
+import { buildProviderContext } from "../../common/providerConfig";
+import type { AccessGrantContext } from "../type/AccessGrantContext";
 
 export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
@@ -165,12 +165,11 @@ export async function getAccessGrantAll(
   }
   const sessionFetch = await getSessionFetch(options);
   // TODO: Fix access API endpoint retrieval (should include all the different API endpoints)
-  const queryEndpoint = options.accessEndpoint
-    ? new URL("derive", options.accessEndpoint)
-    : new URL(
-        "derive",
-        await getAccessApiEndpoint(params.resource as string, options),
-      );
+  const baseUrl = new URL(
+    options.accessEndpoint ??
+      (await getAccessApiEndpoint(params.resource as string, options)),
+  );
+  const queryEndpoint = new URL("derive", baseUrl);
 
   const ancestorUrls = params.resource
     ? getAncestorUrls(
@@ -191,23 +190,28 @@ export async function getAccessGrantAll(
   }
 
   const vcShapes: RecursivePartial<BaseGrantBody & VerifiableCredential>[] =
-    ancestorUrls.map((url) => ({
-      "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
-      type,
-      credentialSubject: {
-        providedConsent: {
-          hasStatus: {
-            granted: gc.ConsentStatusExplicitlyGiven.value,
-            denied: gc.ConsentStatusDenied.value,
-            all: undefined,
-          }[statusShorthand],
-          forPersonalData: url ? [url.href] : undefined,
-          forPurpose: params.purpose,
-          isProvidedTo: params.requestor,
-          mode: specifiedModes.length > 0 ? specifiedModes : undefined,
+    await Promise.all(
+      ancestorUrls.map(async (url) => ({
+        "@context": (await buildProviderContext(
+          baseUrl,
+          // FIXME clean this up.
+        )) as unknown as AccessGrantContext,
+        type,
+        credentialSubject: {
+          providedConsent: {
+            hasStatus: {
+              granted: gc.ConsentStatusExplicitlyGiven.value,
+              denied: gc.ConsentStatusDenied.value,
+              all: undefined,
+            }[statusShorthand],
+            forPersonalData: url ? [url.href] : undefined,
+            forPurpose: params.purpose,
+            isProvidedTo: params.requestor,
+            mode: specifiedModes.length > 0 ? specifiedModes : undefined,
+          },
         },
-      },
-    }));
+      })),
+    );
 
   let result: DatasetWithId[];
 

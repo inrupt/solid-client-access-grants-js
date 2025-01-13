@@ -19,10 +19,18 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import { CONTEXT_VC_W3C } from "../constants";
-import { DEFAULT_CONTEXT } from "../../common/providerConfig";
-
-// I am not sure of the syntax to inline this in the typeof.
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const defaultContext = [CONTEXT_VC_W3C, DEFAULT_CONTEXT] as const;
-export type AccessGrantContext = typeof defaultContext;
+export const mockProviderConfig = ({ context }: { context?: string }) => ({
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    context ?? "https://schema.inrupt.com/credentials/v2.jsonld",
+  ],
+  issuerService: "https://vc.inrupt.com/issue",
+  statusService: "https://vc.inrupt.com/status",
+  verifierService: "https://vc.inrupt.com/verify",
+  derivationService: "https://vc.inrupt.com/derive",
+  proofService: null,
+  availabilityService: null,
+  submissionService: null,
+  queryService: "https://vc.inrupt.com/query",
+  supportedSignatureTypes: ["https://w3id.org/security#Ed25519Signature2020"],
+});

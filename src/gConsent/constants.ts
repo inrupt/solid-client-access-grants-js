@@ -20,6 +20,7 @@
 //
 
 import { gc } from "../common/constants";
+import { DEFAULT_CONTEXT } from "../common/providerConfig";
 
 export const GC_CONSENT_STATUS_DENIED_ABBREV = "ConsentStatusDenied";
 export const GC_CONSENT_STATUS_EXPLICITLY_GIVEN_ABBREV =
@@ -36,15 +37,6 @@ export const PREFERRED_CONSENT_MANAGEMENT_UI =
   "http://inrupt.com/ns/ess#ConsentManagementUI";
 
 export const CONTEXT_VC_W3C = "https://www.w3.org/2018/credentials/v1" as const;
-// This static context is used from the 2.1 version, instead of having a context
-// specific to the deployment.
-export const CONTEXT_ESS_DEFAULT =
-  "https://schema.inrupt.com/credentials/v1.jsonld" as const;
-
-// According to the [ESS documentation](https://docs.inrupt.com/ess/latest/services/service-vc/#ess-vc-service-endpoints),
-// the JSON-LD context for ESS-issued VCs will match the following template.
-const instanciateContextVcEssTemplate = (essVcDomain: string): string =>
-  `https://${essVcDomain}/credentials/v1`;
 
 const extraContext = [
   "https://w3id.org/security/data-integrity/v1",
@@ -53,27 +45,11 @@ const extraContext = [
   "https://w3id.org/security/suites/ed25519-2020/v1",
 ];
 
-// A default context value is provided for mocking purpose accross the codebase.
-export const ACCESS_GRANT_CONTEXT_DEFAULT = [
-  CONTEXT_VC_W3C,
-  CONTEXT_ESS_DEFAULT,
-  instanciateContextVcEssTemplate("vc.inrupt.com"),
-] as const;
-
 export const MOCK_CONTEXT = [
-  ...ACCESS_GRANT_CONTEXT_DEFAULT,
+  CONTEXT_VC_W3C,
+  DEFAULT_CONTEXT,
   ...extraContext,
 ] as const;
-
-// When issuing a VC using a given service,"https://schema.inrupt.com/credentials/v1.jsonld" be sure to set the context using the following.
-export const instanciateEssAccessGrantContext = (
-  essVcDomain: string,
-): typeof ACCESS_GRANT_CONTEXT_DEFAULT =>
-  [
-    CONTEXT_VC_W3C,
-    CONTEXT_ESS_DEFAULT,
-    instanciateContextVcEssTemplate(essVcDomain),
-  ] as const;
 
 export const CREDENTIAL_TYPE_ACCESS_REQUEST = "SolidAccessRequest";
 export const CREDENTIAL_TYPE_ACCESS_GRANT = "SolidAccessGrant";

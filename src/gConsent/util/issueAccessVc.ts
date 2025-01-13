@@ -26,11 +26,14 @@ import type {
 } from "@inrupt/solid-client-vc";
 import { issueVerifiableCredential } from "@inrupt/solid-client-vc";
 import {
-  ACCESS_GRANT_CONTEXT_DEFAULT,
+  CONTEXT_VC_W3C,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_REQUEST,
-  instanciateEssAccessGrantContext,
 } from "../constants";
+import {
+  buildProviderContext,
+  DEFAULT_CONTEXT,
+} from "../../common/providerConfig";
 import type { AccessBaseOptions } from "../type/AccessBaseOptions";
 import { getSessionFetch } from "../../common/util/getSessionFetch";
 import type {
@@ -54,6 +57,7 @@ import { isBaseRequest } from "../guard/isBaseRequest";
 import type { AccessCredentialType } from "../type/AccessCredentialType";
 import type { CustomField } from "../../type/CustomField";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
+import type { AccessGrantContext } from "../type/AccessGrantContext";
 
 function getGConsentAttributes(
   params: AccessRequestParameters,
@@ -105,7 +109,7 @@ function getBaseBody(
   type: "BaseRequestBody" | "BaseGrantBody",
 ): BaseRequestPayload | BaseGrantPayload {
   const body = {
-    "@context": ACCESS_GRANT_CONTEXT_DEFAULT,
+    "@context": [CONTEXT_VC_W3C, DEFAULT_CONTEXT] as AccessGrantContext,
     type: [
       type === "BaseGrantBody"
         ? CREDENTIAL_TYPE_ACCESS_GRANT
@@ -229,21 +233,19 @@ export async function issueAccessVc(
   // It seems like the issuer endpoint should be discovered from the well-known direcly
   // And the access endpoint should be an object with one URI per service
   // (issuer service, verifier service... supposedly status and query and vc???)
-  const accessIssuerEndpoint = new URL(
-    "issue",
+  const provider = new URL(
     await getAccessApiEndpoint(targetResourceIri, options),
   );
+  const accessIssuerEndpoint = new URL("issue", provider);
 
   const issuedVc = await issueVerifiableCredential(
     accessIssuerEndpoint.href,
     {
-      "@context": instanciateEssAccessGrantContext(
-        accessIssuerEndpoint.hostname,
-      ),
+      "@context": await buildProviderContext(provider),
       ...vcBody.credentialSubject,
     },
     {
-      // All the required context is provided by instanciateEssAccessGrantContext,
+      // All the required context is provided by buildProviderContext,
       // and vcBody contains a default context we don't want to include in the
       // result VC.
       "@context": [],

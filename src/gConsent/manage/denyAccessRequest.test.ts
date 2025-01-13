@@ -44,6 +44,7 @@ import type { AccessGrant } from "../type/AccessGrant";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { denyAccessRequest } from "./denyAccessRequest";
+import { cacheProvider, DEFAULT_CONTEXT } from "../../common/providerConfig";
 
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual("@inrupt/solid-client") as any;
@@ -70,6 +71,12 @@ describe("denyAccessRequest", () => {
 
   beforeAll(async () => {
     accessRequestVc = await mockAccessRequestVc();
+    cacheProvider(new URL(MOCKED_ACCESS_ISSUER).href, {
+      context: DEFAULT_CONTEXT,
+    });
+    cacheProvider(new URL("https://some.access-endpoint.override/").href, {
+      context: DEFAULT_CONTEXT,
+    });
   });
 
   afterEach(() => {

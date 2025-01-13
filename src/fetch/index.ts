@@ -25,11 +25,7 @@ import type {
 } from "@inrupt/solid-client-vc";
 import type { UmaConfiguration } from "../type/UmaConfiguration";
 import type { FetchOptions } from "../type/FetchOptions";
-import {
-  CONTEXT_VC_W3C,
-  CONTEXT_ESS_DEFAULT,
-  PRESENTATION_TYPE_BASE,
-} from "../gConsent/constants";
+import { CONTEXT_VC_W3C, PRESENTATION_TYPE_BASE } from "../gConsent/constants";
 import { UmaError } from "../common/errors/UmaError";
 
 const WWW_AUTH_HEADER = "www-authenticate";
@@ -102,7 +98,8 @@ export async function exchangeTicketForAccessToken(
   authFetch: typeof fetch,
 ): Promise<string | null> {
   const credentialPresentation = {
-    "@context": [CONTEXT_VC_W3C, CONTEXT_ESS_DEFAULT],
+    // This is the presentation context, so only the W3C context is required.
+    "@context": [CONTEXT_VC_W3C],
     type: [PRESENTATION_TYPE_BASE],
     verifiableCredential: [accessGrant],
   };
