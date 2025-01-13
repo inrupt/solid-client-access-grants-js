@@ -22,7 +22,7 @@ The following changes are pending, and will be applied on the next major release
   `/derive` endpoint. This allows the server to return all Access Credentials understood
   by the client, both v1 and v2. Clients prior to this version will issue and retrieve
   Access Credentials with a v1 context (and will not be able to use features introduced
-  in the v2).
+  in v2).
 
 ### Bugfix
 
