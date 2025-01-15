@@ -338,14 +338,16 @@ export default function AccessController({
           Redirect to AMC to Grant Access
         </button>
       </div>
-      <p>
+      <br />
+      <div>
         Issued access request:{" "}
         <AccessCredential vc={accessRequest} testId="access-request" />
-      </p>
-      <p>
+      </div>
+      <br />
+      <div>
         Granted access:{" "}
         <AccessCredential vc={accessGrant} testId="access-grant" />
-      </p>
+      </div>
 
       <button
         type="button"
