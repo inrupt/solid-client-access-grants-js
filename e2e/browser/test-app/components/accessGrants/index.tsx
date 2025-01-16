@@ -41,7 +41,6 @@ import {
   deleteFile,
 } from "@inrupt/solid-client";
 import React, { useState } from "react";
-import { useRouter } from "next/router";
 
 const session = getDefaultSession();
 const SHARED_FILE_CONTENT = "Some content.\n";
@@ -103,7 +102,6 @@ export default function AccessController({
   const [customBooleanUrl, setCustomBooleanUrl] = useState<string>(
     "https://example.org/my-boolean",
   );
-  const router = useRouter();
 
   const handleCreate = async () => {
     if (typeof sharedResourceIri === "string") {
@@ -222,17 +220,10 @@ export default function AccessController({
   };
 
   const handleGrantResponse = async () => {
-    if (
-      (router.query.accessGrantUrl !== "" &&
-        typeof router.query.accessGrantUrl === "string") ||
-      window.localStorage.getItem("accessGrantUrl") !== null
-    ) {
+    const accessGrantUrl = window.localStorage.getItem("accessGrantUrl");
+    if (accessGrantUrl !== null) {
       setAccessGrant(
-        await getAccessGrant(
-          window.localStorage.getItem("accessGrantUrl") ??
-            (router.query.accessGrantUrl as string),
-          { fetch: session.fetch },
-        ),
+        await getAccessGrant(accessGrantUrl, { fetch: session.fetch }),
       );
     }
   };
@@ -259,7 +250,7 @@ export default function AccessController({
         Created resource:{" "}
         <span data-testid="resource-iri">{sharedResourceIri}</span>
       </p>
-      <p>
+      <div>
         Custom fields:{" "}
         <form>
           <input
@@ -311,7 +302,7 @@ export default function AccessController({
           />
           <br />
         </form>
-      </p>
+      </div>
       <p>
         Access Request to Approve:{" "}
         <input
@@ -347,14 +338,16 @@ export default function AccessController({
           Redirect to AMC to Grant Access
         </button>
       </div>
-      <p>
+      <br />
+      <div>
         Issued access request:{" "}
         <AccessCredential vc={accessRequest} testId="access-request" />
-      </p>
-      <p>
+      </div>
+      <br />
+      <div>
         Granted access:{" "}
         <AccessCredential vc={accessGrant} testId="access-grant" />
-      </p>
+      </div>
 
       <button
         type="button"

@@ -19,6 +19,8 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+"use client";
+
 import {
   login,
   logout,
@@ -34,7 +36,7 @@ import {
   TESTID_SESSION_STATUS,
 } from "@inrupt/internal-playwright-testids";
 import { useState, useEffect } from "react";
-import AccessController from "../accessGrants";
+import AccessController from "../components/accessGrants";
 
 // This is the content of the file uploaded manually at SHARED_FILE_IRI.
 const DEFAULT_ISSUER = "https://login.inrupt.com/";

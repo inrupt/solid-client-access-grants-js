@@ -19,7 +19,7 @@
     "test:unit:node": "jest --selectProjects node",
     "test:e2e:node": "jest --selectProjects e2e-node --testTimeout 120000 --collectCoverage false",
     "test:e2e:browser": "playwright test",
-    "test:e2e:browser:setup": "cd e2e/browser/test-app && npm ci",
+    "test:e2e:browser:setup": "cd e2e/browser/test-app && npm ci --omit=optional",
     "licenses:list": "license-checker --production --csv --out LICENSE_DEPENDENCIES_ALL",
     "licenses:check": "license-checker --production --failOn \"AGPL-1.0-only; AGPL-1.0-or-later; AGPL-3.0-only; AGPL-3.0-or-later; Beerware; CC-BY-NC-1.0; CC-BY-NC-2.0; CC-BY-NC-2.5; CC-BY-NC-3.0; CC-BY-NC-4.0; CC-BY-NC-ND-1.0; CC-BY-NC-ND-2.0; CC-BY-NC-ND-2.5; CC-BY-NC-ND-3.0; CC-BY-NC-ND-4.0; CC-BY-NC-SA-1.0; CC-BY-NC-SA-2.0; CC-BY-NC-SA-2.5; CC-BY-NC-SA-3.0; CC-BY-NC-SA-4.0; CPAL-1.0; EUPL-1.0; EUPL-1.1; EUPL-1.1;  GPL-1.0-only; GPL-1.0-or-later; GPL-2.0-only;  GPL-2.0-or-later; GPL-3.0; GPL-3.0-only; GPL-3.0-or-later; SISSL;  SISSL-1.2; WTFPL\"",
     "prepublishOnly": "npm run build"
@@ -118,7 +118,7 @@
     "@types/jest": "^29.5.11",
     "@types/n3": "^1.16.4",
     "eslint": "^8.56.0",
-    "eslint-config-next": "^14.0.4",
+    "eslint-config-next": "^15.1.1",
     "event-emitter-promisify": "^1.1.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
