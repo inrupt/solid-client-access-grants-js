@@ -59,13 +59,13 @@ describe("redirectToAccessManagementUi", () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       delete window.location;
-      window.location = {
+      (window as any).location = {
         href: "https://some.site",
       } as Location;
     });
 
     afterEach(() => {
-      window.location = savedLocation;
+      (window as any).location = savedLocation;
     });
 
     it("throws if the access management UI may not be discovered", async () => {
