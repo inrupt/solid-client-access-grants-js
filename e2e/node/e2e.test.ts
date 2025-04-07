@@ -88,8 +88,6 @@ import {
   getPurposes,
 } from "../../src/common/getters";
 import { toBeEqual } from "../../src/gConsent/util/toBeEqual.mock";
-import { setGlobalDispatcher, ProxyAgent } from "undici";
-
 
 const { namedNode } = DataFactory;
 
@@ -1725,7 +1723,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           {
             pageSize: 2,
             type: "SolidAccessGrant",
-            issuedWithin: "P1D"
+            issuedWithin: "P1D",
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -1781,8 +1779,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           {
             pageSize: 2,
             type: "SolidAccessRequest",
-            issuedWithin: "P1D"
-            
+            issuedWithin: "P1D",
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -1790,11 +1787,8 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             queryEndpoint: new URL("query", vcProvider),
           },
         );
-        let pageCount = 0;
         for await (const page of pages) {
           expect(page.items).not.toHaveLength(0);
-          pageCount += 1;
-          // Avoid iterating for too long when there are a lot of results.
         }
       }, 120_000);
 
@@ -1823,9 +1817,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           },
         );
         let foundRequest = false;
-        let currentPage = 1;
         for await (const page of pendingRequests) {
-          currentPage++;
           if (page.items.map((item) => item.id).includes(request.id)) {
             foundRequest = true;
             break;
@@ -1844,9 +1836,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         );
         // Check the request status has been updated and is no longer "Pending"
         foundRequest = false;
-        currentPage = 1;
         for await (const page of pendingRequests) {
-          currentPage++;
           if (page.items.map((item) => item.id).includes(request.id)) {
             foundRequest = true;
             break;
