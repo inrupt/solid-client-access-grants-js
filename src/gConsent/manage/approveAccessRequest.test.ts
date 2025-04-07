@@ -430,6 +430,7 @@ describe("approveAccessRequest", () => {
             accessRequestVc.credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: accessRequestVc.credentialSubject.id,
           forPurpose: [],
+          request: customRequest.id,
         },
         inbox: accessRequestVc.credentialSubject.inbox,
       }),
@@ -485,6 +486,7 @@ describe("approveAccessRequest", () => {
             accessRequestVc.credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: accessRequestVc.credentialSubject.id,
           forPurpose: [],
+          request: customRequest.id,
           "https://example.org/ns/customString": "custom value",
           "https://example.org/ns/customBoolean": true,
           "https://example.org/ns/customInt": 1,
@@ -529,6 +531,7 @@ describe("approveAccessRequest", () => {
             accessRequestVc.credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: accessRequestVc.credentialSubject.id,
           forPurpose: [],
+          request: accessRequestVc.id,
         },
         inbox: accessRequestVc.credentialSubject.inbox,
       }),
@@ -566,47 +569,7 @@ describe("approveAccessRequest", () => {
           isProvidedTo: accessRequestVc.credentialSubject.id,
           forPurpose: accessRequestVc.credentialSubject.hasConsent
             .forPurpose ?? ["https://some.purpose"],
-        },
-        inbox: accessRequestVc.credentialSubject.inbox,
-      }),
-      expect.objectContaining({
-        type: ["SolidAccessGrant"],
-      }),
-      expect.anything(),
-    );
-  });
-
-  it("issues a proper access grant from a given plain JSON request VC IRI", async () => {
-    mockAcpClient();
-    mockAccessApiEndpoint();
-    const mockedIssue = jest.spyOn(
-      jest.requireMock("@inrupt/solid-client-vc") as typeof VcClient,
-      "issueVerifiableCredential",
-    );
-    mockedIssue.mockResolvedValueOnce(accessGrantVc);
-    const mockedFetch = jest.fn<typeof fetch>();
-    mockedFetch.mockResolvedValueOnce(
-      new Response(JSON.stringify(consentRequestVc)),
-    );
-    await approveAccessRequest(
-      JSON.parse(JSON.stringify("https://some.credential")),
-      undefined,
-      {
-        fetch: mockedFetch,
-      },
-    );
-
-    expect(mockedIssue).toHaveBeenCalledWith(
-      `${MOCKED_ACCESS_ISSUER}/issue`,
-      expect.objectContaining({
-        providedConsent: {
-          mode: accessRequestVc.credentialSubject.hasConsent.mode,
-          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
-          forPersonalData:
-            accessRequestVc.credentialSubject.hasConsent.forPersonalData,
-          isProvidedTo: accessRequestVc.credentialSubject.id,
-          forPurpose: accessRequestVc.credentialSubject.hasConsent
-            .forPurpose ?? ["https://some.purpose"],
+          request: "https://some.credential",
         },
         inbox: accessRequestVc.credentialSubject.inbox,
       }),
@@ -705,6 +668,7 @@ describe("approveAccessRequest", () => {
           isProvidedTo: consentRequestVc.credentialSubject.id,
           forPurpose:
             consentGrantVc.credentialSubject.providedConsent.forPurpose,
+          request: consentRequestVc.id,
         },
       }),
       expect.objectContaining({
@@ -746,6 +710,7 @@ describe("approveAccessRequest", () => {
           forPersonalData: ["https://some-custom.resource"],
           isProvidedTo: consentRequestVc.credentialSubject.id,
           forPurpose: ["https://some-custom.purpose"],
+          request: consentRequestVc.id,
         },
         inbox: consentRequestVc.credentialSubject.inbox,
       }),
@@ -856,6 +821,7 @@ describe("approveAccessRequest", () => {
           forPersonalData: ["https://some-custom.resource"],
           isProvidedTo: "https://some-custom.requestor",
           forPurpose: ["https://some-custom.purpose"],
+          request: customRequest.id,
           "https://example.org/ns/customString": "overriddenCustomValue",
           "https://example.org/ns/customBoolean": false,
           "https://example.org/ns/customInt": 2,
@@ -1067,6 +1033,7 @@ describe("approveAccessRequest", () => {
           isProvidedTo: consentRequestVc.credentialSubject.id,
           forPurpose:
             consentGrantVc.credentialSubject.providedConsent.forPurpose,
+          request: consentRequestVc.id,
         },
         inbox: consentRequestVc.credentialSubject.inbox,
       }),
@@ -1110,6 +1077,7 @@ describe("approveAccessRequest", () => {
             consentRequestVc.credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: consentRequestVc.credentialSubject.id,
           forPurpose: consentRequestVc.credentialSubject.hasConsent.forPurpose,
+          request: consentRequestVc.id,
         },
         inbox: consentRequestVc.credentialSubject.inbox,
       }),
@@ -1153,6 +1121,7 @@ describe("approveAccessRequest", () => {
             consentRequestVc.credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: consentRequestVc.credentialSubject.id,
           forPurpose: consentRequestVc.credentialSubject.hasConsent.forPurpose,
+          request: consentRequestVc.id,
         },
         inbox: consentRequestVc.credentialSubject.inbox,
       }),
@@ -1197,6 +1166,7 @@ describe("approveAccessRequest", () => {
             consentRequestVc.credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: consentRequestVc.credentialSubject.id,
           forPurpose: consentRequestVc.credentialSubject.hasConsent.forPurpose,
+          request: consentRequestVc.id,
         },
         inbox: consentRequestVc.credentialSubject.inbox,
       }),
@@ -1242,6 +1212,7 @@ describe("approveAccessRequest", () => {
             consentRequestVc.credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: consentRequestVc.credentialSubject.id,
           forPurpose: consentRequestVc.credentialSubject.hasConsent.forPurpose,
+          request: consentRequestVc.id,
         },
         inbox: consentRequestVc.credentialSubject.inbox,
       }),
@@ -1285,6 +1256,7 @@ describe("approveAccessRequest", () => {
             consentRequestVc.credentialSubject.hasConsent.forPersonalData,
           isProvidedTo: consentRequestVc.credentialSubject.id,
           forPurpose: consentRequestVc.credentialSubject.hasConsent.forPurpose,
+          request: consentRequestVc.id,
         },
         inbox: consentRequestVc.credentialSubject.inbox,
       }),
