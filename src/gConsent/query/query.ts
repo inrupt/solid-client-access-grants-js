@@ -103,7 +103,7 @@ export type CredentialFilter = {
 };
 
 export type AccessGrantFilter = CredentialFilter & {
-  type: "SolidAccessGrant";
+  type?: "SolidAccessGrant";
   /**
    * The Access Grant status (e.g. Active, Revoked...).
    */
@@ -111,7 +111,7 @@ export type AccessGrantFilter = CredentialFilter & {
 };
 
 export type AccessRequestFilter = CredentialFilter & {
-  type: "SolidAccessRequest";
+  type?: "SolidAccessRequest";
   /**
    * The Access Request status (e.g. Pending, Granted...).
    */
