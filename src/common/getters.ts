@@ -36,7 +36,7 @@ import type {
 import { DataFactory } from "n3";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessModes } from "../type/AccessModes";
-import { INHERIT, TYPE, XSD_BOOLEAN, acl, gc, ldp } from "./constants";
+import { INHERIT, TYPE, XSD_BOOLEAN, acl, gc, ldp, solidVc } from "./constants";
 import { AccessGrantError } from "./errors/AccessGrantError";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
@@ -370,6 +370,33 @@ export function getAccessModes(vc: DatasetWithId): AccessModes {
     write: vc.has(quad(consent, acl.mode, acl.Write, defaultGraph())),
     append: vc.has(quad(consent, acl.mode, acl.Append, defaultGraph())),
   };
+}
+
+/**
+ * Get the request related to the provided Access Grant, if any.
+ *
+ * @example
+ *
+ * ```
+ * const requestUrl = getRequest(accessGrant);
+ * ```
+ *
+ * @param grant The Access Grant
+ * @returns The request IRI
+ */
+export function getRequest(grant: DatasetWithId): string | undefined {
+  const consent = getConsent(grant);
+  const result = Array.from(grant.match(
+    consent,
+    solidVc.request,
+    null,
+    defaultGraph(),
+  )).filter(({ object }) => object.termType === "NamedNode")
+  .map(({ object }) => object.value);
+  if (result.length === 0) {
+    return undefined;
+  }
+  return result[0];
 }
 
 const shorthand = {
@@ -816,5 +843,9 @@ export class AccessGrantWrapper {
 
   getInherit(): ReturnType<typeof getInherit> {
     return getInherit(this.vc);
+  }
+
+  getRequest(): ReturnType<typeof getRequest> {
+    return getRequest(this.vc);
   }
 }
