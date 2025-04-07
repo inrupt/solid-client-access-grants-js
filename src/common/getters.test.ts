@@ -47,7 +47,7 @@ import {
   getResources,
   getCustomString,
   getTypes,
-getRequest,
+  getRequest,
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
 import { TYPE, gc, solidVc } from "./constants";
@@ -938,8 +938,9 @@ describe("getters", () => {
       ]);
 
       expect(
-        getRequest(Object.assign(store, { id: mockedGConsentGrant.id }))
-      ).totoBe    });
+        getRequest(Object.assign(store, { id: mockedGConsentGrant.id })),
+      ).toBeUndefined();
+    });
 
     it("handles multiple request values by returning the first one", async () => {
       const firstRequestId = "https://example.org/request/123";
@@ -1007,7 +1008,7 @@ describe("getters", () => {
         getInbox(mockedGConsentRequest),
       );
       expect(wrappedConsentRequest.getRequest()).toStrictEqual(
-       getRequest(mockedGConsentRequest),
+        getRequest(mockedGConsentRequest),
       );
     });
   });

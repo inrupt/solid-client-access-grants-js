@@ -386,13 +386,11 @@ export function getAccessModes(vc: DatasetWithId): AccessModes {
  */
 export function getRequest(grant: DatasetWithId): string | undefined {
   const consent = getConsent(grant);
-  const result = Array.from(grant.match(
-    consent,
-    solidVc.request,
-    null,
-    defaultGraph(),
-  )).filter(({ object }) => object.termType === "NamedNode")
-  .map(({ object }) => object.value);
+  const result = Array.from(
+    grant.match(consent, solidVc.request, null, defaultGraph()),
+  )
+    .filter(({ object }) => object.termType === "NamedNode")
+    .map(({ object }) => object.value);
   if (result.length === 0) {
     return undefined;
   }
