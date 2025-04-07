@@ -16,6 +16,16 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### Patch changes
+
+- When issuing an Access Grant from an Access Request using `approveAccessRequest`,
+  the resulting Access Request now references the source Access Request. A new
+  `getRequest` getter has been added to get this value from an Access Grant.
+  This will result in the `query` module no longer showing approved Access Requests
+  as "Pending".
+- The `query` function now supports the `type` filter not being set, which will result
+  in both Access Grants and Access Requests matching the provided filters being returned.
+
 ## [3.2.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.2.1) - 2025-01-13
 
 ### New feature
