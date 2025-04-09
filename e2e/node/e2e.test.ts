@@ -231,7 +231,6 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
       retryAsync(getRequestorSession),
       retryAsync(() => getAuthenticatedSession(env)),
     ];
-
     sessionInterval = setInterval(
       async () => {
         const nextSessions = [
@@ -1719,11 +1718,12 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
   describeIf(environmentFeatures?.QUERY_ENDPOINT === "true")(
     "query endpoint",
     () => {
-      it.skip("can navigate the paginated results", async () => {
+      it("can navigate the paginated results", async () => {
         const allCredentialsPageOne = await query(
           {
-            pageSize: 15,
+            pageSize: 2,
             type: "SolidAccessGrant",
+            issuedWithin: "P1D",
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -1746,9 +1746,9 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         expect(allCredentialsPageTwo.items.length).toBeLessThanOrEqual(200);
       });
 
-      it.skip("can filter based on one or more criteria", async () => {
+      it("can filter based on one or more criteria", async () => {
         const onType = await query(
-          { type: "SolidAccessGrant" },
+          { type: "SolidAccessGrant", issuedWithin: "P1D" },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             // FIXME add query endpoint discovery check.
@@ -1774,11 +1774,12 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         );
       });
 
-      it.skip("can iterate through pages", async () => {
+      it("can iterate through pages", async () => {
         const pages = paginatedQuery(
           {
-            pageSize: 20,
+            pageSize: 2,
             type: "SolidAccessRequest",
+            issuedWithin: "P1D",
           },
           {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -1786,17 +1787,62 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             queryEndpoint: new URL("query", vcProvider),
           },
         );
-        const maxPages = 2;
-        let pageCount = 0;
         for await (const page of pages) {
           expect(page.items).not.toHaveLength(0);
-          pageCount += 1;
-          // Avoid iterating for too long when there are a lot of results.
-          if (pageCount === maxPages) {
+        }
+      }, 120_000);
+
+      it("shows updated status for an approved request", async () => {
+        // Issue an Access Request.
+        const request = await issueAccessRequest(
+          {
+            access: { read: true },
+            resourceOwner: resourceOwnerSession.info.webId as string,
+            resources: [sharedFileIri],
+            expirationDate: new Date(Date.now() + 60 * 60 * 1000),
+          },
+          {
+            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+            accessEndpoint: vcProvider,
+            updateAcr: false,
+            returnLegacyJsonld: false,
+          },
+        );
+        const pendingRequests = paginatedQuery(
+          { status: "Pending", issuedWithin: "P1D" },
+          {
+            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+            queryEndpoint: new URL("query", vcProvider),
+          },
+        );
+        let foundRequest = false;
+        for await (const page of pendingRequests) {
+          if (page.items.map((item) => item.id).includes(request.id)) {
+            foundRequest = true;
             break;
           }
         }
-      }, 120_000);
+        expect(foundRequest).toBe(true);
+        await approveAccessRequest(
+          request,
+          {},
+          {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            accessEndpoint: vcProvider,
+            updateAcr: false,
+            returnLegacyJsonld: false,
+          },
+        );
+        // Check the request status has been updated and is no longer "Pending"
+        foundRequest = false;
+        for await (const page of pendingRequests) {
+          if (page.items.map((item) => item.id).includes(request.id)) {
+            foundRequest = true;
+            break;
+          }
+        }
+        expect(foundRequest).toBe(false);
+      });
     },
   );
 });

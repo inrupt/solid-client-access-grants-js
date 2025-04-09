@@ -41,6 +41,7 @@ export type GConsentAttributes = {
 
 export type GConsentGrantAttributes = GConsentAttributes & {
   isProvidedTo: UrlString;
+  request?: UrlString;
 };
 
 export type GConsentRequestAttributes = GConsentAttributes & {

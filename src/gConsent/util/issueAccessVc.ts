@@ -88,6 +88,7 @@ function getGConsentAttributes(
     return {
       ...consentAttributes,
       isProvidedTo: (params as AccessGrantParameters).requestor,
+      request: (params as AccessGrantParameters).request,
     };
   }
   return {
@@ -121,6 +122,10 @@ function getBaseBody(
   };
   if (params.issuanceDate !== undefined) {
     (body as BaseAccessVcBody).issuanceDate = params.issuanceDate.toISOString();
+  }
+  if (params.expirationDate !== undefined) {
+    (body as BaseAccessVcBody).expirationDate =
+      params.expirationDate.toISOString();
   }
   if (params.expirationDate !== undefined) {
     (body as BaseAccessVcBody).expirationDate =

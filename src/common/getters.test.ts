@@ -47,9 +47,10 @@ import {
   getResources,
   getCustomString,
   getTypes,
+  getRequest,
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
-import { TYPE, gc } from "./constants";
+import { TYPE, gc, solidVc } from "./constants";
 
 const { quad, namedNode, literal, blankNode } = DataFactory;
 
@@ -910,6 +911,61 @@ describe("getters", () => {
     });
   });
 
+  describe("getRequest", () => {
+    it("gets the request from a gConsent access grant", async () => {
+      const requestId = "https://example.org/request/123";
+      const grantWithRequest = await mockGConsentGrant(undefined, (grant) => {
+        // eslint-disable-next-line no-param-reassign
+        grant.credentialSubject.providedConsent.request = requestId;
+      });
+
+      expect(getRequest(grantWithRequest)).toBe(requestId);
+    });
+
+    it("returns undefined if the request is not present in a gConsent access grant", async () => {
+      // Use the default mocked grant which doesn't have a request field
+      expect(getRequest(mockedGConsentGrant)).toBeUndefined();
+    });
+
+    it("ignores request if it is not a NamedNode", async () => {
+      const store = new Store([
+        ...mockedGConsentGrant,
+        quad(
+          getConsent(mockedGConsentGrant),
+          solidVc.request,
+          literal("hello world"),
+        ),
+      ]);
+
+      expect(
+        getRequest(Object.assign(store, { id: mockedGConsentGrant.id })),
+      ).toBeUndefined();
+    });
+
+    it("handles multiple request values by returning the first one", async () => {
+      const firstRequestId = "https://example.org/request/123";
+      const secondRequestId = "https://example.org/request/456";
+
+      const store = new Store([
+        ...mockedGConsentGrant,
+        quad(
+          getConsent(mockedGConsentGrant),
+          solidVc.request,
+          namedNode(firstRequestId),
+        ),
+        quad(
+          getConsent(mockedGConsentGrant),
+          solidVc.request,
+          namedNode(secondRequestId),
+        ),
+      ]);
+
+      expect(
+        getRequest(Object.assign(store, { id: mockedGConsentGrant.id })),
+      ).toBe(firstRequestId);
+    });
+  });
+
   describe("AccessGrant", () => {
     it("wraps calls to the underlying functions", async () => {
       const wrappedConsentRequest = new AccessGrantWrapper(
@@ -950,6 +1006,9 @@ describe("getters", () => {
       );
       expect(wrappedConsentRequest.getInbox()).toStrictEqual(
         getInbox(mockedGConsentRequest),
+      );
+      expect(wrappedConsentRequest.getRequest()).toStrictEqual(
+        getRequest(mockedGConsentRequest),
       );
     });
   });

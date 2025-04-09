@@ -315,6 +315,7 @@ export async function approveAccessRequest(
       expirationDate: internalGrantOptions.expirationDate ?? undefined,
       status: gc.ConsentStatusExplicitlyGiven.value,
       inherit: internalGrantOptions.inherit,
+      request: internalGrantOptions.request,
     },
     { customFields: internalGrantOptions.customFields },
   );

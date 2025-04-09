@@ -99,6 +99,7 @@ export function initializeGrantParameters(
                   ...toJson(requestOverride?.customFields),
                 }
               : getCustomFields(requestVc),
+          request: requestVc.id,
         };
   if (requestOverride?.expirationDate === null) {
     resultGrant.expirationDate = undefined;
