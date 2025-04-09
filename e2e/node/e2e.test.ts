@@ -1808,7 +1808,6 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             returnLegacyJsonld: false,
           },
         );
-        console.debug("Access request issued");
         const pendingRequests = paginatedQuery(
           { status: "Pending", issuedWithin: "P1D" },
           {
