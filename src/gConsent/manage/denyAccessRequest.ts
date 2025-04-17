@@ -35,6 +35,7 @@ import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { toVcDataset } from "../../common/util/toVcDataset";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
 import { toJson, type CustomField } from "../../type/CustomField";
+import { getCustomFields } from "../../common";
 
 /**
  * Deny an access request. The content of the denied access request is provided
@@ -123,7 +124,10 @@ export async function denyAccessRequest(
       expirationDate: internalOptions.expirationDate as Date | undefined,
     },
     {
-      customFields: toJson(options?.customFields),
+      customFields: {
+        ...getCustomFields(validVc),
+        ...toJson(options?.customFields),
+      },
     },
   );
   denialBody.type = [CREDENTIAL_TYPE_ACCESS_DENIAL];

@@ -410,19 +410,33 @@ describe("denyAccessRequest", () => {
       .spyOn(mockedVcModule, "issueVerifiableCredential")
       .mockResolvedValueOnce(await mockAccessGrantVc());
 
-    const customFields = new Set([
+    const denialCustomFields = new Set([
       {
-        key: new URL("https://example.org/testField1"),
-        value: "testValue1",
+        key: new URL("https://example.org/ns/overriddenCustomString"),
+        value: "overriden custom value",
       },
       {
-        key: new URL("https://example.org/testField2"),
+        key: new URL("https://example.org/ns/denialCustomValue"),
         value: 42,
       },
     ]);
 
-    await denyAccessRequest(accessRequestVc, {
-      customFields,
+    const grantCustomFields = [
+      {
+        key: new URL("https://example.org/ns/overriddenCustomString"),
+        value: "custom value",
+      },
+      {
+        key: new URL("https://example.org/ns/unchangedCustomString"),
+        value: "unchanged value",
+      },
+    ];
+    const customRequest = await mockAccessRequestVc({
+      custom: grantCustomFields,
+    });
+
+    await denyAccessRequest(customRequest, {
+      customFields: denialCustomFields,
       fetch: jest.fn<typeof fetch>(),
     });
 
@@ -430,8 +444,10 @@ describe("denyAccessRequest", () => {
       `${MOCKED_ACCESS_ISSUER}/issue`,
       expect.objectContaining({
         providedConsent: expect.objectContaining({
-          "https://example.org/testField1": "testValue1",
-          "https://example.org/testField2": 42,
+          "https://example.org/ns/overriddenCustomString":
+            "overriden custom value",
+          "https://example.org/ns/unchangedCustomString": "unchanged value",
+          "https://example.org/ns/denialCustomValue": 42,
         }),
       }),
       expect.anything(),
