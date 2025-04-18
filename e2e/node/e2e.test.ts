@@ -86,6 +86,7 @@ import {
   getCustomString,
   getInherit,
   getPurposes,
+  getRequest,
 } from "../../src/common/getters";
 import { toBeEqual } from "../../src/gConsent/util/toBeEqual.mock";
 
@@ -327,6 +328,14 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
+
+          expect(getResources(grant)).toEqual(getResources(sharedRequest));
+          expect(getAccessModes(grant)).toEqual(getAccessModes(sharedRequest));
+          expect(getRequestor(grant)).toEqual(getRequestor(sharedRequest));
+          expect(getResourceOwner(grant)).toEqual(
+            getResourceOwner(sharedRequest),
+          );
+          expect(getRequest(grant)).toEqual(sharedRequest.id);
 
           const grantedAccess = await getAccessGrantAll(
             { resource: sharedFileIri },
@@ -597,7 +606,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         });
 
         it("supports custom fields", async () => {
-          const r = await issueAccessRequest(
+          const request = await issueAccessRequest(
             {
               access: { read: true },
               resourceOwner: "https://example.org/owner",
@@ -624,8 +633,8 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               ]),
             },
           );
-          const g = await approveAccessRequest(
-            r,
+          const grant = await approveAccessRequest(
+            request,
             {
               customFields: new Set([
                 {
@@ -649,23 +658,44 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               updateAcr: false,
             },
           );
+          const denial = await denyAccessRequest(request, {
+            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            returnLegacyJsonld: false,
+            accessEndpoint: vcProvider,
+            updateAcr: false,
+            customFields: new Set([
+              {
+                key: new URL("https://example.org/myOverriddenProperty"),
+                value: "some overriding value",
+              },
+              {
+                key: new URL("https://example.org/myDenialProperty"),
+                value: 1,
+              },
+              {
+                key: new URL("https://example.org/myRequestProperty"),
+                value: undefined,
+              },
+            ]),
+          });
+
           // Check custom fields on request.
           expect(
             getCustomBoolean(
-              r,
+              request,
               new URL("https://example.org/myRequestProperty"),
             ),
           ).toBe(true);
           expect(
-            getCustomString(r, new URL("https://example.org/myProperty")),
+            getCustomString(request, new URL("https://example.org/myProperty")),
           ).toBe("some value");
           expect(
             getCustomString(
-              r,
+              request,
               new URL("https://example.org/myOverriddenProperty"),
             ),
           ).toBe("some overridden value");
-          expect(getCustomFields(r)).toEqual({
+          expect(getCustomFields(request)).toEqual({
             "https://example.org/myRequestProperty": true,
             "https://example.org/myProperty": "some value",
             "https://example.org/myOverriddenProperty": "some overridden value",
@@ -674,27 +704,61 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           // Check custom fields on grant.
           expect(
             getCustomBoolean(
-              g,
+              grant,
               new URL("https://example.org/myRequestProperty"),
             ),
             // This should have been erased.
           ).toBeUndefined();
           expect(
-            getCustomString(g, new URL("https://example.org/myProperty")),
+            getCustomString(grant, new URL("https://example.org/myProperty")),
             // This should be unchanged
           ).toBe("some value");
           expect(
             getCustomString(
-              g,
+              grant,
               new URL("https://example.org/myOverriddenProperty"),
             ),
             // This should be overridden
           ).toBe("some overriding value");
           expect(
-            getCustomInteger(g, new URL("https://example.org/myGrantProperty")),
+            getCustomInteger(
+              grant,
+              new URL("https://example.org/myGrantProperty"),
+            ),
           ).toBe(1);
-          expect(getCustomFields(g)).toEqual({
+          expect(getCustomFields(grant)).toEqual({
             "https://example.org/myGrantProperty": 1,
+            "https://example.org/myProperty": "some value",
+            "https://example.org/myOverriddenProperty": "some overriding value",
+          });
+
+          // Check custom fields on denial.
+          expect(
+            getCustomBoolean(
+              denial,
+              new URL("https://example.org/myRequestProperty"),
+            ),
+            // This should have been erased.
+          ).toBeUndefined();
+          expect(
+            getCustomString(grant, new URL("https://example.org/myProperty")),
+            // This should be unchanged
+          ).toBe("some value");
+          expect(
+            getCustomString(
+              denial,
+              new URL("https://example.org/myOverriddenProperty"),
+            ),
+            // This should be overridden
+          ).toBe("some overriding value");
+          expect(
+            getCustomInteger(
+              denial,
+              new URL("https://example.org/myDenialProperty"),
+            ),
+          ).toBe(1);
+          expect(getCustomFields(denial)).toEqual({
+            "https://example.org/myDenialProperty": 1,
             "https://example.org/myProperty": "some value",
             "https://example.org/myOverriddenProperty": "some overriding value",
           });

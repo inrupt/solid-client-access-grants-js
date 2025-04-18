@@ -400,4 +400,107 @@ describe("denyAccessRequest", () => {
       );
     },
   );
+
+  it("passes custom fields to the VC issuer", async () => {
+    mockAccessApiEndpoint();
+    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      issueVerifiableCredential: () => Promise<AccessGrant>;
+    };
+    const spiedIssueRequest = jest
+      .spyOn(mockedVcModule, "issueVerifiableCredential")
+      .mockResolvedValueOnce(await mockAccessGrantVc());
+
+    const denialCustomFields = new Set([
+      {
+        key: new URL("https://example.org/ns/overriddenCustomString"),
+        value: "overriden custom value",
+      },
+      {
+        key: new URL("https://example.org/ns/denialCustomValue"),
+        value: 42,
+      },
+    ]);
+
+    const grantCustomFields = [
+      {
+        key: new URL("https://example.org/ns/overriddenCustomString"),
+        value: "custom value",
+      },
+      {
+        key: new URL("https://example.org/ns/unchangedCustomString"),
+        value: "unchanged value",
+      },
+    ];
+    const customRequest = await mockAccessRequestVc({
+      custom: grantCustomFields,
+    });
+
+    await denyAccessRequest(customRequest, {
+      customFields: denialCustomFields,
+      fetch: jest.fn<typeof fetch>(),
+    });
+
+    expect(spiedIssueRequest).toHaveBeenCalledWith(
+      `${MOCKED_ACCESS_ISSUER}/issue`,
+      expect.objectContaining({
+        providedConsent: expect.objectContaining({
+          "https://example.org/ns/overriddenCustomString":
+            "overriden custom value",
+          "https://example.org/ns/unchangedCustomString": "unchanged value",
+          "https://example.org/ns/denialCustomValue": 42,
+        }),
+      }),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
+
+  it("correctly merges multiple custom fields", async () => {
+    mockAccessApiEndpoint();
+    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
+      issueVerifiableCredential: () => Promise<AccessGrant>;
+    };
+    const spiedIssueRequest = jest
+      .spyOn(mockedVcModule, "issueVerifiableCredential")
+      .mockResolvedValueOnce(await mockAccessGrantVc());
+
+    const customFields = new Set([
+      {
+        key: new URL("https://example.org/field1"),
+        value: "value1",
+      },
+      {
+        key: new URL("https://example.org/field2"),
+        value: "value2",
+      },
+      {
+        key: new URL("https://example.org/field3"),
+        value: true,
+      },
+      {
+        key: new URL("https://example.org/field4"),
+        value: 123,
+      },
+    ]);
+
+    await denyAccessRequest(accessRequestVc, {
+      customFields,
+      fetch: jest.fn<typeof fetch>(),
+    });
+
+    // Verify all custom fields are included in the context and body
+    expect(spiedIssueRequest).toHaveBeenCalledWith(
+      `${MOCKED_ACCESS_ISSUER}/issue`,
+      expect.objectContaining({
+        providedConsent: expect.objectContaining({
+          "https://example.org/field1": "value1",
+          "https://example.org/field2": "value2",
+          "https://example.org/field3": true,
+          "https://example.org/field4": 123,
+        }),
+      }),
+      expect.anything(),
+      expect.anything(),
+    );
+  });
 });

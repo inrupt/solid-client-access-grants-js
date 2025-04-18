@@ -34,6 +34,8 @@ import { normalizeAccessGrant } from "./approveAccessRequest";
 import { getBaseAccess } from "../util/getBaseAccessVerifiableCredential";
 import { toVcDataset } from "../../common/util/toVcDataset";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
+import { toJson, type CustomField } from "../../type/CustomField";
+import { getCustomFields } from "../../common";
 
 /**
  * Deny an access request. The content of the denied access request is provided
@@ -49,6 +51,7 @@ export async function denyAccessRequest(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
+    customFields?: Set<CustomField>;
   },
 ): Promise<DatasetWithId>;
 /**
@@ -78,19 +81,19 @@ export async function denyAccessRequest(
  * @param options Optional properties to customise the access denial behaviour.
  * @returns A Verifiable Credential representing the denied access.
  * @since 0.0.1
- * @deprecated Deprecated in favour of setting returnLegacyJsonld: false. This will be the default value in future
- * versions of this library.
  */
 export async function denyAccessRequest(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
+    customFields?: Set<CustomField>;
   },
 ): Promise<DatasetWithId>;
 export async function denyAccessRequest(
   vc: DatasetWithId | VerifiableCredential | URL | UrlString,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
+    customFields?: Set<CustomField>;
   },
 ): Promise<DatasetWithId> {
   const validVc = await toVcDataset(vc, options);
@@ -108,17 +111,25 @@ export async function denyAccessRequest(
   );
 
   const internalOptions = initializeGrantParameters(baseVc);
-  const denialBody = getGrantBody({
-    access: internalOptions.access,
-    requestor: internalOptions.requestor,
-    resources: internalOptions.resources,
-    requestorInboxUrl: internalOptions.requestorInboxUrl,
-    status: gc.ConsentStatusExplicitlyGiven.value,
-    purpose: internalOptions.purpose,
-    // denyAccessRequest doesn't take an override, so the expiration date
-    // cannot be null.
-    expirationDate: internalOptions.expirationDate as Date | undefined,
-  });
+  const denialBody = getGrantBody(
+    {
+      access: internalOptions.access,
+      requestor: internalOptions.requestor,
+      resources: internalOptions.resources,
+      requestorInboxUrl: internalOptions.requestorInboxUrl,
+      status: gc.ConsentStatusExplicitlyGiven.value,
+      purpose: internalOptions.purpose,
+      // denyAccessRequest doesn't take an override, so the expiration date
+      // cannot be null.
+      expirationDate: internalOptions.expirationDate as Date | undefined,
+    },
+    {
+      customFields: {
+        ...getCustomFields(validVc),
+        ...toJson(options?.customFields),
+      },
+    },
+  );
   denialBody.type = [CREDENTIAL_TYPE_ACCESS_DENIAL];
   denialBody.credentialSubject.providedConsent.hasStatus =
     gc.ConsentStatusDenied.value;
