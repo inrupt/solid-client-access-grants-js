@@ -27,7 +27,7 @@
 
 export type { ApproveAccessRequestOverrides } from "./approveAccessRequest";
 
-export { approveAccessRequest } from "./approveAccessRequest";
+export { approveAccessRequest, issueAccessGrant } from "./approveAccessRequest";
 export { denyAccessRequest } from "./denyAccessRequest";
 export { getAccessGrant } from "./getAccessGrant";
 export { getAccessGrantAll } from "./getAccessGrantAll";

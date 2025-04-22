@@ -89,6 +89,7 @@ import {
   getRequest,
 } from "../../src/common/getters";
 import { toBeEqual } from "../../src/gConsent/util/toBeEqual.mock";
+import { issueAccessGrant } from "../../src/gConsent/manage/approveAccessRequest";
 
 const { namedNode } = DataFactory;
 
@@ -761,6 +762,49 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             "https://example.org/myDenialProperty": 1,
             "https://example.org/myProperty": "some value",
             "https://example.org/myOverriddenProperty": "some overriding value",
+          });
+        });
+
+        it("can issue an Access Grant without a request", async () => {
+          const expirationDate = new Date(Date.now() + 60 * 60 * 1000);
+          const grant = await issueAccessGrant(
+            {
+              access: { read: true },
+              requestor: "https://example.org/requestor",
+              resources: ["https://example.org/resource"],
+              expirationDate,
+              customFields: new Set([
+                {
+                  key: new URL("https://example.org/myGrantProperty"),
+                  value: 1,
+                },
+              ]),
+            },
+            {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              accessEndpoint: vcProvider,
+            },
+          );
+
+          await expect(
+            isValidAccessGrant(grant, {
+              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              verificationEndpoint: verifierService,
+            }),
+          ).resolves.toMatchObject({ errors: [] });
+
+          expect(getResources(grant)).toEqual(["https://example.org/resource"]);
+          expect(getAccessModes(grant)).toEqual({ read: true });
+          expect(getRequestor(grant)).toBe("https://example.org/requestor");
+          expect(getExpirationDate(grant)).toEqual(expirationDate);
+          expect(
+            getCustomInteger(
+              grant,
+              new URL("https://example.org/myGrantProperty"),
+            ),
+          ).toBe(1);
+          expect(getCustomFields(grant)).toEqual({
+            "https://example.org/myGrantProperty": 1,
           });
         });
       });

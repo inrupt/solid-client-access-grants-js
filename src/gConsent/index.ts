@@ -63,6 +63,7 @@ export {
   getAccessGrantAll,
   getAccessRequestFromRedirectUrl,
   getAccessRequest,
+  issueAccessGrant,
   redirectToRequestor,
   revokeAccessGrant,
   GRANT_VC_URL_PARAM_NAME,

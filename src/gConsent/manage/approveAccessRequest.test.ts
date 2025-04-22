@@ -30,6 +30,7 @@ import {
 } from "../request/request.mock";
 import {
   approveAccessRequest,
+  issueAccessGrant,
   normalizeAccessGrant,
 } from "./approveAccessRequest";
 import {
@@ -1437,5 +1438,74 @@ describe("approveAccessRequest", () => {
     expect(spiedAcrLookup).toHaveBeenCalledTimes(0);
     expect(spiedAcrUpdate).toHaveBeenCalledTimes(0);
     expect(spiedAcrSave).toHaveBeenCalledTimes(0);
+  });
+
+  describe("issueAccessGrant", () => {
+    it("issues an Access Grant from the provided parameters", async () => {
+      mockAcpClient();
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcClient;
+      const spiedIssueGrant = jest.spyOn(
+        mockedVcModule,
+        "issueVerifiableCredential",
+      );
+      spiedIssueGrant.mockResolvedValueOnce(accessGrantVc);
+      await issueAccessGrant(
+        {
+          access: { append: true },
+          expirationDate: new Date(2021, 9, 14),
+          issuanceDate: new Date(2021, 9, 15),
+          purpose: ["https://some-custom.purpose"],
+          requestor: "https://some-custom.requestor",
+          resources: ["https://some-custom.resource"],
+          requestorInboxUrl: "https://some-custom.inbox",
+          customFields: new Set([
+            {
+              key: new URL("https://example.org/ns/customString"),
+              value: "customValue",
+            },
+            {
+              key: new URL("https://example.org/ns/customBoolean"),
+              value: true,
+            },
+            {
+              key: new URL("https://example.org/ns/customInt"),
+              value: 1,
+            },
+            {
+              key: new URL("https://example.org/ns/customFloat"),
+              value: 1.1,
+            },
+          ]),
+        },
+        {
+          fetch: jest.fn<typeof fetch>(),
+        },
+      );
+
+      expect(spiedIssueGrant).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          providedConsent: {
+            mode: ["http://www.w3.org/ns/auth/acl#Append"],
+            hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+            forPersonalData: ["https://some-custom.resource"],
+            isProvidedTo: "https://some-custom.requestor",
+            forPurpose: ["https://some-custom.purpose"],
+            "https://example.org/ns/customString": "customValue",
+            "https://example.org/ns/customBoolean": true,
+            "https://example.org/ns/customInt": 1,
+            "https://example.org/ns/customFloat": 1.1,
+          },
+          inbox: "https://some-custom.inbox",
+        }),
+        expect.objectContaining({
+          type: ["SolidAccessGrant"],
+        }),
+        expect.anything(),
+      );
+    });
   });
 });

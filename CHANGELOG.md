@@ -21,6 +21,9 @@ The following changes are pending, and will be applied on the next major release
 - `denyAccessRequest` supports a new `customFields` option to add custom fields to the
   resulting Access Denial. This option behaves the same as the `customFields` option
   of `approveAccessRequest`.
+- `issueAccessGrant` is now available as an alternative to `approveAccessRequest` with
+  an undefined request, to issue Access Grants in the case when there is no initial
+  Access Request.
 
 ### Patch changes
 

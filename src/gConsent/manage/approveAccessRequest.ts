@@ -352,5 +352,25 @@ export async function approveAccessRequest(
   return accessGrant;
 }
 
+/**
+ * Issue an Access Grant from the provided parameters. The obtained Access Grant
+ * will not be linked to any pre-existing Access Request.
+ *
+ * @param grantParameters Claims constructing the Access Grant.
+ * @param options Optional properties to customise the access grant behaviour.
+ * @returns A Verifiable Credential representing the granted access.
+ * @since unreleased
+ */
+export async function issueAccessGrant(
+  grantParameters: ApproveAccessRequestOverrides,
+  options?: Omit<AccessBaseOptions, "updateAcr">,
+): Promise<DatasetWithId> {
+  return approveAccessRequest(undefined, grantParameters, {
+    ...options,
+    updateAcr: false,
+    returnLegacyJsonld: false,
+  });
+}
+
 export default approveAccessRequest;
 export type { UrlString, VerifiableCredential };
