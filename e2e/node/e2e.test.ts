@@ -794,7 +794,11 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           ).resolves.toMatchObject({ errors: [] });
 
           expect(getResources(grant)).toEqual(["https://example.org/resource"]);
-          expect(getAccessModes(grant)).toEqual({ read: true });
+          expect(getAccessModes(grant)).toEqual({
+            read: true,
+            write: false,
+            append: false,
+          });
           expect(getRequestor(grant)).toBe("https://example.org/requestor");
           expect(getExpirationDate(grant)).toEqual(expirationDate);
           expect(
