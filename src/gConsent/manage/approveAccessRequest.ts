@@ -359,7 +359,7 @@ export async function approveAccessRequest(
  * @param grantParameters Claims constructing the Access Grant.
  * @param options Optional properties to customise the access grant behaviour.
  * @returns A Verifiable Credential representing the granted access.
- * @since unreleased
+ * @since 3.3.0
  */
 export async function issueAccessGrant(
   grantParameters: ApproveAccessRequestOverrides,

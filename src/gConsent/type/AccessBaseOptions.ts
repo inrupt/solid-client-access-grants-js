@@ -82,7 +82,7 @@ export interface AccessBaseOptions {
 }
 
 /**
- * @since unreleased
+ * @since 3.0.0
  */
 export interface WithLegacyJsonFlag {
   returnLegacyJsonld?: boolean;
