@@ -16,6 +16,8 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+## [3.3.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.3.0) - 2025-04-23
+
 ### New feature
 
 - `denyAccessRequest` supports a new `customFields` option to add custom fields to the
