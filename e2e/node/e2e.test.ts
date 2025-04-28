@@ -1920,15 +1920,16 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             returnLegacyJsonld: false,
           },
         );
-        const pendingRequests = paginatedQuery(
-          { status: "Pending", issuedWithin: "P1D" },
-          {
-            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            queryEndpoint: new URL("query", vcProvider),
-          },
-        );
+        const pendingRequests = () =>
+          paginatedQuery(
+            { status: "Pending", issuedWithin: "P1D" },
+            {
+              fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+              queryEndpoint: new URL("query", vcProvider),
+            },
+          );
         let foundRequest = false;
-        for await (const page of pendingRequests) {
+        for await (const page of pendingRequests()) {
           if (page.items.map((item) => item.id).includes(request.id)) {
             foundRequest = true;
             break;
@@ -1947,7 +1948,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         );
         // Check the request status has been updated and is no longer "Pending"
         foundRequest = false;
-        for await (const page of pendingRequests) {
+        for await (const page of pendingRequests()) {
           if (page.items.map((item) => item.id).includes(request.id)) {
             foundRequest = true;
             break;
