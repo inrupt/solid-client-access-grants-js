@@ -16,6 +16,11 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### Patch changes
+
+- `denyAccessRequest` now links the Access Denial to the incoming Access Request the same way `approveAccessRequest`
+  does, so that the request status is updated at the `/query` endpoint.
+
 ## [3.3.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.3.0) - 2025-04-23
 
 ### New feature

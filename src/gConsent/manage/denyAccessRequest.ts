@@ -122,6 +122,7 @@ export async function denyAccessRequest(
       // denyAccessRequest doesn't take an override, so the expiration date
       // cannot be null.
       expirationDate: internalOptions.expirationDate as Date | undefined,
+      request: validVc.id,
     },
     {
       customFields: {

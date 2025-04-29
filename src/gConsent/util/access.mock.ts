@@ -47,6 +47,7 @@ type RequestVcOptions = Partial<{
   inherit: boolean;
   purpose: UrlString[];
   custom: CustomField[];
+  request: UrlString;
 }>;
 
 export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
