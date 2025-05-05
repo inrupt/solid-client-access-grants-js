@@ -1365,7 +1365,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
       });
 
       describe("requestor can use the resource File APIs to interact with resources", () => {
-        let accessGrant: AccessGrant;
+        let accessGrant: DatasetWithId;
         let testFileIri: string;
         let testContainerIri: string;
         let fileContents: Blob;
@@ -1399,6 +1399,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               {
                 fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
+                returnLegacyJsonld: false,
               },
             ),
           );
@@ -1410,6 +1411,8 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               {
                 fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
+                updateAcr: false,
+                returnLegacyJsonld: false,
               },
             ),
           );
