@@ -21,10 +21,7 @@
 
 // Globals are actually not injected, so this does not shadow anything.
 import { File as NodeFile } from "buffer";
-import {
-  getAuthenticatedSession,
-  getNodeTestingEnvironment,
-} from "@inrupt/internal-test-env";
+import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 import { Session } from "@inrupt/solid-client-authn-node";
 import type {
   DatasetWithId,
