@@ -309,6 +309,7 @@ describe("denyAccessRequest", () => {
             isProvidedTo: "https://some.requestor",
             forPurpose:
               accessRequestWithPurpose.credentialSubject.hasConsent.forPurpose,
+            request: accessRequestWithPurpose.id,
           },
           inbox: accessRequestWithPurpose.credentialSubject.inbox,
         }),
@@ -349,6 +350,7 @@ describe("denyAccessRequest", () => {
             hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
             forPersonalData:
               accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+            request: "https://some.credential",
           }),
           inbox: accessRequestVc.credentialSubject.inbox,
         }),
@@ -390,6 +392,7 @@ describe("denyAccessRequest", () => {
             hasStatus: "https://w3id.org/GConsent#ConsentStatusDenied",
             forPersonalData:
               accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+            request: "https://some.credential",
           }),
           inbox: accessRequestVc.credentialSubject.inbox,
         }),

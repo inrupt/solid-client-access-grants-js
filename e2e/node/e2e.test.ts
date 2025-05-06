@@ -662,6 +662,8 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             ]),
           });
 
+          expect(getRequest(denial)).toBe(request.id);
+
           // Check custom fields on request.
           expect(
             getCustomBoolean(
