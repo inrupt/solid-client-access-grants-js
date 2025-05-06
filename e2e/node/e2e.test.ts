@@ -21,10 +21,7 @@
 
 // Globals are actually not injected, so this does not shadow anything.
 import { File as NodeFile } from "buffer";
-import {
-  getAuthenticatedSession,
-  getNodeTestingEnvironment,
-} from "@inrupt/internal-test-env";
+import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 import { Session } from "@inrupt/solid-client-authn-node";
 import type {
   DatasetWithId,
@@ -171,28 +168,36 @@ if (!globalThis.btoa) {
 // This is the content of the file uploaded manually at SHARED_FILE_IRI.
 const SHARED_FILE_CONTENT = "Some content.\n";
 
-async function getRequestorSession() {
-  const session = new Session();
-  await session.login({
-    oidcIssuer,
-    clientId: clientCredentials?.requestor?.id,
-    clientSecret: clientCredentials?.requestor?.secret,
-    // Note that currently, using a Bearer token (as opposed to a DPoP one)
-    // is required for the UMA access token to be usable.
-    tokenType: "Bearer",
-  });
-  return session;
-}
-
 describe(`End-to-end access grant tests for environment [${environment}] `, () => {
-  let sharedFileIri: string;
+  const requestorSession = new Session();
+  const requestorLogin = async () => {
+    await requestorSession.login({
+      oidcIssuer,
+      clientId: clientCredentials?.requestor?.id,
+      clientSecret: clientCredentials?.requestor?.secret,
+      // Note that currently, using a Bearer token (as opposed to a DPoP one)
+      // is required for the UMA access token to be usable.
+      tokenType: "Bearer",
+    });
+  };
+  // Keep the session loggined in.
+  requestorSession.events.on("sessionExpired", requestorLogin);
 
-  let requestorSession: Session;
-  let resourceOwnerSession: Session;
+  const ownerSession = new Session();
+  const ownerLogin = async () => {
+    await ownerSession.login({
+      oidcIssuer,
+      clientId: clientCredentials?.owner?.id,
+      clientSecret: clientCredentials?.owner?.secret,
+      // Note that currently, using a Bearer token (as opposed to a DPoP one)
+      // is required for the UMA access token to be usable.
+      tokenType: "Bearer",
+    });
+  };
+  ownerSession.events.on("sessionExpired", ownerLogin);
+  let sharedFileIri: string;
   let resourceOwnerPod: string;
   let vcProvider: string;
-  let sessionInterval: NodeJS.Timeout;
-  let allSessions: Promise<Session>[];
   let sharedRequest: DatasetWithId;
   let verifierService: string;
 
@@ -204,7 +209,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         new Blob([SHARED_FILE_CONTENT]),
         {
           fetch: addUserAgent(
-            addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             TEST_USER_AGENT,
           ),
         },
@@ -219,7 +224,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
     return retryAsync(() =>
       sc.deleteFile(iri, {
         fetch: addUserAgent(
-          addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+          addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           TEST_USER_AGENT,
         ),
       }),
@@ -228,29 +233,11 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
   beforeAll(async () => {
     // Log both sessions in.
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    allSessions = [
-      retryAsync(getRequestorSession),
-      retryAsync(() => getAuthenticatedSession(env)),
-    ];
-    sessionInterval = setInterval(
-      async () => {
-        const nextSessions = [
-          retryAsync(getRequestorSession),
-          retryAsync(() => getAuthenticatedSession(env)),
-        ];
-        allSessions.push(...nextSessions);
-        [requestorSession, resourceOwnerSession] =
-          await Promise.all(nextSessions);
-      },
-      4 * 60 * 1000,
-    );
-
-    [requestorSession, resourceOwnerSession] = await Promise.all(allSessions);
+    await Promise.all([ownerLogin(), requestorLogin()]);
 
     // Create a file in the resource owner's Pod
     const resourceOwnerPodAll = await retryAsync(() =>
-      sc.getPodUrlAll(resourceOwnerSession.info.webId as string),
+      sc.getPodUrlAll(ownerSession.info.webId as string),
     );
     if (resourceOwnerPodAll.length === 0) {
       throw new Error(
@@ -276,9 +263,9 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
     await deleteSharedFile(sharedFileIri);
     // Making sure the session is logged out prevents tests from hanging due
     // to the callback refreshing the access token.
-    clearInterval(sessionInterval);
+
     await Promise.all(
-      allSessions.map((session) => session.then((s) => s.logout())),
+      [ownerSession, requestorSession].map((session) => session.logout()),
     );
   });
 
@@ -293,7 +280,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         sharedRequest = await issueAccessRequest(
           {
             access: { read: true },
-            resourceOwner: resourceOwnerSession.info.webId as string,
+            resourceOwner: ownerSession.info.webId as string,
             resources: [sharedFileIri],
             purpose: [
               "https://some.purpose/not-a-nefarious-one/i-promise",
@@ -317,7 +304,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             sharedRequest,
             {},
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
               returnLegacyJsonld,
             },
@@ -325,7 +312,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           await expect(
             isValidAccessGrant(grant, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
@@ -341,7 +328,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           const grantedAccess = await getAccessGrantAll(
             { resource: sharedFileIri },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
             },
           );
@@ -365,15 +352,12 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           await expect(sharedFile.text()).resolves.toBe(SHARED_FILE_CONTENT);
 
           await revokeAccessGrant(grant, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           });
           expect(
             (
               await isValidAccessGrant(grant, {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 verificationEndpoint: verifierService,
               })
             ).errors,
@@ -408,14 +392,14 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               expirationDate: new Date(expirationMs),
             },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
             },
           );
 
           await expect(
             isValidAccessGrant(grant, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
@@ -433,9 +417,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           });
           expect(getResources(grant)).toEqual([sharedFileIri]);
           expect(getRequestor(grant)).toEqual(requestorSession.info.webId);
-          expect(getResourceOwner(grant)).toEqual(
-            resourceOwnerSession.info.webId,
-          );
+          expect(getResourceOwner(grant)).toEqual(ownerSession.info.webId);
 
           for (const type of [
             "http://www.w3.org/ns/solid/vc#SolidAccessGrant",
@@ -477,13 +459,13 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               inherit: false,
             },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
             },
           );
           await expect(
             isValidAccessGrant(grant, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
@@ -495,7 +477,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           const request = await issueAccessRequest(
             {
               access: { read: true },
-              resourceOwner: resourceOwnerSession.info.webId as string,
+              resourceOwner: ownerSession.info.webId as string,
               resources: [sharedFile2Iri],
               purpose: [
                 "https://some.purpose/not-a-nefarious-one/i-promise",
@@ -514,7 +496,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             request,
             {},
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
               updateAcr: false,
             },
@@ -522,14 +504,14 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           await expect(
             isValidAccessGrant(grant, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
 
           const sharedFileWithAcr = await retryAsync(() =>
             sc.acp_ess_2.getFileWithAcr(sharedFile2Iri, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
 
@@ -553,7 +535,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           const request = await issueAccessRequest(
             {
               access: { read: true },
-              resourceOwner: resourceOwnerSession.info.webId as string,
+              resourceOwner: ownerSession.info.webId as string,
               resources: [sharedFileIri],
               purpose: [
                 "https://some.purpose/not-a-nefarious-one/i-promise",
@@ -572,7 +554,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             request,
             {},
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
               updateAcr: true,
             },
@@ -580,14 +562,14 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           await expect(
             isValidAccessGrant(grant, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
 
           const sharedFileWithAcr = await retryAsync(() =>
             sc.acp_ess_2.getFileWithAcr(sharedFileIri, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
 
@@ -615,7 +597,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               expirationDate: new Date(Date.now() + 60 * 60 * 1000),
             },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               returnLegacyJsonld: false,
               accessEndpoint: vcProvider,
               customFields: new Set([
@@ -653,14 +635,14 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               ]),
             },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               returnLegacyJsonld: false,
               accessEndpoint: vcProvider,
               updateAcr: false,
             },
           );
           const denial = await denyAccessRequest(request, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             returnLegacyJsonld: false,
             accessEndpoint: vcProvider,
             updateAcr: false,
@@ -783,14 +765,14 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               ]),
             },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
             },
           );
 
           await expect(
             isValidAccessGrant(grant, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
@@ -818,13 +800,13 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
       describe("access request, deny flow", () => {
         it("can issue an access grant denying an access request", async () => {
           const grant = await denyAccessRequest(sharedRequest, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
           });
 
           await expect(
             isValidAccessGrant(grant, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               verificationEndpoint: verifierService,
             }),
           ).resolves.toMatchObject({ errors: [] });
@@ -847,7 +829,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           // Retrieving the grant should still be possible:
           const retrievedGrant = await getAccessGrant(grant.id, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           });
           toBeEqual(retrievedGrant, grant);
         });
@@ -864,7 +846,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             issueAccessRequest(
               {
                 access: { read: true, write: true, append: true },
-                resourceOwner: resourceOwnerSession.info.webId as string,
+                resourceOwner: ownerSession.info.webId as string,
                 resources: [sharedFilterTestIri],
                 purpose: [
                   "https://some.purpose/not-a-nefarious-one/i-promise",
@@ -885,20 +867,14 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
                 request,
                 {},
                 {
-                  fetch: addUserAgent(
-                    resourceOwnerSession.fetch,
-                    TEST_USER_AGENT,
-                  ),
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                   accessEndpoint: vcProvider,
                 },
               ),
             ),
             retryAsync(() =>
               denyAccessRequest(request.id, {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               }),
             ),
@@ -909,7 +885,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           await deleteSharedFile(sharedFilterTestIri);
           await retryAsync(() =>
             revokeAccessGrant(accessGrant, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
         });
@@ -921,7 +897,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               resource: sharedFilterTestIri,
             },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
             },
           );
@@ -947,10 +923,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
                 resource: sharedFilterTestIri,
               },
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               },
             ),
@@ -961,7 +934,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           const allGrants = getAccessGrantAll(
             { resource: sharedFilterTestIri },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
             },
           );
@@ -982,10 +955,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             getAccessGrantAll(
               { resource: "https://some.unkown.resource" },
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               },
             ),
@@ -1000,10 +970,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
                 resource: sharedFilterTestIri,
               },
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               },
             ),
@@ -1013,30 +980,21 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
                 resource: sharedFilterTestIri,
               },
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               },
             ),
             getAccessGrantAll(
               { status: "all", resource: sharedFilterTestIri },
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               },
             ),
             getAccessGrantAll(
               { resource: sharedFilterTestIri },
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               },
             ),
@@ -1084,10 +1042,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             getAccessGrantAll(
               { resource: sharedFilterTestIri },
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               },
             ),
@@ -1097,10 +1052,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
                 resource: sharedFilterTestIri,
               },
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               },
             ),
@@ -1110,10 +1062,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
                 resource: sharedFilterTestIri,
               },
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               },
             ),
@@ -1126,10 +1075,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
                 resource: sharedFilterTestIri,
               },
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               },
             ),
@@ -1139,10 +1085,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
                 resource: sharedFilterTestIri,
               },
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               },
             ),
@@ -1190,7 +1133,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         beforeEach(async () => {
           const testContainer = await retryAsync(() =>
             sc.createContainerInContainer(resourceOwnerPod, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
           testContainerIri = sc.getSourceUrl(testContainer);
@@ -1207,7 +1150,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           const persistedDataset = await retryAsync(() =>
             sc.saveSolidDatasetInContainer(testContainerIri, dataset, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
 
@@ -1217,7 +1160,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             issueAccessRequest(
               {
                 access: { read: true, write: true, append: true },
-                resourceOwner: resourceOwnerSession.info.webId as string,
+                resourceOwner: ownerSession.info.webId as string,
                 resources: [testResourceIri, testContainerIri],
                 purpose: [
                   "https://some.purpose/not-a-nefarious-one/i-promise",
@@ -1237,10 +1180,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               request,
               {},
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
               },
             ),
@@ -1250,19 +1190,19 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         afterEach(async () => {
           await retryAsync(() =>
             revokeAccessGrant(accessGrant, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
 
           await retryAsync(() =>
             sc.deleteFile(testResourceIri, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
 
           const testContainer = await retryAsync(() =>
             sc.getSolidDataset(testContainerIri, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
           // Iterate over the contained resources because the IRI of some child resources
@@ -1271,10 +1211,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             sc.getContainedResourceUrlAll(testContainer).map((childUrl) =>
               retryAsync(() =>
                 sc.deleteSolidDataset(childUrl, {
-                  fetch: addUserAgent(
-                    resourceOwnerSession.fetch,
-                    TEST_USER_AGENT,
-                  ),
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 }),
               ),
             ),
@@ -1283,7 +1220,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
         it("can use the getSolidDataset API to fetch an existing dataset", async () => {
           const ownerDataset = await sc.getSolidDataset(testResourceIri, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           });
 
           const requestorDataset = await getSolidDataset(
@@ -1306,7 +1243,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           // as the requestor, this is just to limit how much of the Access Grants
           // library we're testing in a single test case:
           const dataset = await sc.getSolidDataset(testResourceIri, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           });
 
           // Create a thing and add it to the dataset:
@@ -1334,7 +1271,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           const updatedDatasetAsOwner = await sc.getSolidDataset(
             testResourceIri,
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             },
           );
 
@@ -1363,7 +1300,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           const parentContainer = await retryAsync(() =>
             sc.getSolidDataset(testContainerIri, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
           const parentContainerContainsAll = sc.getUrlAll(
@@ -1386,7 +1323,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           // Need to delete dataset that was already created in test setup,
           // such that our test can create an empty dataset at `testFileIri`.
           await sc.deleteFile(testResourceIri, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           });
 
           const testDataset = sc.createSolidDataset();
@@ -1402,7 +1339,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           const datasetInPodAsResourceOwner = await sc.getSolidDataset(
             sc.getSourceIri(savedDataset),
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             },
           );
 
@@ -1427,7 +1364,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
       });
 
       describe("requestor can use the resource File APIs to interact with resources", () => {
-        let accessGrant: AccessGrant;
+        let accessGrant: DatasetWithId;
         let testFileIri: string;
         let testContainerIri: string;
         let fileContents: Blob;
@@ -1435,7 +1372,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         beforeEach(async () => {
           const fileApisContainer = await retryAsync(() =>
             sc.createContainerInContainer(resourceOwnerPod, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
           testContainerIri = sc.getSourceIri(fileApisContainer);
@@ -1444,7 +1381,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           const uploadedFile = await retryAsync(() =>
             sc.saveFileInContainer(testContainerIri, fileContents, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
 
@@ -1455,12 +1392,13 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               {
                 access: { read: true, write: true, append: true },
                 resources: [testContainerIri, testFileIri],
-                resourceOwner: resourceOwnerSession.info.webId as string,
+                resourceOwner: ownerSession.info.webId as string,
                 expirationDate: new Date(Date.now() + 60 * 60 * 1000),
               },
               {
                 fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
+                returnLegacyJsonld: false,
               },
             ),
           );
@@ -1470,11 +1408,10 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               request,
               {},
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 accessEndpoint: vcProvider,
+                updateAcr: false,
+                returnLegacyJsonld: false,
               },
             ),
           );
@@ -1484,10 +1421,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           try {
             await retryAsync(() =>
               revokeAccessGrant(accessGrant, {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               }),
             );
           } catch (e) {
@@ -1498,7 +1432,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           }
           const testContainer = await retryAsync(() =>
             sc.getSolidDataset(testContainerIri, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
           // Iterate over the contained resources because the IRI of some child resources
@@ -1507,10 +1441,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             sc.getContainedResourceUrlAll(testContainer).map((childUrl) =>
               retryAsync(() =>
                 sc.deleteFile(childUrl, {
-                  fetch: addUserAgent(
-                    resourceOwnerSession.fetch,
-                    TEST_USER_AGENT,
-                  ),
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 }),
               ),
             ),
@@ -1518,7 +1449,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           await retryAsync(() =>
             sc.deleteContainer(testContainerIri, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
         });
@@ -1552,10 +1483,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             const fileAsResourceOwner = await sc.getFile(
               sc.getSourceUrl(newFile),
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               },
             );
 
@@ -1597,10 +1525,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
               // Verify as the resource owner that the file was actually overwritten:
               const fileAsResourceOwner = await sc.getFile(testFileIri, {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               });
 
               await expect(fileAsResourceOwner.text()).resolves.toBe(
@@ -1624,7 +1549,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         beforeEach(async () => {
           const testContainer = await retryAsync(() =>
             sc.createContainerInContainer(resourceOwnerPod, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
           testContainerIri = sc.getSourceUrl(testContainer);
@@ -1634,10 +1559,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
               testContainerIri,
               new Blob([testFileContent]),
               {
-                fetch: addUserAgent(
-                  resourceOwnerSession.fetch,
-                  TEST_USER_AGENT,
-                ),
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               },
             ),
           );
@@ -1647,7 +1569,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             issueAccessRequest(
               {
                 access: { read: true, write: true, append: true },
-                resourceOwner: resourceOwnerSession.info.webId as string,
+                resourceOwner: ownerSession.info.webId as string,
                 // Note that access is only requested for the container, not the contained file.
                 resources: [testContainerIri],
                 purpose: [
@@ -1667,19 +1589,19 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         afterEach(async () => {
           await retryAsync(() =>
             revokeAccessGrant(accessGrant, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
 
           await retryAsync(() =>
             sc.deleteFile(testFileIri, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
 
           await retryAsync(() =>
             sc.deleteContainer(testContainerIri, {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             }),
           );
         });
@@ -1691,7 +1613,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             // Access is granted to the target container and all contained resources.
             { inherit: true },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
             },
           );
@@ -1705,7 +1627,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           const grants = await getAccessGrantAll(
             { resource: testFileIri },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             },
           );
           expect(grants.map((grant) => grant.proof)).toContainEqual(
@@ -1719,7 +1641,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             // Access is granted to the target container only.
             { inherit: false },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
             },
           );
@@ -1735,7 +1657,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           const grants = await getAccessGrantAll(
             { resource: testFileIri },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             },
           );
           expect(grants).not.toContainEqual(accessGrant);
@@ -1744,7 +1666,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         it("can use the overwriteFile API to create a new file", async () => {
           // Delete the existing file as to be able to save a new file:
           await sc.deleteFile(testFileIri, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           });
 
           accessGrant = await approveAccessRequest(
@@ -1752,7 +1674,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             // Access is granted to the target container and all contained resources.
             { inherit: true },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
             },
           );
@@ -1775,7 +1697,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           // Verify as the resource owner that the file was actually created:
           const fileAsResourceOwner = await sc.getFile(testFileIri, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           });
 
           await expect(fileAsResourceOwner.text()).resolves.toBe(
@@ -1789,13 +1711,13 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             // Access is granted to the target container and all contained resources.
             { inherit: true },
             {
-              fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               accessEndpoint: vcProvider,
             },
           );
 
           await sc.deleteFile(testFileIri, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           });
 
           const dataset = sc.createSolidDataset();
@@ -1812,7 +1734,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           // Fetch it back as the owner to prove the dataset was actually created:
           const updatedDatasetAsOwner = await sc.getSolidDataset(testFileIri, {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           });
 
           // Serialize each to turtle:
@@ -1911,7 +1833,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         const request = await issueAccessRequest(
           {
             access: { read: true },
-            resourceOwner: resourceOwnerSession.info.webId as string,
+            resourceOwner: ownerSession.info.webId as string,
             resources: [sharedFileIri],
             expirationDate: new Date(Date.now() + 60 * 60 * 1000),
           },
@@ -1942,7 +1864,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           request,
           {},
           {
-            fetch: addUserAgent(resourceOwnerSession.fetch, TEST_USER_AGENT),
+            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             accessEndpoint: vcProvider,
             updateAcr: false,
             returnLegacyJsonld: false,
