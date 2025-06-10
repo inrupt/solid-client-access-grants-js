@@ -24,5 +24,5 @@ import { ACCESS_CREDENTIAL_TYPE } from "../constants";
  * @deprecated
  */
 export function isAccessCredentialType(x: unknown): x is string[] {
-  return Array.isArray(x) && x.some((y) => ACCESS_CREDENTIAL_TYPE.has(y));
+  return Array.isArray(x) && x.some((y) => ACCESS_CREDENTIAL_TYPE.includes(y));
 }

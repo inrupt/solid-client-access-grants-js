@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.test.ts",
+    "e2e/**/*.ts*",
+    "examples/**/*.ts",
+    "jest.config.ts",
+    "jest.setup.ts",
+    "typedoc.config.mjs"
+  ]
+}
