@@ -16,6 +16,10 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### Breaking Changes
+
+- Support for Node.js v18.x has been dropped as that version has reached end-of-life.
+
 ### Patch changes
 
 - `denyAccessRequest` now links the Access Denial to the incoming Access Request the same way `approveAccessRequest`
