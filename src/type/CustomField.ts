@@ -19,8 +19,11 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+import { DataFactory } from "n3";
 import { INHERIT, acl, gc } from "../common/constants";
 import { AccessGrantError } from "../common/errors/AccessGrantError";
+
+const { namedNode } = DataFactory;
 
 export type CustomField = {
   /* The custom field name (this must be a URL). */
@@ -40,7 +43,8 @@ const WELL_KNOWN_FIELDS = [
 ];
 
 function isWellKnown(field: URL) {
-  return WELL_KNOWN_FIELDS.map((p) => p.value).includes(field.href);
+  const fieldNode = namedNode(field.href);
+  return WELL_KNOWN_FIELDS.some((p) => p.equals(fieldNode));
 }
 
 /**
