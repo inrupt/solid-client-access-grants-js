@@ -1,8 +1,9 @@
-import inruptCfg from "@inrupt/eslint-config-base"
+import inruptCfg, { ignoreTypedLinting } from "@inrupt/eslint-config-base"
 import next from "@next/eslint-plugin-next"
 
-
 import { defineConfig } from "eslint/config";
+
+ignoreTypedLinting(["**/fixtures.ts"])
 
 export default defineConfig([
   inruptCfg, {
@@ -14,5 +15,5 @@ export default defineConfig([
       ...next.configs['core-web-vitals'].rules,
     },
     files:  ["e2e/browser/test-app/"]
-  },
+  }
 ]);
