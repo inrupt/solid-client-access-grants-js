@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -110,7 +109,6 @@ describe("getters", () => {
       expect(
         getPurposes(
           await mockGConsentGrant(undefined, (grant) => {
-            // eslint-disable-next-line no-param-reassign
             grant.credentialSubject.providedConsent.forPurpose = purposes;
           }),
         ),
@@ -121,7 +119,6 @@ describe("getters", () => {
       expect(
         getPurposes(
           await mockGConsentGrant(undefined, (object) => {
-            // eslint-disable-next-line no-param-reassign
             object.credentialSubject.providedConsent.forPurpose = [
               "https://some.purpose",
             ];
@@ -416,7 +413,6 @@ describe("getters", () => {
     it("gets the gConsent access issuance date", async () => {
       const issuanceDate = new Date().toString();
       const gConsentGrant = await mockGConsentGrant(undefined, (obj) => {
-        // eslint-disable-next-line no-param-reassign
         obj.issuanceDate = issuanceDate;
       });
       expect(getIssuanceDate(gConsentGrant)).toStrictEqual(
@@ -427,7 +423,6 @@ describe("getters", () => {
     it("gets the gConsent access request issuance date", async () => {
       const issuanceDate = new Date().toString();
       const gConsentRequest = await mockGConsentRequest(undefined, (obj) => {
-        // eslint-disable-next-line no-param-reassign
         obj.issuanceDate = issuanceDate;
       });
       expect(getIssuanceDate(gConsentRequest)).toStrictEqual(
@@ -440,7 +435,6 @@ describe("getters", () => {
     it("gets the gConsent access expiration date", async () => {
       const expirationDate = new Date().toString();
       const gConsentGrant = await mockGConsentGrant(undefined, (obj) => {
-        // eslint-disable-next-line no-param-reassign
         obj.expirationDate = expirationDate;
       });
       expect(getExpirationDate(gConsentGrant)).toStrictEqual(
@@ -483,7 +477,6 @@ describe("getters", () => {
     it("gets the gConsent access request expiration date", async () => {
       const expirationDate = new Date().toString();
       const gConsentRequest = await mockGConsentRequest(undefined, (obj) => {
-        // eslint-disable-next-line no-param-reassign
         obj.expirationDate = expirationDate;
       });
       expect(getExpirationDate(gConsentRequest)).toStrictEqual(
@@ -915,7 +908,6 @@ describe("getters", () => {
     it("gets the request from a gConsent access grant", async () => {
       const requestId = "https://example.org/request/123";
       const grantWithRequest = await mockGConsentGrant(undefined, (grant) => {
-        // eslint-disable-next-line no-param-reassign
         grant.credentialSubject.providedConsent.request = requestId;
       });
 

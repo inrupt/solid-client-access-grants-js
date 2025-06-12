@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -65,7 +64,7 @@ export async function saveSolidDatasetAt<Dataset extends SolidDataset>(
     options,
   );
 
-  return await solidClientSaveSolidDatasetAt(datasetUrl, solidDataset, {
+  return solidClientSaveSolidDatasetAt(datasetUrl, solidDataset, {
     ...options,
     fetch: authenticatedFetch,
   });

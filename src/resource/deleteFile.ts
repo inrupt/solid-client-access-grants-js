@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -48,7 +47,7 @@ export async function deleteFile(
 ) {
   const authenticatedFetch = await fetchWithVc(fileUrl, accessGrant, options);
 
-  return await coreDeleteFile(fileUrl, {
+  return coreDeleteFile(fileUrl, {
     ...options,
     fetch: authenticatedFetch,
   });

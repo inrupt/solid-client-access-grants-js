@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -74,7 +73,6 @@ export const mockWebIdWithUi = (
   return setThing(mockSolidDatasetFrom(webId), profile.build());
 };
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const mockAccessApiEndpoint = (withCredentialIssuer = true) => {
   const mockedFetch = jest
     .spyOn(globalThis, "fetch")

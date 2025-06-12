@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,7 +32,7 @@ jest.mock("../../common/util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {
   // TypeScript can't infer the type of modules imported via Jest;
   // skip type checking for those:
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   const vcModule = jest.requireActual("@inrupt/solid-client-vc") as any;
   return {
     ...vcModule,

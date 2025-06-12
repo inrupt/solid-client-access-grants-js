@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -127,7 +126,7 @@ describe("getAccessGrant", () => {
 
   // There is an expect call in the `toBeEqual` function,
   // but the linter doesn't pick up on this.
-  // eslint-disable-next-line jest/expect-expect
+
   it("supports denied access grants with a given IRI", async () => {
     const mockedAccessGrant = mockAccessGrantObject();
     mockedAccessGrant.credentialSubject.providedConsent.hasStatus =
@@ -156,7 +155,7 @@ describe("getAccessGrant", () => {
 
   // There is an expect call in the `toBeEqual` function,
   // but the linter doesn't pick up on this.
-  // eslint-disable-next-line jest/expect-expect
+
   it("returns the access grant with the given IRI", async () => {
     const accessGrant = await getAccessGrant("https://some.vc.url", {
       fetch: async () =>
@@ -169,7 +168,7 @@ describe("getAccessGrant", () => {
 
   // There is an expect call in the `toBeEqual` function,
   // but the linter doesn't pick up on this.
-  // eslint-disable-next-line jest/expect-expect
+
   it("normalizes equivalent JSON-LD VCs", async () => {
     const normalizedAccessGrant = mockAccessGrantObject();
     const fetchFn = async () =>
@@ -225,7 +224,7 @@ describe("getAccessGrant", () => {
 
   // There is an expect call in the `toBeEqual` function,
   // but the linter doesn't pick up on this.
-  // eslint-disable-next-line jest/expect-expect
+
   it("returns the access grant with the given URL object", async () => {
     const mockedFetch = jest.fn<typeof fetch>(
       async () =>

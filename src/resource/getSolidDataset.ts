@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -52,7 +51,7 @@ export async function getSolidDataset(
     options,
   );
 
-  return await coreGetSolidDataset(datasetUrl, {
+  return coreGetSolidDataset(datasetUrl, {
     ...options,
     fetch: authenticatedFetch,
   });

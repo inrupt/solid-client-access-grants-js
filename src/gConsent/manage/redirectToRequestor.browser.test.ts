@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -53,7 +52,7 @@ describe("redirectToRequestor", () => {
     it("redirects to the provided redirect IRI", async () => {
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
-      // eslint-disable-next-line no-void
+
       void redirectToRequestor(
         "https://some.grant-vc.iri",
         "https://some.redirect.iri",
@@ -70,7 +69,7 @@ describe("redirectToRequestor", () => {
     it("includes the VC IRI as query parameters to the redirect IRI", async () => {
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
-      // eslint-disable-next-line no-void
+
       void redirectToRequestor(
         "https://some.grant-vc.iri",
         "https://some.redirect.iri",
@@ -91,7 +90,7 @@ describe("redirectToRequestor", () => {
     it("supports the redirect IRI and VC ID being URL objects", async () => {
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
-      // eslint-disable-next-line no-void
+
       void redirectToRequestor(
         new URL("https://some.grant-vc.iri"),
         new URL("https://some.redirect.iri"),
@@ -114,7 +113,7 @@ describe("redirectToRequestor", () => {
       const redirectCallback = jest.fn();
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
-      // eslint-disable-next-line no-void
+
       void redirectToRequestor(
         "https://some.grant-vc.iri",
         "https://some.redirect.iri",

@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,7 +25,7 @@ import {
   REQUEST_VC_URL_PARAM_NAME,
 } from "../discover/redirectToAccessManagementUi";
 import type { AccessRequest } from "../type/AccessRequest";
-import getAccessRequest from "./getAccessRequest";
+import { getAccessRequest } from "./getAccessRequest";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 function getSearchParam(url: URL, param: string) {

@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -70,7 +69,7 @@ export async function saveSolidDatasetInContainer(
     options,
   );
 
-  return await coreSaveSolidDatasetInContainer(containerUrl, solidDataset, {
+  return coreSaveSolidDatasetInContainer(containerUrl, solidDataset, {
     ...options,
     fetch: authenticatedFetch,
   });

@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -94,7 +93,6 @@ export default function Home() {
         clientName: APP_NAME,
       });
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error(err);
     }
   };

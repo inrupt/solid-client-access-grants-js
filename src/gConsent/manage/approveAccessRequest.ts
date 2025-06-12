@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,7 +19,7 @@
 //
 
 import type { UrlString } from "@inrupt/solid-client";
-// eslint-disable-next-line camelcase
+
 import { acp_ess_2 } from "@inrupt/solid-client";
 import type {
   DatasetWithId,
@@ -122,22 +121,21 @@ async function addVcMatcher(
 ) {
   return Promise.all(
     targetResources.map(async (targetResource) => {
-      // eslint-disable-next-line camelcase
       const resourceInfo = await acp_ess_2.getResourceInfoWithAcr(
         targetResource,
         options,
       );
-      // eslint-disable-next-line camelcase
+
       if (!acp_ess_2.hasAccessibleAcr(resourceInfo)) {
         throw new AccessGrantError(
           "The current user does not have access to the resource's Access Control Resource. Either they have insufficiant credentials, or the resource is not controlled using ACP. In either case, an Access Grant cannot be issued.",
         );
       }
-      // eslint-disable-next-line camelcase
+
       const updatedResource = acp_ess_2.setVcAccess(resourceInfo, accessMode, {
         inherit: options?.inherit ?? true,
       });
-      // eslint-disable-next-line camelcase
+
       return acp_ess_2.saveAcrFor(updatedResource, options);
     }),
   );

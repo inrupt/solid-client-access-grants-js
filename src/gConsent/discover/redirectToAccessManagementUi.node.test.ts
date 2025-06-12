@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -100,7 +99,7 @@ describe("redirectToAccessManagementUi", () => {
       const redirectCallback = jest.fn();
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
-      // eslint-disable-next-line no-void
+
       void redirectToAccessManagementUi(
         await mockAccessRequestVc(),
         "https://some.redirect.iri",
@@ -125,7 +124,7 @@ describe("redirectToAccessManagementUi", () => {
       const redirectCallback = jest.fn();
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
-      // eslint-disable-next-line no-void
+
       void redirectToAccessManagementUi(
         JSON.parse(JSON.stringify(await mockAccessRequestVc())),
         "https://some.redirect.iri",
@@ -148,7 +147,7 @@ describe("redirectToAccessManagementUi", () => {
       const redirectCallback = jest.fn();
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
-      // eslint-disable-next-line no-void
+
       void redirectToAccessManagementUi(
         await mockAccessRequestVc(),
         "https://some.redirect.iri",
@@ -171,7 +170,7 @@ describe("redirectToAccessManagementUi", () => {
       const redirectCallback = jest.fn();
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
-      // eslint-disable-next-line no-void
+
       void redirectToAccessManagementUi(
         JSON.parse(JSON.stringify(await mockAccessRequestVc())),
         "https://some.redirect.iri",

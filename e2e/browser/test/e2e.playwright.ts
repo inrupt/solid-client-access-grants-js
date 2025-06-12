@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,7 +31,6 @@ const clickOpenIdPrompt = async (page: Page) => {
     timeout: 15_000,
   });
   // Fallback selector to support class attributes, until testid supports is fully deployed.
-  // eslint-disable-next-line playwright/no-conditional-in-test
   const correctSelector = (await testidBasedSelector.isVisible())
     ? testidBasedSelector
     : classBasedSelector;
@@ -73,7 +71,6 @@ test("Redirect to AMC to accept Access Request", async ({
 
   // The test user confirms the access they selected and is redirected back to app
   await Promise.all([
-    // eslint-disable-next-line playwright/no-force-option
     page.getByTestId("modal-primary-action").click(),
     page.waitForURL("http://localhost:3000/?accessGrantUrl=*"),
   ]);

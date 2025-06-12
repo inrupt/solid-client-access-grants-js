@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,7 +22,6 @@ import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import {
   isVerifiableCredential,
   getVerifiableCredentialApiConfiguration,
-  verifiableCredentialToDataset,
 } from "@inrupt/solid-client-vc";
 import type * as SolidClient from "@inrupt/solid-client";
 import type * as VcLibrary from "@inrupt/solid-client-vc";

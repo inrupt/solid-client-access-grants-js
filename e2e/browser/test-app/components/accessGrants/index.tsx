@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -195,7 +194,7 @@ export default function AccessController({
       // If the resource does not exist, do nothing.
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     await getAccessGrant(accessGrant.id, { fetch: session.fetch });
   };
 
