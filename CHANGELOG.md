@@ -14,6 +14,8 @@ The following changes are pending, and will be applied on the next major release
   with the equivalent non-gConsent submodules (e.g. `gConsent/manage` can be replaced
   with `manage`). There is no functionality change between the two.
 
+## Unreleased
+
 ## [3.3.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.3.1) - 2025-06-12
 
 ### Patch changes
