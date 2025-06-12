@@ -16,6 +16,10 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### Breaking Changes
+
+- Support for Node.js v18.x has been dropped as that version has reached end-of-life.
+
 ## [3.3.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.3.1) - 2025-06-12
 
 ### Patch changes
