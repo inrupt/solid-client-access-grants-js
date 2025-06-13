@@ -15,11 +15,11 @@ It is part of a [family open source JavaScript
 libraries](https://docs.inrupt.com/developer-tools/javascript/client-libraries/)
 designed to support developers building Solid applications.
 
-# Server support
+## Server support
 
 This feature is currently only available in ESS.
 
-# Supported environments
+## Supported environments
 
 Our JavaScript Client Libraries use relatively modern JavaScript, aligned with
 the [ES2018](https://262.ecma-international.org/9.0/) Specification features, we
@@ -38,12 +38,12 @@ through a tool like [Babel](https://babeljs.io), and to add polyfills for e.g.
 `Map`, `Set`, `Promise`, `Headers`, `Array.prototype.includes`, `Object.entries`
 and `String.prototype.endsWith`.
 
-## Node.js Support
+### Node.js Support
 
 See [Inrupt Solid Javascript Client
 Libraries](https://docs.inrupt.com/developer-tools/javascript/client-libraries/#node-js-support).
 
-# Installation
+## Installation
 
 For the latest stable version of solid-client-access-grants:
 
@@ -51,32 +51,32 @@ For the latest stable version of solid-client-access-grants:
 npm install @inrupt/solid-client-access-grants
 ```
 
-# Issues & Help
+## Issues & Help
 
-## Solid Community Forum
+### Solid Community Forum
 
 If you have questions about working with Solid or just want to share what you’re
 working on, visit the [Solid forum](https://forum.solidproject.org/). The Solid
 forum is a good place to meet the rest of the community.
 
-## Bugs and Feature Requests
+### Bugs and Feature Requests
 
 - For public feedback, bug reports, and feature requests please file an issue
   via [GitHub](https://github.com/inrupt/solid-client-access-grants-js/issues/).
 - For non-public feedback or support inquiries please use the
   [Inrupt Service Desk](https://inrupt.atlassian.net/servicedesk).
 
-## Documentation
+### Documentation
 
 - [Inrupt Solid Javascript Client Libraries](https://docs.inrupt.com/developer-tools/javascript/client-libraries/)
 - [Homepage](https://docs.inrupt.com/)
 - [Examples](./examples)
 - [Security policy and vulnerability reporting](./SECURITY.md)
 
-# Changelog
+## Changelog
 
 See [the release notes](https://github.com/inrupt/solid-client-js/blob/main/CHANGELOG.md).
 
-# License
+## License
 
 MIT © [Inrupt](https://inrupt.com)

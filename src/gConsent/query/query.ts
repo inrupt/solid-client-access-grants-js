@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -324,7 +323,7 @@ export async function* paginatedQuery(
     yield page;
     // This is a generator, so we don't want to go through
     // all the pages at once with a Promise.all approach.
-    // eslint-disable-next-line no-await-in-loop
+
     page = await query(page.next, options);
   }
   // Return the last page.

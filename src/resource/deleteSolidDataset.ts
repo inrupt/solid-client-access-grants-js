@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -52,7 +51,7 @@ export async function deleteSolidDataset(
     options,
   );
 
-  return await coreDeleteSolidDataset(datasetUrl, {
+  return coreDeleteSolidDataset(datasetUrl, {
     ...options,
     fetch: authenticatedFetch,
   });

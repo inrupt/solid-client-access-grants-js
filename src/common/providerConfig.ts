@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -93,7 +92,7 @@ export async function getIssuerContext(
     return providerCtx;
   } catch (e) {
     // We don't want this issue to be swallowed silently.
-    // eslint-disable-next-line no-console
+
     console.error(e);
   }
   return undefined;

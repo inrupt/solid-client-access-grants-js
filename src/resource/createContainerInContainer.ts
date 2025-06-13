@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -68,7 +67,7 @@ export async function createContainerInContainer(
     options,
   );
 
-  return await solidClientCreateContainerInContainer(containerUrl, {
+  return solidClientCreateContainerInContainer(containerUrl, {
     ...options,
     fetch: authenticatedFetch,
   });

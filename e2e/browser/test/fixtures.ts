@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -33,7 +32,7 @@ import {
 } from "@inrupt/solid-client";
 
 import { Session } from "@inrupt/solid-client-authn-node";
-import issueAccessRequest from "../../../src/gConsent/request/issueAccessRequest";
+import { issueAccessRequest } from "../../../src/gConsent/request/issueAccessRequest";
 
 export { expect } from "@inrupt/internal-playwright-helpers";
 
@@ -93,7 +92,6 @@ const createAccessRequest = async (
     );
     return accessRequest;
   } catch (error) {
-    // eslint-disable-next-line no-console
     console.log(error);
     return error;
   }
@@ -101,7 +99,7 @@ const createAccessRequest = async (
 
 export const test = base.extend<Fixtures>({
   // playwright expects the first argument to be a destructuring pattern.
-  // eslint-disable-next-line no-empty-pattern
+
   accessRequest: async ({}, use) => {
     let ownerSession: Session;
     const setupEnvironment = getNodeTestingEnvironment();
@@ -148,7 +146,7 @@ export const test = base.extend<Fixtures>({
     );
     await use(accessRequest.id);
   },
-  // eslint-disable-next-line no-empty-pattern
+
   idp: async ({}, use) => {
     const setupEnvironment = getNodeTestingEnvironment();
     await use(setupEnvironment.idp);

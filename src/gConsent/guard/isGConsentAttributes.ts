@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +20,7 @@
 
 import type { UrlString } from "@inrupt/solid-client";
 import { DataFactory } from "n3";
-// eslint-disable-next-line camelcase
+
 import type { DatasetCore, Quad_Subject } from "@rdfjs/types";
 import { ACCESS_STATUS } from "../constants";
 import type { GConsentRequestAttributes } from "../type/AccessVerifiableCredential";
@@ -64,7 +63,7 @@ export function isGConsentAttributes(
 
 export function isRdfjsGConsentAttributes(
   dataset: DatasetCore,
-  // eslint-disable-next-line camelcase
+
   consent: Quad_Subject,
 ) {
   // isResourceAccessModeArray

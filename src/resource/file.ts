@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -57,7 +56,7 @@ export async function getFile(
     options,
   );
 
-  return await coreGetFile(resourceUrl, {
+  return coreGetFile(resourceUrl, {
     ...options,
     fetch: authenticatedFetch,
   });
@@ -97,7 +96,7 @@ export async function overwriteFile<T extends File | NodeFile | Blob>(
     options,
   );
 
-  return await coreOverwriteFile(resourceUrl, file, {
+  return coreOverwriteFile(resourceUrl, file, {
     ...options,
     fetch: authenticatedFetch,
   });
@@ -129,7 +128,7 @@ export async function saveFileInContainer<T extends File | NodeFile | Blob>(
     accessGrant,
     options,
   );
-  return await coreSaveFileInContainer(containerUrl, file, {
+  return coreSaveFileInContainer(containerUrl, file, {
     ...options,
     fetch: authenticatedFetch,
   });

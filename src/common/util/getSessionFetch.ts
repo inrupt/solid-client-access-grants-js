@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -18,6 +17,7 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
+
 import type { AccessBaseOptions } from "../../gConsent/type/AccessBaseOptions";
 
 /**
@@ -38,7 +38,7 @@ export async function getSessionFetch(
       // we dynamically check whether it is in the caller's dependencies.
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      // eslint-disable-next-line import/no-unresolved
+
       "@inrupt/solid-client-authn-browser"
     );
 

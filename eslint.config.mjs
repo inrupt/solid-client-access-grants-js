@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,34 +18,39 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-// eslint-disable-next-line no-shadow
-import type { Request, Response } from "express";
+import inruptCfg, { ignoreTypedLinting } from "@inrupt/eslint-config-base";
+import next from "@next/eslint-plugin-next";
 
-import { Session } from "@inrupt/solid-client-authn-node";
-// eslint-disable-next-line import/no-unresolved
-import { getAccessGrant } from "@inrupt/solid-client-access-grants";
-import { getEnvironment } from "../utils/getEnvironment";
+import { defineConfig } from "eslint/config";
 
-export async function getAccessGrantFromUrl(
-  req: Request,
-  res: Response,
-): Promise<void> {
-  const env = getEnvironment();
-  const session = new Session();
-  await session.login({
-    clientId: env.clientId,
-    clientSecret: env.clientSecret,
-    oidcIssuer: env.oidcIssuer.href,
-    // Note that using a Bearer token is mandatory for the UMA access token to be valid.
-    tokenType: "Bearer",
-  });
+ignoreTypedLinting([
+  "**/fixtures.ts",
+  "jest.config.ts",
+  "playwright.config.ts",
+]);
 
-  /**
-   * Retrieve an Access Grant issued to the application.
-   */
-  const accessGrant = await getAccessGrant(req.query.accessGrantUrl as string, {
-    fetch: session.fetch,
-  });
-
-  res.send(accessGrant);
-}
+export default defineConfig([
+  inruptCfg,
+  {
+    plugins: {
+      "@next/next": next,
+    },
+    rules: {
+      ...next.configs.recommended.rules,
+      ...next.configs["core-web-vitals"].rules,
+    },
+    files: ["e2e/browser/test-app/"],
+  },
+  {
+    rules: {
+      "import/no-unresolved": "off",
+    },
+    files: ["**/e2e/browser/test-app/**"],
+  },
+  {
+    rules: {
+      "import/no-unresolved": "off",
+    },
+    files: ["**/e2e/browser/test-app/**"],
+  },
+]);

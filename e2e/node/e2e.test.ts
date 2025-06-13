@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -101,12 +100,12 @@ async function retryAsync<T>(
     try {
       // The purpose here is to retry an async operation, not to parallelize.
       // Awaiting the callback will throw on error before returning.
-      // eslint-disable-next-line no-await-in-loop
+
       return await callback();
     } catch (e: unknown) {
       errors.push(e as Error);
       tries += 1;
-      // eslint-disable-next-line no-await-in-loop
+
       await new Promise((resolve) => {
         setTimeout(resolve, interval);
       });
@@ -156,7 +155,6 @@ const addUserAgent =
 const describeIf = (condition: boolean) =>
   condition ? describe : describe.skip;
 // Conditional tests confuse eslint.
-/* eslint-disable jest/no-standalone-expect */
 
 // For some reason, the Node jest runner throws an undefined error when
 // calling to btoa. This overrides it, while keeping the actual code
@@ -340,7 +338,6 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           // if the issued grant is part of the query result set. Matching on the proofs
           // is sufficient, as proofs are generated on canonicalized datasets.
           if (returnLegacyJsonld) {
-            // eslint-disable-next-line jest/no-conditional-expect
             expect(
               grantedAccess.map((matchingGrant) => matchingGrant.proof),
             ).toContainEqual((grant as AccessGrant).proof);
@@ -1370,25 +1367,28 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         let fileContents: Blob;
 
         beforeEach(async () => {
-          const fileApisContainer = await retryAsync(() =>
-            sc.createContainerInContainer(resourceOwnerPod, {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            }),
-          );
-          testContainerIri = sc.getSourceIri(fileApisContainer);
+          try {
+            const fileApisContainer = await sc.createContainerInContainer(
+              resourceOwnerPod,
+              {
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+              },
+            );
+            testContainerIri = sc.getSourceIri(fileApisContainer);
 
-          fileContents = new Blob(["hello world"]);
+            fileContents = new Blob(["hello world"]);
 
-          const uploadedFile = await retryAsync(() =>
-            sc.saveFileInContainer(testContainerIri, fileContents, {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            }),
-          );
+            const uploadedFile = await sc.saveFileInContainer(
+              testContainerIri,
+              fileContents,
+              {
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+              },
+            );
 
-          testFileIri = sc.getSourceIri(uploadedFile);
+            testFileIri = sc.getSourceIri(uploadedFile);
 
-          const request = await retryAsync(() =>
-            issueAccessRequest(
+            const request = await issueAccessRequest(
               {
                 access: { read: true, write: true, append: true },
                 resources: [testContainerIri, testFileIri],
@@ -1400,11 +1400,9 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
                 accessEndpoint: vcProvider,
                 returnLegacyJsonld: false,
               },
-            ),
-          );
+            );
 
-          accessGrant = await retryAsync(() =>
-            approveAccessRequest(
+            accessGrant = await approveAccessRequest(
               request,
               {},
               {
@@ -1413,22 +1411,27 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
                 updateAcr: false,
                 returnLegacyJsonld: false,
               },
-            ),
-          );
+            );
+            console.log(
+              `Issued Access Grant ${accessGrant} as ${ownerSession.info.webId}`,
+            );
+          } catch (e) {
+            console.error(`An error occurred: ${e}`);
+          }
         });
 
         afterEach(async () => {
           try {
-            await retryAsync(() =>
-              revokeAccessGrant(accessGrant, {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-              }),
-            );
+            await revokeAccessGrant(accessGrant, {
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+            });
           } catch (e) {
             // Allow console statement as this is useful to capture, either
             // running tests locally or in CI.
-            // eslint-disable-next-line no-console
-            console.error(`Revoking the Access Grant failed: ${e}`);
+
+            console.error(
+              `Revoking the Access Grant ${accessGrant} as ${ownerSession.info.webId} failed: ${e}`,
+            );
           }
           const testContainer = await retryAsync(() =>
             sc.getSolidDataset(testContainerIri, {
