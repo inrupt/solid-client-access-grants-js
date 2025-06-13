@@ -20,6 +20,7 @@
 
 import { jest, describe, it, expect, beforeAll } from "@jest/globals";
 import {
+  verifiableCredentialToDataset,
   isVerifiableCredential,
   getVerifiableCredentialApiConfiguration,
 } from "@inrupt/solid-client-vc";
@@ -42,6 +43,7 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
+  // eslint-disable-next-line no-shadow
   const { verifiableCredentialToDataset, getIssuer, getVerifiableCredential } =
     jest.requireActual<typeof VcLibrary>("@inrupt/solid-client-vc");
   return {
@@ -89,6 +91,7 @@ describe("isValidAccessGrant", () => {
   let MOCK_ACCESS_GRANT: VcLibrary.VerifiableCredential;
 
   beforeAll(async () => {
+    // eslint-disable-next-line no-shadow
     const { verifiableCredentialToDataset } = jest.requireActual<
       typeof VcLibrary
     >("@inrupt/solid-client-vc");
