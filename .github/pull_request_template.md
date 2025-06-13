@@ -8,9 +8,9 @@ This PR fixes #<issue ID>.
 
 <!-- When adding a new feature: -->
 
-# New feature description
+## New feature description
 
-# Checklist
+## Checklist
 
 - [ ] All acceptance criteria are met.
 - [ ] Relevant documentation, if any, has been written/updated.
@@ -24,7 +24,7 @@ This PR fixes #<issue ID>.
 
 This PR bumps the version to <version number>.
 
-# Release steps:
+## Release steps:
 
 1. Inspecting the `CHANGELOG.md` to determine if the release was major, minor or patch. Make sure you align with the rest of the team first.
 2. Use `npm version --no-git-tag-version <major|minor|patch>` to update `package.json`.

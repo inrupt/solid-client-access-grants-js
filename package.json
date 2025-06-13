@@ -11,7 +11,7 @@
     "docs:preview": "python3 -m http.server --bind 127.0.0.1 --directory docs/dist",
     "lint": "npm run lint:check",
     "lint:check": "npm run lint:eslint",
-    "lint:eslint": "eslint --config eslint.config.mjs src/ e2e/",
+    "lint:eslint": "eslint --config eslint.config.mjs .",
     "lint:fix": "npm run lint:eslint -- --fix",
     "test": "jest --ignoreProjects e2e-node",
     "test:unit:browser": "jest --selectProjects browser",
@@ -103,7 +103,7 @@
     "url": "https://github.com/inrupt/solid-client-access-grants-js.git"
   },
   "devDependencies": {
-    "@inrupt/eslint-config-base": "file:../typescript-sdk-tools/packages/eslint-config",
+    "@inrupt/eslint-config-base": "^4.0.3",
     "@inrupt/internal-playwright-helpers": "^3.2.7",
     "@inrupt/internal-test-env": "^3.2.7",
     "@inrupt/jest-jsdom-polyfills": "^3.2.7",
