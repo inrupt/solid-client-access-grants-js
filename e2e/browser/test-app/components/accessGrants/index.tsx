@@ -160,15 +160,15 @@ export default function AccessController({
         customFields: new Set([
           {
             key: new URL(customIntUrl),
-            value: customInt!,
+            value: customInt,
           },
           {
             key: new URL(customStrUrl),
-            value: customStr!,
+            value: customStr,
           },
           {
             key: new URL(customBooleanUrl),
-            value: customBoolean!,
+            value: customBoolean,
           },
         ]),
       },

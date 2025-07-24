@@ -1777,6 +1777,8 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         expect(allCredentialsPageOne.next).toBeDefined();
 
         // Go to the next result page
+        // allCredentialsPageOne.next being defined is enforced by assertions.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const allCredentialsPageTwo = await query(allCredentialsPageOne.next!, {
           fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
           // FIXME add query endpoint discovery check.
