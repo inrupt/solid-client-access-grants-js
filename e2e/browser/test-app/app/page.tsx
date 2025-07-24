@@ -82,6 +82,8 @@ export default function Home() {
       if (currentURL.searchParams.has("accessGrantUrl")) {
         window.localStorage.setItem(
           "accessGrantUrl",
+          // The search param presence has been verified.
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           decodeURIComponent(currentURL.searchParams.get("accessGrantUrl")!),
         );
       }

@@ -49,8 +49,21 @@ export default defineConfig([
   },
   {
     rules: {
-      "import/no-unresolved": "off",
+      camelcase: [
+        "error",
+        {
+          allow: [
+            "verifiable_credential_issuer",
+            "acp_ess_2",
+            "Quad_Subject",
+            "grant_type",
+            "claim_token_format",
+            "claim_token",
+            "access_token",
+            "token_endpoint",
+          ],
+        },
+      ],
     },
-    files: ["**/e2e/browser/test-app/**"],
   },
 ]);

@@ -119,6 +119,8 @@ test("Issue an access request, then revoking the access request", async ({
     .getByTestId("credential-custom")
     .textContent();
   expect(customFields).not.toBeNull();
+  // customFields being defined is enforced by assertions.
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const record = JSON.parse(customFields!);
   expect(record["https://example.org/test-string"]).toBe("test value");
 

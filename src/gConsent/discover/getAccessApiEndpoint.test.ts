@@ -86,12 +86,12 @@ describe("getAccessApiEndpoint", () => {
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
-            some_property: "some value",
+            someProperty: "some value",
           }),
         ),
       );
     await expect(getAccessApiEndpoint(MOCK_RESOURCE_OWNER_IRI)).rejects.toThrow(
-      /No access issuer listed for property \[verifiable_credential_issuer\] in.*some_property.*some value/,
+      /No access issuer listed for property \[verifiable_credential_issuer\] in.*someProperty.*some value/,
     );
   });
 });
