@@ -47,7 +47,7 @@ import { gc } from "../../common/constants";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
 import { buildProviderContext } from "../../common/providerConfig";
 import type { AccessGrantContext } from "../type/AccessGrantContext";
-import { AccessCredentialType } from "../type/AccessCredentialType";
+import type { AccessCredentialType } from "../type/AccessCredentialType";
 
 export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {

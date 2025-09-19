@@ -1,4 +1,3 @@
-//
 // Copyright Inrupt Inc.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -63,8 +62,8 @@ export default {
   ],
   // includeCategories: true,
   // options: {
-    navigation: {
-      includeCategories: true,
-    },
+  navigation: {
+    includeCategories: true,
+  },
   // },
 };

@@ -17,5 +17,5 @@
     // This is required to transform native ESM from our dependencies using ts-jest.
     "allowJs": true
   },
-  "include": ["src/index.ts"],
+  "include": ["src/index.ts"]
 }
