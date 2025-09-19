@@ -157,6 +157,7 @@ describe("isAccessRequest (legacy and RDFJS)", () => {
     const badTypeRequest = JSON.parse(
       JSON.stringify(validAccessRequestVerifiableCredential),
     ) as AccessRequest;
+    // @ts-expect-error This is intentionally a non-supported type.
     badTypeRequest.type = ["https://example.org/ns/some-vc-type"];
     expect(isAccessRequest(badTypeRequest)).toBe(false);
     expect(
