@@ -50,18 +50,31 @@ export const MOCK_CONTEXT = [
   ...extraContext,
 ] as const;
 
+/**
+ * Type for Access Request credentials.
+ */
 export const CREDENTIAL_TYPE_ACCESS_REQUEST = "SolidAccessRequest";
+/**
+ * Type for Access Grant credentials.
+ */
 export const CREDENTIAL_TYPE_ACCESS_GRANT = "SolidAccessGrant";
-export const CREDENTIAL_TYPE_ACCESS_DENIAL = "SolidAccessDenial";
-export const CREDENTIAL_TYPE_BASE = "VerifiableCredential";
-export const PRESENTATION_TYPE_BASE = "VerifiablePresentation";
+/**
+ * Type for Access Denial credentials.
+ */
+export const CREDENTIAL_TYPE_ACCESS_DENIAL = "SolidAccessDenial" as const;
+export const CREDENTIAL_TYPE_BASE = "VerifiableCredential" as const;
+export const PRESENTATION_TYPE_BASE = "VerifiablePresentation" as const;
 
-export const ACCESS_CREDENTIAL_TYPE = new Set([
+/**
+ * The supported types of Access Credentials.
+ */
+export const ACCESS_CREDENTIAL_TYPE = [
+  CREDENTIAL_TYPE_BASE,
   CREDENTIAL_TYPE_ACCESS_REQUEST,
   CREDENTIAL_TYPE_ACCESS_GRANT,
   CREDENTIAL_TYPE_ACCESS_DENIAL,
   "vc:SolidAccessDenial",
-]);
+] as const;
 
 export const ACCESS_GRANT_STATUS = Object.freeze(
   new Set([

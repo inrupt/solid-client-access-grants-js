@@ -47,6 +47,7 @@ import { gc } from "../../common/constants";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
 import { buildProviderContext } from "../../common/providerConfig";
 import type { AccessGrantContext } from "../type/AccessGrantContext";
+import type { AccessCredentialType } from "../type/AccessCredentialType";
 
 export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
@@ -179,7 +180,7 @@ export async function getAccessGrantAll(
     : [undefined];
 
   const specifiedModes = accessToResourceAccessModeArray(params.access ?? {});
-  const type = [CREDENTIAL_TYPE_BASE];
+  const type: AccessCredentialType[] = [CREDENTIAL_TYPE_BASE];
   const statusShorthand = params.status ?? "granted";
 
   if (statusShorthand === "granted") {

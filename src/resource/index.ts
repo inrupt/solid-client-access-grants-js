@@ -18,6 +18,15 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
+/**
+ * @categoryDescription Using Access Grants
+ * These functions are available for...
+ * @showCategories
+ */
+
+/**
+ * @category Using Access Grants
+ */
 export { getFile, overwriteFile, saveFileInContainer } from "./file";
 export { createContainerInContainer } from "./createContainerInContainer";
 export { deleteFile } from "./deleteFile";
