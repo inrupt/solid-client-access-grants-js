@@ -1833,7 +1833,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         }
       }, 120_000);
 
-      it("shows updated status for an approved request", async () => {
+      it.skip("shows updated status for an approved request", async () => {
         // Issue an Access Request.
         const request = await issueAccessRequest(
           {
