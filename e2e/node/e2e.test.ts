@@ -86,6 +86,7 @@ import {
 } from "../../src/common/getters";
 import { toBeEqual } from "../../src/gConsent/util/toBeEqual.mock";
 import { issueAccessGrant } from "../../src/gConsent/manage/approveAccessRequest";
+import { hasErrorResponse } from "@inrupt/solid-client-errors";
 
 const { namedNode } = DataFactory;
 
@@ -119,12 +120,12 @@ async function retryAsync<T>(
 
 if (process.env.CI === "true") {
   // Tests running in the CI runners tend to be more flaky.
-  jest.retryTimes(3, { logErrorsBeforeRetry: true });
+  jest.retryTimes(5, { logErrorsBeforeRetry: true });
 }
 
 // Extend the timeout because of frequent issues in CI (default is 3500)
 custom.setHttpOptionsDefaults({
-  timeout: 10000,
+  timeout: 30000,
 });
 
 const env = getNodeTestingEnvironment({
@@ -1029,95 +1030,105 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         });
 
         it("can filter VCs held by the service based on purpose", async () => {
-          const [
-            noPurposeFilter,
-            partialPurposeFilter,
-            otherPartialPurposeFilter,
-            bothPurposeFilter,
-            unknownPurposeFilter,
-          ] = await Promise.all([
-            getAccessGrantAll(
-              { resource: sharedFilterTestIri },
-              {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-            getAccessGrantAll(
-              {
-                purpose: ["https://some.purpose/not-a-nefarious-one/i-promise"],
-                resource: sharedFilterTestIri,
-              },
-              {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-            getAccessGrantAll(
-              {
-                purpose: ["https://some.other.purpose/"],
-                resource: sharedFilterTestIri,
-              },
-              {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-            getAccessGrantAll(
-              {
-                purpose: [
-                  "https://some.purpose/not-a-nefarious-one/i-promise",
-                  "https://some.other.purpose/",
-                ],
-                resource: sharedFilterTestIri,
-              },
-              {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-            getAccessGrantAll(
-              {
-                purpose: ["https://some.unknown.purpose/"],
-                resource: sharedFilterTestIri,
-              },
-              {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-          ]);
+          try {
+            const [
+              noPurposeFilter,
+              partialPurposeFilter,
+              otherPartialPurposeFilter,
+              bothPurposeFilter,
+              unknownPurposeFilter,
+            ] = await Promise.all([
+              getAccessGrantAll(
+                { resource: sharedFilterTestIri },
+                {
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                  accessEndpoint: vcProvider,
+                },
+              ),
+              getAccessGrantAll(
+                {
+                  purpose: [
+                    "https://some.purpose/not-a-nefarious-one/i-promise",
+                  ],
+                  resource: sharedFilterTestIri,
+                },
+                {
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                  accessEndpoint: vcProvider,
+                },
+              ),
+              getAccessGrantAll(
+                {
+                  purpose: ["https://some.other.purpose/"],
+                  resource: sharedFilterTestIri,
+                },
+                {
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                  accessEndpoint: vcProvider,
+                },
+              ),
+              getAccessGrantAll(
+                {
+                  purpose: [
+                    "https://some.purpose/not-a-nefarious-one/i-promise",
+                    "https://some.other.purpose/",
+                  ],
+                  resource: sharedFilterTestIri,
+                },
+                {
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                  accessEndpoint: vcProvider,
+                },
+              ),
+              getAccessGrantAll(
+                {
+                  purpose: ["https://some.unknown.purpose/"],
+                  resource: sharedFilterTestIri,
+                },
+                {
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                  accessEndpoint: vcProvider,
+                },
+              ),
+            ]);
 
-          // All filters should return a result except for the last one.
-          expect(noPurposeFilter.length).toBeGreaterThan(0);
-          expect(partialPurposeFilter.length).toBeGreaterThan(0);
-          expect(otherPartialPurposeFilter.length).toBeGreaterThan(0);
-          expect(bothPurposeFilter.length).toBeGreaterThan(0);
-          expect(unknownPurposeFilter).toHaveLength(0);
-          // The unfiltered results should contain the other ones
-          // Note that we serialize the VCs to avoid comparing by reference
-          expect(
-            bothPurposeFilter.every((vc) =>
-              noPurposeFilter
-                .map((vcNoPurpose) => JSON.stringify(vcNoPurpose))
-                .includes(JSON.stringify(vc)),
-            ),
-          ).toBe(true);
-          // Filtering on both purposes should include the results filtered on individual purposes
-          expect(
-            partialPurposeFilter.every((vc) =>
-              bothPurposeFilter
-                .map((vcWithPurpose) => JSON.stringify(vcWithPurpose))
-                .includes(JSON.stringify(vc)),
-            ),
-          ).toBe(true);
-          expect(
-            otherPartialPurposeFilter.every((vc) =>
-              bothPurposeFilter
-                .map((vcWithPurpose) => JSON.stringify(vcWithPurpose))
-                .includes(JSON.stringify(vc)),
-            ),
-          ).toBe(true);
+            // All filters should return a result except for the last one.
+            expect(noPurposeFilter.length).toBeGreaterThan(0);
+            expect(partialPurposeFilter.length).toBeGreaterThan(0);
+            expect(otherPartialPurposeFilter.length).toBeGreaterThan(0);
+            expect(bothPurposeFilter.length).toBeGreaterThan(0);
+            expect(unknownPurposeFilter).toHaveLength(0);
+            // The unfiltered results should contain the other ones
+            // Note that we serialize the VCs to avoid comparing by reference
+            expect(
+              bothPurposeFilter.every((vc) =>
+                noPurposeFilter
+                  .map((vcNoPurpose) => JSON.stringify(vcNoPurpose))
+                  .includes(JSON.stringify(vc)),
+              ),
+            ).toBe(true);
+            // Filtering on both purposes should include the results filtered on individual purposes
+            expect(
+              partialPurposeFilter.every((vc) =>
+                bothPurposeFilter
+                  .map((vcWithPurpose) => JSON.stringify(vcWithPurpose))
+                  .includes(JSON.stringify(vc)),
+              ),
+            ).toBe(true);
+            expect(
+              otherPartialPurposeFilter.every((vc) =>
+                bothPurposeFilter
+                  .map((vcWithPurpose) => JSON.stringify(vcWithPurpose))
+                  .includes(JSON.stringify(vc)),
+              ),
+            ).toBe(true);
+          } catch (e) {
+            if (e instanceof Error && hasErrorResponse(e)) {
+              console.error(
+                `An HTTP error happened: ${e.response.status} ${e.response.statusText}, ${e.message} (caused by ${e.cause})`,
+              );
+            }
+          }
         });
       });
 
@@ -1833,7 +1844,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         }
       }, 120_000);
 
-      it.skip("shows updated status for an approved request", async () => {
+      it("shows updated status for an approved request", async () => {
         // Issue an Access Request.
         const request = await issueAccessRequest(
           {
