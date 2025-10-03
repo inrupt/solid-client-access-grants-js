@@ -1884,7 +1884,8 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             accessEndpoint: vcProvider,
             updateAcr: false,
             returnLegacyJsonld: false,
-            verifyLinkedRequest: true,
+            verifyLinkedRequest:
+              environmentFeatures?.VERIFIED_REQUESTS === "true",
           },
         );
         // Check the request status has been updated and is no longer "Pending"
