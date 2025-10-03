@@ -137,6 +137,7 @@ function getBaseBody(
       ...body,
       credentialSubject: {
         ...body.credentialSubject,
+        id: (params as AccessGrantParameters).owner,
         providedConsent: getGConsentAttributes(
           params as AccessGrantParameters,
           type,

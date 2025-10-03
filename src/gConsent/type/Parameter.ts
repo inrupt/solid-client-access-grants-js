@@ -44,6 +44,12 @@ export interface AccessRequestParameters extends InputAccessRequestParameters {
 }
 
 export interface InputAccessGrantParameters extends BaseRequestParameters {
+  /**
+   * WebID of the resource owner. If the request is not issued by an admin,
+   * this is overridden by the server to the identity of the agent issuing
+   * the Access Grant.
+   */
+  owner?: UrlString;
   requestor: UrlString;
   request?: UrlString;
   verifiedRequest?: UrlString;
