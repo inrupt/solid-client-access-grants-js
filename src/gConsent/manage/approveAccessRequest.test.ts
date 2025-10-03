@@ -1308,6 +1308,51 @@ describe("approveAccessRequest", () => {
     );
   });
 
+  it("allows overriding the issued Access Grant subject ID", async () => {
+    mockAcpClient();
+    mockAccessApiEndpoint();
+    const mockedVcModule = jest.requireMock(
+      "@inrupt/solid-client-vc",
+    ) as typeof VcClient;
+    const spiedIssueRequest = jest.spyOn(
+      mockedVcModule,
+      "issueVerifiableCredential",
+    );
+    spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+    await issueAccessGrant(
+      {
+        owner: "https://id.some-custom-owner.com/owner",
+        access: { append: true },
+        expirationDate: new Date(2021, 9, 14),
+        issuanceDate: new Date(2021, 9, 15),
+        purpose: ["https://some-custom.purpose"],
+        requestor: "https://some-custom.requestor",
+        resources: ["https://some-custom.resource"],
+      },
+      {
+        fetch: jest.fn<typeof fetch>(),
+      },
+    );
+
+    expect(spiedIssueRequest).toHaveBeenCalledWith(
+      `${MOCKED_ACCESS_ISSUER}/issue`,
+      expect.objectContaining({
+        providedConsent: {
+          mode: ["http://www.w3.org/ns/auth/acl#Append"],
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          forPersonalData: ["https://some-custom.resource"],
+          isProvidedTo: "https://some-custom.requestor",
+          forPurpose: ["https://some-custom.purpose"],
+        },
+        id: "https://id.some-custom-owner.com/owner",
+      }),
+      expect.objectContaining({
+        type: ["SolidAccessGrant"],
+      }),
+      expect.anything(),
+    );
+  });
+
   it("normalizes equivalent JSON-LD VCs", async () => {
     mockAcpClient();
     mockAccessApiEndpoint();
