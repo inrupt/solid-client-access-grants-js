@@ -307,6 +307,7 @@ export async function approveAccessRequest(
   );
 
   const grantBodyParams: AccessGrantParameters = {
+    owner: internalGrantOptions.owner,
     access: internalGrantOptions.access,
     requestor: internalGrantOptions.requestor,
     resources: internalGrantOptions.resources,
