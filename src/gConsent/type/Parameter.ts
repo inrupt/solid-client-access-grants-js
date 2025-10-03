@@ -46,6 +46,7 @@ export interface AccessRequestParameters extends InputAccessRequestParameters {
 export interface InputAccessGrantParameters extends BaseRequestParameters {
   requestor: UrlString;
   request?: UrlString;
+  verifiedRequest?: UrlString;
 }
 
 export interface AccessGrantParameters extends InputAccessGrantParameters {

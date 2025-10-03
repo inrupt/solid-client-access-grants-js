@@ -87,7 +87,9 @@ function getGConsentAttributes(
     return {
       ...consentAttributes,
       isProvidedTo: (params as AccessGrantParameters).requestor,
+      // Only one of the following two should be defined.
       request: (params as AccessGrantParameters).request,
+      verifiedRequest: (params as AccessGrantParameters).verifiedRequest,
     };
   }
   return {
