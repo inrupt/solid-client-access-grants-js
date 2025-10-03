@@ -16,6 +16,11 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### New feature
+
+- The link between an Access Request and an Access Grant issued using `approveAccessRequest`
+  can now be verified by the server when setting the `verifyLinkedRequest` option to `true`.
+
 ### Breaking Changes
 
 - Support for Node.js v18.x has been dropped as that version has reached end-of-life.
