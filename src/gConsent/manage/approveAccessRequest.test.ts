@@ -1268,6 +1268,46 @@ describe("approveAccessRequest", () => {
     );
   });
 
+  it("issues an access grant with a verified link to the provided request VC", async () => {
+    mockAcpClient();
+    mockAccessApiEndpoint();
+    const mockedVcModule = jest.requireMock(
+      "@inrupt/solid-client-vc",
+    ) as typeof VcClient;
+    const spiedIssueRequest = jest.spyOn(
+      mockedVcModule,
+      "issueVerifiableCredential",
+    );
+    const mockedIssue = jest.spyOn(mockedVcModule, "issueVerifiableCredential");
+    mockedIssue.mockResolvedValueOnce(accessGrantVc);
+    const customRequest = await mockAccessRequestVc();
+    await approveAccessRequest(customRequest, undefined, {
+      fetch: jest.fn<typeof fetch>(),
+      returnLegacyJsonld: false,
+      verifyLinkedRequest: true,
+    });
+
+    expect(spiedIssueRequest).toHaveBeenCalledWith(
+      `${MOCKED_ACCESS_ISSUER}/issue`,
+      expect.objectContaining({
+        providedConsent: {
+          mode: accessRequestVc.credentialSubject.hasConsent.mode,
+          hasStatus: "https://w3id.org/GConsent#ConsentStatusExplicitlyGiven",
+          forPersonalData:
+            accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+          isProvidedTo: accessRequestVc.credentialSubject.id,
+          forPurpose: [],
+          verifiedRequest: customRequest.id,
+        },
+        inbox: accessRequestVc.credentialSubject.inbox,
+      }),
+      expect.objectContaining({
+        type: ["SolidAccessGrant"],
+      }),
+      expect.anything(),
+    );
+  });
+
   it("normalizes equivalent JSON-LD VCs", async () => {
     mockAcpClient();
     mockAccessApiEndpoint();
