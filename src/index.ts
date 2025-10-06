@@ -26,6 +26,7 @@ export type {
   AccessBaseOptions,
   AccessCredentialType,
   AccessGrant,
+  AccessGrantBody,
   AccessGrantContext,
   AccessRequest,
   ApproveAccessRequestOverrides,
@@ -73,14 +74,30 @@ export {
 
 // Add an API object to the exports to allow explicitly relying on the gConsent-based
 // functions even when not relying on named exports.
+/**
+ * @hidden
+ */
 export * as gConsent from "./gConsent";
 
 export { isValidAccessGrant } from "./common/verify";
 
+/**
+ * @hidden
+ */
 export * as common from "./common";
 
 export { fetchWithVc } from "./fetch";
 
+/**
+ * @categoryDescription Using Access Grants
+ * These functions are available for...
+ * @showCategories
+ * @module
+ */
+
+/**
+ * @category Using Access Grants
+ */
 export {
   createContainerInContainer,
   deleteFile,
@@ -91,7 +108,7 @@ export {
   saveFileInContainer,
   saveSolidDatasetAt,
   saveSolidDatasetInContainer,
-} from "./resource";
+} from "./resource/index";
 
 export {
   getAccessModes,

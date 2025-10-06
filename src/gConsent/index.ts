@@ -25,6 +25,7 @@ export type {
 } from "./type/AccessRequest";
 export type { AccessBaseOptions } from "./type/AccessBaseOptions";
 export type { AccessCredentialType } from "./type/AccessCredentialType";
+export type { AccessGrantBody } from "./type/AccessVerifiableCredential";
 export type { AccessGrantContext } from "./type/AccessGrantContext";
 export type { ApproveAccessRequestOverrides } from "./manage/approveAccessRequest";
 export type { IssueAccessRequestParameters } from "./type/IssueAccessRequestParameters";

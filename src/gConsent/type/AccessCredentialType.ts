@@ -20,5 +20,8 @@
 
 import type { ACCESS_CREDENTIAL_TYPE } from "../constants";
 
+/**
+ * @useDeclaredType
+ */
 export type AccessCredentialType =
-  typeof ACCESS_CREDENTIAL_TYPE extends Set<infer T> ? T : never;
+  typeof ACCESS_CREDENTIAL_TYPE extends Readonly<Array<infer T>> ? T : never;

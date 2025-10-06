@@ -120,6 +120,9 @@ export type AccessDeniedBody = BaseGrantBody & {
   };
 };
 
+/**
+ * @useDeclaredType
+ */
 export type AccessGrantBody = BaseGrantBody & {
   credentialSubject: {
     providedConsent: {

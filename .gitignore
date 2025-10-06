@@ -6,10 +6,7 @@ umd
 whitesource/
 LICENSE_DEPENDENCIES
 LICENSE_DEPENDENCIES_ALL
-docs/api/build/
-docs/api/source/api/
-docs/api/docs-assets/
-docs/dist/
+docs/api/
 examples/solid-client-access-grants-demo/static/javascript/
 .env*.local
 .cache
