@@ -165,6 +165,7 @@ export async function approveAccessRequest(
   requestOverride: Partial<ApproveAccessRequestOverrides>,
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
+    verifyLinkedRequest?: boolean;
   },
 ): Promise<DatasetWithId>;
 
@@ -221,6 +222,7 @@ export async function approveAccessRequest(
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
+    verifyLinkedRequest?: boolean;
   },
 ): Promise<DatasetWithId>;
 
@@ -240,6 +242,7 @@ export async function approveAccessRequest(
   requestOverride: ApproveAccessRequestOverrides,
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
+    verifyLinkedRequest?: boolean;
   },
 ): Promise<DatasetWithId>;
 /**
@@ -281,7 +284,8 @@ export async function approveAccessRequest(
 export async function approveAccessRequest(
   requestVc: DatasetWithId | VerifiableCredential | URL | UrlString | undefined,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
-  options: AccessBaseOptions & WithLegacyJsonFlag = {},
+  options: AccessBaseOptions &
+    WithLegacyJsonFlag & { verifyLinkedRequest?: boolean } = {},
 ): Promise<DatasetWithId> {
   const internalOptions = {
     ...options,
@@ -302,21 +306,29 @@ export async function approveAccessRequest(
     requestOverride,
   );
 
-  const grantBody = getGrantBody(
-    {
-      access: internalGrantOptions.access,
-      requestor: internalGrantOptions.requestor,
-      resources: internalGrantOptions.resources,
-      requestorInboxUrl: internalGrantOptions.requestorInboxUrl,
-      purpose: internalGrantOptions.purpose,
-      issuanceDate: internalGrantOptions.issuanceDate,
-      expirationDate: internalGrantOptions.expirationDate ?? undefined,
-      status: gc.ConsentStatusExplicitlyGiven.value,
-      inherit: internalGrantOptions.inherit,
-      request: internalGrantOptions.request,
-    },
-    { customFields: internalGrantOptions.customFields },
-  );
+  const grantBodyParams: AccessGrantParameters = {
+    owner: internalGrantOptions.owner,
+    access: internalGrantOptions.access,
+    requestor: internalGrantOptions.requestor,
+    resources: internalGrantOptions.resources,
+    requestorInboxUrl: internalGrantOptions.requestorInboxUrl,
+    purpose: internalGrantOptions.purpose,
+    issuanceDate: internalGrantOptions.issuanceDate,
+    expirationDate: internalGrantOptions.expirationDate ?? undefined,
+    status: gc.ConsentStatusExplicitlyGiven.value,
+    inherit: internalGrantOptions.inherit,
+  };
+
+  // Default to unverified request for backwards compatibility.
+  if (options.verifyLinkedRequest === true) {
+    grantBodyParams.verifiedRequest = internalGrantOptions.request;
+  } else {
+    grantBodyParams.request = internalGrantOptions.request;
+  }
+
+  const grantBody = getGrantBody(grantBodyParams, {
+    customFields: internalGrantOptions.customFields,
+  });
 
   const grantedAccess = getAccessModesFromAccessGrant(grantBody);
 

@@ -87,7 +87,9 @@ function getGConsentAttributes(
     return {
       ...consentAttributes,
       isProvidedTo: (params as AccessGrantParameters).requestor,
+      // Only one of the following two should be defined.
       request: (params as AccessGrantParameters).request,
+      verifiedRequest: (params as AccessGrantParameters).verifiedRequest,
     };
   }
   return {
@@ -135,6 +137,7 @@ function getBaseBody(
       ...body,
       credentialSubject: {
         ...body.credentialSubject,
+        id: (params as AccessGrantParameters).owner,
         providedConsent: getGConsentAttributes(
           params as AccessGrantParameters,
           type,

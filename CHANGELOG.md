@@ -16,6 +16,16 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### New feature
+
+- The link between an Access Request and an Access Grant issued using `approveAccessRequest`
+  can now be verified by the server when setting the `verifyLinkedRequest` option to `true`.
+- `approveAccessRequest` and `issueAccessGrant` now support an additional `owner`
+  parameter in the Access Grant body overrides. Setting this will include a
+  custom resource owner in the Access Grant issuing request. This allows an admin
+  to issue Access Grants on behalf of a user at provisioning time. This parameter
+  will be ignored by the server for sessions that have been activated already.
+
 ### Breaking Changes
 
 - Support for Node.js v18.x has been dropped as that version has reached end-of-life.
