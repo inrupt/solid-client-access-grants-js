@@ -79,6 +79,8 @@ export function initializeGrantParameters(
           // approveAccessRequest.
         } as InitializedGrantsParameter)
       : {
+          // If not explicitly overridden, the Access Grant owner will be set by the server.
+          owner: requestOverride?.owner,
           requestor:
             requestOverride?.requestor ?? getCredentialSubject(requestVc).value,
           access: requestOverride?.access ?? getAccessModes(requestVc),

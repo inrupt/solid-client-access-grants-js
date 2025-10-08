@@ -377,70 +377,79 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         });
 
         it("can issue an access grant overriding an access request", async () => {
-          const startTime = Date.now();
-          const expirationMs = startTime + 25 * 60 * 1000;
-          const grant = await approveAccessRequest(
-            sharedRequest,
-            {
-              // Only grant a subset of the required access.
-              access: { read: true },
-              requestor: requestorSession.info.webId as string,
-              resources: [sharedFileIri],
-              // Remove the expiration date from the grant.
-              expirationDate: new Date(expirationMs),
-            },
-            {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-              accessEndpoint: vcProvider,
-            },
-          );
+          try {
+            const startTime = Date.now();
+            const expirationMs = startTime + 25 * 60 * 1000;
+            const grant = await approveAccessRequest(
+              sharedRequest,
+              {
+                // Only grant a subset of the required access.
+                access: { read: true },
+                requestor: requestorSession.info.webId as string,
+                resources: [sharedFileIri],
+                // Remove the expiration date from the grant.
+                expirationDate: new Date(expirationMs),
+              },
+              {
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                accessEndpoint: vcProvider,
+              },
+            );
 
-          await expect(
-            isValidAccessGrant(grant, {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-              verificationEndpoint: verifierService,
-            }),
-          ).resolves.toMatchObject({ errors: [] });
-          expect(
-            grant.expirationDate && Date.parse(grant.expirationDate),
-          ).toEqual(expirationMs);
-          expect(getExpirationDate(grant)).toEqual(new Date(expirationMs));
-          expect(["http://www.w3.org/ns/auth/acl#Read", "Read"]).toContain(
-            grant.credentialSubject.providedConsent.mode[0],
-          );
-          expect(getAccessModes(grant)).toEqual({
-            read: true,
-            append: false,
-            write: false,
-          });
-          expect(getResources(grant)).toEqual([sharedFileIri]);
-          expect(getRequestor(grant)).toEqual(requestorSession.info.webId);
-          expect(getResourceOwner(grant)).toEqual(ownerSession.info.webId);
+            await expect(
+              isValidAccessGrant(grant, {
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                verificationEndpoint: verifierService,
+              }),
+            ).resolves.toMatchObject({ errors: [] });
+            expect(
+              grant.expirationDate && Date.parse(grant.expirationDate),
+            ).toEqual(expirationMs);
+            expect(getExpirationDate(grant)).toEqual(new Date(expirationMs));
+            expect(["http://www.w3.org/ns/auth/acl#Read", "Read"]).toContain(
+              grant.credentialSubject.providedConsent.mode[0],
+            );
+            expect(getAccessModes(grant)).toEqual({
+              read: true,
+              append: false,
+              write: false,
+            });
+            expect(getResources(grant)).toEqual([sharedFileIri]);
+            expect(getRequestor(grant)).toEqual(requestorSession.info.webId);
+            expect(getResourceOwner(grant)).toEqual(ownerSession.info.webId);
 
-          for (const type of [
-            "http://www.w3.org/ns/solid/vc#SolidAccessGrant",
-            "SolidAccessGrant",
-            "https://www.w3.org/2018/credentials#VerifiableCredential",
-            "VerifiableCredential",
-          ]) {
-            expect(getTypes(grant)).toContain(type);
+            for (const type of [
+              "http://www.w3.org/ns/solid/vc#SolidAccessGrant",
+              "SolidAccessGrant",
+              "https://www.w3.org/2018/credentials#VerifiableCredential",
+              "VerifiableCredential",
+            ]) {
+              expect(getTypes(grant)).toContain(type);
+            }
+
+            // Check the issuance date is within 2 minutes of the start of this test
+            // expect(getIssuanceDate(grant).valueOf()).toBeGreaterThan(
+            //   startTime -
+            //     1000 /* subtract 1000ms to allow for clock drift in testing infrastructure */,
+            // );
+            expect(getIssuanceDate(grant).valueOf()).toBeLessThan(
+              startTime + 2 * 60 * 1000,
+            );
+
+            expect(getIssuer(grant)).toEqual(vcProvider);
+            expect(getInherit(grant)).toBe(true);
+            expect(getPurposes(grant)).toEqual([
+              "https://some.purpose/not-a-nefarious-one/i-promise",
+              "https://some.other.purpose/",
+            ]);
+          } catch (e) {
+            if (e instanceof Error && hasErrorResponse(e)) {
+              console.error(
+                `${e.message} (${e.response.status}: ${e.response.statusText} ${e.response.body})`,
+              );
+              throw new Error("Test failed");
+            }
           }
-
-          // Check the issuance date is within 2 minutes of the start of this test
-          // expect(getIssuanceDate(grant).valueOf()).toBeGreaterThan(
-          //   startTime -
-          //     1000 /* subtract 1000ms to allow for clock drift in testing infrastructure */,
-          // );
-          expect(getIssuanceDate(grant).valueOf()).toBeLessThan(
-            startTime + 2 * 60 * 1000,
-          );
-
-          expect(getIssuer(grant)).toEqual(vcProvider);
-          expect(getInherit(grant)).toBe(true);
-          expect(getPurposes(grant)).toEqual([
-            "https://some.purpose/not-a-nefarious-one/i-promise",
-            "https://some.other.purpose/",
-          ]);
         });
 
         it("can issue a non-recursive access grant", async () => {
