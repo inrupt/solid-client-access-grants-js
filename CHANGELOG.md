@@ -16,6 +16,12 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+## [4.0.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v4.0.0) - 2025-10-08
+
+### Breaking Changes
+
+- Support for Node.js v18.x has been dropped as that version has reached end-of-life.
+
 ### New feature
 
 - The link between an Access Request and an Access Grant issued using `approveAccessRequest`
@@ -25,10 +31,6 @@ The following changes are pending, and will be applied on the next major release
   custom resource owner in the Access Grant issuing request. This allows an admin
   to issue Access Grants on behalf of a user at provisioning time. This parameter
   will be ignored by the server for sessions that have been activated already.
-
-### Breaking Changes
-
-- Support for Node.js v18.x has been dropped as that version has reached end-of-life.
 
 ## [3.3.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v3.3.1) - 2025-06-12
 
