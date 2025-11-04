@@ -16,6 +16,11 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+## [4.0.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v4.0.1) - 2025-11-04
+
+This patch release aims at exercising the new release pipeline (see https://github.blog/changelog/2025-09-29-strengthening-npm-security-important-changes-to-authentication-and-token-management/).
+There are some dev dependencies update which do not impact downstream consumers.
+
 ## [4.0.0](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v4.0.0) - 2025-10-08
 
 ### Breaking Changes
