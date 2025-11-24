@@ -22,7 +22,7 @@ jobs:
         environment-name: ["ESS PodSpaces", "ESS Release-2-3", "ESS Next"]
         experimental: [false]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
         with:
