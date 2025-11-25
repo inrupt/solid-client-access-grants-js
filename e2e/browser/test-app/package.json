@@ -16,15 +16,15 @@
     "start": "next start"
   },
   "dependencies": {
-    "@inrupt/internal-playwright-testids": "^4.0.5",
+    "@inrupt/internal-playwright-testids": "^4.0.8",
     "@inrupt/solid-client": "^2.0.0",
     "@inrupt/solid-client-access-grants": "file:../../../",
     "@inrupt/solid-client-authn-browser": "^2.0.0",
-    "next": "^16.0.1",
+    "next": "^16.0.4",
     "react": "^19.2.0"
   },
   "devDependencies": {
-    "@types/react": "^19.2.2",
+    "@types/react": "^19.2.7",
     "typescript": "^5.3.3"
   }
 }
