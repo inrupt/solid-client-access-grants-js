@@ -36,6 +36,7 @@ export {
   getRequestor,
   getResourceOwner,
   getResources,
+  getTemplates,
   getTypes,
   getPurposes,
   getCredentialSubject,
