@@ -13,6 +13,10 @@ The following changes are pending, and will be applied on the next major release
   be replaced by a regular import of the library, and the latter can be replaced
   with the equivalent non-gConsent submodules (e.g. `gConsent/manage` can be replaced
   with `manage`). There is no functionality change between the two.
+- An access request can now be created with URL template values which can be mapped
+  to absolute URIs when approving an access request via `approveAccessRequest`.
+- For access requests that use templates, the `resourceOwner` request parameter is
+  optional.
 
 ## Unreleased
 
