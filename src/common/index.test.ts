@@ -50,6 +50,7 @@ describe("Index exports", () => {
       "getRequestor",
       "getResourceOwner",
       "getResources",
+      "getTemplates",
       "getTypes",
       "getPurposes",
       "getCredentialSubject",

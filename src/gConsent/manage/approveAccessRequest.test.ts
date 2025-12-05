@@ -1591,5 +1591,159 @@ describe("approveAccessRequest", () => {
         expect.anything(),
       );
     });
+
+    it("uses templateMapper to convert templates to resources", async () => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcClient;
+      const spiedIssueRequest = jest.spyOn(
+        mockedVcModule,
+        "issueVerifiableCredential",
+      );
+      spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+
+      const requestWithTemplates = await mockAccessRequestVc({
+        templates: [
+          "https://some.pod/data-{id}",
+          "https://some.pod/user-{userId}/file-{fileId}",
+        ],
+      });
+
+      const templateMapper = jest.fn((templates: string[]) => {
+        return templates.map((t) =>
+          t.replace("{id}", "123").replace("{userId}", "user1").replace("{fileId}", "file1"),
+        );
+      });
+
+      // Mock ACP client for existing resource + 2 mapped resources (3 total)
+      mockAcpClient({
+        initialResource: mockedInitialResource,
+        updatedResource: mockedUpdatedResource,
+      });
+      mockAcpClient({
+        initialResource: mockedInitialResource,
+        updatedResource: mockedUpdatedResource,
+      });
+      mockAcpClient({
+        initialResource: mockedInitialResource,
+        updatedResource: mockedUpdatedResource,
+      });
+
+      await approveAccessRequest(requestWithTemplates, undefined, {
+        fetch: jest.fn<typeof fetch>(),
+        templateMapper,
+      });
+
+      expect(templateMapper).toHaveBeenCalledWith([
+        "https://some.pod/data-{id}",
+        "https://some.pod/user-{userId}/file-{fileId}",
+      ]);
+
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          providedConsent: expect.objectContaining({
+            forPersonalData: expect.arrayContaining([
+              "https://some.pod/data-123",
+              "https://some.pod/user-user1/file-file1",
+            ]),
+          }),
+        }),
+        expect.anything(),
+        expect.anything(),
+      );
+    });
+
+    it("combines existing resources with mapped templates", async () => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcClient;
+      const spiedIssueRequest = jest.spyOn(
+        mockedVcModule,
+        "issueVerifiableCredential",
+      );
+      spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+
+      const requestWithTemplates = await mockAccessRequestVc({
+        templates: ["https://some.pod/data-{id}"],
+      });
+
+      // Mock ACP client for existing resource
+      mockAcpClient({
+        initialResource: mockedInitialResource,
+        updatedResource: mockedUpdatedResource,
+      });
+      // Mock ACP client for mapped resource
+      mockAcpClient({
+        initialResource: mockedInitialResource,
+        updatedResource: mockedUpdatedResource,
+      });
+
+      await approveAccessRequest(requestWithTemplates, undefined, {
+        fetch: jest.fn<typeof fetch>(),
+        templateMapper: async (templates) => {
+          return templates.map((t) => t.replace("{id}", "456"));
+        },
+      });
+
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          providedConsent: expect.objectContaining({
+            forPersonalData: expect.arrayContaining([
+              ...accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+              "https://some.pod/data-456",
+            ]),
+          }),
+        }),
+        expect.anything(),
+        expect.anything(),
+      );
+    });
+
+    it("does not include template property in the access grant", async () => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcClient;
+      const spiedIssueRequest = jest.spyOn(
+        mockedVcModule,
+        "issueVerifiableCredential",
+      );
+      spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+
+      const requestWithTemplates = await mockAccessRequestVc({
+        templates: ["https://some.pod/data-{id}"],
+      });
+
+      // Mock ACP client for existing resource
+      mockAcpClient({
+        initialResource: mockedInitialResource,
+        updatedResource: mockedUpdatedResource,
+      });
+      // Mock ACP client for mapped resource
+      mockAcpClient({
+        initialResource: mockedInitialResource,
+        updatedResource: mockedUpdatedResource,
+      });
+
+      await approveAccessRequest(requestWithTemplates, undefined, {
+        fetch: jest.fn<typeof fetch>(),
+        templateMapper: (templates) => templates.map((t) => t.replace("{id}", "789")),
+      });
+
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          providedConsent: expect.not.objectContaining({
+            template: expect.anything(),
+          }),
+        }),
+        expect.anything(),
+        expect.anything(),
+      );
+    });
   });
 });

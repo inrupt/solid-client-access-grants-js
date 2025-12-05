@@ -38,7 +38,7 @@ export interface BaseRequestParameters {
 }
 
 export interface InputAccessRequestParameters extends BaseRequestParameters {
-  resourceOwner: UrlString;
+  resourceOwner?: UrlString;
 }
 export interface AccessRequestParameters extends InputAccessRequestParameters {
   status: typeof gc.ConsentStatusRequested.value;
