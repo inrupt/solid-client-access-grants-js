@@ -92,10 +92,15 @@ function getGConsentAttributes(
       verifiedRequest: (params as AccessGrantParameters).verifiedRequest,
     };
   }
-  return {
+  const requestParams = params as AccessRequestParameters;
+  const requestAttributes: GConsentRequestAttributes = {
     ...consentAttributes,
-    isConsentForDataSubject: (params as AccessRequestParameters).resourceOwner,
+    isConsentForDataSubject: requestParams.resourceOwner,
   };
+  if (requestParams.templates !== undefined) {
+    requestAttributes.template = requestParams.templates;
+  }
+  return requestAttributes;
 }
 
 function getBaseBody(

@@ -30,6 +30,7 @@ export interface BaseRequestParameters {
   access: AccessModes;
   requestorInboxUrl?: UrlString;
   resources: Array<UrlString>;
+  templates?: Array<string>;
   purpose?: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;
@@ -43,7 +44,8 @@ export interface AccessRequestParameters extends InputAccessRequestParameters {
   status: typeof gc.ConsentStatusRequested.value;
 }
 
-export interface InputAccessGrantParameters extends BaseRequestParameters {
+export interface InputAccessGrantParameters
+  extends Omit<BaseRequestParameters, "templates"> {
   /**
    * WebID of the resource owner. If the request is not issued by an admin,
    * this is overridden by the server to the identity of the agent issuing

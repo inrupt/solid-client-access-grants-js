@@ -26,6 +26,7 @@ const { namedNode } = DataFactory;
 const GC = "https://w3id.org/GConsent#";
 const VC = "http://www.w3.org/ns/solid/vc#";
 const XSD = "http://www.w3.org/2001/XMLSchema#";
+const HYDRA = "http://www.w3.org/ns/hydra/core#";
 
 export const XSD_BOOLEAN = namedNode(`${XSD}boolean`);
 
@@ -52,6 +53,10 @@ export const gc = {
   ConsentStatusDenied: namedNode(`${GC}ConsentStatusDenied`),
   ConsentStatusExplicitlyGiven: namedNode(`${GC}ConsentStatusExplicitlyGiven`),
   ConsentStatusRequested: namedNode(`${GC}ConsentStatusRequested`),
+};
+
+export const hydra = {
+  template: namedNode(`${HYDRA}template`),
 };
 
 export const acl = {

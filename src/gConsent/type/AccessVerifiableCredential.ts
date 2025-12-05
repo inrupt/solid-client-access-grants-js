@@ -46,6 +46,7 @@ export type GConsentGrantAttributes = GConsentAttributes & {
 
 export type GConsentRequestAttributes = GConsentAttributes & {
   isConsentForDataSubject?: UrlString;
+  template?: string[];
 };
 
 export type CredentialSubject = {
