@@ -36,7 +36,16 @@ import type {
 import { DataFactory } from "n3";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessModes } from "../type/AccessModes";
-import { INHERIT, TYPE, XSD_BOOLEAN, acl, gc, hydra, ldp, solidVc } from "./constants";
+import {
+  INHERIT,
+  TYPE,
+  XSD_BOOLEAN,
+  acl,
+  gc,
+  hydra,
+  ldp,
+  solidVc,
+} from "./constants";
 import { AccessGrantError } from "./errors/AccessGrantError";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;

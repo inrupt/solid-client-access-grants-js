@@ -1612,7 +1612,10 @@ describe("approveAccessRequest", () => {
 
       const templateMapper = jest.fn((templates: string[]) => {
         return templates.map((t) =>
-          t.replace("{id}", "123").replace("{userId}", "user1").replace("{fileId}", "file1"),
+          t
+            .replace("{id}", "123")
+            .replace("{userId}", "user1")
+            .replace("{fileId}", "file1"),
         );
       });
 
@@ -1731,7 +1734,8 @@ describe("approveAccessRequest", () => {
 
       await approveAccessRequest(requestWithTemplates, undefined, {
         fetch: jest.fn<typeof fetch>(),
-        templateMapper: (templates) => templates.map((t) => t.replace("{id}", "789")),
+        templateMapper: (templates) =>
+          templates.map((t) => t.replace("{id}", "789")),
       });
 
       expect(spiedIssueRequest).toHaveBeenCalledWith(

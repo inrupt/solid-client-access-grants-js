@@ -167,7 +167,9 @@ export async function approveAccessRequest(
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
     verifyLinkedRequest?: boolean;
-    templateMapper?: (templates: string[]) => UrlString[] | Promise<UrlString[]>;
+    templateMapper?: (
+      templates: string[],
+    ) => UrlString[] | Promise<UrlString[]>;
   },
 ): Promise<DatasetWithId>;
 
@@ -197,7 +199,9 @@ export async function approveAccessRequest(
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
-    templateMapper?: (templates: string[]) => UrlString[] | Promise<UrlString[]>;
+    templateMapper?: (
+      templates: string[],
+    ) => UrlString[] | Promise<UrlString[]>;
   },
 ): Promise<AccessGrant>;
 
@@ -228,7 +232,9 @@ export async function approveAccessRequest(
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
     verifyLinkedRequest?: boolean;
-    templateMapper?: (templates: string[]) => UrlString[] | Promise<UrlString[]>;
+    templateMapper?: (
+      templates: string[],
+    ) => UrlString[] | Promise<UrlString[]>;
   },
 ): Promise<DatasetWithId>;
 
@@ -249,7 +255,9 @@ export async function approveAccessRequest(
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
     verifyLinkedRequest?: boolean;
-    templateMapper?: (templates: string[]) => UrlString[] | Promise<UrlString[]>;
+    templateMapper?: (
+      templates: string[],
+    ) => UrlString[] | Promise<UrlString[]>;
   },
 ): Promise<DatasetWithId>;
 /**
@@ -269,7 +277,9 @@ export async function approveAccessRequest(
   requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
-    templateMapper?: (templates: string[]) => UrlString[] | Promise<UrlString[]>;
+    templateMapper?: (
+      templates: string[],
+    ) => UrlString[] | Promise<UrlString[]>;
   },
 ): Promise<AccessGrant>;
 /**
@@ -287,9 +297,12 @@ export async function approveAccessRequest(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
-  options?: AccessBaseOptions & WithLegacyJsonFlag & {
-    templateMapper?: (templates: string[]) => UrlString[] | Promise<UrlString[]>;
-  },
+  options?: AccessBaseOptions &
+    WithLegacyJsonFlag & {
+      templateMapper?: (
+        templates: string[],
+      ) => UrlString[] | Promise<UrlString[]>;
+    },
 ): Promise<DatasetWithId>;
 export async function approveAccessRequest(
   requestVc: DatasetWithId | VerifiableCredential | URL | UrlString | undefined,
@@ -297,7 +310,9 @@ export async function approveAccessRequest(
   options: AccessBaseOptions &
     WithLegacyJsonFlag & {
       verifyLinkedRequest?: boolean;
-      templateMapper?: (templates: string[]) => UrlString[] | Promise<UrlString[]>;
+      templateMapper?: (
+        templates: string[],
+      ) => UrlString[] | Promise<UrlString[]>;
     } = {},
 ): Promise<DatasetWithId> {
   const internalOptions = {

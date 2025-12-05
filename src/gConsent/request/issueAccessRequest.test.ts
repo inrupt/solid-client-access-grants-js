@@ -151,10 +151,12 @@ describe("getRequestBody", () => {
       "https://some.pod/data-{id}",
       "https://some.pod/user-{userId}/file-{fileId}",
     ]);
-    expect(requestBody.credentialSubject.hasConsent.forPersonalData).toEqual([]);
-    expect(requestBody.credentialSubject.hasConsent.isConsentForDataSubject).toBe(
-      MOCK_RESOURCE_OWNER_IRI,
+    expect(requestBody.credentialSubject.hasConsent.forPersonalData).toEqual(
+      [],
     );
+    expect(
+      requestBody.credentialSubject.hasConsent.isConsentForDataSubject,
+    ).toBe(MOCK_RESOURCE_OWNER_IRI);
   });
 
   it("can generate a request body with only templates and no isConsentForDataSubject", () => {
@@ -169,7 +171,9 @@ describe("getRequestBody", () => {
     expect(requestBody.credentialSubject.hasConsent.template).toEqual([
       "https://some.pod/data-{id}",
     ]);
-    expect(requestBody.credentialSubject.hasConsent.forPersonalData).toEqual([]);
+    expect(requestBody.credentialSubject.hasConsent.forPersonalData).toEqual(
+      [],
+    );
     expect(
       requestBody.credentialSubject.hasConsent.isConsentForDataSubject,
     ).toBeUndefined();
