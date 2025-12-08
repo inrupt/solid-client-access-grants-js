@@ -1619,22 +1619,9 @@ describe("approveAccessRequest", () => {
         );
       });
 
-      // Mock ACP client for existing resource + 2 mapped resources (3 total)
-      mockAcpClient({
-        initialResource: mockedInitialResource,
-        updatedResource: mockedUpdatedResource,
-      });
-      mockAcpClient({
-        initialResource: mockedInitialResource,
-        updatedResource: mockedUpdatedResource,
-      });
-      mockAcpClient({
-        initialResource: mockedInitialResource,
-        updatedResource: mockedUpdatedResource,
-      });
-
       await approveAccessRequest(requestWithTemplates, undefined, {
         fetch: jest.fn<typeof fetch>(),
+        updateAcr: false,
         templateMapper,
       });
 
@@ -1673,19 +1660,9 @@ describe("approveAccessRequest", () => {
         templates: ["https://some.pod/data-{id}"],
       });
 
-      // Mock ACP client for existing resource
-      mockAcpClient({
-        initialResource: mockedInitialResource,
-        updatedResource: mockedUpdatedResource,
-      });
-      // Mock ACP client for mapped resource
-      mockAcpClient({
-        initialResource: mockedInitialResource,
-        updatedResource: mockedUpdatedResource,
-      });
-
       await approveAccessRequest(requestWithTemplates, undefined, {
         fetch: jest.fn<typeof fetch>(),
+        updateAcr: false,
         templateMapper: async (templates) => {
           return templates.map((t) => t.replace("{id}", "456"));
         },
@@ -1721,19 +1698,9 @@ describe("approveAccessRequest", () => {
         templates: ["https://some.pod/data-{id}"],
       });
 
-      // Mock ACP client for existing resource
-      mockAcpClient({
-        initialResource: mockedInitialResource,
-        updatedResource: mockedUpdatedResource,
-      });
-      // Mock ACP client for mapped resource
-      mockAcpClient({
-        initialResource: mockedInitialResource,
-        updatedResource: mockedUpdatedResource,
-      });
-
       await approveAccessRequest(requestWithTemplates, undefined, {
         fetch: jest.fn<typeof fetch>(),
+        updateAcr: false,
         templateMapper: (templates) =>
           templates.map((t) => t.replace("{id}", "789")),
       });

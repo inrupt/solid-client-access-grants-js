@@ -167,9 +167,7 @@ export async function approveAccessRequest(
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
     verifyLinkedRequest?: boolean;
-    templateMapper?: (
-      templates: string[],
-    ) => UrlString[] | Promise<UrlString[]>;
+    templateMapper?: (templates: string[]) => UrlString[];
   },
 ): Promise<DatasetWithId>;
 
