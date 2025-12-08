@@ -133,7 +133,7 @@
   "dependencies": {
     "@inrupt/solid-client": "^2.0.0",
     "@inrupt/solid-client-errors": "^0.0.3",
-    "@inrupt/solid-client-vc": "^1.2.0",
+    "@inrupt/solid-client-vc": "^2.0.0",
     "@types/rdfjs__dataset": "^2.0.7",
     "auth-header": "^1.0.0",
     "base64url": "^3.0.1",
