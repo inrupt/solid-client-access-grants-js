@@ -1663,7 +1663,7 @@ describe("approveAccessRequest", () => {
       await approveAccessRequest(requestWithTemplates, undefined, {
         fetch: jest.fn<typeof fetch>(),
         updateAcr: false,
-        templateMapper: async (templates) => {
+        templateMapper: (templates) => {
           return templates.map((t) => t.replace("{id}", "456"));
         },
       });
@@ -1681,6 +1681,37 @@ describe("approveAccessRequest", () => {
         expect.anything(),
         expect.anything(),
       );
+    });
+
+    it("throws if all templates are not mapped", async () => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcClient;
+      const spiedIssueRequest = jest.spyOn(
+        mockedVcModule,
+        "issueVerifiableCredential",
+      );
+      spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+
+      const requestWithTemplates = await mockAccessRequestVc({
+        templates: [
+          "https://some.pod/data-{id}",
+          "https://some.pod/data2-{id}",
+          "https://some.pod/data3-{id}",
+        ],
+      });
+
+      await expect(() =>
+        approveAccessRequest(requestWithTemplates, undefined, {
+          fetch: jest.fn<typeof fetch>(),
+          updateAcr: false,
+          templateMapper: (templates) => {
+            // This mapper drops some templates
+            return templates.map((t) => t.replace("{id}", "456")).slice(0, 1);
+          },
+        }),
+      ).rejects.toThrow();
     });
 
     it("does not include template property in the access grant", async () => {
