@@ -16,6 +16,13 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### Patch changes
+
+- Support `gc:isProvidedTo` alternatives An Access Grant consent has three valid predicates
+  to express the link to the recepient: `gc:isProvidedTo`, `gc:isProvidedToPerson` and 
+  `gc:isProvidedToPerson`. The library was making an assumption validating a received Access
+  Grant that only `gc:isProvidedTo` was valid. All three are now supported.
+
 ## [4.0.1](https://github.com/inrupt/solid-client-access-grants-js/releases/tag/v4.0.1) - 2025-11-04
 
 This patch release aims at exercising the new release pipeline (see https://github.blog/changelog/2025-09-29-strengthening-npm-security-important-changes-to-authentication-and-token-management/).
