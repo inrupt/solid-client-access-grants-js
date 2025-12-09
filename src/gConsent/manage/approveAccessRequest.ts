@@ -197,9 +197,7 @@ export async function approveAccessRequest(
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
-    templateMapper?: (
-      templates: string[],
-    ) => UrlString[] | Promise<UrlString[]>;
+    templateMapper?: (templates: string[]) => UrlString[];
   },
 ): Promise<AccessGrant>;
 
@@ -230,9 +228,7 @@ export async function approveAccessRequest(
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
     verifyLinkedRequest?: boolean;
-    templateMapper?: (
-      templates: string[],
-    ) => UrlString[] | Promise<UrlString[]>;
+    templateMapper?: (templates: string[]) => UrlString[];
   },
 ): Promise<DatasetWithId>;
 
@@ -253,9 +249,7 @@ export async function approveAccessRequest(
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
     verifyLinkedRequest?: boolean;
-    templateMapper?: (
-      templates: string[],
-    ) => UrlString[] | Promise<UrlString[]>;
+    templateMapper?: (templates: string[]) => UrlString[];
   },
 ): Promise<DatasetWithId>;
 /**
@@ -275,9 +269,7 @@ export async function approveAccessRequest(
   requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
-    templateMapper?: (
-      templates: string[],
-    ) => UrlString[] | Promise<UrlString[]>;
+    templateMapper?: (templates: string[]) => UrlString[];
   },
 ): Promise<AccessGrant>;
 /**
@@ -297,9 +289,7 @@ export async function approveAccessRequest(
   requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions &
     WithLegacyJsonFlag & {
-      templateMapper?: (
-        templates: string[],
-      ) => UrlString[] | Promise<UrlString[]>;
+      templateMapper?: (templates: string[]) => UrlString[];
     },
 ): Promise<DatasetWithId>;
 export async function approveAccessRequest(
@@ -308,9 +298,7 @@ export async function approveAccessRequest(
   options: AccessBaseOptions &
     WithLegacyJsonFlag & {
       verifyLinkedRequest?: boolean;
-      templateMapper?: (
-        templates: string[],
-      ) => UrlString[] | Promise<UrlString[]>;
+      templateMapper?: (templates: string[]) => UrlString[];
     } = {},
 ): Promise<DatasetWithId> {
   const internalOptions = {
@@ -339,9 +327,14 @@ export async function approveAccessRequest(
     internalGrantOptions.templates &&
     internalGrantOptions.templates.length > 0
   ) {
-    const mappedResources = await options.templateMapper(
+    const mappedResources = options.templateMapper(
       internalGrantOptions.templates,
     );
+    if (mappedResources.length !== internalGrantOptions.templates.length) {
+      throw new Error(
+        `Instantiating some templates failed: got (${mappedResources.length}) when expecting (${internalGrantOptions.templates})`,
+      );
+    }
     resources = [...resources, ...mappedResources];
   }
 
