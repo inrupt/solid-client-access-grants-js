@@ -235,15 +235,36 @@ export function isGConsentAccessGrant(vc: DatasetWithId): boolean {
     false,
   );
 
-  return (
-    gcStatus !== undefined &&
-    (vc.has(quad(providedConsent, gc.hasStatus, gc.ConsentStatusDenied)) ||
-      vc.has(
-        quad(providedConsent, gc.hasStatus, gc.ConsentStatusExplicitlyGiven),
-      )) &&
-    getSingleObject(vc, providedConsent, gc.isProvidedTo, undefined, false)
-      ?.termType === "NamedNode"
+  let isValid = gcStatus !== undefined;
+  const validStatusQuads = [
+    quad(providedConsent, gc.hasStatus, gc.ConsentStatusDenied),
+    quad(providedConsent, gc.hasStatus, gc.ConsentStatusExplicitlyGiven),
+  ];
+  isValid &&= validStatusQuads.some((validStatusQuad) =>
+    vc.has(validStatusQuad),
   );
+  const candidateProvidedPredicates = [
+    getSingleObject(vc, providedConsent, gc.isProvidedTo, undefined, false),
+    getSingleObject(
+      vc,
+      providedConsent,
+      gc.isProvidedToController,
+      undefined,
+      false,
+    ),
+    getSingleObject(
+      vc,
+      providedConsent,
+      gc.isProvidedToPerson,
+      undefined,
+      false,
+    ),
+  ];
+  // One of the three isProvidedTo variants must be present.
+  isValid &&= candidateProvidedPredicates.some(
+    (candidate) => candidate?.termType === "NamedNode",
+  );
+  return isValid;
 }
 
 /**
