@@ -48,6 +48,7 @@ import {
   getCustomString,
   getTypes,
   getRequest,
+  isGConsentAccessGrant,
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
 import { TYPE, gc, hydra, solidVc } from "./constants";
@@ -1051,6 +1052,44 @@ describe("getters", () => {
       expect(wrappedConsentRequest.getRequest()).toStrictEqual(
         getRequest(mockedGConsentRequest),
       );
+    });
+  });
+
+  describe("isGConsentAccessGrant", () => {
+    it("rejects credentials with an unknown status", async () => {
+      const invalidStatusGrant = await mockGConsentGrant(undefined, (grant) => {
+        grant.credentialSubject.providedConsent.hasStatus =
+          "https://example.org/some-unknown-status";
+      });
+      expect(isGConsentAccessGrant(invalidStatusGrant)).toBe(false);
+    });
+
+    it("rejects credentials with an providedTo predicate", async () => {
+      const providedToPersonGrant = await mockGConsentGrant(
+        undefined,
+        (grant) => {
+          grant.credentialSubject.providedConsent.isProvidedTo = undefined;
+          grant.credentialSubject.providedConsent.isProvidedToPerson =
+            "https://example.org/some-recipient";
+        },
+      );
+      expect(isGConsentAccessGrant(providedToPersonGrant)).toBe(true);
+      const providedToControllerGrant = await mockGConsentGrant(
+        undefined,
+        (grant) => {
+          grant.credentialSubject.providedConsent.isProvidedTo = undefined;
+          grant.credentialSubject.providedConsent.isProvidedToController =
+            "https://example.org/some-recipient";
+        },
+      );
+      expect(isGConsentAccessGrant(providedToControllerGrant)).toBe(true);
+      const missingProvidedToGrant = await mockGConsentGrant(
+        undefined,
+        (grant) => {
+          grant.credentialSubject.providedConsent.isProvidedTo = undefined;
+        },
+      );
+      expect(isGConsentAccessGrant(missingProvidedToGrant)).toBe(false);
     });
   });
 });
