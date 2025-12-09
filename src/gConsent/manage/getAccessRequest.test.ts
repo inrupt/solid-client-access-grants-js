@@ -136,7 +136,7 @@ describe("getAccessRequest", () => {
           // The 1-value array is replaced by the literal value.
           forPersonalData:
             normalizedAccessRequest.credentialSubject.hasConsent
-              .forPersonalData[0],
+              .forPersonalData?.[0],
           mode: normalizedAccessRequest.credentialSubject.hasConsent.mode[0],
         },
       },

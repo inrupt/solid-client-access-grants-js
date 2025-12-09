@@ -33,7 +33,6 @@ import type { gc } from "../../common/constants";
 export type GConsentAttributes = {
   mode: ResourceAccessMode[];
   hasStatus: GConsentStatus;
-  forPersonalData: UrlString[];
   forPurpose?: UrlString[];
   inherit?: boolean;
 };
@@ -42,12 +41,21 @@ export type GConsentGrantAttributes = GConsentAttributes & {
   isProvidedTo: UrlString;
   request?: UrlString;
   verifiedRequest?: UrlString;
+  forPersonalData: UrlString[];
 };
 
 export type GConsentRequestAttributes = GConsentAttributes & {
   isConsentForDataSubject?: UrlString;
-  template?: string[];
-};
+} & (
+    | {
+        template?: string[];
+        forPersonalData: UrlString[];
+      }
+    | {
+        template: string[];
+        forPersonalData?: UrlString[];
+      }
+  );
 
 export type CredentialSubject = {
   id: UrlString;

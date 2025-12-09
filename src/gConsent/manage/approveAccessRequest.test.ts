@@ -1673,7 +1673,8 @@ describe("approveAccessRequest", () => {
         expect.objectContaining({
           providedConsent: expect.objectContaining({
             forPersonalData: expect.arrayContaining([
-              ...accessRequestVc.credentialSubject.hasConsent.forPersonalData,
+              ...(accessRequestVc.credentialSubject.hasConsent
+                .forPersonalData as string[]),
               "https://some.pod/data-456",
             ]),
           }),

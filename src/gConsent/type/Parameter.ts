@@ -26,23 +26,28 @@ import type { UrlString } from "@inrupt/solid-client";
 import type { AccessModes } from "../../type/AccessModes";
 import type { gc } from "../../common/constants";
 
-export interface BaseRequestParameters {
+export type BaseRequestParameters = {
   access: AccessModes;
   requestorInboxUrl?: UrlString;
-  resources: Array<UrlString>;
-  templates?: Array<string>;
   purpose?: Array<UrlString>;
   issuanceDate?: Date;
   expirationDate?: Date;
   inherit?: boolean;
-}
+} &
+  // One of resources or templates must be defined
+  (| {
+        resources: Array<UrlString>;
+        templates?: Array<string>;
+      }
+    | { resources?: Array<UrlString>; templates: Array<string> }
+  );
 
-export interface InputAccessRequestParameters extends BaseRequestParameters {
+export type InputAccessRequestParameters = BaseRequestParameters & {
   resourceOwner?: UrlString;
-}
-export interface AccessRequestParameters extends InputAccessRequestParameters {
+};
+export type AccessRequestParameters = InputAccessRequestParameters & {
   status: typeof gc.ConsentStatusRequested.value;
-}
+};
 
 export interface InputAccessGrantParameters
   extends Omit<BaseRequestParameters, "templates"> {

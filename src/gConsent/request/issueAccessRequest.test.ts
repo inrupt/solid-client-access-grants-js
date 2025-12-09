@@ -483,7 +483,7 @@ describe.each([true, false, undefined])(
           ...request.credentialSubject.hasConsent,
           // The 1-value array is replaced by the literal value.
           forPersonalData:
-            request.credentialSubject.hasConsent.forPersonalData[0],
+            request.credentialSubject.hasConsent.forPersonalData?.[0],
           mode: request.credentialSubject.hasConsent.mode[0],
           inherit: options.inherit,
         },

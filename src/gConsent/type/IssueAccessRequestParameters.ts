@@ -52,7 +52,6 @@ export type IssueAccessRequestParameters = InputAccessRequestParameters;
 /**
  * @hidden
  */
-export interface DeprecatedAccessRequestParameters
-  extends IssueAccessRequestParameters {
+export type DeprecatedAccessRequestParameters = IssueAccessRequestParameters & {
   requestor: WebId;
-}
+};

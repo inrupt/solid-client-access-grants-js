@@ -127,11 +127,10 @@ describe("isAccessRequest (legacy and RDFJS)", () => {
     ).toBe(false);
   });
 
-  it("returns false if the credential subject 'hasConsent' is missing 'forPersonalData'", async () => {
+  it("returns false if the credential subject 'hasConsent' is missing 'forPersonalData' and templates", async () => {
     const noDataRequest = JSON.parse(
       JSON.stringify(validAccessRequestVerifiableCredential),
     ) as AccessRequest;
-    // @ts-expect-error this creates a malformed VC on purpose
     delete noDataRequest.credentialSubject.hasConsent.forPersonalData;
     expect(isAccessRequest(noDataRequest)).toBe(false);
     expect(

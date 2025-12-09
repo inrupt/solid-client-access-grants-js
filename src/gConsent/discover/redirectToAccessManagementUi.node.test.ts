@@ -68,7 +68,7 @@ describe("redirectToAccessManagementUi", () => {
       ).rejects.toThrow(
         `Cannot discover access management UI URL for [${
           (await mockAccessRequestVc()).credentialSubject.hasConsent
-            .forPersonalData[0]
+            .forPersonalData?.[0]
         }]`,
       );
     });
@@ -88,7 +88,7 @@ describe("redirectToAccessManagementUi", () => {
       ).rejects.toThrow(
         `Cannot discover access management UI URL for [${
           (await mockAccessRequestVc()).credentialSubject.hasConsent
-            .forPersonalData[0]
+            .forPersonalData?.[0]
         }], neither from [${resourceOwner}]`,
       );
     });

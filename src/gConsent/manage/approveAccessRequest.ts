@@ -335,7 +335,10 @@ export async function approveAccessRequest(
         `Instantiating some templates failed: got (${mappedResources.length}) when expecting (${internalGrantOptions.templates})`,
       );
     }
-    resources = [...resources, ...mappedResources];
+    resources =
+      resources !== undefined
+        ? [...resources, ...mappedResources]
+        : mappedResources;
   }
 
   const grantBodyParams: AccessGrantParameters = {
