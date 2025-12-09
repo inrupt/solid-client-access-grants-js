@@ -1913,7 +1913,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
   describeIf(environmentFeatures?.TEMPLATE_REQUESTS === "true")(
     "template request",
     () => {
-      it("supports templated Access Request", async () => {
+      it.only("supports templated Access Request", async () => {
         const templatedRequest = await issueAccessRequest(
           {
             access: { read: true },

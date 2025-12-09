@@ -219,7 +219,6 @@ export function getTemplates(vc: DatasetWithId): string[] {
     }
     templates.push(object.value);
   }
-
   return templates;
 }
 

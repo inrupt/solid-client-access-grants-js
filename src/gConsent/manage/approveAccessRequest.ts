@@ -323,7 +323,7 @@ export async function approveAccessRequest(
   // Map templates to resources if templateMapper is provided
   let resources = internalGrantOptions.resources;
   if (
-    options.templateMapper &&
+    typeof options.templateMapper === "function" &&
     internalGrantOptions.templates &&
     internalGrantOptions.templates.length > 0
   ) {

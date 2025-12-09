@@ -32,7 +32,7 @@ import {
 import { isRdfjsAccessVerifiableCredential } from "./isBaseAccessVcBody";
 import { isRdfjsGConsentAttributes } from "./isGConsentAttributes";
 
-const { quad, defaultGraph } = DataFactory;
+const { quad } = DataFactory;
 
 /**
  * @deprecated This function checks structural assumptions about the JSON-LD presentation of the Access Request,
@@ -68,14 +68,7 @@ export function isRdfjsAccessRequest(dataset: DatasetWithId) {
     return (
       dataset.has(
         quad(requestClaimSubject, gc.hasStatus, gc.ConsentStatusRequested),
-      ) &&
-      dataset.match(
-        requestClaimSubject,
-        gc.isConsentForDataSubject,
-        null,
-        defaultGraph(),
-      ).size === 1 &&
-      isRdfjsGConsentAttributes(dataset, requestClaimSubject)
+      ) && isRdfjsGConsentAttributes(dataset, requestClaimSubject)
     );
   } catch {
     return false;
