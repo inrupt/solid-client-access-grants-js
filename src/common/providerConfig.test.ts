@@ -19,6 +19,7 @@
 //
 
 import { jest, it, describe, expect, beforeEach } from "@jest/globals";
+import { setMaxJsonSize } from "@inrupt/solid-client-vc";
 import {
   buildProviderContext,
   DEFAULT_CONTEXT,
@@ -26,6 +27,9 @@ import {
   clearProviderCache,
 } from "./providerConfig";
 import { mockProviderConfig } from "./providerConfig.mock";
+
+// Mocked responses do not include the content lenght.
+setMaxJsonSize(undefined);
 
 describe("getIssuerContext", () => {
   beforeEach(() => {

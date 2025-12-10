@@ -154,8 +154,9 @@ async function addVcMatcher(
  * of the Resource will be updated when the access grant is approved. If this flag is
  * set to false, the ACR of the Resource will remain unchanged. This is an advanced
  * feature, and only users having a good understanding of the relationship between
- * Access Grants and ACRs should deviate from the default. Additional information is
- * available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
+ * Access Grants and ACRs should deviate from the default. The `templateMapper` option
+ * allows mapping URI templates from the access request to concrete resource URLs.
+ * Additional information is available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
  * @returns A Verifiable Credential representing the granted access.
  * @since 0.0.1.
  */
@@ -166,6 +167,7 @@ export async function approveAccessRequest(
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
     verifyLinkedRequest?: boolean;
+    templateMapper?: (templates: string[]) => UrlString[];
   },
 ): Promise<DatasetWithId>;
 
@@ -182,8 +184,9 @@ export async function approveAccessRequest(
  * of the Resource will be updated when the access grant is approved. If this flag is
  * set to false, the ACR of the Resource will remain unchanged. This is an advanced
  * feature, and only users having a good understanding of the relationship between
- * Access Grants and ACRs should deviate from the default. Additional information is
- * available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
+ * Access Grants and ACRs should deviate from the default. The `templateMapper` option
+ * allows mapping URI templates from the access request to concrete resource URLs.
+ * Additional information is available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
  * @returns A Verifiable Credential representing the granted access.
  * @since 0.0.1.
  * @deprecated Set the options flag `returnLegacyJsonLd` to false, and prefer using the RDFJS interfaces.
@@ -194,6 +197,7 @@ export async function approveAccessRequest(
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
+    templateMapper?: (templates: string[]) => UrlString[];
   },
 ): Promise<AccessGrant>;
 
@@ -210,8 +214,9 @@ export async function approveAccessRequest(
  * of the Resource will be updated when the access grant is approved. If this flag is
  * set to false, the ACR of the Resource will remain unchanged. This is an advanced
  * feature, and only users having a good understanding of the relationship between
- * Access Grants and ACRs should deviate from the default. Additional information is
- * available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
+ * Access Grants and ACRs should deviate from the default. The `templateMapper` option
+ * allows mapping URI templates from the access request to concrete resource URLs.
+ * Additional information is available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
  * @returns A Verifiable Credential representing the granted access.
  * @since 0.0.1.
  * @deprecated Set the options flag `returnLegacyJsonLd` to false, and prefer using the RDFJS interfaces.
@@ -223,6 +228,7 @@ export async function approveAccessRequest(
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: boolean;
     verifyLinkedRequest?: boolean;
+    templateMapper?: (templates: string[]) => UrlString[];
   },
 ): Promise<DatasetWithId>;
 
@@ -243,6 +249,7 @@ export async function approveAccessRequest(
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
     verifyLinkedRequest?: boolean;
+    templateMapper?: (templates: string[]) => UrlString[];
   },
 ): Promise<DatasetWithId>;
 /**
@@ -262,6 +269,7 @@ export async function approveAccessRequest(
   requestOverride: ApproveAccessRequestOverrides,
   options?: AccessBaseOptions & {
     returnLegacyJsonld?: true;
+    templateMapper?: (templates: string[]) => UrlString[];
   },
 ): Promise<AccessGrant>;
 /**
@@ -279,13 +287,19 @@ export async function approveAccessRequest(
   requestVc: undefined,
   // If the VC is undefined, then some of the overrides become mandatory
   requestOverride: ApproveAccessRequestOverrides,
-  options?: AccessBaseOptions & WithLegacyJsonFlag,
+  options?: AccessBaseOptions &
+    WithLegacyJsonFlag & {
+      templateMapper?: (templates: string[]) => UrlString[];
+    },
 ): Promise<DatasetWithId>;
 export async function approveAccessRequest(
   requestVc: DatasetWithId | VerifiableCredential | URL | UrlString | undefined,
   requestOverride?: Partial<ApproveAccessRequestOverrides>,
   options: AccessBaseOptions &
-    WithLegacyJsonFlag & { verifyLinkedRequest?: boolean } = {},
+    WithLegacyJsonFlag & {
+      verifyLinkedRequest?: boolean;
+      templateMapper?: (templates: string[]) => UrlString[];
+    } = {},
 ): Promise<DatasetWithId> {
   const internalOptions = {
     ...options,
@@ -306,11 +320,32 @@ export async function approveAccessRequest(
     requestOverride,
   );
 
+  // Map templates to resources if templateMapper is provided
+  let resources = internalGrantOptions.resources;
+  if (
+    typeof options.templateMapper === "function" &&
+    internalGrantOptions.templates &&
+    internalGrantOptions.templates.length > 0
+  ) {
+    const mappedResources = options.templateMapper(
+      internalGrantOptions.templates,
+    );
+    if (mappedResources.length !== internalGrantOptions.templates.length) {
+      throw new Error(
+        `Instantiating some templates failed: got (${mappedResources.length}) when expecting (${internalGrantOptions.templates})`,
+      );
+    }
+    resources =
+      resources !== undefined
+        ? [...resources, ...mappedResources]
+        : mappedResources;
+  }
+
   const grantBodyParams: AccessGrantParameters = {
     owner: internalGrantOptions.owner,
     access: internalGrantOptions.access,
     requestor: internalGrantOptions.requestor,
-    resources: internalGrantOptions.resources,
+    resources,
     requestorInboxUrl: internalGrantOptions.requestorInboxUrl,
     purpose: internalGrantOptions.purpose,
     issuanceDate: internalGrantOptions.issuanceDate,

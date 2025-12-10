@@ -59,7 +59,9 @@ export function normalizeAccessRequest<T extends VerifiableCredentialBase>(
       normalized.credentialSubject.hasConsent.mode,
     ];
   }
-  if (!Array.isArray(normalized.credentialSubject.hasConsent.forPersonalData)) {
+  if (
+    typeof normalized.credentialSubject.hasConsent.forPersonalData === "string"
+  ) {
     normalized.credentialSubject.hasConsent.forPersonalData = [
       normalized.credentialSubject.hasConsent.forPersonalData,
     ];

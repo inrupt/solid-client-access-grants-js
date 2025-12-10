@@ -23,7 +23,8 @@ import {
   verifiableCredentialToDataset,
   type VerifiableCredential,
 } from "@inrupt/solid-client-vc";
-import { gc } from "../../common/constants";
+import { DataFactory, Store } from "n3";
+import { gc, hydra } from "../../common/constants";
 import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import {
   CREDENTIAL_TYPE_ACCESS_GRANT,
@@ -35,6 +36,9 @@ import { toJson, type CustomField } from "../../type/CustomField";
 import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import type { AccessGrant } from "../type/AccessGrant";
 import type { AccessRequest } from "../type/AccessRequest";
+import { getConsent } from "../../common/getters";
+
+const { literal } = DataFactory;
 
 type RequestVcOptions = Partial<{
   subjectId: string;
@@ -47,6 +51,7 @@ type RequestVcOptions = Partial<{
   purpose: UrlString[];
   custom: CustomField[];
   request: UrlString;
+  templates: string[];
 }>;
 
 export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
@@ -99,6 +104,10 @@ export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
     asObject.credentialSubject.hasConsent.forPurpose = options.purpose;
   }
 
+  if (options?.templates) {
+    asObject.credentialSubject.hasConsent.template = options.templates;
+  }
+
   return asObject;
 };
 
@@ -110,13 +119,28 @@ export const mockAccessRequestVc = async (
   const asObject = mockAccessRequestVcObject(options) as VerifiableCredential;
   const modifiedObject = modify?.(asObject) ?? asObject;
 
-  return (await verifiableCredentialToDataset(
+  const dataset = (await verifiableCredentialToDataset(
     normalizeAccessRequest(modifiedObject),
     {
       baseIRI: modifiedObject.id,
       includeVcProperties: true,
     },
   )) as unknown as AccessRequest;
+
+  // Manually add template triples if templates were provided
+  // This is necessary because the JSON-LD context may not include hydra
+  if (options?.templates && options.templates.length > 0) {
+    const store = new Store([...dataset]);
+    const consentNode = getConsent(dataset);
+
+    for (const template of options.templates) {
+      store.addQuad(consentNode, hydra.template, literal(template));
+    }
+
+    return Object.assign(store, { id: dataset.id }) as unknown as AccessRequest;
+  }
+
+  return dataset;
 };
 
 export const mockAccessGrantObject = (options?: RequestVcOptions) => ({

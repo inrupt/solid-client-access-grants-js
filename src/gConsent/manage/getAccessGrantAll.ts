@@ -23,7 +23,10 @@ import type {
   VerifiableCredential,
   DatasetWithId,
 } from "@inrupt/solid-client-vc";
-import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
+import {
+  getVerifiableCredentialAllFromShape,
+  setMaxJsonSize,
+} from "@inrupt/solid-client-vc";
 import {
   CREDENTIAL_TYPE_ACCESS_DENIAL,
   CREDENTIAL_TYPE_ACCESS_GRANT,
@@ -215,6 +218,9 @@ export async function getAccessGrantAll(
 
   let result: DatasetWithId[];
 
+  // The derive endpoint is not setting a `Content-Length`.
+  const maxJsonSize = 10 * 1024 * 1024;
+  setMaxJsonSize(undefined);
   if (options.returnLegacyJsonld === false) {
     // TODO: Fix up the type of accepted arguments (this function should allow deep partial)
     result = (
@@ -259,6 +265,8 @@ export async function getAccessGrantAll(
         (vc) => isBaseAccessGrantVerifiableCredential(vc) && isAccessGrant(vc),
       );
   }
+  // Restore max JSON size.
+  setMaxJsonSize(maxJsonSize);
   // Explicitly non-recursive grants are filtered out, except if they apply
   // directly to the target resource (in the case a resource is used as a
   // filtering criteria for getAccessGrantAll).

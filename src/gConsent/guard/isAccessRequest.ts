@@ -23,7 +23,7 @@ import { DataFactory } from "n3";
 import { ACCESS_REQUEST_STATUS } from "../constants";
 import type { AccessRequestBody } from "../type/AccessVerifiableCredential";
 import { isBaseAccessRequestVerifiableCredential } from "./isBaseAccessRequestVerifiableCredential";
-import { gc, solidVc } from "../../common/constants";
+import { gc, hydra, solidVc } from "../../common/constants";
 import {
   getCredentialSubject,
   getIssuanceDate,
@@ -65,18 +65,24 @@ export function isRdfjsAccessRequest(dataset: DatasetWithId) {
       getCredentialSubject(dataset),
       gc.hasConsent,
     );
-    return (
-      dataset.has(
-        quad(requestClaimSubject, gc.hasStatus, gc.ConsentStatusRequested),
-      ) &&
+    const hasDataSubject =
       dataset.match(
         requestClaimSubject,
         gc.isConsentForDataSubject,
         null,
         defaultGraph(),
-      ).size === 1 &&
-      isRdfjsGConsentAttributes(dataset, requestClaimSubject)
+      ).size > 0;
+    const hasTempalte =
+      dataset.match(requestClaimSubject, hydra.template, null, defaultGraph())
+        .size > 0;
+    const hasExpectedStatus = dataset.has(
+      quad(requestClaimSubject, gc.hasStatus, gc.ConsentStatusRequested),
     );
+    let isValid = hasExpectedStatus;
+    // One of the data subject or the template must be present;
+    isValid &&= hasDataSubject || hasTempalte;
+    isValid &&= isRdfjsGConsentAttributes(dataset, requestClaimSubject);
+    return isValid;
   } catch {
     return false;
   }

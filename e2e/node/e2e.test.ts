@@ -1909,4 +1909,65 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
       });
     },
   );
+
+  describeIf(environmentFeatures?.TEMPLATE_REQUESTS === "true")(
+    "template request",
+    () => {
+      it("supports templated Access Request", async () => {
+        const templatedRequest = await issueAccessRequest(
+          {
+            access: { read: true },
+            templates: ["https://{DOMAIN}{PATH}"],
+            purpose: [
+              "https://some.purpose/not-a-nefarious-one/i-promise",
+              "https://some.other.purpose/",
+            ],
+            expirationDate: new Date(Date.now() + 60 * 60 * 1000),
+          },
+          {
+            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+            accessEndpoint: vcProvider,
+            returnLegacyJsonld: false,
+          },
+        );
+
+        const grant = await approveAccessRequest(templatedRequest, undefined, {
+          fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+          returnLegacyJsonld: false,
+          verifyLinkedRequest: true,
+          accessEndpoint: vcProvider,
+          updateAcr: false,
+          templateMapper: (templates) =>
+            templates.map((template) =>
+              template
+                .replace("{DOMAIN}", "example.org")
+                .replace("{PATH}", "/some/resource"),
+            ),
+        });
+        expect(getResources(grant)).toContain(
+          "https://example.org/some/resource",
+        );
+        // Issuing multiple Access Grants with the same template Access Request should be supported.
+        await expect(
+          approveAccessRequest(
+            templatedRequest,
+            {},
+            {
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+              returnLegacyJsonld: false,
+              verifyLinkedRequest: true,
+              accessEndpoint: vcProvider,
+              updateAcr: false,
+              templateMapper: (templates) =>
+                templates.map((template) =>
+                  template
+                    .replace("{DOMAIN}", "example.org")
+                    .replace("{PATH}", "/some/resource"),
+                ),
+            },
+          ),
+        ).resolves.not.toThrow();
+      });
+    },
+  );
 });

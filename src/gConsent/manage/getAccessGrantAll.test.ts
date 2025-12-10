@@ -19,9 +19,15 @@
 //
 
 import { jest, it, describe, expect, beforeAll } from "@jest/globals";
-import { getVerifiableCredentialAllFromShape } from "@inrupt/solid-client-vc";
+import {
+  getVerifiableCredentialAllFromShape,
+  setMaxJsonSize,
+} from "@inrupt/solid-client-vc";
 import * as VcModule from "@inrupt/solid-client-vc";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
+
+// Mocked responses do not include the content lenght.
+setMaxJsonSize(undefined);
 import type {
   AccessParameters,
   IssueAccessRequestParameters,
@@ -35,13 +41,11 @@ import { cacheProvider, DEFAULT_CONTEXT } from "../../common/providerConfig";
 const otherFetch = jest.fn<typeof fetch>();
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const { verifiableCredentialToDataset, getCredentialSubject } =
-    jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
-      typeof VcLibrary
-    >;
+  const vcModule = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
+    typeof VcLibrary
+  >;
   return {
-    verifiableCredentialToDataset,
-    getCredentialSubject,
+    ...vcModule,
     issueVerifiableCredential: jest.fn(),
     getVerifiableCredentialAllFromShape: jest.fn(() =>
       mockAccessGrantVc().then((res) => [res]),

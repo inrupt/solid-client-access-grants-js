@@ -28,7 +28,7 @@ import type { ResourceAccessMode } from "../../type/ResourceAccessMode";
 import { RESOURCE_ACCESS_MODE } from "../../type/ResourceAccessMode";
 import { isUnknownObject } from "./isUnknownObject";
 import type { GConsentStatus } from "../type/GConsentStatus";
-import { acl, gc } from "../../common/constants";
+import { acl, gc, hydra } from "../../common/constants";
 import { AccessGrantError } from "../../common/errors/AccessGrantError";
 
 const { defaultGraph } = DataFactory;
@@ -103,8 +103,23 @@ export function isRdfjsGConsentAttributes(
     defaultGraph(),
   );
 
-  if (forPersonalData.size === 0) {
+  if (
+    forPersonalData.size === 0 &&
+    statuses[0].object.equals(gc.ConsentStatusExplicitlyGiven)
+  ) {
     throw new AccessGrantError("No Personal Data specified for Access Grant");
+  }
+
+  const templates = dataset.match(
+    consent,
+    hydra.template,
+    null,
+    defaultGraph(),
+  );
+  if (templates.size === 0 && forPersonalData.size === 0) {
+    throw new AccessGrantError(
+      "No Personal Data or template specified for Access Request",
+    );
   }
 
   for (const { object } of forPersonalData) {

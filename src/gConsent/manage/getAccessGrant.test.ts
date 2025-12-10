@@ -19,8 +19,12 @@
 //
 
 import { beforeAll, describe, expect, it, jest } from "@jest/globals";
+import { setMaxJsonSize } from "@inrupt/solid-client-vc";
 import { isomorphic } from "rdf-isomorphic";
 import { getResources } from "../../common/getters";
+
+// Mocked responses do not include the content lenght.
+setMaxJsonSize(undefined);
 
 import {
   mockAccessGrantObject,

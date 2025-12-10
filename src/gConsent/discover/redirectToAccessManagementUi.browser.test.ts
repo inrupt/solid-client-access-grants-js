@@ -26,6 +26,11 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
+import { setMaxJsonSize } from "@inrupt/solid-client-vc";
+
+// Mocked responses do not include the content lenght.
+setMaxJsonSize(undefined);
+
 import { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 import {
   getAccessManagementUiFromWellKnown,
@@ -77,7 +82,7 @@ describe("redirectToAccessManagementUi", () => {
       ).rejects.toThrow(
         `Cannot discover access management UI URL for [${
           (await mockAccessRequestVc()).credentialSubject.hasConsent
-            .forPersonalData[0]
+            .forPersonalData?.[0]
         }]`,
       );
     });
@@ -96,7 +101,7 @@ describe("redirectToAccessManagementUi", () => {
       ).rejects.toThrow(
         `Cannot discover access management UI URL for [${
           (await mockAccessRequestVc()).credentialSubject.hasConsent
-            .forPersonalData[0]
+            .forPersonalData?.[0]
         }], neither from [${resourceOwner}]`,
       );
     });

@@ -44,13 +44,14 @@ import {
   getRequestor,
   getResourceOwner,
   getResources,
+  getTemplates,
   getCustomString,
   getTypes,
   getRequest,
   isGConsentAccessGrant,
 } from "./getters";
 import type { AccessGrant, AccessRequest } from "../gConsent";
-import { TYPE, gc, solidVc } from "./constants";
+import { TYPE, gc, hydra, solidVc } from "./constants";
 
 const { quad, namedNode, literal, blankNode } = DataFactory;
 
@@ -193,6 +194,54 @@ describe("getters", () => {
         getPurposes(Object.assign(store, { id: mockedGConsentGrant.id })),
       ).toThrow(
         "Expected consent to be a Named Node or Blank Node, instead got [Literal].",
+      );
+    });
+  });
+
+  describe("getTemplates", () => {
+    it("returns an empty array when there are no templates", async () => {
+      expect(getTemplates(mockedGConsentRequest)).toEqual([]);
+    });
+
+    it("gets the templates from an access request with templates", async () => {
+      const templates = [
+        "https://pod.example/resource-{id}",
+        "https://pod.example/data-{userId}/file-{fileId}",
+      ];
+
+      const store = new Store([
+        ...mockedGConsentRequest,
+        quad(
+          getConsent(mockedGConsentRequest),
+          hydra.template,
+          literal(templates[0]),
+        ),
+        quad(
+          getConsent(mockedGConsentRequest),
+          hydra.template,
+          literal(templates[1]),
+        ),
+      ]);
+
+      expect(
+        getTemplates(Object.assign(store, { id: mockedGConsentRequest.id })),
+      ).toEqual(templates);
+    });
+
+    it("errors when templates are not Literals", async () => {
+      const store = new Store([
+        ...mockedGConsentRequest,
+        quad(
+          getConsent(mockedGConsentRequest),
+          hydra.template,
+          namedNode("https://example.org/not-a-literal"),
+        ),
+      ]);
+
+      expect(() =>
+        getTemplates(Object.assign(store, { id: mockedGConsentRequest.id })),
+      ).toThrow(
+        "Expected template to be a Literal. Instead got [https://example.org/not-a-literal] with term type [NamedNode]",
       );
     });
   });

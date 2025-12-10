@@ -71,31 +71,45 @@ function getGConsentAttributes(
   type: "BaseRequestBody" | "BaseGrantBody",
 ): GConsentRequestAttributes | GConsentGrantAttributes {
   const modes = accessToResourceAccessModeArray(params.access);
-  const consentAttributes: GConsentRequestAttributes = {
-    mode: modes,
-    hasStatus: params.status,
-    forPersonalData: params.resources,
-  };
-  if (params.purpose !== undefined) {
-    consentAttributes.forPurpose = params.purpose;
-  }
-  if (params.inherit !== undefined) {
-    consentAttributes.inherit = params.inherit;
-  }
-
   if (type === "BaseGrantBody") {
-    return {
-      ...consentAttributes,
+    const grantAttributes: GConsentGrantAttributes = {
+      mode: modes,
+      hasStatus: params.status,
+      // FIXME the type assertion should not be necessary.
+      forPersonalData: params.resources as string[],
       isProvidedTo: (params as AccessGrantParameters).requestor,
       // Only one of the following two should be defined.
       request: (params as AccessGrantParameters).request,
       verifiedRequest: (params as AccessGrantParameters).verifiedRequest,
     };
+    if (params.purpose !== undefined) {
+      grantAttributes.forPurpose = params.purpose;
+    }
+    if (params.inherit !== undefined) {
+      grantAttributes.inherit = params.inherit;
+    }
+    return grantAttributes;
   }
-  return {
-    ...consentAttributes,
-    isConsentForDataSubject: (params as AccessRequestParameters).resourceOwner,
+  const requestParams = params as AccessRequestParameters;
+  const requestAttributes: Record<string, unknown> = {
+    mode: modes,
+    hasStatus: params.status,
+    isConsentForDataSubject: requestParams.resourceOwner,
   };
+  if (params.resources !== undefined) {
+    requestAttributes.forPersonalData = params.resources;
+  }
+  if (requestParams.templates !== undefined) {
+    requestAttributes.template = requestParams.templates;
+  }
+  if (params.purpose !== undefined) {
+    requestAttributes.forPurpose = params.purpose;
+  }
+  if (params.inherit !== undefined) {
+    requestAttributes.inherit = params.inherit;
+  }
+  // FIXME the type assertion should be replaced with a proper type check.
+  return requestAttributes as GConsentRequestAttributes;
 }
 
 function getBaseBody(
@@ -217,29 +231,37 @@ export async function issueAccessVc(
 ): Promise<DatasetWithId> {
   const fetcher = await getSessionFetch(options);
 
-  const hasConsent = isBaseRequest(vcBody);
-  if (
-    hasConsent &&
-    vcBody.credentialSubject.hasConsent.forPersonalData.length <= 0
-  ) {
-    throw new AccessGrantError("There are no resources in the access request");
-  } else if (
-    !hasConsent &&
-    (vcBody as BaseGrantBody).credentialSubject.providedConsent.forPersonalData
-      .length <= 0
-  ) {
-    throw new AccessGrantError("There are no resources in the access grant");
+  const isRequest = isBaseRequest(vcBody);
+  let targetResourceIri;
+
+  if (isRequest) {
+    const hasTemplate =
+      vcBody.credentialSubject.hasConsent.template &&
+      vcBody.credentialSubject.hasConsent.template.length > 0;
+    const hasResource =
+      vcBody.credentialSubject.hasConsent.forPersonalData !== undefined &&
+      vcBody.credentialSubject.hasConsent.forPersonalData.length > 0;
+    if (!hasTemplate && !hasResource) {
+      throw new AccessGrantError(
+        "There are no resources in the access request",
+      );
+    }
+    if (hasResource) {
+      // Legacy behavior: if no VC endpoint is issued, discover it from the resource storage.
+      targetResourceIri =
+        vcBody.credentialSubject.hasConsent.forPersonalData?.[0];
+    }
+  } else {
+    if (
+      (vcBody as BaseGrantBody).credentialSubject.providedConsent
+        .forPersonalData.length <= 0
+    ) {
+      throw new AccessGrantError("There are no resources in the access grant");
+    }
+    targetResourceIri = (vcBody as BaseGrantBody).credentialSubject
+      .providedConsent.forPersonalData[0];
   }
 
-  const targetResourceIri = isBaseRequest(vcBody)
-    ? vcBody.credentialSubject.hasConsent.forPersonalData[0]
-    : (vcBody as BaseGrantBody).credentialSubject.providedConsent
-        .forPersonalData[0];
-
-  // TODO: find out if concatenating "issue" here is correct
-  // It seems like the issuer endpoint should be discovered from the well-known direcly
-  // And the access endpoint should be an object with one URI per service
-  // (issuer service, verifier service... supposedly status and query and vc???)
   const provider = new URL(
     await getAccessApiEndpoint(targetResourceIri, options),
   );

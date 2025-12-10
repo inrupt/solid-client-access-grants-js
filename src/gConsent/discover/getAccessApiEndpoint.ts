@@ -67,11 +67,16 @@ async function getAccessEndpointForResource(
  * @since 0.4.0
  */
 export async function getAccessApiEndpoint(
-  resource: URL | UrlString,
+  resource?: URL | UrlString,
   options: AccessBaseOptions = {},
 ): Promise<UrlString> {
   if (options.accessEndpoint !== undefined) {
     return options.accessEndpoint.toString();
+  }
+  if (resource === undefined) {
+    throw new AccessGrantError(
+      "One of the accessEndpoint option or target resource must be provided to discover the credential issuer",
+    );
   }
   try {
     return await getAccessEndpointForResource(resource.toString());

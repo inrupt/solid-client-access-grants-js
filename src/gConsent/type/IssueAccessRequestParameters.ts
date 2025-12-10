@@ -34,6 +34,7 @@ import type { InputAccessRequestParameters } from "./Parameter";
  * - `access`: Level access to request on the given Resource.
  *             See {@link https://docs.inrupt.com/developer-tools/api/javascript/solid-client/interfaces/access_universal.access.html}.
  * - `resources`: Array of URLs of the Resources to which access is requested.
+ * - `templates`: (Optional.) Array of URL template strings to which access is requested.
  * - `purpose`: (Optional.) URL representing what the requested access will be used for.
  * - `issuanceDate`: (Optional, set to the current time if left out.) Point in time from which the access should be granted.
  * - `expirationDate`: (Optional.) Point in time until when the access is needed.
@@ -51,7 +52,6 @@ export type IssueAccessRequestParameters = InputAccessRequestParameters;
 /**
  * @hidden
  */
-export interface DeprecatedAccessRequestParameters
-  extends IssueAccessRequestParameters {
+export type DeprecatedAccessRequestParameters = IssueAccessRequestParameters & {
   requestor: WebId;
-}
+};

@@ -36,7 +36,16 @@ import type {
 import { DataFactory } from "n3";
 import type { AccessGrantGConsent } from "../gConsent/type/AccessGrant";
 import type { AccessModes } from "../type/AccessModes";
-import { INHERIT, TYPE, XSD_BOOLEAN, acl, gc, ldp, solidVc } from "./constants";
+import {
+  INHERIT,
+  TYPE,
+  XSD_BOOLEAN,
+  acl,
+  gc,
+  hydra,
+  ldp,
+  solidVc,
+} from "./constants";
 import { AccessGrantError } from "./errors/AccessGrantError";
 
 const { namedNode, defaultGraph, quad, literal } = DataFactory;
@@ -180,6 +189,37 @@ export function getResources(vc: DatasetWithId): string[] {
   }
 
   return resources;
+}
+
+/**
+ * Get the templates to which an Access Request applies.
+ *
+ * @example
+ *
+ * ```
+ * const templates = getTemplates(accessRequest);
+ * ```
+ *
+ * @param vc The Access Request
+ * @returns The template strings
+ */
+export function getTemplates(vc: DatasetWithId): string[] {
+  const templates: string[] = [];
+
+  for (const { object } of vc.match(
+    getConsent(vc),
+    hydra.template,
+    null,
+    defaultGraph(),
+  )) {
+    if (object.termType !== "Literal") {
+      throw new AccessGrantError(
+        `Expected template to be a Literal. Instead got [${object.value}] with term type [${object.termType}]`,
+      );
+    }
+    templates.push(object.value);
+  }
+  return templates;
 }
 
 /**
@@ -731,6 +771,7 @@ const WELL_KNOWN_FIELDS = [
   gc.isProvidedToPerson,
   gc.hasStatus,
   gc.isConsentForDataSubject,
+  hydra.template,
   acl.mode,
   INHERIT,
 ] as const;

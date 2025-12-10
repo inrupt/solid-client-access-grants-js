@@ -19,6 +19,10 @@
 //
 
 import { jest, describe, it, expect } from "@jest/globals";
+import { setMaxJsonSize } from "@inrupt/solid-client-vc";
+
+// Mocked responses do not include the content lenght.
+setMaxJsonSize(undefined);
 
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 import { revokeAccessGrant } from "./revokeAccessGrant";
@@ -26,27 +30,13 @@ import { MOCKED_CREDENTIAL_ID } from "../request/request.mock";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const {
-    verifiableCredentialToDataset,
-    getIssuanceDate,
-    getCredentialSubject,
-    getExpirationDate,
-    getId,
-    getIssuer,
-    getVerifiableCredential,
-  } = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
+  const vcModule = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
     typeof VcLibrary
   >;
   return {
-    verifiableCredentialToDataset,
+    ...vcModule,
     issueVerifiableCredential: jest.fn(),
     revokeVerifiableCredential: jest.fn(),
-    getIssuanceDate,
-    getCredentialSubject,
-    getExpirationDate,
-    getId,
-    getIssuer,
-    getVerifiableCredential,
   };
 });
 describe("revokeAccessGrant", () => {

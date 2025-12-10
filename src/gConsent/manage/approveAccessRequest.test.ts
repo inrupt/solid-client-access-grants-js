@@ -19,9 +19,8 @@
 //
 
 import { jest, it, describe, expect, beforeAll } from "@jest/globals";
-
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
-import type * as VcClient from "@inrupt/solid-client-vc";
+import * as VcClient from "@inrupt/solid-client-vc";
 import type * as SolidClient from "@inrupt/solid-client";
 import {
   mockAccessApiEndpoint,
@@ -39,6 +38,9 @@ import {
   mockConsentRequestVc,
 } from "../util/access.mock";
 import { cacheProvider, DEFAULT_CONTEXT } from "../../common/providerConfig";
+
+// Mocked responses do not include the content lenght.
+VcClient.setMaxJsonSize(undefined);
 
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual(
@@ -72,6 +74,7 @@ jest.mock("@inrupt/solid-client-vc", () => {
     getExpirationDate,
     getId,
     getVerifiableCredential,
+    setMaxJsonSize,
   } = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
     typeof VcClient
   >;
@@ -84,6 +87,7 @@ jest.mock("@inrupt/solid-client-vc", () => {
     getId,
     issueVerifiableCredential: jest.fn(),
     getVerifiableCredential,
+    setMaxJsonSize,
   };
 });
 
@@ -1588,6 +1592,163 @@ describe("approveAccessRequest", () => {
         expect.objectContaining({
           type: ["SolidAccessGrant"],
         }),
+        expect.anything(),
+      );
+    });
+
+    it("uses templateMapper to convert templates to resources", async () => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcClient;
+      const spiedIssueRequest = jest.spyOn(
+        mockedVcModule,
+        "issueVerifiableCredential",
+      );
+      spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+
+      const requestWithTemplates = await mockAccessRequestVc({
+        templates: [
+          "https://some.pod/data-{id}",
+          "https://some.pod/user-{userId}/file-{fileId}",
+        ],
+      });
+
+      const templateMapper = jest.fn((templates: string[]) => {
+        return templates.map((t) =>
+          t
+            .replace("{id}", "123")
+            .replace("{userId}", "user1")
+            .replace("{fileId}", "file1"),
+        );
+      });
+
+      await approveAccessRequest(requestWithTemplates, undefined, {
+        fetch: jest.fn<typeof fetch>(),
+        updateAcr: false,
+        templateMapper,
+      });
+
+      expect(templateMapper).toHaveBeenCalledWith([
+        "https://some.pod/data-{id}",
+        "https://some.pod/user-{userId}/file-{fileId}",
+      ]);
+
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          providedConsent: expect.objectContaining({
+            forPersonalData: expect.arrayContaining([
+              "https://some.pod/data-123",
+              "https://some.pod/user-user1/file-file1",
+            ]),
+          }),
+        }),
+        expect.anything(),
+        expect.anything(),
+      );
+    });
+
+    it("combines existing resources with mapped templates", async () => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcClient;
+      const spiedIssueRequest = jest.spyOn(
+        mockedVcModule,
+        "issueVerifiableCredential",
+      );
+      spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+
+      const requestWithTemplates = await mockAccessRequestVc({
+        templates: ["https://some.pod/data-{id}"],
+      });
+
+      await approveAccessRequest(requestWithTemplates, undefined, {
+        fetch: jest.fn<typeof fetch>(),
+        updateAcr: false,
+        templateMapper: (templates) => {
+          return templates.map((t) => t.replace("{id}", "456"));
+        },
+      });
+
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          providedConsent: expect.objectContaining({
+            forPersonalData: expect.arrayContaining([
+              ...(accessRequestVc.credentialSubject.hasConsent
+                .forPersonalData as string[]),
+              "https://some.pod/data-456",
+            ]),
+          }),
+        }),
+        expect.anything(),
+        expect.anything(),
+      );
+    });
+
+    it("throws if all templates are not mapped", async () => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcClient;
+      const spiedIssueRequest = jest.spyOn(
+        mockedVcModule,
+        "issueVerifiableCredential",
+      );
+      spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+
+      const requestWithTemplates = await mockAccessRequestVc({
+        templates: [
+          "https://some.pod/data-{id}",
+          "https://some.pod/data2-{id}",
+          "https://some.pod/data3-{id}",
+        ],
+      });
+
+      await expect(() =>
+        approveAccessRequest(requestWithTemplates, undefined, {
+          fetch: jest.fn<typeof fetch>(),
+          updateAcr: false,
+          templateMapper: (templates) => {
+            // This mapper drops some templates
+            return templates.map((t) => t.replace("{id}", "456")).slice(0, 1);
+          },
+        }),
+      ).rejects.toThrow();
+    });
+
+    it("does not include template property in the access grant", async () => {
+      mockAccessApiEndpoint();
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcClient;
+      const spiedIssueRequest = jest.spyOn(
+        mockedVcModule,
+        "issueVerifiableCredential",
+      );
+      spiedIssueRequest.mockResolvedValueOnce(accessGrantVc);
+
+      const requestWithTemplates = await mockAccessRequestVc({
+        templates: ["https://some.pod/data-{id}"],
+      });
+
+      await approveAccessRequest(requestWithTemplates, undefined, {
+        fetch: jest.fn<typeof fetch>(),
+        updateAcr: false,
+        templateMapper: (templates) =>
+          templates.map((t) => t.replace("{id}", "789")),
+      });
+
+      expect(spiedIssueRequest).toHaveBeenCalledWith(
+        `${MOCKED_ACCESS_ISSUER}/issue`,
+        expect.objectContaining({
+          providedConsent: expect.not.objectContaining({
+            template: expect.anything(),
+          }),
+        }),
+        expect.anything(),
         expect.anything(),
       );
     });

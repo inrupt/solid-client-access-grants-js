@@ -132,6 +132,52 @@ describe("getRequestBody", () => {
       type: ["SolidAccessRequest"],
     });
   });
+
+  it("can generate a request body with templates", () => {
+    const requestBody = getRequestBody({
+      access: { read: true },
+      resources: [],
+      templates: [
+        "https://some.pod/data-{id}",
+        "https://some.pod/user-{userId}/file-{fileId}",
+      ],
+      status: "https://w3id.org/GConsent#ConsentStatusRequested",
+      requestorInboxUrl: MOCK_REQUESTOR_INBOX,
+      resourceOwner: MOCK_RESOURCE_OWNER_IRI,
+    });
+
+    expect(requestBody.credentialSubject.hasConsent).toHaveProperty("template");
+    expect(requestBody.credentialSubject.hasConsent.template).toEqual([
+      "https://some.pod/data-{id}",
+      "https://some.pod/user-{userId}/file-{fileId}",
+    ]);
+    expect(requestBody.credentialSubject.hasConsent.forPersonalData).toEqual(
+      [],
+    );
+    expect(
+      requestBody.credentialSubject.hasConsent.isConsentForDataSubject,
+    ).toBe(MOCK_RESOURCE_OWNER_IRI);
+  });
+
+  it("can generate a request body with only templates and no isConsentForDataSubject", () => {
+    const requestBody = getRequestBody({
+      access: { read: true },
+      resources: [],
+      templates: ["https://some.pod/data-{id}"],
+      status: "https://w3id.org/GConsent#ConsentStatusRequested",
+    });
+
+    expect(requestBody.credentialSubject.hasConsent).toHaveProperty("template");
+    expect(requestBody.credentialSubject.hasConsent.template).toEqual([
+      "https://some.pod/data-{id}",
+    ]);
+    expect(requestBody.credentialSubject.hasConsent.forPersonalData).toEqual(
+      [],
+    );
+    expect(
+      requestBody.credentialSubject.hasConsent.isConsentForDataSubject,
+    ).toBeUndefined();
+  });
 });
 
 describe.each([true, false, undefined])(
@@ -437,7 +483,7 @@ describe.each([true, false, undefined])(
           ...request.credentialSubject.hasConsent,
           // The 1-value array is replaced by the literal value.
           forPersonalData:
-            request.credentialSubject.hasConsent.forPersonalData[0],
+            request.credentialSubject.hasConsent.forPersonalData?.[0],
           mode: request.credentialSubject.hasConsent.mode[0],
           inherit: options.inherit,
         },

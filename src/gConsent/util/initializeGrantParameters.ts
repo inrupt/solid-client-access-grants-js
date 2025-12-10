@@ -31,6 +31,7 @@ import {
   getCustomFields,
   getInbox,
   getPurposes,
+  getTemplates,
 } from "../../common/getters";
 import type { ApproveAccessRequestOverrides } from "../manage/approveAccessRequest";
 import { INHERIT, XSD_BOOLEAN } from "../../common/constants";
@@ -64,6 +65,7 @@ type InitializedGrantsParameter = Omit<
   "customFields"
 > & {
   customFields: Record<string, unknown>;
+  templates?: string[];
 };
 
 export function initializeGrantParameters(
@@ -101,6 +103,9 @@ export function initializeGrantParameters(
                 }
               : getCustomFields(requestVc),
           request: requestVc.id,
+          // Extract templates from the request VC for use with templateMapper
+          // Note: templates are NOT included in the resulting access grant
+          templates: getTemplates(requestVc),
         };
   if (requestOverride?.expirationDate === null) {
     resultGrant.expirationDate = undefined;
