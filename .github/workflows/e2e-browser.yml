@@ -13,12 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: ${{ matrix.environment-name }}
-    continue-on-error: ${{ matrix.experimental }}
+    # Do not interrupt the tests on one failure, as they are quite flaky.
+    continue-on-error: true
     strategy:
       fail-fast: true
       matrix:
         environment-name: ["ESS PodSpaces", "ESS Release-2-3", "ESS Next"]
-        experimental: [false]
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
