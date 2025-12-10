@@ -1913,7 +1913,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
   describeIf(environmentFeatures?.TEMPLATE_REQUESTS === "true")(
     "template request",
     () => {
-      it.only("supports templated Access Request", async () => {
+      it("supports templated Access Request", async () => {
         const templatedRequest = await issueAccessRequest(
           {
             access: { read: true },
@@ -1932,6 +1932,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         );
 
         const grant = await approveAccessRequest(templatedRequest, undefined, {
+          fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           returnLegacyJsonld: false,
           verifyLinkedRequest: true,
           accessEndpoint: vcProvider,
@@ -1952,6 +1953,7 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             templatedRequest,
             {},
             {
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               returnLegacyJsonld: false,
               verifyLinkedRequest: true,
               accessEndpoint: vcProvider,

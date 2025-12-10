@@ -103,7 +103,10 @@ export function isRdfjsGConsentAttributes(
     defaultGraph(),
   );
 
-  if (forPersonalData.size === 0) {
+  if (
+    forPersonalData.size === 0 &&
+    statuses[0].object.equals(gc.ConsentStatusExplicitlyGiven)
+  ) {
     throw new AccessGrantError("No Personal Data specified for Access Grant");
   }
 
