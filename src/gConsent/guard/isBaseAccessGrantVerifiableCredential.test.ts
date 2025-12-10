@@ -19,7 +19,11 @@
 //
 
 import { it, describe, expect } from "@jest/globals";
-import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
+import { verifiableCredentialToDataset, setMaxJsonSize } from "@inrupt/solid-client-vc";
+
+// Mocked responses do not include the content lenght.
+setMaxJsonSize(undefined);
+
 import {
   isBaseAccessGrantVerifiableCredential,
   isRdfjsBaseAccessGrantVerifiableCredential,

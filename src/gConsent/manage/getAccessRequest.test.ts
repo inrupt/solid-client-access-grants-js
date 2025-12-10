@@ -20,12 +20,16 @@
 
 import { describe, it, jest, expect, beforeEach } from "@jest/globals";
 import * as VcModule from "@inrupt/solid-client-vc";
+import { setMaxJsonSize } from "@inrupt/solid-client-vc";
 import { isomorphic } from "rdf-isomorphic";
 import { getAccessRequest } from "./getAccessRequest";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import type { getSessionFetch } from "../../common/util/getSessionFetch";
 import { normalizeAccessRequest } from "../request/issueAccessRequest";
 import { toBeEqual, withoutDataset } from "../util/toBeEqual.mock";
+
+// Mocked responses do not include the content lenght.
+setMaxJsonSize(undefined);
 
 jest.mock("../../common/util/getSessionFetch");
 jest.mock("@inrupt/solid-client-vc", () => {

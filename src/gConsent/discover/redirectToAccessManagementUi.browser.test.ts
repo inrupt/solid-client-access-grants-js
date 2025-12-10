@@ -26,6 +26,11 @@ import {
   beforeEach,
   afterEach,
 } from "@jest/globals";
+import { setMaxJsonSize } from "@inrupt/solid-client-vc";
+
+// Mocked responses do not include the content lenght.
+setMaxJsonSize(undefined);
+
 import { redirectToAccessManagementUi } from "./redirectToAccessManagementUi";
 import {
   getAccessManagementUiFromWellKnown,

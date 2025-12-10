@@ -19,7 +19,11 @@
 //
 
 import { it, describe, expect } from "@jest/globals";
-import { verifiableCredentialToDataset } from "@inrupt/solid-client-vc";
+import { verifiableCredentialToDataset, setMaxJsonSize } from "@inrupt/solid-client-vc";
+
+// Mocked responses do not include the content lenght.
+setMaxJsonSize(undefined);
+
 import { isAccessRequest, isRdfjsAccessRequest } from "./isAccessRequest";
 import {
   validAccessRequestVerifiableCredential,
@@ -138,7 +142,7 @@ describe("isAccessRequest (legacy and RDFJS)", () => {
     ).toBe(false);
   });
 
-  it("returns false if the credential subject 'hasConsent' is missing 'isConsentForDataSubject'", async () => {
+  it("returns false if the credential subject 'hasConsent' is missing both 'isConsentForDataSubject' and 'template'", async () => {
     const noDataSubjectRequest = JSON.parse(
       JSON.stringify(validAccessRequestVerifiableCredential),
     ) as AccessRequest;

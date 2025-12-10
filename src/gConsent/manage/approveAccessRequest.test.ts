@@ -19,9 +19,8 @@
 //
 
 import { jest, it, describe, expect, beforeAll } from "@jest/globals";
-
 import { mockSolidDatasetFrom } from "@inrupt/solid-client";
-import type * as VcClient from "@inrupt/solid-client-vc";
+import * as VcClient from "@inrupt/solid-client-vc";
 import type * as SolidClient from "@inrupt/solid-client";
 import {
   mockAccessApiEndpoint,
@@ -39,6 +38,9 @@ import {
   mockConsentRequestVc,
 } from "../util/access.mock";
 import { cacheProvider, DEFAULT_CONTEXT } from "../../common/providerConfig";
+
+// Mocked responses do not include the content lenght.
+VcClient.setMaxJsonSize(undefined);
 
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual(
@@ -72,6 +74,7 @@ jest.mock("@inrupt/solid-client-vc", () => {
     getExpirationDate,
     getId,
     getVerifiableCredential,
+    setMaxJsonSize,
   } = jest.requireActual("@inrupt/solid-client-vc") as jest.Mocked<
     typeof VcClient
   >;
@@ -84,6 +87,7 @@ jest.mock("@inrupt/solid-client-vc", () => {
     getId,
     issueVerifiableCredential: jest.fn(),
     getVerifiableCredential,
+    setMaxJsonSize,
   };
 });
 

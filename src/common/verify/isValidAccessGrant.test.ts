@@ -23,10 +23,14 @@ import {
   verifiableCredentialToDataset,
   isVerifiableCredential,
   getVerifiableCredentialApiConfiguration,
+  setMaxJsonSize,
 } from "@inrupt/solid-client-vc";
 import type * as SolidClient from "@inrupt/solid-client";
 import type * as VcLibrary from "@inrupt/solid-client-vc";
 import { isValidAccessGrant } from "./isValidAccessGrant";
+
+// Mocked responses do not include the content lenght.
+setMaxJsonSize(undefined);
 
 jest.mock("@inrupt/solid-client", () => {
   const solidClientModule = jest.requireActual(
@@ -43,13 +47,17 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  // eslint-disable-next-line no-shadow
-  const { verifiableCredentialToDataset, getIssuer, getVerifiableCredential } =
-    jest.requireActual<typeof VcLibrary>("@inrupt/solid-client-vc");
+  const {
+    verifiableCredentialToDataset,
+    getIssuer,
+    getVerifiableCredential,
+    setMaxJsonSize,
+  } = jest.requireActual<typeof VcLibrary>("@inrupt/solid-client-vc");
   return {
     verifiableCredentialToDataset,
     getIssuer,
     getVerifiableCredential,
+    setMaxJsonSize,
     isVerifiableCredential: jest.fn(),
     issueVerifiableCredential: jest.fn(),
     getVerifiableCredentialApiConfiguration: jest.fn(),

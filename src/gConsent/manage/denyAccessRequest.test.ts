@@ -32,7 +32,12 @@ import {
   getCredentialSubject,
   getIssuer,
   verifiableCredentialToDataset,
+  setMaxJsonSize,
 } from "@inrupt/solid-client-vc";
+
+// Mocked responses do not include the content lenght.
+setMaxJsonSize(undefined);
+
 import { isomorphic } from "rdf-isomorphic";
 import { getAccessModes, getRequestor, getResources } from "../../common";
 import {
