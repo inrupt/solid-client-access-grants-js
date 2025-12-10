@@ -51,7 +51,6 @@ import { AccessGrantError } from "../../common/errors/AccessGrantError";
 import { buildProviderContext } from "../../common/providerConfig";
 import type { AccessGrantContext } from "../type/AccessGrantContext";
 import type { AccessCredentialType } from "../type/AccessCredentialType";
-import { getMaxJsonSize } from "@inrupt/solid-client-vc/dist/common/config";
 
 export type AccessParameters = Partial<
   Pick<IssueAccessRequestParameters, "access" | "purpose"> & {
@@ -220,7 +219,7 @@ export async function getAccessGrantAll(
   let result: DatasetWithId[];
 
   // The derive endpoint is not setting a `Content-Length`.
-  const maxJsonSize = getMaxJsonSize();
+  const maxJsonSize = 10 * 1024 * 1024;
   setMaxJsonSize(undefined);
   if (options.returnLegacyJsonld === false) {
     // TODO: Fix up the type of accepted arguments (this function should allow deep partial)
