@@ -47,17 +47,11 @@ jest.mock("@inrupt/solid-client", () => {
 });
 
 jest.mock("@inrupt/solid-client-vc", () => {
-  const {
-    verifiableCredentialToDataset,
-    getIssuer,
-    getVerifiableCredential,
-    setMaxJsonSize,
-  } = jest.requireActual<typeof VcLibrary>("@inrupt/solid-client-vc");
+  const vcModule = jest.requireActual<typeof VcLibrary>(
+    "@inrupt/solid-client-vc",
+  );
   return {
-    verifiableCredentialToDataset,
-    getIssuer,
-    getVerifiableCredential,
-    setMaxJsonSize,
+    ...vcModule,
     isVerifiableCredential: jest.fn(),
     issueVerifiableCredential: jest.fn(),
     getVerifiableCredentialApiConfiguration: jest.fn(),
