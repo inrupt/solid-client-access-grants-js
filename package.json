@@ -137,7 +137,7 @@
     "@types/rdfjs__dataset": "^2.0.7",
     "auth-header": "^1.0.0",
     "base64url": "^3.0.1",
-    "n3": "^1.17.2",
+    "n3": "^2.0.1",
     "rdf-namespaces": "^1.9.2"
   },
   "engines": {
