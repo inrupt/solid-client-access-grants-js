@@ -81,7 +81,6 @@ async function getAccessManagementUiFromProfile(
  */
 export async function getAccessManagementUiFromWellKnown(
   storage: UrlString | undefined,
-  options: { fetch: typeof global.fetch },
 ): Promise<UrlString | undefined> {
   if (storage === undefined) {
     return undefined;
@@ -123,10 +122,7 @@ export async function getAccessManagementUi(
     { fetch: fetcher },
   );
 
-  return (
-    accessEndpoint ??
-    getAccessManagementUiFromWellKnown(storage, { fetch: fetcher })
-  );
+  return accessEndpoint ?? getAccessManagementUiFromWellKnown(storage);
 }
 
 export default getAccessManagementUi;
