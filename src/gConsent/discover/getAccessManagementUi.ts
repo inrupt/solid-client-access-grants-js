@@ -87,9 +87,7 @@ export async function getAccessManagementUiFromWellKnown(
     return undefined;
   }
 
-  const wellKnown = await getWellKnownSolid(storage, {
-    fetch: options.fetch,
-  });
+  const wellKnown = await getWellKnownSolid(storage);
 
   if (getThingAll(wellKnown, { acceptBlankNodes: true }).length === 0) {
     return undefined;
