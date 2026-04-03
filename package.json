@@ -131,7 +131,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@inrupt/solid-client": "^2.0.0",
+    "@inrupt/solid-client": "^3.0.0",
     "@inrupt/solid-client-errors": "^0.0.3",
     "@inrupt/solid-client-vc": "^2.0.1",
     "@types/rdfjs__dataset": "^2.0.7",
