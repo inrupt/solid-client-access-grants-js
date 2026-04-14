@@ -16,11 +16,11 @@
     "start": "next start"
   },
   "dependencies": {
-    "@inrupt/internal-playwright-testids": "^4.0.8",
+    "@inrupt/internal-playwright-testids": "^4.1.0",
     "@inrupt/solid-client": "^2.0.0",
     "@inrupt/solid-client-access-grants": "file:../../../",
     "@inrupt/solid-client-authn-browser": "^2.0.0",
-    "next": "^16.1.7",
+    "next": "^16.2.3",
     "react": "^19.2.4"
   },
   "devDependencies": {
