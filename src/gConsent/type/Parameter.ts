@@ -49,8 +49,10 @@ export type AccessRequestParameters = InputAccessRequestParameters & {
   status: typeof gc.ConsentStatusRequested.value;
 };
 
-export interface InputAccessGrantParameters
-  extends Omit<BaseRequestParameters, "templates"> {
+export interface InputAccessGrantParameters extends Omit<
+  BaseRequestParameters,
+  "templates"
+> {
   /**
    * WebID of the resource owner. If the request is not issued by an admin,
    * this is overridden by the server to the identity of the agent issuing
