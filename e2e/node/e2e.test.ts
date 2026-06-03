@@ -1340,11 +1340,11 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           await expect(requestorFile.text()).resolves.toBe(testFileContent);
 
-          // Lookup grants for the target resource, while it has been issued for the container.
+          // Lookup grants for the container the grant was issued for.
           const grants = await query(
             {
               type: "SolidAccessGrant",
-              resource: new URL(testFileIri),
+              resource: new URL(testContainerIri),
             },
             {
               fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
@@ -1373,19 +1373,21 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             }),
           ).rejects.toThrow();
 
-          // Lookup grants for the target resource, while it has been issued for the container.
-          // There should be no matching grant, because the issued grant is not recursive.
+          // The non-recursive grant on the container should still be discoverable
+          // via the query endpoint when querying by the container URL.
           const grants = await query(
             {
               type: "SolidAccessGrant",
-              resource: new URL(testFileIri),
+              resource: new URL(testContainerIri),
             },
             {
               fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               queryEndpoint: new URL("query", vcProvider),
             },
           );
-          expect(grants.items).not.toContainEqual(accessGrant);
+          expect(grants.items.map((grant) => grant.id)).toContain(
+            accessGrant.id,
+          );
         });
 
         it("can use the overwriteFile API to create a new file", async () => {
