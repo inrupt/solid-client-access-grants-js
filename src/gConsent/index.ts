@@ -60,7 +60,6 @@ export {
   approveAccessRequest,
   denyAccessRequest,
   getAccessGrant,
-  getAccessGrantAll,
   getAccessRequestFromRedirectUrl,
   getAccessRequest,
   issueAccessGrant,
