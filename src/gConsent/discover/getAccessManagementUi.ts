@@ -81,15 +81,12 @@ async function getAccessManagementUiFromProfile(
  */
 export async function getAccessManagementUiFromWellKnown(
   storage: UrlString | undefined,
-  options: { fetch: typeof global.fetch },
 ): Promise<UrlString | undefined> {
   if (storage === undefined) {
     return undefined;
   }
 
-  const wellKnown = await getWellKnownSolid(storage, {
-    fetch: options.fetch,
-  });
+  const wellKnown = await getWellKnownSolid(storage);
 
   if (getThingAll(wellKnown, { acceptBlankNodes: true }).length === 0) {
     return undefined;
@@ -125,10 +122,7 @@ export async function getAccessManagementUi(
     { fetch: fetcher },
   );
 
-  return (
-    accessEndpoint ??
-    getAccessManagementUiFromWellKnown(storage, { fetch: fetcher })
-  );
+  return accessEndpoint ?? getAccessManagementUiFromWellKnown(storage);
 }
 
 export default getAccessManagementUi;

@@ -33,8 +33,6 @@ export type {
   IssueAccessRequestParameters,
   RedirectToAccessManagementUiOptions,
 } from "./gConsent";
-export type { AccessParameters } from "./gConsent/manage/getAccessGrantAll";
-
 export type { AccessGrantAny } from "./type/AccessGrant";
 export type { AccessModes } from "./type/AccessModes";
 export type { CustomField } from "./type/CustomField";
@@ -55,7 +53,6 @@ export {
   DURATION,
   getAccessApiEndpoint,
   getAccessGrant,
-  getAccessGrantAll,
   getAccessGrantFromRedirectUrl,
   getAccessRequest,
   getAccessManagementUi,
