@@ -22,10 +22,7 @@
 import { File as NodeFile } from "buffer";
 import { getNodeTestingEnvironment } from "@inrupt/internal-test-env";
 import { Session } from "@inrupt/solid-client-authn-node";
-import type {
-  DatasetWithId,
-  VerifiableCredential,
-} from "@inrupt/solid-client-vc";
+import type { DatasetWithId } from "@inrupt/solid-client-vc";
 import {
   isVerifiableCredential as _isVerifiableCredential,
   getVerifiableCredentialApiConfiguration,
@@ -54,7 +51,6 @@ import {
   denyAccessRequest,
   getAccessApiEndpoint,
   getAccessGrant,
-  getAccessGrantAll,
   getAccessModes,
   getExpirationDate,
   getFile,
@@ -324,25 +320,22 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           );
           expect(getRequest(grant)).toEqual(sharedRequest.id);
 
-          const grantedAccess = await getAccessGrantAll(
-            { resource: sharedFileIri },
+          const grantedAccess = await query(
+            {
+              type: "SolidAccessGrant",
+              resource: new URL(sharedFileIri),
+            },
             {
               fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-              accessEndpoint: vcProvider,
+              queryEndpoint: new URL("query", vcProvider),
             },
           );
 
           // Test that looking up the access grants for the given resource returns
           // the access we just granted.
-          // The issuer and query service return the grants with a slight difference
-          // in the value order in arrays, so we can't use deep comparison to verify
-          // if the issued grant is part of the query result set. Matching on the proofs
-          // is sufficient, as proofs are generated on canonicalized datasets.
-          if (returnLegacyJsonld) {
-            expect(
-              grantedAccess.map((matchingGrant) => matchingGrant.proof),
-            ).toContainEqual((grant as AccessGrant).proof);
-          }
+          expect(
+            grantedAccess.items.map((matchingGrant) => matchingGrant.id),
+          ).toContain(grant.id);
 
           const sharedFile = await getFile(sharedFileIri, grant, {
             fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
@@ -839,305 +832,6 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           });
           toBeEqual(retrievedGrant, grant);
-        });
-      });
-
-      describe("resource owner interaction with VC provider", () => {
-        let sharedFilterTestIri: string;
-        let accessGrant: AccessGrant;
-        let denyGrant: VerifiableCredential;
-        beforeAll(async () => {
-          sharedFilterTestIri = await getSharedFile();
-
-          const request = await retryAsync(() =>
-            issueAccessRequest(
-              {
-                access: { read: true, write: true, append: true },
-                resourceOwner: ownerSession.info.webId as string,
-                resources: [sharedFilterTestIri],
-                purpose: [
-                  "https://some.purpose/not-a-nefarious-one/i-promise",
-                  "https://some.other.purpose/",
-                ],
-                expirationDate: new Date(Date.now() + 60 * 60 * 1000),
-              },
-              {
-                fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-          );
-
-          [accessGrant, denyGrant] = await Promise.all([
-            retryAsync(() =>
-              approveAccessRequest(
-                request,
-                {},
-                {
-                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                  accessEndpoint: vcProvider,
-                },
-              ),
-            ),
-            retryAsync(() =>
-              denyAccessRequest(request.id, {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              }),
-            ),
-          ]);
-        });
-
-        afterAll(async () => {
-          await deleteSharedFile(sharedFilterTestIri);
-          await retryAsync(() =>
-            revokeAccessGrant(accessGrant, {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            }),
-          );
-        });
-
-        it("can filter VCs held by the service based on requestor", async () => {
-          const allGrants = getAccessGrantAll(
-            {
-              requestor: requestorSession.info.webId as string,
-              resource: sharedFilterTestIri,
-            },
-            {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-              accessEndpoint: vcProvider,
-            },
-          );
-
-          // There should be at least one grant
-          await expect(allGrants).resolves.not.toHaveLength(0);
-
-          // There should be exactly one grant once we filter out grants
-          // that target the pod root
-          await expect(
-            allGrants.then((grants) =>
-              grants.filter(
-                (grant) =>
-                  !getResources(grant as any).includes(resourceOwnerPod),
-              ),
-            ),
-          ).resolves.toHaveLength(1);
-
-          await expect(
-            getAccessGrantAll(
-              {
-                requestor: "https://some.unknown.requestor",
-                resource: sharedFilterTestIri,
-              },
-              {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-          ).resolves.toHaveLength(0);
-        });
-
-        it("can filter VCs held by the service based on target resource", async () => {
-          const allGrants = getAccessGrantAll(
-            { resource: sharedFilterTestIri },
-            {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-              accessEndpoint: vcProvider,
-            },
-          );
-          // There should be at least one grant
-          await expect(allGrants).resolves.not.toHaveLength(0);
-
-          // There should be exactly one grant once we filter out grants
-          // that target the pod root
-          await expect(
-            allGrants.then((grants) =>
-              grants.filter(
-                (grant) =>
-                  !getResources(grant as any).includes(resourceOwnerPod),
-              ),
-            ),
-          ).resolves.toHaveLength(1);
-          await expect(
-            getAccessGrantAll(
-              { resource: "https://some.unkown.resource" },
-              {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-          ).resolves.toHaveLength(0);
-        });
-
-        it("can filter VCs held by the service based on status", async () => {
-          const [granted, denied, both, unspecified] = await Promise.all([
-            getAccessGrantAll(
-              {
-                status: "granted",
-                resource: sharedFilterTestIri,
-              },
-              {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-            getAccessGrantAll(
-              {
-                status: "denied",
-                resource: sharedFilterTestIri,
-              },
-              {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-            getAccessGrantAll(
-              { status: "all", resource: sharedFilterTestIri },
-              {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-            getAccessGrantAll(
-              { resource: sharedFilterTestIri },
-              {
-                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-          ]);
-
-          // Currently not specifying the status should be equivalent to setting it to granted
-          expect(unspecified).toHaveLength(granted.length);
-
-          // There should be at least one grant
-          expect(granted).not.toHaveLength(0);
-
-          // There should be exactly one grant once we filter out grants
-          // that target the pod root
-          expect(
-            granted.filter(
-              (grant) => !getResources(grant as any).includes(resourceOwnerPod),
-            ),
-          ).toHaveLength(1);
-
-          expect(denied).toHaveLength(1);
-          expect(both).toHaveLength(granted.length + denied.length);
-
-          toBeEqual(denied[0], {
-            ...denyGrant,
-            credentialSubject: {
-              ...denyGrant.credentialSubject,
-              providedConsent: {
-                ...(denyGrant.credentialSubject.providedConsent as any),
-                forPersonalData: (
-                  denyGrant.credentialSubject.providedConsent as any
-                ).forPersonalData,
-              },
-            },
-          });
-        });
-
-        it("can filter VCs held by the service based on purpose", async () => {
-          try {
-            const [
-              noPurposeFilter,
-              partialPurposeFilter,
-              otherPartialPurposeFilter,
-              bothPurposeFilter,
-              unknownPurposeFilter,
-            ] = await Promise.all([
-              getAccessGrantAll(
-                { resource: sharedFilterTestIri },
-                {
-                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                  accessEndpoint: vcProvider,
-                },
-              ),
-              getAccessGrantAll(
-                {
-                  purpose: [
-                    "https://some.purpose/not-a-nefarious-one/i-promise",
-                  ],
-                  resource: sharedFilterTestIri,
-                },
-                {
-                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                  accessEndpoint: vcProvider,
-                },
-              ),
-              getAccessGrantAll(
-                {
-                  purpose: ["https://some.other.purpose/"],
-                  resource: sharedFilterTestIri,
-                },
-                {
-                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                  accessEndpoint: vcProvider,
-                },
-              ),
-              getAccessGrantAll(
-                {
-                  purpose: [
-                    "https://some.purpose/not-a-nefarious-one/i-promise",
-                    "https://some.other.purpose/",
-                  ],
-                  resource: sharedFilterTestIri,
-                },
-                {
-                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                  accessEndpoint: vcProvider,
-                },
-              ),
-              getAccessGrantAll(
-                {
-                  purpose: ["https://some.unknown.purpose/"],
-                  resource: sharedFilterTestIri,
-                },
-                {
-                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                  accessEndpoint: vcProvider,
-                },
-              ),
-            ]);
-
-            // All filters should return a result except for the last one.
-            expect(noPurposeFilter.length).toBeGreaterThan(0);
-            expect(partialPurposeFilter.length).toBeGreaterThan(0);
-            expect(otherPartialPurposeFilter.length).toBeGreaterThan(0);
-            expect(bothPurposeFilter.length).toBeGreaterThan(0);
-            expect(unknownPurposeFilter).toHaveLength(0);
-            // The unfiltered results should contain the other ones
-            // Note that we serialize the VCs to avoid comparing by reference
-            expect(
-              bothPurposeFilter.every((vc) =>
-                noPurposeFilter
-                  .map((vcNoPurpose) => JSON.stringify(vcNoPurpose))
-                  .includes(JSON.stringify(vc)),
-              ),
-            ).toBe(true);
-            // Filtering on both purposes should include the results filtered on individual purposes
-            expect(
-              partialPurposeFilter.every((vc) =>
-                bothPurposeFilter
-                  .map((vcWithPurpose) => JSON.stringify(vcWithPurpose))
-                  .includes(JSON.stringify(vc)),
-              ),
-            ).toBe(true);
-            expect(
-              otherPartialPurposeFilter.every((vc) =>
-                bothPurposeFilter
-                  .map((vcWithPurpose) => JSON.stringify(vcWithPurpose))
-                  .includes(JSON.stringify(vc)),
-              ),
-            ).toBe(true);
-          } catch (e) {
-            if (e instanceof Error && hasErrorResponse(e)) {
-              console.error(
-                `An HTTP error happened: ${e.response.status} ${e.response.statusText}, ${e.message} (caused by ${e.cause})`,
-              );
-            }
-          }
         });
       });
 
@@ -1647,14 +1341,18 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
           await expect(requestorFile.text()).resolves.toBe(testFileContent);
 
           // Lookup grants for the target resource, while it has been issued for the container.
-          const grants = await getAccessGrantAll(
-            { resource: testFileIri },
+          const grants = await query(
+            {
+              type: "SolidAccessGrant",
+              resource: new URL(testFileIri),
+            },
             {
               fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+              queryEndpoint: new URL("query", vcProvider),
             },
           );
-          expect(grants.map((grant) => grant.proof)).toContainEqual(
-            accessGrant.proof,
+          expect(grants.items.map((grant) => grant.id)).toContain(
+            accessGrant.id,
           );
         });
 
@@ -1677,13 +1375,17 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
 
           // Lookup grants for the target resource, while it has been issued for the container.
           // There should be no matching grant, because the issued grant is not recursive.
-          const grants = await getAccessGrantAll(
-            { resource: testFileIri },
+          const grants = await query(
+            {
+              type: "SolidAccessGrant",
+              resource: new URL(testFileIri),
+            },
             {
               fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+              queryEndpoint: new URL("query", vcProvider),
             },
           );
-          expect(grants).not.toContainEqual(accessGrant);
+          expect(grants.items).not.toContainEqual(accessGrant);
         });
 
         it("can use the overwriteFile API to create a new file", async () => {

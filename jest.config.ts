@@ -66,6 +66,13 @@ export default {
       // don't load the polyfills
       setupFilesAfterEnv: [],
       slowTestThreshold: 30,
+      transformIgnorePatterns: [
+        "/node_modules/(?!(.+/)*?(jose|uuid)/)",
+      ],
+      transform: {
+        "^.+\\.tsx?$": "ts-jest",
+        "^.+\\.jsx?$": "ts-jest",
+      },
     },
   ],
 } as Config;
