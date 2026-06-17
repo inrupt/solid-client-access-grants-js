@@ -20,6 +20,10 @@ The following changes are pending, and will be applied on the next major release
 
 ## Unreleased
 
+### Breaking Changes
+
+- Support for Node.js v20.x has been dropped as that version has reached end-of-life.
+
 ### Patch changes
 
 - Support `gc:isProvidedTo` alternatives An Access Grant consent has three valid predicates
