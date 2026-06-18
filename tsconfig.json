@@ -2,8 +2,8 @@
   "compilerOptions": {
     /* Basic Options */
     "target": "ES2022",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "es2022",
+    "moduleResolution": "bundler",
     "lib": ["es2022", "dom"],
     "declaration": true,
     "outDir": "dist",
