@@ -81,7 +81,6 @@ export default [
     input: [
       "./src/type/AccessModes.ts",
       "./src/type/FetchOptions.ts",
-      "./src/type/RecursivePartial.ts",
       "./src/type/RedirectOptions.ts",
       "./src/type/UmaConfiguration.ts",
       "./src/type/ResourceAccessMode.ts",

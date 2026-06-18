@@ -26,7 +26,6 @@ export const mockProviderConfig = ({ context }: { context?: string }) => ({
   issuerService: "https://vc.inrupt.com/issue",
   statusService: "https://vc.inrupt.com/status",
   verifierService: "https://vc.inrupt.com/verify",
-  derivationService: "https://vc.inrupt.com/derive",
   proofService: null,
   availabilityService: null,
   submissionService: null,

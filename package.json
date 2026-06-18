@@ -103,12 +103,12 @@
     "url": "https://github.com/inrupt/solid-client-access-grants-js.git"
   },
   "devDependencies": {
-    "@inrupt/eslint-config-base": "^4.0.3",
-    "@inrupt/internal-playwright-helpers": "^4.0.3",
-    "@inrupt/internal-test-env": "^4.0.3",
-    "@inrupt/jest-jsdom-polyfills": "^4.0.3",
-    "@inrupt/solid-client-authn-browser": "^4.0.0",
-    "@inrupt/solid-client-authn-node": "^4.0.0",
+    "@inrupt/eslint-config-base": "^4.1.1",
+    "@inrupt/internal-playwright-helpers": "^4.1.1",
+    "@inrupt/internal-test-env": "^4.1.1",
+    "@inrupt/jest-jsdom-polyfills": "^4.0.8",
+    "@inrupt/solid-client-authn-browser": "^5.0.0",
+    "@inrupt/solid-client-authn-node": "^5.0.0",
     "@playwright/test": "~1.60.0",
     "@rdfjs/types": "^2.0.1",
     "@types/auth-header": "^1.0.6",
@@ -131,7 +131,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@inrupt/solid-client": "^2.0.0",
+    "@inrupt/solid-client": "^3.0.0",
     "@inrupt/solid-client-errors": "^0.0.3",
     "@inrupt/solid-client-vc": "^2.0.1",
     "@types/rdfjs__dataset": "^2.0.7",
