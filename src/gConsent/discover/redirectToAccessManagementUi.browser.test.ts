@@ -18,14 +18,12 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import {
-  it,
-  describe,
-  expect,
-  jest,
-  beforeEach,
-  afterEach,
-} from "@jest/globals";
+import { it, describe, expect, jest } from "@jest/globals";
+// jsdom (>= 21, bundled with jest-environment-jsdom 30) makes window.location
+// non-configurable and turns assignments to location.href into real (unimplemented)
+// navigations, so it can no longer be replaced by hand. jest-location-mock shadows
+// window.location with a mock that captures these assignments.
+import "jest-location-mock";
 import { setMaxJsonSize } from "@inrupt/solid-client-vc";
 
 // Mocked responses do not include the content lenght.
@@ -54,24 +52,6 @@ const mockAccessManagementUiDiscovery = (url: string | undefined) => {
 
 describe("redirectToAccessManagementUi", () => {
   describe("in a browser environment", () => {
-    const { location: savedLocation } = window;
-
-    beforeEach(() => {
-      // location and history aren't optional on window, which makes TS complain
-      // (rightfully) when we delete them. However, they are deleted on purpose
-      // here just for testing.
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      delete window.location;
-      (window as any).location = {
-        href: "https://some.site",
-      } as Location;
-    });
-
-    afterEach(() => {
-      (window as any).location = savedLocation;
-    });
-
     it("throws if the access management UI may not be discovered", async () => {
       mockAccessManagementUiDiscovery(undefined);
       await expect(
@@ -302,6 +282,8 @@ describe("redirectToAccessManagementUi", () => {
     it("calls the redirection callback if provided", async () => {
       mockAccessManagementUiDiscovery("https://some.access.ui");
       const redirectCallback = jest.fn();
+      // The callback is expected to be used instead of navigating the browser.
+      const initialHref = window.location.href;
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
 
@@ -325,7 +307,7 @@ describe("redirectToAccessManagementUi", () => {
       expect(redirectIri.searchParams.get("redirectUrl")).toBe(
         "https://some.redirect.iri",
       );
-      expect(window.location.href).toBe("https://some.site");
+      expect(window.location.href).toBe(initialHref);
     });
   });
 });
