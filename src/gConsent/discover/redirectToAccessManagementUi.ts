@@ -78,7 +78,6 @@ async function discoverAccessManagementUi(options: {
   } else {
     accessManagementUi = await getAccessManagementUiFromWellKnown(
       options.resourceUrl,
-      { fetch: authFetch },
     );
   }
   return accessManagementUi ?? options.fallbackUi;
