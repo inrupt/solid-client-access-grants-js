@@ -18,37 +18,17 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
 
-import {
-  jest,
-  it,
-  describe,
-  expect,
-  beforeEach,
-  afterEach,
-} from "@jest/globals";
+import { jest, it, describe, expect } from "@jest/globals";
+// jsdom (>= 21, bundled with jest-environment-jsdom 30) makes window.location
+// non-configurable and turns assignments to location.href into real (unimplemented)
+// navigations, so it can no longer be replaced by hand. jest-location-mock shadows
+// window.location with a mock that captures these assignments.
+import "jest-location-mock";
 
 import { redirectToRequestor } from "./redirectToRequestor";
 
 describe("redirectToRequestor", () => {
   describe("in a browser environment", () => {
-    const { location: savedLocation } = window;
-
-    beforeEach(() => {
-      // location and history aren't optional on window, which makes TS complain
-      // (rightfully) when we delete them. However, they are deleted on purpose
-      // here just for testing.
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      delete window.location;
-      (window as any).location = {
-        href: "https://some.site",
-      } as Location;
-    });
-
-    afterEach(() => {
-      (window as any).location = savedLocation;
-    });
-
     it("redirects to the provided redirect IRI", async () => {
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
@@ -111,6 +91,8 @@ describe("redirectToRequestor", () => {
 
     it("calls the redirection callback if provided", async () => {
       const redirectCallback = jest.fn();
+      // The callback is expected to be used instead of navigating the browser.
+      const initialHref = window.location.href;
       // redirectToAccessManagementUi never resolves, which prevents checking values
       // if it is awaited.
 
@@ -132,33 +114,11 @@ describe("redirectToRequestor", () => {
           redirectIri.searchParams.get("accessGrantUrl") as string,
         ),
       ).toBe("https://some.grant-vc.iri");
-      expect(window.location.href).toBe("https://some.site");
+      expect(window.location.href).toBe(initialHref);
     });
   });
 
-  describe("in a Node environment", () => {
-    const windowSpy = jest.spyOn(window, "window", "get");
-
-    beforeEach(() => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      windowSpy.mockImplementation(() => undefined);
-    });
-
-    afterEach(() => {
-      windowSpy.mockRestore();
-    });
-
-    it("throws if the callback is undefined", async () => {
-      expect(window).toBeUndefined();
-      await expect(
-        redirectToRequestor(
-          "https://some.grant-vc.iri",
-          "https://some.redirect.iri",
-        ),
-      ).rejects.toThrow(
-        `In a non-browser environment, a redirectCallback must be provided by the user.`,
-      );
-    });
-  });
+  // The non-browser environment (window === undefined) is covered in
+  // redirectToRequestor.node.test.ts, since jsdom no longer allows window to be
+  // spied on / undefined within the browser test environment.
 });

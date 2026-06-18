@@ -44,7 +44,6 @@ import {
   MOCKED_ACCESS_ISSUER,
   mockAccessApiEndpoint,
 } from "../request/request.mock";
-import type { AccessGrant } from "../type/AccessGrant";
 import { mockAccessGrantVc, mockAccessRequestVc } from "../util/access.mock";
 import { normalizeAccessGrant } from "./approveAccessRequest";
 import { denyAccessRequest } from "./denyAccessRequest";
@@ -147,9 +146,9 @@ describe("denyAccessRequest", () => {
     "uses the provided access endpoint, if any [returnLegacyJsonld: %s]",
     async (returnLegacyJsonld) => {
       mockAccessApiEndpoint();
-      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: () => Promise<AccessGrant>;
-      };
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcLibrary;
       const spiedIssueRequest = jest
         .spyOn(mockedVcModule, "issueVerifiableCredential")
         .mockResolvedValueOnce(await mockAccessGrantVc());
@@ -178,9 +177,9 @@ describe("denyAccessRequest", () => {
     "uses the provided access endpoint from plain JSON VC, if any [returnLegacyJsonld: %s]",
     async (returnLegacyJsonld) => {
       mockAccessApiEndpoint();
-      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: () => Promise<AccessGrant>;
-      };
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcLibrary;
       const spiedIssueRequest = jest
         .spyOn(mockedVcModule, "issueVerifiableCredential")
         .mockResolvedValueOnce(await mockAccessGrantVc());
@@ -210,9 +209,9 @@ describe("denyAccessRequest", () => {
 
   it("returns isomorphic results regardless of how returnLegacyJsonld is set", async () => {
     mockAccessApiEndpoint();
-    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      issueVerifiableCredential: () => Promise<AccessGrant>;
-    };
+    const mockedVcModule = jest.requireMock(
+      "@inrupt/solid-client-vc",
+    ) as typeof VcLibrary;
     jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
       .mockResolvedValueOnce(await mockAccessGrantVc());
@@ -226,7 +225,6 @@ describe("denyAccessRequest", () => {
     jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
       .mockResolvedValueOnce(
-        // @ts-expect-error only return the dataset-like value.
         await verifiableCredentialToDataset(await mockAccessGrantVc(), {
           includeVcProperties: false,
         }),
@@ -258,9 +256,9 @@ describe("denyAccessRequest", () => {
     async (returnLegacyJsonld) => {
       mockAccessApiEndpoint();
       const mockedFetch = async () => new Response();
-      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: () => Promise<AccessGrant>;
-      };
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcLibrary;
       const spiedIssueRequest = jest
         .spyOn(mockedVcModule, "issueVerifiableCredential")
         .mockResolvedValueOnce(await mockAccessGrantVc());
@@ -286,9 +284,9 @@ describe("denyAccessRequest", () => {
     "issues a proper denied access VC [returnLegacyJsonld: %s]",
     async (returnLegacyJsonld) => {
       mockAccessApiEndpoint();
-      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: () => Promise<AccessGrant>;
-      };
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcLibrary;
       const spiedIssueRequest = jest
         .spyOn(mockedVcModule, "issueVerifiableCredential")
         .mockResolvedValueOnce(await mockAccessGrantVc());
@@ -330,9 +328,9 @@ describe("denyAccessRequest", () => {
     "issues a proper denied access VC from a given access request VC IRI [returnLegacyJsonld: %s]",
     async (returnLegacyJsonld) => {
       mockAccessApiEndpoint();
-      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: () => Promise<AccessGrant>;
-      };
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcLibrary;
       const spiedIssueRequest = jest
         .spyOn(mockedVcModule, "issueVerifiableCredential")
         .mockResolvedValueOnce(await mockAccessGrantVc());
@@ -370,9 +368,9 @@ describe("denyAccessRequest", () => {
     "can take a URL as VC IRI parameter [returnLegacyJsonld: %s]",
     async (returnLegacyJsonld) => {
       mockAccessApiEndpoint();
-      const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-        issueVerifiableCredential: () => Promise<AccessGrant>;
-      };
+      const mockedVcModule = jest.requireMock(
+        "@inrupt/solid-client-vc",
+      ) as typeof VcLibrary;
       const spiedIssueRequest = jest
         .spyOn(mockedVcModule, "issueVerifiableCredential")
         .mockResolvedValueOnce(await mockAccessGrantVc());
@@ -410,9 +408,9 @@ describe("denyAccessRequest", () => {
 
   it("passes custom fields to the VC issuer", async () => {
     mockAccessApiEndpoint();
-    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      issueVerifiableCredential: () => Promise<AccessGrant>;
-    };
+    const mockedVcModule = jest.requireMock(
+      "@inrupt/solid-client-vc",
+    ) as typeof VcLibrary;
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
       .mockResolvedValueOnce(await mockAccessGrantVc());
@@ -464,9 +462,9 @@ describe("denyAccessRequest", () => {
 
   it("correctly merges multiple custom fields", async () => {
     mockAccessApiEndpoint();
-    const mockedVcModule = jest.requireMock("@inrupt/solid-client-vc") as {
-      issueVerifiableCredential: () => Promise<AccessGrant>;
-    };
+    const mockedVcModule = jest.requireMock(
+      "@inrupt/solid-client-vc",
+    ) as typeof VcLibrary;
     const spiedIssueRequest = jest
       .spyOn(mockedVcModule, "issueVerifiableCredential")
       .mockResolvedValueOnce(await mockAccessGrantVc());
