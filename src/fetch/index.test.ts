@@ -148,7 +148,7 @@ describe("exchangeTicketForAccessToken", () => {
     const tokenEndpoint = "https://fake.url/token";
     const authTicket = "auth-ticket";
 
-    const mockedFetch = jest.fn(
+    const mockedFetch = jest.fn<typeof fetch>(
       async () =>
         new Response(
           JSON.stringify({

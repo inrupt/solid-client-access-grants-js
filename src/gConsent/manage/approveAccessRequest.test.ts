@@ -191,7 +191,7 @@ describe("approveAccessRequest", () => {
     );
     // The resources' ACR is updated with the modes from the grant.
     expect(spiedAcrUpdate).toHaveBeenCalledWith(
-      mockedInitialResource,
+      mockedInitialResource as unknown as SolidClient.WithAccessibleAcr,
       {
         read: true,
         write: true,
@@ -245,7 +245,7 @@ describe("approveAccessRequest", () => {
     );
     // The resources' ACR is updated with the modes from the grant.
     expect(spiedAcrUpdate).toHaveBeenCalledWith(
-      mockedInitialResource,
+      mockedInitialResource as unknown as SolidClient.WithAccessibleAcr,
       {
         read: true,
         write: true,
@@ -1432,7 +1432,7 @@ describe("approveAccessRequest", () => {
     );
     // // The resources' ACR is updated with the modes from the grant.
     expect(spiedAcrUpdate).toHaveBeenCalledWith(
-      mockedInitialResource,
+      mockedInitialResource as unknown as SolidClient.WithAccessibleAcr,
       {
         read: true,
         write: true,
@@ -1481,7 +1481,7 @@ describe("approveAccessRequest", () => {
     );
     // The resources' ACR is updated with the modes from the grant.
     expect(spiedAcrUpdate).toHaveBeenCalledWith(
-      mockedInitialResource,
+      mockedInitialResource as unknown as SolidClient.WithAccessibleAcr,
       {
         read: true,
         write: true,
