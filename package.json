@@ -109,7 +109,7 @@
     "@inrupt/jest-jsdom-polyfills": "^4.0.8",
     "@inrupt/solid-client-authn-browser": "^5.0.0",
     "@inrupt/solid-client-authn-node": "^5.0.0",
-    "@playwright/test": "~1.60.0",
+    "@playwright/test": "~1.61.0",
     "@rdfjs/types": "^2.0.1",
     "@types/auth-header": "^1.0.6",
     "@types/jest": "^30.0.0",
