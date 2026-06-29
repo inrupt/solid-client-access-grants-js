@@ -27,7 +27,7 @@ The following changes are pending, and will be applied on the next major release
 ### Patch changes
 
 - Support `gc:isProvidedTo` alternatives An Access Grant consent has three valid predicates
-  to express the link to the recepient: `gc:isProvidedTo`, `gc:isProvidedToPerson` and 
+  to express the link to the recepient: `gc:isProvidedTo`, `gc:isProvidedToPerson` and
   `gc:isProvidedToPerson`. The library was making an assumption validating a received Access
   Grant that only `gc:isProvidedTo` was valid. All three are now supported.
 
@@ -268,7 +268,6 @@ There are some dev dependencies update which do not impact downstream consumers.
 
 - JSON-LD/JSON alignment: We are processing Verifiable Credentials as plain JSON,
   while they actually are JSON-LD. This creates some discrepancies:
-
   - The Access Grants and Access Requests status is now accepted in its abbreviated
     form, and not only as a fully qualified IRI, as allowed by the JSON-LD context.
   - Arrays containing a single value are also accepted as a literal equal to said

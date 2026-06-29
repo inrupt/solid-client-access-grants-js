@@ -149,6 +149,4 @@ export type AccessGrantBody = BaseGrantBody & {
 };
 
 export type AccessVerifiableCredentialBody =
-  | AccessRequestBody
-  | AccessDeniedBody
-  | AccessGrantBody;
+  AccessRequestBody | AccessDeniedBody | AccessGrantBody;

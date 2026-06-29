@@ -35,7 +35,8 @@ export type BaseRequestParameters = {
   inherit?: boolean;
 } &
   // One of resources or templates must be defined
-  (| {
+  (
+    | {
         resources: Array<UrlString>;
         templates?: Array<string>;
       }
