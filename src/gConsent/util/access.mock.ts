@@ -60,8 +60,7 @@ export const mockAccessRequestVcObject = (options?: RequestVcOptions) => {
     hasStatus: gc.ConsentStatusRequested.value,
     mode: options?.modes ?? ["http://www.w3.org/ns/auth/acl#Read"],
     isConsentForDataSubject: "https://some.pod/profile#you" as
-      | string
-      | undefined,
+      string | undefined,
   };
   if (options?.custom !== undefined) {
     Object.assign(hasConsent, toJson(new Set(options?.custom)));

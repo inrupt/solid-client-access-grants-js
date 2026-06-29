@@ -29,11 +29,7 @@ import { AccessGrantError } from "../../common/errors/AccessGrantError";
  * Supported Access Request statuses
  */
 export type AccessRequestStatus =
-  | "Pending"
-  | "Denied"
-  | "Granted"
-  | "Canceled"
-  | "Expired";
+  "Pending" | "Denied" | "Granted" | "Canceled" | "Expired";
 
 /**
  * Supported Access Grant statuses
@@ -44,9 +40,7 @@ export type AccessGrantStatus = "Expired" | "Active" | "Revoked";
  * Supported Access Credential types
  */
 export type CredentialType =
-  | "SolidAccessRequest"
-  | "SolidAccessGrant"
-  | "SolidAccessDenial";
+  "SolidAccessRequest" | "SolidAccessGrant" | "SolidAccessDenial";
 
 /**
  * Supported durations for Access Credential filtering.
@@ -218,8 +212,7 @@ async function toCredentialResult(
       // The type assertion here relies on the consistency of the server
       // response with the client request, which must be AccessRequestFilter | AccessGrantFilter.
       result[rel] = toCredentialFilter(new URL(link[0].uri)) as
-        | AccessRequestFilter
-        | AccessGrantFilter;
+        AccessRequestFilter | AccessGrantFilter;
     });
   }
   result.items = await parseQueryResponse(await response.json());
