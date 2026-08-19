@@ -49,6 +49,9 @@ function getSearchParam(url: URL, param: string) {
  * @returns An Access Request, and the URL to which the corresponding grant should
  * be sent when redirecting the resource owner back to the requestor.
  * @since 0.5.0
+ * @deprecated The redirect-based Access Request flow is deprecated, and will be
+ * removed in a future major release. Only direct access requesting and granting
+ * (e.g. `issueAccessRequest` and `approveAccessRequest`) will be supported.
  */
 export async function getAccessRequestFromRedirectUrl(
   redirectUrl: UrlString | URL,
@@ -68,7 +71,10 @@ export async function getAccessRequestFromRedirectUrl(
  * @returns An Access Request, and the URL to which the corresponding grant should
  * be sent when redirecting the resource owner back to the requestor.
  * @since 0.5.0
- * @deprecated Use RDFJS API
+ * @deprecated Use the RDFJS API instead. In addition, the redirect-based Access
+ * Request flow is deprecated, and will be removed in a future major release. Only
+ * direct access requesting and granting (e.g. `issueAccessRequest` and
+ * `approveAccessRequest`) will be supported.
  */
 export async function getAccessRequestFromRedirectUrl(
   redirectUrl: UrlString | URL,
@@ -88,6 +94,9 @@ export async function getAccessRequestFromRedirectUrl(
  * @returns An Access Request, and the URL to which the corresponding grant should
  * be sent when redirecting the resource owner back to the requestor.
  * @since 0.5.0
+ * @deprecated The redirect-based Access Request flow is deprecated, and will be
+ * removed in a future major release. Only direct access requesting and granting
+ * (e.g. `issueAccessRequest` and `approveAccessRequest`) will be supported.
  */
 export async function getAccessRequestFromRedirectUrl(
   redirectUrl: UrlString | URL,

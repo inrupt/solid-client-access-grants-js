@@ -17,6 +17,10 @@ The following changes are pending, and will be applied on the next major release
   to absolute URIs when approving an access request via `approveAccessRequest`.
 - For access requests that use templates, the `resourceOwner` request parameter is
   optional.
+- The functions involved in the redirect-based Access Request flow are deprecated:
+  `redirectToAccessManagementUi`, `getAccessRequestFromRedirectUrl` and
+  `redirectToRequestor`. Only requesting and granting access directly (i.e. using
+  `issueAccessRequest` and `approveAccessRequest`) will be supported going forward.
 
 ## Unreleased
 
