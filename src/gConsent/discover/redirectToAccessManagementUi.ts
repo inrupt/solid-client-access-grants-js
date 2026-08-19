@@ -93,6 +93,9 @@ async function discoverAccessManagementUi(options: {
  * @param options If you are in a NodeJS environment, you must specify a
  * callback to handle the redirection.
  * @since 0.4.0
+ * @deprecated The redirect-based Access Request flow is deprecated, and will be
+ * removed in a future major release. Only direct access requesting and granting
+ * (e.g. `issueAccessRequest` and `approveAccessRequest`) will be supported.
  */
 export async function redirectToAccessManagementUi(
   accessRequestVc: DatasetWithId | VerifiableCredential | UrlString | URL,

@@ -19,14 +19,9 @@
 //
 
 import { getDefaultSession } from "@inrupt/solid-client-authn-browser";
-import type {
-  AccessGrant,
-  DatasetWithId,
-} from "@inrupt/solid-client-access-grants";
+import type { DatasetWithId } from "@inrupt/solid-client-access-grants";
 import {
   issueAccessRequest,
-  redirectToAccessManagementUi,
-  getAccessGrant,
   cancelAccessRequest,
   getCustomFields,
   getResourceOwner,
@@ -49,7 +44,7 @@ function AccessCredential({
   testId,
 }: {
   vc: DatasetWithId | undefined;
-  testId: "access-request" | "access-grant";
+  testId: "access-request";
 }) {
   if (vc === undefined) {
     return undefined;
@@ -85,8 +80,6 @@ export default function AccessController({
 }: {
   setErrorMessage: (msg: string) => void;
 }) {
-  const [accessGrant, setAccessGrant] = useState<AccessGrant>();
-  const [accessRequestUrl, setAccessRequestUrl] = useState<string>();
   const [accessRequest, setAccessRequest] = useState<DatasetWithId>();
   const [sharedResourceIri, setSharedResourceIri] = useState<string>();
   const [customInt, setCustomInt] = useState<number>();
@@ -174,7 +167,6 @@ export default function AccessController({
       },
     );
     setAccessRequest(accessRequestReturned);
-    setAccessRequestUrl(accessRequestReturned.id);
   };
 
   const handleRevoke = async () => {
@@ -186,45 +178,6 @@ export default function AccessController({
       fetch: session.fetch,
     });
     setAccessRequest(undefined);
-    setAccessRequestUrl(undefined);
-  };
-
-  const handleCallAuthedGrant = async () => {
-    if (typeof accessGrant === "undefined") {
-      // If the resource does not exist, do nothing.
-      return;
-    }
-
-    await getAccessGrant(accessGrant.id, { fetch: session.fetch });
-  };
-
-  const handleAccessRequest = async () => {
-    if (accessRequestUrl === undefined || !URL.canParse(accessRequestUrl)) {
-      console.error(
-        "Please issue an Access Request and provide its URL before being redirected.",
-      );
-      return;
-    }
-    await redirectToAccessManagementUi(
-      accessRequestUrl,
-      `http://localhost:3000/`,
-      {
-        redirectCallback: (url: string) => {
-          window.location.replace(url);
-        },
-        fallbackAccessManagementUi: "https://amc.inrupt.com/accessRequest/",
-        fetch: session.fetch,
-      },
-    );
-  };
-
-  const handleGrantResponse = async () => {
-    const accessGrantUrl = window.localStorage.getItem("accessGrantUrl");
-    if (accessGrantUrl !== null) {
-      setAccessGrant(
-        await getAccessGrant(accessGrantUrl, { fetch: session.fetch }),
-      );
-    }
   };
 
   return (
@@ -302,18 +255,6 @@ export default function AccessController({
           <br />
         </form>
       </div>
-      <p>
-        Access Request to Approve:{" "}
-        <input
-          id="request-id"
-          data-testid="access-request-id"
-          placeholder="Access Request URL"
-          onChange={(e) => {
-            setAccessRequestUrl(e.currentTarget.value);
-          }}
-          value={accessRequestUrl}
-        />
-      </p>
       <div>
         <button
           type="button"
@@ -329,39 +270,12 @@ export default function AccessController({
         >
           Revoke access request
         </button>
-        <button
-          type="button"
-          onClick={handleAccessRequest}
-          data-testid="redirect-for-access"
-        >
-          Redirect to AMC to Grant Access
-        </button>
       </div>
       <br />
       <div>
         Issued access request:{" "}
         <AccessCredential vc={accessRequest} testId="access-request" />
       </div>
-      <br />
-      <div>
-        Granted access:{" "}
-        <AccessCredential vc={accessGrant} testId="access-grant" />
-      </div>
-
-      <button
-        type="button"
-        onClick={handleCallAuthedGrant}
-        data-testid="get-authed-grant"
-      >
-        Authenticated Fetch of Grant
-      </button>
-      <button
-        type="button"
-        onClick={handleGrantResponse}
-        data-testid="handle-grant-response"
-      >
-        Handle Grant Response
-      </button>
     </>
   );
 }

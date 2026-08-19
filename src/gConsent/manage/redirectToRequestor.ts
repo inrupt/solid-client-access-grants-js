@@ -39,6 +39,9 @@ export const GRANT_VC_PARAM_NAME = "accessGrant";
  * from the page by this call, so no code should be expected to run in that context
  * after the redirect.
  * @since 0.5.0
+ * @deprecated The redirect-based Access Request flow is deprecated, and will be
+ * removed in a future major release. Only direct access requesting and granting
+ * (e.g. `issueAccessRequest` and `approveAccessRequest`) will be supported.
  */
 export async function redirectToRequestor(
   accessGrantVcId: UrlString | URL,
