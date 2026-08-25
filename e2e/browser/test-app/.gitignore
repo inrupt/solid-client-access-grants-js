@@ -28,3 +28,7 @@ next-env.d.ts
 
 # vercel
 .vercel
+
+# next 16.3+ generates these on `next dev`
+/AGENTS.md
+/CLAUDE.md

@@ -28,7 +28,6 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps
-      - run: npm run test:e2e:browser:setup
       - # Dependabot cannot access secrets, so it doesn't have a token to authenticate to ESS.
         # We want jobs in this workflow to be gating PRs, so the whole matrix must
         # run even for dependabot so that the matrixed jobs are skipped, instead
