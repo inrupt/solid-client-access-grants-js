@@ -120,7 +120,7 @@
     "eslint-config-next": "^16.0.1",
     "event-emitter-promisify": "^1.1.0",
     "globals": "^17.3.0",
-    "jest": "^30.4.2",
+    "jest": "^30.5.0",
     "jest-environment-jsdom": "^30.5.0",
     "jest-location-mock": "^4.0.1",
     "license-checker": "^25.0.1",
