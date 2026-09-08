@@ -121,7 +121,7 @@
     "event-emitter-promisify": "^1.1.0",
     "globals": "^17.12.0",
     "jest": "^30.5.0",
-    "jest-environment-jsdom": "^30.5.0",
+    "jest-environment-jsdom": "^30.5.1",
     "jest-location-mock": "^4.0.1",
     "license-checker": "^25.0.1",
     "rdf-isomorphic": "^2.0.0",
