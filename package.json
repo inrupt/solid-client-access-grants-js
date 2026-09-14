@@ -111,7 +111,7 @@
     "@inrupt/jest-jsdom-polyfills": "^4.0.8",
     "@inrupt/solid-client-authn-browser": "^5.0.0",
     "@inrupt/solid-client-authn-node": "^5.0.0",
-    "@playwright/test": "~1.62.0",
+    "@playwright/test": "~1.63.0",
     "@rdfjs/types": "^2.0.1",
     "@types/auth-header": "^1.0.6",
     "@types/jest": "^30.0.0",
@@ -120,7 +120,7 @@
     "eslint-config-next": "^16.3.4",
     "event-emitter-promisify": "^1.1.0",
     "globals": "^17.12.0",
-    "jest": "^30.5.0",
+    "jest": "^30.5.1",
     "jest-environment-jsdom": "^30.5.1",
     "jest-location-mock": "^4.0.1",
     "license-checker": "^25.0.1",
@@ -140,7 +140,7 @@
     "@types/rdfjs__dataset": "^2.0.7",
     "auth-header": "^1.0.0",
     "base64url": "^3.0.1",
-    "n3": "^2.7.4",
+    "n3": "^2.7.12",
     "rdf-namespaces": "^1.9.2"
   },
   "engines": {
