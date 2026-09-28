@@ -108,7 +108,7 @@
     "@inrupt/internal-playwright-helpers": "^4.1.1",
     "@inrupt/internal-test-env": "^4.1.1",
     "@inrupt/jest-jsdom-polyfills": "^4.0.8",
-    "@inrupt/solid-client-authn-browser": "^5.0.0",
+    "@inrupt/solid-client-authn-browser": "^5.0.1",
     "@inrupt/solid-client-authn-node": "^5.0.0",
     "@playwright/test": "~1.63.0",
     "@rdfjs/types": "^2.0.1",
