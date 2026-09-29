@@ -19,15 +19,27 @@
 //
 
 import type { Config } from "jest";
+import { createDefaultPreset } from "ts-jest";
 
 type ArrayElement<MyArray> = MyArray extends Array<infer T> ? T : never;
 
+const defaultPreset = createDefaultPreset();
+
 const baseConfig: ArrayElement<NonNullable<Config["projects"]>> = {
+  ...defaultPreset,
   modulePathIgnorePatterns: ["dist/", "<rootDir>/examples/"],
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   clearMocks: true,
   injectGlobals: false,
-  preset: "ts-jest",
+  transform: {
+    ...defaultPreset.transform,
+    // [\\\\/] expands to [\\/], which makes the regex Windows-compatible.
+    "node_modules[\\\\/]uuid.+\\.js$": [
+      "ts-jest",
+      { tsconfig: { allowJs: true } },
+    ],
+  },
+  transformIgnorePatterns: ["node_modules[\\\\/](?!uuid)"],
 };
 
 export default {
