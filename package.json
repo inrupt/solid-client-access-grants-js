@@ -118,7 +118,7 @@
     "eslint": "^9.28.0",
     "eslint-config-next": "^16.3.8",
     "event-emitter-promisify": "^1.1.0",
-    "globals": "^17.12.0",
+    "globals": "^17.13.0",
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
     "jest-location-mock": "^4.0.1",
