@@ -434,7 +434,8 @@ export function getAccessModes(vc: DatasetWithId): AccessModes {
 }
 
 /**
- * Get the request related to the provided Access Grant, if any.
+ * Get the request related to the provided Access Grant, if any. The link to the
+ * request may either be verified by the server (`verifiedRequest`) or not (`request`).
  *
  * @example
  *
@@ -447,9 +448,10 @@ export function getAccessModes(vc: DatasetWithId): AccessModes {
  */
 export function getRequest(grant: DatasetWithId): string | undefined {
   const consent = getConsent(grant);
-  const result = Array.from(
-    grant.match(consent, solidVc.request, null, defaultGraph()),
-  )
+  const result = [solidVc.verifiedRequest, solidVc.request]
+    .flatMap((predicate) =>
+      Array.from(grant.match(consent, predicate, null, defaultGraph())),
+    )
     .filter(({ object }) => object.termType === "NamedNode")
     .map(({ object }) => object.value);
   if (result.length === 0) {
