@@ -37,6 +37,7 @@ The following changes are pending, and will be applied on the next major release
 
 ### Patch changes
 
+- NodeJS 26 is now officially supported.
 - Support `gc:isProvidedTo` alternatives An Access Grant consent has three valid predicates
   to express the link to the recepient: `gc:isProvidedTo`, `gc:isProvidedToPerson` and
   `gc:isProvidedToPerson`. The library was making an assumption validating a received Access
