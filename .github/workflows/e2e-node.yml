@@ -2,6 +2,10 @@ name: End-to-end node tests
 
 on:
   push:
+    # Every change to main has already been tested in the merge queue
+    # (gh-readonly-queue/main/* branches).
+    branches-ignore:
+      - main
 
 env:
   CI: true
@@ -19,14 +23,12 @@ jobs:
       fail-fast: true
       matrix:
         os: [ubuntu-latest]
-        node-version: ["22.x", "24.x", "26.x"]
         environment-name: ["ESS PodSpaces"]
     steps:
       - uses: actions/checkout@v7
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v7
+      - uses: actions/setup-node@v7
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: ".nvmrc"
           cache: npm
       - run: npm ci
       - run: npm run build
@@ -34,7 +36,14 @@ jobs:
         # We want jobs in this workflow to be gating PRs, so the whole matrix must
         # run even for dependabot so that the matrixed jobs are skipped, instead
         # of the whole pipeline.
-        if: ${{ github.actor != 'dependabot[bot]' }}
+        # Dev dependency bumps from dependabot are also skipped in the merge queue
+        # (where the head commit is the squashed dependabot commit)
+        if: >-
+          github.actor != 'dependabot[bot]' &&
+          !(
+            github.event.head_commit.author.name == 'dependabot[bot]' &&
+            startsWith(github.event.head_commit.message, 'Chore(deps-dev)')
+          )
         run: npm run test:e2e:node
         env:
           E2E_TEST_IDP: ${{ secrets.E2E_TEST_IDP }}
