@@ -1597,8 +1597,6 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             accessEndpoint: vcProvider,
             updateAcr: false,
             returnLegacyJsonld: false,
-            verifyLinkedRequest:
-              environmentFeatures?.VERIFIED_REQUESTS === "true",
           },
         );
         // Check the request status has been updated and is no longer "Pending"
@@ -1638,7 +1636,6 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         const grant = await approveAccessRequest(templatedRequest, undefined, {
           fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
           returnLegacyJsonld: false,
-          verifyLinkedRequest: true,
           accessEndpoint: vcProvider,
           updateAcr: false,
           templateMapper: (templates) =>
@@ -1659,7 +1656,6 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
             {
               fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               returnLegacyJsonld: false,
-              verifyLinkedRequest: true,
               accessEndpoint: vcProvider,
               updateAcr: false,
               templateMapper: (templates) =>

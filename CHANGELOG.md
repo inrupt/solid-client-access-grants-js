@@ -21,12 +21,19 @@ The following changes are pending, and will be applied on the next major release
   `redirectToAccessManagementUi`, `getAccessRequestFromRedirectUrl` and
   `redirectToRequestor`. Only requesting and granting access directly (i.e. using
   `issueAccessRequest` and `approveAccessRequest`) will be supported going forward.
+- The `verifyLinkedRequest` option of `approveAccessRequest` is deprecated. In a next
+  major release, the library will no longer allow callers to opt out of Access Request
+  validation.
 
 ## Unreleased
 
 ### Breaking Changes
 
 - Support for Node.js v20.x has been dropped as that version has reached end-of-life.
+- `approveAccessRequest` now defaults the `verifyLinkedRequest` option to `true`: the
+  issuer verifies the provided Access Request has not been already approved and is still
+  valid. Setting `verifyLinkedRequest: false` restores the previous behavior, but is
+  deprecated and will no longer be supported in a next major release.
 
 ### Patch changes
 
