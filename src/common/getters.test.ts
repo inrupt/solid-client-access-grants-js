@@ -964,6 +964,30 @@ describe("getters", () => {
       expect(getRequest(grantWithRequest)).toBe(requestId);
     });
 
+    it("gets the verified request from a gConsent access grant", async () => {
+      const requestId = "https://example.org/request/123";
+      const grantWithRequest = await mockGConsentGrant(undefined, (grant) => {
+        grant.credentialSubject.providedConsent.verifiedRequest = requestId;
+      });
+
+      expect(getRequest(grantWithRequest)).toBe(requestId);
+    });
+
+    it("ignores a verified request if it is not a NamedNode", async () => {
+      const store = new Store([
+        ...mockedGConsentGrant,
+        quad(
+          getConsent(mockedGConsentGrant),
+          solidVc.verifiedRequest,
+          literal("hello world"),
+        ),
+      ]);
+
+      expect(
+        getRequest(Object.assign(store, { id: mockedGConsentGrant.id })),
+      ).toBeUndefined();
+    });
+
     it("returns undefined if the request is not present in a gConsent access grant", async () => {
       // Use the default mocked grant which doesn't have a request field
       expect(getRequest(mockedGConsentGrant)).toBeUndefined();

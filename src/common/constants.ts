@@ -37,6 +37,7 @@ export const solidVc = {
   SolidAccessGrant: namedNode(`${VC}SolidAccessGrant`),
   SolidAccessDenial: namedNode(`${VC}SolidAccessDenial`),
   request: namedNode(`${VC}request`),
+  verifiedRequest: namedNode(`${VC}verifiedRequest`),
 };
 
 export const gc = {

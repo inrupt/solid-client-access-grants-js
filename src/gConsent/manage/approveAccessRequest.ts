@@ -166,6 +166,40 @@ export async function approveAccessRequest(
   requestOverride: Partial<ApproveAccessRequestOverrides>,
   options: AccessBaseOptions & {
     returnLegacyJsonld: false;
+    templateMapper?: (templates: string[]) => UrlString[];
+  },
+): Promise<DatasetWithId>;
+
+/**
+ * Approve an access request. The content of the approved access request is provided
+ * as a Verifiable Credential which properties may be overridden if necessary.
+ *
+ * @param requestVc The Verifiable Credential representing the Access Request. If
+ * not conform to an Access Request, the function will throw.
+ * @param requestOverride Elements overriding information from the provided Verifiable
+ * Credential.
+ * @param options Optional properties to customizes the access grant behavior. Options
+ * include `updateAcr` which defaults to true. If this flag is set to true, the ACR
+ * of the Resource will be updated when the access grant is approved. If this flag is
+ * set to false, the ACR of the Resource will remain unchanged. This is an advanced
+ * feature, and only users having a good understanding of the relationship between
+ * Access Grants and ACRs should deviate from the default. The `templateMapper` option
+ * allows mapping URI templates from the access request to concrete resource URLs.
+ * The `verifyLinkedRequest` option defaults to true: the server verifies the link
+ * between the issued Access Grant and the Access Request it approves.
+ * Additional information is available in [the ESS documentation](https://docs.inrupt.com/ess/latest/security/access-requests-grants/#acp)
+ * @returns A Verifiable Credential representing the granted access.
+ * @since 0.0.1.
+ * @deprecated The `verifyLinkedRequest` option is deprecated. The approved Access
+ * Request should always be verified (now default behavior). Remove the
+ * `verifyLinkedRequest` option to use the non-deprecated signature.
+ */
+export async function approveAccessRequest(
+  // If the VC is specified, all the overrides become optional
+  requestVc: DatasetWithId | VerifiableCredential | URL | UrlString,
+  requestOverride: Partial<ApproveAccessRequestOverrides>,
+  options: AccessBaseOptions & {
+    returnLegacyJsonld: false;
     verifyLinkedRequest?: boolean;
     templateMapper?: (templates: string[]) => UrlString[];
   },
@@ -220,6 +254,8 @@ export async function approveAccessRequest(
  * @returns A Verifiable Credential representing the granted access.
  * @since 0.0.1.
  * @deprecated Set the options flag `returnLegacyJsonLd` to false, and prefer using the RDFJS interfaces.
+ * The `verifyLinkedRequest` option is deprecated. The approved Access Request should always be verified
+ * (now default behavior). Remove the `verifyLinkedRequest` option to use the non-deprecated signature.
  */
 export async function approveAccessRequest(
   // If the VC is specified, all the overrides become optional
@@ -241,6 +277,29 @@ export async function approveAccessRequest(
  * @param options Optional properties to customise the access grant behaviour.
  * @returns A Verifiable Credential representing the granted access.
  * @since 0.0.1.
+ */
+export async function approveAccessRequest(
+  requestVc: undefined,
+  // If the VC is undefined, then some of the overrides become mandatory
+  requestOverride: ApproveAccessRequestOverrides,
+  options: AccessBaseOptions & {
+    returnLegacyJsonld: false;
+    templateMapper?: (templates: string[]) => UrlString[];
+  },
+): Promise<DatasetWithId>;
+/**
+ * Approve an access request. The content of the approved access request is provided
+ * as a set of claims, and no input Verifiable Credential is expected.
+ *
+ * @param requestVc A Verifiable Credential that would represent the Access Request if provided.
+ * @param requestOverride Claims constructing the Access Grant.
+ * @param options Optional properties to customise the access grant behaviour. The
+ * `verifyLinkedRequest` option defaults to true.
+ * @returns A Verifiable Credential representing the granted access.
+ * @since 0.0.1.
+ * @deprecated The `verifyLinkedRequest` option is deprecated. The approved Access
+ * Request should always be verified (now default behavior). Remove the
+ * `verifyLinkedRequest` option to use the non-deprecated signature.
  */
 export async function approveAccessRequest(
   requestVc: undefined,
@@ -354,11 +413,12 @@ export async function approveAccessRequest(
     inherit: internalGrantOptions.inherit,
   };
 
-  // Default to unverified request for backwards compatibility.
-  if (options.verifyLinkedRequest === true) {
-    grantBodyParams.verifiedRequest = internalGrantOptions.request;
-  } else {
+  // The linked request is verified by default. Opting out is deprecated, and
+  // will no longer be supported in the next major release.
+  if (options.verifyLinkedRequest === false) {
     grantBodyParams.request = internalGrantOptions.request;
+  } else {
+    grantBodyParams.verifiedRequest = internalGrantOptions.request;
   }
 
   const grantBody = getGrantBody(grantBodyParams, {
