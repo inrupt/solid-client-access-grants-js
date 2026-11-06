@@ -2,6 +2,10 @@ name: End-to-end browser-based tests
 
 on:
   push:
+    # Every change to main has already been tested in the merge queue
+    # (gh-readonly-queue/main/* branches).
+    branches-ignore:
+      - main
 
 env:
   CI: true
@@ -32,7 +36,17 @@ jobs:
         # We want jobs in this workflow to be gating PRs, so the whole matrix must
         # run even for dependabot so that the matrixed jobs are skipped, instead
         # of the whole pipeline.
-        if: ${{ github.actor != 'dependabot[bot]' }}
+        # Dev dependency bumps from dependabot are also skipped in the merge queue
+        # (where the head commit is the squashed dependabot commit): they do not
+        # change the library's runtime dependencies (build tooling changes are
+        # still covered by unit tests), and running e2e tests for each of them
+        # issues a large volume of VCs against the test accounts.
+        if: >-
+          github.actor != 'dependabot[bot]' &&
+          !(
+            github.event.head_commit.author.name == 'dependabot[bot]' &&
+            startsWith(github.event.head_commit.message, 'Chore(deps-dev)')
+          )
         run: npm run test:e2e:browser
         env:
           E2E_TEST_USER: ${{ secrets.E2E_TEST_USER }}

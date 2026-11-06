@@ -264,6 +264,9 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
       const isVerifiableCredential = returnLegacyJsonld
         ? _isVerifiableCredential
         : (d: DatasetWithId) => isRdfjsVerifiableCredential(d, namedNode(d.id));
+      // The following blocks exercise resource access using an Access Grant,
+      // and do not depend on the returned VC format.
+      const describeIfDefaultFormat = describeIf(!returnLegacyJsonld);
 
       beforeAll(async () => {
         sharedRequest = await issueAccessRequest(
@@ -789,427 +792,444 @@ describe(`End-to-end access grant tests for environment [${environment}] `, () =
         });
       });
 
-      describe("requestor can use the resource Dataset APIs to interact with Datasets", () => {
-        let accessGrant: AccessGrant;
-        let testResourceIri: string;
-        let testContainerIri: string;
-        let testContainerIriChild: string;
+      describeIfDefaultFormat(
+        "requestor can use the resource Dataset APIs to interact with Datasets",
+        () => {
+          let accessGrant: AccessGrant;
+          let testResourceIri: string;
+          let testContainerIri: string;
+          let testContainerIriChild: string;
 
-        beforeEach(async () => {
-          const testContainer = await retryAsync(() =>
-            sc.createContainerInContainer(resourceOwnerPod, {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            }),
-          );
-          testContainerIri = sc.getSourceUrl(testContainer);
-
-          const newThing = sc.setStringNoLocale(
-            sc.createThing({
-              name: "e2e-test-thing",
-            }),
-            "https://arbitrary.vocab/regular-predicate",
-            "initial-dataset",
-          );
-
-          const dataset = sc.setThing(sc.createSolidDataset(), newThing);
-
-          const persistedDataset = await retryAsync(() =>
-            sc.saveSolidDatasetInContainer(testContainerIri, dataset, {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            }),
-          );
-
-          testResourceIri = sc.getSourceUrl(persistedDataset);
-
-          const request = await retryAsync(() =>
-            issueAccessRequest(
-              {
-                access: { read: true, write: true, append: true },
-                resourceOwner: ownerSession.info.webId as string,
-                resources: [testResourceIri, testContainerIri],
-                purpose: [
-                  "https://some.purpose/not-a-nefarious-one/i-promise",
-                  "https://some.other.purpose/",
-                ],
-                expirationDate: new Date(Date.now() + 60 * 60 * 1000),
-              },
-              {
-                fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-          );
-
-          accessGrant = await retryAsync(() =>
-            approveAccessRequest(
-              request,
-              {},
-              {
+          beforeEach(async () => {
+            const testContainer = await retryAsync(() =>
+              sc.createContainerInContainer(resourceOwnerPod, {
                 fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-              },
-            ),
-          );
-        });
+              }),
+            );
+            testContainerIri = sc.getSourceUrl(testContainer);
 
-        afterEach(async () => {
-          await retryAsync(() =>
-            revokeAccessGrant(accessGrant, {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            }),
-          );
+            const newThing = sc.setStringNoLocale(
+              sc.createThing({
+                name: "e2e-test-thing",
+              }),
+              "https://arbitrary.vocab/regular-predicate",
+              "initial-dataset",
+            );
 
-          await retryAsync(() =>
-            sc.deleteFile(testResourceIri, {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            }),
-          );
+            const dataset = sc.setThing(sc.createSolidDataset(), newThing);
 
-          const testContainer = await retryAsync(() =>
-            sc.getSolidDataset(testContainerIri, {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            }),
-          );
-          // Iterate over the contained resources because the IRI of some child resources
-          // is unknown.
-          await Promise.all(
-            sc.getContainedResourceUrlAll(testContainer).map((childUrl) =>
-              retryAsync(() =>
-                sc.deleteSolidDataset(childUrl, {
-                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                }),
+            const persistedDataset = await retryAsync(() =>
+              sc.saveSolidDatasetInContainer(testContainerIri, dataset, {
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+              }),
+            );
+
+            testResourceIri = sc.getSourceUrl(persistedDataset);
+
+            const request = await retryAsync(() =>
+              issueAccessRequest(
+                {
+                  access: { read: true, write: true, append: true },
+                  resourceOwner: ownerSession.info.webId as string,
+                  resources: [testResourceIri, testContainerIri],
+                  purpose: [
+                    "https://some.purpose/not-a-nefarious-one/i-promise",
+                    "https://some.other.purpose/",
+                  ],
+                  expirationDate: new Date(Date.now() + 60 * 60 * 1000),
+                },
+                {
+                  fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+                  accessEndpoint: vcProvider,
+                },
               ),
-            ),
-          );
-        });
+            );
 
-        it("can use the getSolidDataset API to fetch an existing dataset", async () => {
-          const ownerDataset = await sc.getSolidDataset(testResourceIri, {
-            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+            accessGrant = await retryAsync(() =>
+              approveAccessRequest(
+                request,
+                {},
+                {
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                  accessEndpoint: vcProvider,
+                },
+              ),
+            );
           });
 
-          const requestorDataset = await getSolidDataset(
-            testResourceIri,
-            accessGrant,
-            {
-              fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            },
-          );
-
-          const ownerTtl = await sc.solidDatasetAsTurtle(ownerDataset);
-          const requestorTtl = await sc.solidDatasetAsTurtle(requestorDataset);
-
-          expect(ownerTtl).toBe(requestorTtl);
-        });
-
-        it("can use the saveSolidDatasetAt API for an existing dataset", async () => {
-          // Here we request the dataset as the resource owner, but in real-world
-          // applications, you'd need to use an Access Grant to request the dataset
-          // as the requestor, this is just to limit how much of the Access Grants
-          // library we're testing in a single test case:
-          const dataset = await sc.getSolidDataset(testResourceIri, {
-            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-          });
-
-          // Create a thing and add it to the dataset:
-          let newThing = sc.createThing({
-            name: "e2e-test-thing",
-          });
-          newThing = sc.setBoolean(
-            newThing,
-            "https://arbitrary.vocab/regular-predicate",
-            true,
-          );
-          const datasetUpdate = sc.setThing(dataset, newThing);
-
-          // Try to update the dataset as a requestor of the Access Grant:
-          const updatedDataset = await saveSolidDatasetAt(
-            testResourceIri,
-            datasetUpdate,
-            accessGrant,
-            {
-              fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            },
-          );
-
-          // Fetch it back as the owner to prove the dataset was actually updated:
-          const updatedDatasetAsOwner = await sc.getSolidDataset(
-            testResourceIri,
-            {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            },
-          );
-
-          // Serialize each to turtle:
-          const updatedDatasetTtl =
-            await sc.solidDatasetAsTurtle(updatedDataset);
-          const existingDatasetAsOwnerTtl =
-            await sc.solidDatasetAsTurtle(dataset);
-          const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
-            updatedDatasetAsOwner,
-          );
-
-          // Assert that the dataset changed:
-          expect(updatedDatasetTtl).not.toBe(existingDatasetAsOwnerTtl);
-          expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
-        });
-
-        it("can use the createContainerInContainer API to create a new container", async () => {
-          const newChildContainer = await createContainerInContainer(
-            testContainerIri,
-            accessGrant,
-            {
-              fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            },
-          );
-
-          const parentContainer = await retryAsync(() =>
-            sc.getSolidDataset(testContainerIri, {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            }),
-          );
-          const parentContainerContainsAll = sc.getUrlAll(
-            sc.getThing(
-              parentContainer,
-              sc.getSourceUrl(parentContainer),
-            ) as sc.Thing,
-            "http://www.w3.org/ns/ldp#contains",
-          );
-          testContainerIriChild = sc.getSourceUrl(newChildContainer);
-
-          const match = parentContainerContainsAll.filter((childUrl) => {
-            return childUrl === testContainerIriChild;
-          });
-
-          expect(match).toHaveLength(1);
-        });
-
-        it("can use the saveSolidDatasetInContainer API for an existing dataset", async () => {
-          // Need to delete dataset that was already created in test setup,
-          // such that our test can create an empty dataset at `testFileIri`.
-          await sc.deleteFile(testResourceIri, {
-            fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-          });
-
-          const testDataset = sc.createSolidDataset();
-          const savedDataset = await saveSolidDatasetInContainer(
-            testContainerIri,
-            testDataset,
-            accessGrant,
-            {
-              fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-            },
-          );
-
-          const datasetInPodAsResourceOwner = await sc.getSolidDataset(
-            sc.getSourceIri(savedDataset),
-            {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            },
-          );
-
-          // We cannot request the newly created dataset using our existing Access
-          // Grant because of ACR inheritance. When we delete the file containing
-          // the dataset at the start of this testcase it also deletes the datasets'
-          // ACRs, so this test case will fail (SDK-2792).
-
-          // const datasetInPodAsRequestor = await
-          // getSolidDataset( testFileIri, accessGrant,
-          //   {
-          //     fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-          //   }
-          // );
-
-          const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
-            datasetInPodAsResourceOwner,
-          );
-          const savedDatasetTtl = await sc.solidDatasetAsTurtle(savedDataset);
-          expect(savedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
-        });
-      });
-
-      describe("requestor can use the resource File APIs to interact with resources", () => {
-        let accessGrant: DatasetWithId;
-        let testFileIri: string;
-        let testContainerIri: string;
-        let fileContents: Blob;
-
-        beforeEach(async () => {
-          try {
-            const fileApisContainer = await sc.createContainerInContainer(
-              resourceOwnerPod,
-              {
+          afterEach(async () => {
+            await retryAsync(() =>
+              revokeAccessGrant(accessGrant, {
                 fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-              },
+              }),
             );
-            testContainerIri = sc.getSourceIri(fileApisContainer);
 
-            fileContents = new Blob(["hello world"]);
-
-            const uploadedFile = await sc.saveFileInContainer(
-              testContainerIri,
-              fileContents,
-              {
+            await retryAsync(() =>
+              sc.deleteFile(testResourceIri, {
                 fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-              },
+              }),
             );
 
-            testFileIri = sc.getSourceIri(uploadedFile);
-
-            const request = await issueAccessRequest(
-              {
-                access: { read: true, write: true, append: true },
-                resources: [testContainerIri, testFileIri],
-                resourceOwner: ownerSession.info.webId as string,
-                expirationDate: new Date(Date.now() + 60 * 60 * 1000),
-              },
-              {
-                fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-                returnLegacyJsonld: false,
-              },
-            );
-
-            accessGrant = await approveAccessRequest(
-              request,
-              {},
-              {
+            const testContainer = await retryAsync(() =>
+              sc.getSolidDataset(testContainerIri, {
                 fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                accessEndpoint: vcProvider,
-                updateAcr: false,
-                returnLegacyJsonld: false,
-              },
+              }),
             );
-            console.log(
-              `Issued Access Grant ${accessGrant} as ${ownerSession.info.webId}`,
+            // Iterate over the contained resources because the IRI of some child resources
+            // is unknown.
+            await Promise.all(
+              sc.getContainedResourceUrlAll(testContainer).map((childUrl) =>
+                retryAsync(() =>
+                  sc.deleteSolidDataset(childUrl, {
+                    fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                  }),
+                ),
+              ),
             );
-          } catch (e) {
-            console.error(`An error occurred: ${e}`);
-          }
-        });
+          });
 
-        afterEach(async () => {
-          try {
-            await revokeAccessGrant(accessGrant, {
+          it("can use the getSolidDataset API to fetch an existing dataset", async () => {
+            const ownerDataset = await sc.getSolidDataset(testResourceIri, {
               fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
             });
-          } catch (e) {
-            // Allow console statement as this is useful to capture, either
-            // running tests locally or in CI.
 
-            console.error(
-              `Revoking the Access Grant ${accessGrant} as ${ownerSession.info.webId} failed: ${e}`,
-            );
-          }
-          const testContainer = await retryAsync(() =>
-            sc.getSolidDataset(testContainerIri, {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            }),
-          );
-          // Iterate over the contained resources because the IRI of some child resources
-          // is unknown.
-          await Promise.all(
-            sc.getContainedResourceUrlAll(testContainer).map((childUrl) =>
-              retryAsync(() =>
-                sc.deleteFile(childUrl, {
-                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-                }),
-              ),
-            ),
-          );
-
-          await retryAsync(() =>
-            sc.deleteContainer(testContainerIri, {
-              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
-            }),
-          );
-        });
-
-        const fileContentMatrix: [string, File | NodeFile | Blob][] = [
-          ["Blob", new Blob(["new contents"])],
-          ["Node File", new NodeFile(["new contents"], "file.txt")],
-        ];
-
-        const overwrittenContentMatrix: [string, Blob | File | NodeFile][] = [
-          ["Blob", new Blob(["overwritten contents"])],
-          ["Node File", new NodeFile(["overwritten contents"], "file.txt")],
-        ];
-
-        describe.each(fileContentMatrix)(`Using %s`, (__, newFileContents) => {
-          it("can use the saveFileInContainer API to create a new file", async () => {
-            const newFile = await saveFileInContainer(
-              testContainerIri,
-              newFileContents,
+            const requestorDataset = await getSolidDataset(
+              testResourceIri,
               accessGrant,
               {
                 fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
               },
             );
 
-            await expect(newFile.text()).resolves.toBe(
-              await newFileContents.text(),
+            const ownerTtl = await sc.solidDatasetAsTurtle(ownerDataset);
+            const requestorTtl =
+              await sc.solidDatasetAsTurtle(requestorDataset);
+
+            expect(ownerTtl).toBe(requestorTtl);
+          });
+
+          it("can use the saveSolidDatasetAt API for an existing dataset", async () => {
+            // Here we request the dataset as the resource owner, but in real-world
+            // applications, you'd need to use an Access Grant to request the dataset
+            // as the requestor, this is just to limit how much of the Access Grants
+            // library we're testing in a single test case:
+            const dataset = await sc.getSolidDataset(testResourceIri, {
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+            });
+
+            // Create a thing and add it to the dataset:
+            let newThing = sc.createThing({
+              name: "e2e-test-thing",
+            });
+            newThing = sc.setBoolean(
+              newThing,
+              "https://arbitrary.vocab/regular-predicate",
+              true,
+            );
+            const datasetUpdate = sc.setThing(dataset, newThing);
+
+            // Try to update the dataset as a requestor of the Access Grant:
+            const updatedDataset = await saveSolidDatasetAt(
+              testResourceIri,
+              datasetUpdate,
+              accessGrant,
+              {
+                fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+              },
             );
 
-            // Verify as the resource owner that the file was actually created:
-            const fileAsResourceOwner = await sc.getFile(
-              sc.getSourceUrl(newFile),
+            // Fetch it back as the owner to prove the dataset was actually updated:
+            const updatedDatasetAsOwner = await sc.getSolidDataset(
+              testResourceIri,
               {
                 fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               },
             );
 
-            await expect(fileAsResourceOwner.text()).resolves.toBe(
-              await newFileContents.text(),
+            // Serialize each to turtle:
+            const updatedDatasetTtl =
+              await sc.solidDatasetAsTurtle(updatedDataset);
+            const existingDatasetAsOwnerTtl =
+              await sc.solidDatasetAsTurtle(dataset);
+            const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
+              updatedDatasetAsOwner,
             );
-          });
-        });
 
-        it("can use the getFile API to get an existing file", async () => {
-          // Try fetching it as the requestor of the access grant:
-          const existingFile = await getFile(testFileIri, accessGrant, {
-            fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+            // Assert that the dataset changed:
+            expect(updatedDatasetTtl).not.toBe(existingDatasetAsOwnerTtl);
+            expect(updatedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
           });
 
-          expect(sc.getSourceUrl(existingFile)).toBe(testFileIri);
-          await expect(existingFile.text()).resolves.toBe(
-            await fileContents.text(),
-          );
-        });
+          it("can use the createContainerInContainer API to create a new container", async () => {
+            const newChildContainer = await createContainerInContainer(
+              testContainerIri,
+              accessGrant,
+              {
+                fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+              },
+            );
 
-        describe.each(overwrittenContentMatrix)(
-          `Using %s`,
-          (__, newFileContents) => {
-            it("can use the overwriteFile API to replace an existing file", async () => {
-              const newFile = await overwriteFile(
-                testFileIri,
-                newFileContents,
-                accessGrant,
+            const parentContainer = await retryAsync(() =>
+              sc.getSolidDataset(testContainerIri, {
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+              }),
+            );
+            const parentContainerContainsAll = sc.getUrlAll(
+              sc.getThing(
+                parentContainer,
+                sc.getSourceUrl(parentContainer),
+              ) as sc.Thing,
+              "http://www.w3.org/ns/ldp#contains",
+            );
+            testContainerIriChild = sc.getSourceUrl(newChildContainer);
+
+            const match = parentContainerContainsAll.filter((childUrl) => {
+              return childUrl === testContainerIriChild;
+            });
+
+            expect(match).toHaveLength(1);
+          });
+
+          it("can use the saveSolidDatasetInContainer API for an existing dataset", async () => {
+            // Need to delete dataset that was already created in test setup,
+            // such that our test can create an empty dataset at `testFileIri`.
+            await sc.deleteFile(testResourceIri, {
+              fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+            });
+
+            const testDataset = sc.createSolidDataset();
+            const savedDataset = await saveSolidDatasetInContainer(
+              testContainerIri,
+              testDataset,
+              accessGrant,
+              {
+                fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+              },
+            );
+
+            const datasetInPodAsResourceOwner = await sc.getSolidDataset(
+              sc.getSourceIri(savedDataset),
+              {
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+              },
+            );
+
+            // We cannot request the newly created dataset using our existing Access
+            // Grant because of ACR inheritance. When we delete the file containing
+            // the dataset at the start of this testcase it also deletes the datasets'
+            // ACRs, so this test case will fail (SDK-2792).
+
+            // const datasetInPodAsRequestor = await
+            // getSolidDataset( testFileIri, accessGrant,
+            //   {
+            //     fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+            //   }
+            // );
+
+            const updatedDatasetAsOwnerTtl = await sc.solidDatasetAsTurtle(
+              datasetInPodAsResourceOwner,
+            );
+            const savedDatasetTtl = await sc.solidDatasetAsTurtle(savedDataset);
+            expect(savedDatasetTtl).toBe(updatedDatasetAsOwnerTtl);
+          });
+        },
+      );
+
+      describeIfDefaultFormat(
+        "requestor can use the resource File APIs to interact with resources",
+        () => {
+          let accessGrant: DatasetWithId;
+          let testFileIri: string;
+          let testContainerIri: string;
+          let fileContents: Blob;
+
+          beforeEach(async () => {
+            try {
+              const fileApisContainer = await sc.createContainerInContainer(
+                resourceOwnerPod,
                 {
-                  fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                },
+              );
+              testContainerIri = sc.getSourceIri(fileApisContainer);
+
+              fileContents = new Blob(["hello world"]);
+
+              const uploadedFile = await sc.saveFileInContainer(
+                testContainerIri,
+                fileContents,
+                {
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
                 },
               );
 
-              await expect(newFile.text()).resolves.toBe(
-                await newFileContents.text(),
-              );
-              expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
+              testFileIri = sc.getSourceIri(uploadedFile);
 
-              // Verify as the resource owner that the file was actually overwritten:
-              const fileAsResourceOwner = await sc.getFile(testFileIri, {
+              const request = await issueAccessRequest(
+                {
+                  access: { read: true, write: true, append: true },
+                  resources: [testContainerIri, testFileIri],
+                  resourceOwner: ownerSession.info.webId as string,
+                  expirationDate: new Date(Date.now() + 60 * 60 * 1000),
+                },
+                {
+                  fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
+                  accessEndpoint: vcProvider,
+                  returnLegacyJsonld: false,
+                },
+              );
+
+              accessGrant = await approveAccessRequest(
+                request,
+                {},
+                {
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                  accessEndpoint: vcProvider,
+                  updateAcr: false,
+                  returnLegacyJsonld: false,
+                },
+              );
+              console.log(
+                `Issued Access Grant ${accessGrant} as ${ownerSession.info.webId}`,
+              );
+            } catch (e) {
+              console.error(`An error occurred: ${e}`);
+            }
+          });
+
+          afterEach(async () => {
+            try {
+              await revokeAccessGrant(accessGrant, {
                 fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
               });
+            } catch (e) {
+              // Allow console statement as this is useful to capture, either
+              // running tests locally or in CI.
 
-              await expect(fileAsResourceOwner.text()).resolves.toBe(
-                await newFileContents.text(),
+              console.error(
+                `Revoking the Access Grant ${accessGrant} as ${ownerSession.info.webId} failed: ${e}`,
               );
+            }
+            const testContainer = await retryAsync(() =>
+              sc.getSolidDataset(testContainerIri, {
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+              }),
+            );
+            // Iterate over the contained resources because the IRI of some child resources
+            // is unknown.
+            await Promise.all(
+              sc.getContainedResourceUrlAll(testContainer).map((childUrl) =>
+                retryAsync(() =>
+                  sc.deleteFile(childUrl, {
+                    fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                  }),
+                ),
+              ),
+            );
+
+            await retryAsync(() =>
+              sc.deleteContainer(testContainerIri, {
+                fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+              }),
+            );
+          });
+
+          const fileContentMatrix: [string, File | NodeFile | Blob][] = [
+            ["Blob", new Blob(["new contents"])],
+            ["Node File", new NodeFile(["new contents"], "file.txt")],
+          ];
+
+          const overwrittenContentMatrix: [string, Blob | File | NodeFile][] = [
+            ["Blob", new Blob(["overwritten contents"])],
+            ["Node File", new NodeFile(["overwritten contents"], "file.txt")],
+          ];
+
+          describe.each(fileContentMatrix)(
+            `Using %s`,
+            (__, newFileContents) => {
+              it("can use the saveFileInContainer API to create a new file", async () => {
+                const newFile = await saveFileInContainer(
+                  testContainerIri,
+                  newFileContents,
+                  accessGrant,
+                  {
+                    fetch: addUserAgent(
+                      requestorSession.fetch,
+                      TEST_USER_AGENT,
+                    ),
+                  },
+                );
+
+                await expect(newFile.text()).resolves.toBe(
+                  await newFileContents.text(),
+                );
+
+                // Verify as the resource owner that the file was actually created:
+                const fileAsResourceOwner = await sc.getFile(
+                  sc.getSourceUrl(newFile),
+                  {
+                    fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                  },
+                );
+
+                await expect(fileAsResourceOwner.text()).resolves.toBe(
+                  await newFileContents.text(),
+                );
+              });
+            },
+          );
+
+          it("can use the getFile API to get an existing file", async () => {
+            // Try fetching it as the requestor of the access grant:
+            const existingFile = await getFile(testFileIri, accessGrant, {
+              fetch: addUserAgent(requestorSession.fetch, TEST_USER_AGENT),
             });
-          },
-        );
-      });
+
+            expect(sc.getSourceUrl(existingFile)).toBe(testFileIri);
+            await expect(existingFile.text()).resolves.toBe(
+              await fileContents.text(),
+            );
+          });
+
+          describe.each(overwrittenContentMatrix)(
+            `Using %s`,
+            (__, newFileContents) => {
+              it("can use the overwriteFile API to replace an existing file", async () => {
+                const newFile = await overwriteFile(
+                  testFileIri,
+                  newFileContents,
+                  accessGrant,
+                  {
+                    fetch: addUserAgent(
+                      requestorSession.fetch,
+                      TEST_USER_AGENT,
+                    ),
+                  },
+                );
+
+                await expect(newFile.text()).resolves.toBe(
+                  await newFileContents.text(),
+                );
+                expect(sc.getSourceUrl(newFile)).toBe(testFileIri);
+
+                // Verify as the resource owner that the file was actually overwritten:
+                const fileAsResourceOwner = await sc.getFile(testFileIri, {
+                  fetch: addUserAgent(ownerSession.fetch, TEST_USER_AGENT),
+                });
+
+                await expect(fileAsResourceOwner.text()).resolves.toBe(
+                  await newFileContents.text(),
+                );
+              });
+            },
+          );
+        },
+      );
 
       describeIf(
-        environmentFeatures?.RECURSIVE_ACCESS_GRANTS === "true" ||
-          environmentFeatures?.RECURSIVE_ACCESS_GRANTS === true,
+        !returnLegacyJsonld &&
+          (environmentFeatures?.RECURSIVE_ACCESS_GRANTS === "true" ||
+            environmentFeatures?.RECURSIVE_ACCESS_GRANTS === true),
       )("recursive access grants support", () => {
         let accessRequest: AccessRequest;
         let accessGrant: AccessGrant;
