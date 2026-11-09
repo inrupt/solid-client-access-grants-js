@@ -116,7 +116,7 @@
     "@types/jest": "^30.0.0",
     "@types/n3": "^1.26.6",
     "eslint": "^9.28.0",
-    "eslint-config-next": "^16.4.3",
+    "eslint-config-next": "^16.4.5",
     "event-emitter-promisify": "^1.1.0",
     "globals": "^17.14.0",
     "jest": "^30.5.2",
